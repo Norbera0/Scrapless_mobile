@@ -17,10 +17,16 @@ export default function LogWastePage() {
     resetStore();
   }, [resetStore]);
 
+  useEffect(() => {
+    if (!method) {
+      // If no method is specified, redirect to the dashboard.
+      // This is wrapped in useEffect to prevent rendering errors.
+      router.replace('/dashboard');
+    }
+  }, [method, router]);
+
   if (!method) {
-    // If no method is specified, redirect to the dashboard or show a selection.
-    // For now, redirecting to the dashboard.
-    router.replace('/dashboard');
+    // Render nothing while we are redirecting
     return null;
   }
 

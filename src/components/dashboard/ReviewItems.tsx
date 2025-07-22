@@ -8,11 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { Input } from '@/components/ui/input';
 import { Plus, Trash2, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import Image from 'next/image';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const reviewSchema = z.object({
   items: z.array(
@@ -29,11 +30,12 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 export function ReviewItems() {
   const router = useRouter();
   const { items, photoDataUri, setItems } = useWasteLogStore();
+  const [isReady, setIsReady] = useState(false);
 
   const form = useForm<ReviewFormValues>({
     resolver: zodResolver(reviewSchema),
     defaultValues: {
-      items: items,
+      items: [],
     },
   });
 
@@ -45,10 +47,12 @@ export function ReviewItems() {
   useEffect(() => {
     // If there are no items in the store, the user likely landed here
     // by mistake. Redirect them to the logging page to start over.
+    // This effect runs only on the client after hydration.
     if (items.length === 0) {
       router.replace('/log-waste?method=camera');
     } else {
-        form.reset({ items });
+      form.reset({ items });
+      setIsReady(true);
     }
   }, [items, router, form]);
 
@@ -56,6 +60,40 @@ export function ReviewItems() {
     setItems(data.items);
     router.push('/summary');
   };
+  
+  if (!isReady) {
+    return (
+        <div className="grid md:grid-cols-2 gap-6">
+             <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="w-full aspect-video rounded-lg" />
+                </CardContent>
+             </Card>
+               <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex gap-2 items-end">
+                        <div className="w-1/3 space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
+                        <div className="flex-grow space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
+                        <Skeleton className="h-10 w-10" />
+                    </div>
+                     <div className="flex gap-2 items-end">
+                        <div className="w-1/3 space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
+                        <div className="flex-grow space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
+                        <Skeleton className="h-10 w-10" />
+                    </div>
+                </CardContent>
+             </Card>
+        </div>
+    )
+  }
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
