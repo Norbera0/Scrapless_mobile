@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for logging food waste using AI.
+ * @fileOverview This file defines a Genkit flow for logging food waste using AI from a photo.
  *
  * - logFoodWaste - The main function to initiate the food waste logging process.
  * - LogFoodWasteInput - The input type for the logFoodWaste function, including a photo of the waste.
@@ -9,28 +9,8 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { LogFoodWasteInputSchema, LogFoodWasteOutputSchema, type LogFoodWasteInput, type LogFoodWasteOutput } from '@/ai/schemas';
 
-const LogFoodWasteInputSchema = z.object({
-  photoDataUri: z
-    .string()
-    .describe(
-      'A photo of the wasted food, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' 
-    ),
-});
-export type LogFoodWasteInput = z.infer<typeof LogFoodWasteInputSchema>;
-
-const LogFoodWasteOutputSchema = z.object({
-  items: z.array(
-    z.object({
-      name: z.string().describe('The name of the food item.'),
-      estimatedAmount: z
-        .string()
-        .describe('The estimated amount of the food item (e.g., 1/2 cup, 1 slice).'),
-    })
-  ).describe('A list of detected food items and their estimated amounts.'),
-});
-export type LogFoodWasteOutput = z.infer<typeof LogFoodWasteOutputSchema>;
 
 export async function logFoodWaste(input: LogFoodWasteInput): Promise<LogFoodWasteOutput> {
   return logFoodWasteFlow(input);
@@ -59,4 +39,3 @@ const logFoodWasteFlow = ai.defineFlow(
     return output!;
   }
 );
-

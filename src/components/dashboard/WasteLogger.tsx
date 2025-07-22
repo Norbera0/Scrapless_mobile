@@ -1,20 +1,23 @@
 'use client';
 
-import { logFoodWaste, type LogFoodWasteOutput } from '@/ai/flows/log-food-waste';
+import { logFoodWaste } from '@/ai/flows/log-food-waste';
+import { logFoodWasteFromAudio } from '@/ai/flows/log-food-waste-from-audio';
+import type { LogFoodWasteOutput } from '@/ai/schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { getImpact, saveWasteLog } from '@/lib/data';
 import type { FoodItem, User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Camera, Plus, Save, Trash2, Wind, Utensils, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Mic, Plus, Save, Square, Trash2, Utensils } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 const wasteLogSchema = z.object({
   items: z.array(
@@ -33,7 +36,13 @@ export function WasteLogger() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
   const { toast } = useToast();
   const router = useRouter();
 
@@ -44,7 +53,7 @@ export function WasteLogger() {
     },
   });
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'items',
   });
@@ -75,21 +84,88 @@ export function WasteLogger() {
     form.reset({ items: [] });
     try {
       const result: LogFoodWasteOutput = await logFoodWaste({ photoDataUri });
-      if (result.items && result.items.length > 0) {
-        const newItems = result.items.map((item) => ({
-          ...item,
-          id: crypto.randomUUID(),
-        }));
-        form.setValue('items', newItems);
-        toast({ title: 'Analysis complete!', description: 'Review the items below and adjust as needed.' });
-      } else {
-        toast({ title: 'No items detected', description: 'Could not identify items in the photo. Please add them manually.' });
-      }
+      processAiResult(result);
     } catch (error) {
       console.error(error);
-      toast({ variant: 'destructive', title: 'Analysis failed', description: 'An error occurred during analysis.' });
+      toast({ variant: 'destructive', title: 'Analysis failed', description: 'An error occurred during photo analysis.' });
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  const startRecording = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setHasAudioPermission(false);
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setHasAudioPermission(true);
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      mediaRecorderRef.current.onstop = handleStopRecording;
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      toast({ title: "Recording started...", description: "Speak the food items you've wasted." });
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+      setHasAudioPermission(false);
+      toast({
+        variant: 'destructive',
+        title: 'Microphone Access Denied',
+        description: 'Please enable microphone permissions in your browser settings.',
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      toast({ title: "Recording stopped", description: "Processing your voice log..."});
+    }
+  };
+
+  const handleStopRecording = async () => {
+    setIsLoading(true);
+    form.reset({ items: [] });
+    setPhotoPreview(null);
+    setPhotoDataUri(null);
+
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+    const reader = new FileReader();
+    reader.readAsDataURL(audioBlob);
+    reader.onloadend = async () => {
+      const base64Audio = reader.result as string;
+      try {
+        const result = await logFoodWasteFromAudio({ audioDataUri: base64Audio });
+        processAiResult(result);
+      } catch (error) {
+        console.error(error);
+        toast({ variant: 'destructive', title: 'Voice analysis failed', description: 'Could not process the audio.' });
+      } finally {
+        setIsLoading(false);
+        // Clean up stream
+        if(mediaRecorderRef.current) {
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+        }
+      }
+    };
+  };
+
+  const processAiResult = (result: LogFoodWasteOutput) => {
+    if (result.items && result.items.length > 0) {
+      const newItems = result.items.map((item) => ({
+        ...item,
+        id: crypto.randomUUID(),
+      }));
+      form.setValue('items', newItems);
+      toast({ title: 'Analysis complete!', description: 'Review the items below and adjust as needed.' });
+    } else {
+      toast({ title: 'No items detected', description: 'Could not identify items. Please add them manually.' });
     }
   };
   
@@ -141,15 +217,15 @@ export function WasteLogger() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>1. Take a Photo</CardTitle>
-              <CardDescription>Upload a picture of your food waste.</CardDescription>
+              <CardTitle>1. Capture Waste</CardTitle>
+              <CardDescription>Use your camera or microphone to log items.</CardDescription>
             </CardHeader>
             <CardContent>
               <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
               <div
                 className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
-                onClick={() => fileInputRef.current?.click()}
-                onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+                onClick={() => !isRecording && fileInputRef.current?.click()}
+                onKeyDown={(e) => e.key === 'Enter' && !isRecording && fileInputRef.current?.click()}
                 tabIndex={0}
                 role="button"
                 aria-label="Upload a photo"
@@ -163,11 +239,23 @@ export function WasteLogger() {
                   </div>
                 )}
               </div>
+                {hasAudioPermission === false && (
+                    <Alert variant="destructive" className="mt-4">
+                        <AlertTitle>Microphone Access Required</AlertTitle>
+                        <AlertDescription>
+                            Please allow microphone access in your browser to use the voice log feature.
+                        </AlertDescription>
+                    </Alert>
+                )}
             </CardContent>
-            <CardFooter>
-              <Button type="button" onClick={handleAnalyzeClick} disabled={!photoPreview || isLoading} className="w-full">
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Utensils className="mr-2 h-4 w-4" />}
-                Analyze Waste
+            <CardFooter className="grid grid-cols-2 gap-4">
+              <Button type="button" onClick={handleAnalyzeClick} disabled={!photoPreview || isLoading || isRecording} >
+                {isLoading && !isRecording ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Utensils className="mr-2 h-4 w-4" />}
+                Analyze Photo
+              </Button>
+              <Button type="button" variant="outline" onClick={isRecording ? stopRecording : startRecording} disabled={isLoading}>
+                 {isRecording ? <Square className="mr-2 h-4 w-4 text-red-500 fill-current" /> : <Mic className="mr-2 h-4 w-4" />}
+                {isRecording ? 'Stop Logging' : 'Voice Log'}
               </Button>
             </CardFooter>
           </Card>
@@ -218,7 +306,7 @@ export function WasteLogger() {
                     ))}
                     {fields.length === 0 && !isLoading && (
                         <p className="text-muted-foreground text-sm text-center py-8">
-                            {photoPreview ? "Click 'Analyze Waste' to get started." : "Upload a photo first."}
+                            {photoPreview ? "Click 'Analyze Photo' to get started." : "Use your camera or microphone to log waste."}
                         </p>
                     )}
                      {isLoading && (
