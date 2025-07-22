@@ -19,13 +19,15 @@ const prompt = ai.definePrompt({
   name: 'logFoodWasteFromAudioPrompt',
   input: { schema: LogFoodWasteFromAudioInputSchema },
   output: { schema: LogFoodWasteOutputSchema },
-  prompt: `You are an AI assistant that transcribes audio of a person listing their food waste and extracts the items and quantities.
+  prompt: `You are an AI assistant that transcribes audio of a person listing their food waste. Your task is to intelligently extract only the food items and their quantities, filtering out all filler words, pauses, and irrelevant phrases.
 
-  Listen to the following audio and convert it to a structured list of food items and their estimated amounts. For example, if the user says "I wasted one cup of rice and two pieces of chicken", you should output:
-  - item: "rice", amount: "1 cup"
-  - item: "chicken", amount: "2 pieces"
+Listen to the following audio. The user might speak naturally, with phrases like "uh...", "I think...", or "like...". Your job is to ignore these and provide a clean, structured list of the wasted items.
 
-  Audio: {{media url=audioDataUri}}
+For example, if the user says "uh... I wasted one cup of rice and, like, two slices of pizza I think...", you should extract and output only:
+- item: "rice", amount: "1 cup"
+- item: "pizza", amount: "2 slices"
+
+Audio: {{media url=audioDataUri}}
   `,
 });
 
