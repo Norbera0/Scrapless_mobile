@@ -1,3 +1,4 @@
+
 'use client';
 
 import { logFoodWaste } from '@/ai/flows/log-food-waste';
@@ -11,14 +12,15 @@ import { useToast } from '@/hooks/use-toast';
 import { getImpact, saveWasteLog } from '@/lib/data';
 import type { FoodItem, User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Image as ImageIcon, Loader2, Mic, Plus, Save, Square, Trash2, Utensils } from 'lucide-react';
+import { Camera, Image as ImageIcon, Loader2, Mic, Plus, Save, Square, Trash2, Video, VideoOff } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { auth } from '@/lib/firebase';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const wasteLogSchema = z.object({
   items: z.array(
@@ -38,14 +40,20 @@ export function WasteLogger() {
   const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const defaultTab = searchParams.get('method') || 'camera';
 
   const form = useForm<WasteLogFormValues>({
     resolver: zodResolver(wasteLogSchema),
@@ -54,16 +62,45 @@ export function WasteLogger() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control: form.control,
     name: 'items',
   });
-
+  
+  // Camera Effect
   useEffect(() => {
-    // The user is now set from the layout, but we can listen for changes
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    return () => unsubscribe();
-  }, []);
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions to use this feature.',
+        });
+      }
+    };
+
+    if(defaultTab === 'camera') {
+      getCameraPermission();
+    }
+    
+    return () => {
+        // Cleanup stream on component unmount
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+  }, [defaultTab]);
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -72,14 +109,40 @@ export function WasteLogger() {
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
         setPhotoDataUri(reader.result as string);
+        stopCameraStream();
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const stopCameraStream = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+    }
+  }
+
+  const handleCaptureClick = () => {
+      if (!videoRef.current || !canvasRef.current) return;
+
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      if(context) {
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        const dataUri = canvas.toDataURL('image/jpeg');
+        setPhotoPreview(dataUri);
+        setPhotoDataUri(dataUri);
+        stopCameraStream();
+      }
+  }
+
   const handleAnalyzeClick = async () => {
     if (!photoDataUri) {
-      toast({ variant: 'destructive', title: 'No photo selected', description: 'Please select a photo to analyze.' });
+      toast({ variant: 'destructive', title: 'No photo selected', description: 'Please capture or upload a photo to analyze.' });
       return;
     }
     setIsLoading(true);
@@ -150,7 +213,6 @@ export function WasteLogger() {
         toast({ variant: 'destructive', title: 'Voice analysis failed', description: 'Could not process the audio.' });
       } finally {
         setIsLoading(false);
-        // Clean up stream
         if(mediaRecorderRef.current) {
             mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
         }
@@ -190,6 +252,7 @@ export function WasteLogger() {
       toast({ variant: 'destructive', title: 'Error', description: 'User not found. Please log in again.' });
       return;
     }
+    setIsLoading(true);
     const finalItems: FoodItem[] = data.items.map(item => {
         const { peso, co2e } = getImpact(item.name);
         return {
@@ -213,83 +276,116 @@ export function WasteLogger() {
         router.push('/trends');
     } catch(e) {
         toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
+    } finally {
+        setIsLoading(false);
     }
   };
+
+  const resetCapture = () => {
+    setPhotoDataUri(null);
+    setPhotoPreview(null);
+    form.reset({items: []});
+    if(defaultTab === 'camera') {
+        const getCameraPermission = async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({video: true});
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+        };
+        getCameraPermission();
+    }
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSave)} className="grid md:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>1. Capture Waste</CardTitle>
-              <CardDescription>Use your camera or microphone to log items.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-              <div
-                className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:border-primary transition-colors"
-                onClick={() => !isRecording && fileInputRef.current?.click()}
-                onKeyDown={(e) => e.key === 'Enter' && !isRecording && fileInputRef.current?.click()}
-                tabIndex={0}
-                role="button"
-                aria-label="Upload a photo"
-              >
-                {photoPreview ? (
-                  <Image src={photoPreview} alt="Food waste preview" width={400} height={225} className="object-cover w-full h-full rounded-md" />
-                ) : (
-                  <div className="text-center text-muted-foreground">
-                    <ImageIcon className="mx-auto h-12 w-12" />
-                    <p>Click or tap to upload a photo</p>
-                  </div>
-                )}
-              </div>
-                {hasAudioPermission === false && (
-                    <Alert variant="destructive" className="mt-4">
-                        <AlertTitle>Microphone Access Required</AlertTitle>
-                        <AlertDescription>
-                            Please allow microphone access in your browser to use the voice log feature.
-                        </AlertDescription>
-                    </Alert>
-                )}
-            </CardContent>
-            <CardFooter className="grid grid-cols-2 gap-4">
-              <Button type="button" onClick={handleAnalyzeClick} disabled={!photoPreview || isLoading || isRecording} >
-                {isLoading && !isRecording ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Utensils className="mr-2 h-4 w-4" />}
-                Analyze Photo
-              </Button>
-              <Button type="button" variant="outline" onClick={isRecording ? stopRecording : startRecording} disabled={isLoading}>
-                 {isRecording ? <Square className="mr-2 h-4 w-4 text-red-500 fill-current" /> : <Mic className="mr-2 h-4 w-4" />}
-                {isRecording ? 'Stop Logging' : 'Voice Log'}
-              </Button>
-            </CardFooter>
-          </Card>
-          <Card>
-             <CardHeader>
-                <CardTitle>3. Impact Summary</CardTitle>
-                <CardDescription>Estimated environmental and financial cost.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 text-center">
-                <div className="bg-secondary p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Peso Value</p>
-                    <p className="text-2xl font-bold">₱{impactData.totalPesoValue.toFixed(2)}</p>
-                </div>
-                <div className="bg-secondary p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground">Carbon Footprint</p>
-                    <p className="text-2xl font-bold">{impactData.totalCarbonFootprint.toFixed(2)}<span className="text-sm">kg CO₂e</span></p>
-                </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue={defaultTab} className="w-full" onValueChange={(value) => router.push(`/log-waste?method=${value}`)}>
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="camera"><Camera className="mr-2"/>Camera</TabsTrigger>
+                <TabsTrigger value="voice"><Mic className="mr-2"/>Voice</TabsTrigger>
+            </TabsList>
+            <TabsContent value="camera">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>1. Capture Waste with Camera</CardTitle>
+                        <CardDescription>Take a live photo or upload one.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                        <div className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center bg-muted overflow-hidden">
+                           {photoPreview ? (
+                                <Image src={photoPreview} alt="Food waste preview" width={400} height={225} className="object-cover w-full h-full" />
+                            ) : (
+                                <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                            )}
+                            <canvas ref={canvasRef} className="hidden"></canvas>
+                        </div>
+                        {hasCameraPermission === false && (
+                            <Alert variant="destructive">
+                                <VideoOff className="h-4 w-4" />
+                                <AlertTitle>Camera Access Required</AlertTitle>
+                                <AlertDescription>
+                                    Please allow camera access to use this feature.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                    </CardContent>
+                    <CardFooter className="grid grid-cols-2 gap-4">
+                       {photoPreview ? (
+                           <>
+                             <Button type="button" onClick={handleAnalyzeClick} disabled={isLoading}>
+                               {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+                               Analyze Photo
+                             </Button>
+                             <Button type="button" variant="outline" onClick={resetCapture}>
+                                 <Trash2 className="mr-2 h-4 w-4" /> Retake
+                             </Button>
+                           </>
+                       ) : (
+                           <>
+                               <Button type="button" onClick={handleCaptureClick} disabled={!hasCameraPermission}>
+                                   <Camera className="mr-2 h-4 w-4" /> Capture Photo
+                               </Button>
+                               <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                   <ImageIcon className="mr-2 h-4 w-4" /> Upload
+                               </Button>
+                           </>
+                       )}
+                    </CardFooter>
+                </Card>
+            </TabsContent>
+            <TabsContent value="voice">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>1. Log Waste with Voice</CardTitle>
+                        <CardDescription>Press the button and speak your items.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex justify-center items-center h-[250px]">
+                        <Button type="button" variant={isRecording ? 'destructive' : 'outline'} className="h-24 w-24 rounded-full text-lg" onClick={isRecording ? stopRecording : startRecording} disabled={isLoading}>
+                            {isRecording ? <Square className="h-10 w-10" /> : <Mic className="h-10 w-10" />}
+                        </Button>
+                        {hasAudioPermission === false && (
+                           <Alert variant="destructive" className="mt-4">
+                               <AlertTitle>Microphone Access Required</AlertTitle>
+                               <AlertDescription>
+                                   Please allow microphone access.
+                               </AlertDescription>
+                           </Alert>
+                       )}
+                    </CardContent>
+                </Card>
+            </TabsContent>
+          </Tabs>
         </div>
 
         <div className="space-y-6">
             <Card className="flex flex-col h-full">
                 <CardHeader>
-                    <CardTitle>2. Adjust Items</CardTitle>
-                    <CardDescription>Edit, add, or remove items detected by the AI.</CardDescription>
+                    <CardTitle>2. Review & Adjust Items</CardTitle>
+                    <CardDescription>Edit, add, or remove items detected by the AI before saving.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow">
-                    <div className="space-y-4">
+                <CardContent className="flex-grow space-y-4">
                     {fields.map((field, index) => (
                         <div key={field.id} className="flex gap-2 items-end">
                             <FormField control={form.control} name={`items.${index}.estimatedAmount`} render={({ field }) => (
@@ -311,7 +407,7 @@ export function WasteLogger() {
                     ))}
                     {fields.length === 0 && !isLoading && (
                         <p className="text-muted-foreground text-sm text-center py-8">
-                            {photoPreview ? "Click 'Analyze Photo' to get started." : "Use your camera or microphone to log waste."}
+                            Items will appear here after analysis.
                         </p>
                     )}
                      {isLoading && (
@@ -319,12 +415,18 @@ export function WasteLogger() {
                              <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     )}
-                    </div>
                 </CardContent>
-                <CardFooter className="flex-col gap-4 !pt-4">
+                <CardFooter className="flex-col gap-4 !pt-4 border-t">
                      <Button type="button" variant="outline" className="w-full" onClick={() => append({ id: crypto.randomUUID(), name: '', estimatedAmount: '' })}>
                         <Plus className="mr-2 h-4 w-4" /> Add Item Manually
                     </Button>
+                    <div className="w-full p-4 rounded-lg bg-secondary space-y-2 text-center">
+                        <p className="font-bold text-lg">Total Impact</p>
+                        <div className="flex justify-around">
+                            <span>Peso Value: <span className="font-mono">₱{impactData.totalPesoValue.toFixed(2)}</span></span>
+                            <span>CO₂e: <span className="font-mono">{impactData.totalCarbonFootprint.toFixed(2)}kg</span></span>
+                        </div>
+                    </div>
                     <Button type="submit" className="w-full" disabled={isLoading || watchedItems.length === 0}>
                         <Save className="mr-2 h-4 w-4" /> Save Log
                     </Button>

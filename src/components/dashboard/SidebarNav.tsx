@@ -1,6 +1,7 @@
+
 'use client';
 
-import { Camera, LogOut, BarChart, Utensils } from 'lucide-react';
+import { Home, Camera, LogOut, BarChart, Utensils } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,8 @@ export function SidebarNav({ user }: { user: User }) {
   };
 
   const menuItems = [
-    { href: '/dashboard', label: 'Log Waste', icon: Camera },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/log-waste', label: 'Log Waste', icon: Camera },
     { href: '/trends', label: 'Trends', icon: BarChart },
   ];
   
@@ -59,7 +61,7 @@ export function SidebarNav({ user }: { user: User }) {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 onClick={() => router.push(item.href)}
-                isActive={pathname === item.href}
+                isActive={pathname.startsWith(item.href)}
                 className="w-full justify-start text-base h-12"
                 tooltip={item.label}
               >
