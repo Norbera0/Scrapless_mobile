@@ -33,7 +33,7 @@ export function SidebarNav({ user }: { user: User }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/log-waste', label: 'Log Waste', icon: Camera },
+    { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/trends', label: 'Trends', icon: BarChart },
   ];
   
@@ -61,7 +61,7 @@ export function SidebarNav({ user }: { user: User }) {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 onClick={() => router.push(item.href)}
-                isActive={pathname.startsWith(item.href)}
+                isActive={pathname.startsWith('/log-waste') && item.href.startsWith('/log-waste') || pathname === item.href}
                 className="w-full justify-start text-base h-12"
                 tooltip={item.label}
               >
