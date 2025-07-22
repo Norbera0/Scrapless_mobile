@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -44,7 +45,7 @@ export function TrendsDashboard() {
   }
 
   const chartData = useMemo(() => {
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const data = Array.from({ length: 7 }, (_, i) => {
       const date = subDays(new Date(), i);
       return {
         date: format(date, 'MMM d'),
@@ -58,14 +59,14 @@ export function TrendsDashboard() {
       const logDate = new Date(log.date);
       if (isAfter(logDate, sevenDaysAgo)) {
         const formattedDate = format(logDate, 'MMM d');
-        const dayData = chartData.find(d => d.date === formattedDate);
+        const dayData = data.find(d => d.date === formattedDate);
         if (dayData) {
           dayData.totalPesoValue += log.totalPesoValue;
         }
       }
     });
 
-    return chartData;
+    return data;
   }, [logs]);
   
   const chartConfig = {
