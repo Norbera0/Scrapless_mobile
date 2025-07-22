@@ -214,8 +214,15 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       {method === 'camera' && (
         <>
           <CardHeader>
-            <CardTitle>1. Capture Waste with Camera</CardTitle>
-            <CardDescription>Take a live photo or upload one.</CardDescription>
+             <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>1. Capture with Camera</CardTitle>
+                    <CardDescription>Take a live photo or upload one.</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => router.push('/log-waste?method=voice')}>
+                    <Mic className="mr-2 h-4 w-4" /> Use Voice
+                </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
@@ -262,9 +269,16 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
       {method === 'voice' && (
         <>
-          <CardHeader>
-            <CardTitle>1. Log Waste with Voice</CardTitle>
-            <CardDescription>Press the button and speak your items. Click stop when you are done.</CardDescription>
+           <CardHeader>
+             <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>1. Record with Voice</CardTitle>
+                    <CardDescription>Press record and list your wasted items.</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => router.push('/log-waste?method=camera')}>
+                    <Camera className="mr-2 h-4 w-4" /> Use Camera
+                </Button>
+            </div>
           </CardHeader>
           <CardContent className="flex justify-center items-center h-[250px] flex-col gap-4">
              <Button 
