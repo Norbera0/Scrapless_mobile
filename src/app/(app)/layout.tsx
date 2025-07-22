@@ -6,6 +6,8 @@ import { SidebarProvider, Sidebar, SidebarInset } from '@/components/ui/sidebar'
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import type { User } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -13,19 +15,20 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('scrapless-user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName,
+          email: firebaseUser.email,
+        });
       } else {
         router.replace('/login');
       }
-    } catch (error) {
-      console.error('Failed to parse user from localStorage', error);
-      router.replace('/login');
-    } finally {
       setIsLoading(false);
-    }
+    });
+
+    return () => unsubscribe();
   }, [router]);
 
   if (isLoading) {

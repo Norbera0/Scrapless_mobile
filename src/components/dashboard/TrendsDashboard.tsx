@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { getWasteLogsForUser, deleteWasteLog } from '@/lib/data';
 import type { WasteLog, User } from '@/types';
 import { format, subDays, startOfDay, isAfter } from 'date-fns';
@@ -22,25 +22,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useToast } from '@/hooks/use-toast';
+import { auth } from '@/lib/firebase';
 
 
 export function TrendsDashboard() {
   const [logs, setLogs] = useState<WasteLog[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('scrapless-user');
-    if (storedUser) {
-        const parsedUser: User = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setLogs(getWasteLogsForUser(parsedUser.email));
-    }
-  }, []);
-
-  const handleDelete = (logId: string) => {
-    deleteWasteLog(logId);
     if(user) {
-        setLogs(getWasteLogsForUser(user.email));
+        const fetchLogs = async () => {
+            setIsLoading(true);
+            const userLogs = await getWasteLogsForUser(user.uid);
+            setLogs(userLogs);
+            setIsLoading(false);
+        }
+        fetchLogs();
+    }
+  }, [user]);
+
+  const handleDelete = async (logId: string) => {
+    try {
+        await deleteWasteLog(logId);
+        if(user) {
+            setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
+        }
+        toast({ title: 'Success', description: 'Log deleted successfully.' });
+    } catch(e) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete log.' });
     }
   }
 
@@ -74,6 +86,14 @@ export function TrendsDashboard() {
       label: "Peso Value (₱)",
       color: "hsl(var(--primary))",
     },
+  }
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center h-full p-4 md:p-6">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    )
   }
 
   return (

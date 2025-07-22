@@ -1,4 +1,6 @@
-import type { WasteLog } from '@/types';
+import { collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy } from 'firebase/firestore';
+import type { WasteLog, FoodItem } from '@/types';
+import { db } from './firebase';
 
 // Simplified mapping. In a real app, this would be in a database.
 const FOOD_DATA: Record<string, { peso: number; co2e: number }> = {
@@ -29,34 +31,37 @@ export function getImpact(itemName: string): { peso: number; co2e: number } {
   return { peso: 5, co2e: 0.1 }; // Default for unrecognized items
 }
 
-const getLogsFromStorage = (): WasteLog[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const logsJson = localStorage.getItem('scrapless-logs');
-    return logsJson ? JSON.parse(logsJson) : [];
-  } catch (e) {
-    console.error('Failed to parse logs from localStorage', e);
-    return [];
-  }
+
+export const saveWasteLog = async (newLog: Omit<WasteLog, 'id'>) => {
+    try {
+        const docRef = await addDoc(collection(db, 'wasteLogs'), newLog);
+        return docRef.id;
+    } catch (e) {
+        console.error('Error adding document: ', e);
+        throw new Error("Could not save waste log.");
+    }
 };
 
-const saveLogsToStorage = (logs: WasteLog[]) => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('scrapless-logs', JSON.stringify(logs));
+export const getWasteLogsForUser = async (userId: string): Promise<WasteLog[]> => {
+    try {
+        const q = query(collection(db, 'wasteLogs'), where('userId', '==', userId), orderBy('date', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const logs: WasteLog[] = [];
+        querySnapshot.forEach((doc) => {
+            logs.push({ id: doc.id, ...doc.data() } as WasteLog);
+        });
+        return logs;
+    } catch (e) {
+        console.error('Error getting documents: ', e);
+        return [];
+    }
 };
 
-export const saveWasteLog = (newLog: WasteLog) => {
-  const allLogs = getLogsFromStorage();
-  saveLogsToStorage([...allLogs, newLog]);
-};
-
-export const getWasteLogsForUser = (userEmail: string): WasteLog[] => {
-  const allLogs = getLogsFromStorage();
-  return allLogs.filter(log => log.userEmail === userEmail).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-};
-
-export const deleteWasteLog = (logId: string) => {
-    const allLogs = getLogsFromStorage();
-    const updatedLogs = allLogs.filter(log => log.id !== logId);
-    saveLogsToStorage(updatedLogs);
+export const deleteWasteLog = async (logId: string) => {
+    try {
+        await deleteDoc(doc(db, 'wasteLogs', logId));
+    } catch (e) {
+        console.error('Error deleting document: ', e);
+        throw new Error("Could not delete waste log.");
+    }
 }

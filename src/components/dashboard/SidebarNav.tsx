@@ -14,20 +14,36 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import type { User } from '@/types';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export function SidebarNav({ user }: { user: User }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem('scrapless-user');
-    router.push('/login');
+  const handleLogout = async () => {
+    try {
+        await signOut(auth);
+        router.push('/login');
+    } catch (error) {
+        console.error('Logout failed', error);
+    }
   };
 
   const menuItems = [
     { href: '/dashboard', label: 'Log Waste', icon: Camera },
     { href: '/trends', label: 'Trends', icon: BarChart },
   ];
+  
+  const getInitials = (name?: string | null) => {
+    if (!name) return '?';
+    const names = name.split(' ');
+    if (names.length > 1) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
+  }
+
 
   return (
     <>
@@ -58,10 +74,10 @@ export function SidebarNav({ user }: { user: User }) {
         <SidebarSeparator />
         <div className="flex items-center gap-3 p-2">
           <Avatar>
-            <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col overflow-hidden">
-            <span className="font-semibold text-sm truncate">{user.name}</span>
+            <span className="font-semibold text-sm truncate">{user.name || 'User'}</span>
             <span className="text-xs text-muted-foreground truncate">{user.email}</span>
           </div>
         </div>

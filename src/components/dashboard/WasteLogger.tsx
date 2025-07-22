@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { auth } from '@/lib/firebase';
 
 const wasteLogSchema = z.object({
   items: z.array(
@@ -32,7 +33,7 @@ const wasteLogSchema = z.object({
 type WasteLogFormValues = z.infer<typeof wasteLogSchema>;
 
 export function WasteLogger() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,8 +60,9 @@ export function WasteLogger() {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('scrapless-user');
-    if (storedUser) setUser(JSON.parse(storedUser));
+    // The user is now set from the layout, but we can listen for changes
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return () => unsubscribe();
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,7 +185,7 @@ export function WasteLogger() {
     );
   }, [watchedItems]);
 
-  const onSave = (data: WasteLogFormValues) => {
+  const onSave = async (data: WasteLogFormValues) => {
     if (!user) {
       toast({ variant: 'destructive', title: 'Error', description: 'User not found. Please log in again.' });
       return;
@@ -197,18 +199,21 @@ export function WasteLogger() {
         }
     })
 
-    saveWasteLog({
-      id: crypto.randomUUID(),
-      date: new Date().toISOString(),
-      userEmail: user.email,
-      items: finalItems,
-      totalPesoValue: impactData.totalPesoValue,
-      totalCarbonFootprint: impactData.totalCarbonFootprint,
-      photoDataUri: photoDataUri ?? undefined,
-    });
+    try {
+        await saveWasteLog({
+          date: new Date().toISOString(),
+          userId: user.uid,
+          items: finalItems,
+          totalPesoValue: impactData.totalPesoValue,
+          totalCarbonFootprint: impactData.totalCarbonFootprint,
+          photoDataUri: photoDataUri ?? undefined,
+        });
 
-    toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
-    router.push('/trends');
+        toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
+        router.push('/trends');
+    } catch(e) {
+        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
+    }
   };
 
   return (

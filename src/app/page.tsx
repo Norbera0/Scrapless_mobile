@@ -3,22 +3,22 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      const user = localStorage.getItem('scrapless-user');
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         router.replace('/dashboard');
       } else {
         router.replace('/login');
       }
-    } catch (error) {
-      // If localStorage is not available, redirect to login
-      router.replace('/login');
-    }
+    });
+
+    return () => unsubscribe();
   }, [router]);
 
   return (
