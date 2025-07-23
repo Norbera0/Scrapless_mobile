@@ -85,7 +85,7 @@ export const getPantryItemsForUser = async (userId: string): Promise<PantryItem[
     }
 };
 
-export const savePantryLog = async (newLog: Omit<PantryLog, 'id'>, userId: string) => {
+export const savePantryLog = async (newLog: Omit<PantryLog, 'id' | 'date' | 'userId'>, userId: string) => {
     try {
         const batch = writeBatch(db);
 
