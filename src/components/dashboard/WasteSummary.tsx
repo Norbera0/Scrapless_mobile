@@ -80,10 +80,9 @@ export function WasteSummary() {
 
         toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
         reset(); // Clear the store
-        router.push('/trends');
+        router.push('/dashboard');
     } catch(e) {
         toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
-    } finally {
         setIsLoading(false);
     }
   }
