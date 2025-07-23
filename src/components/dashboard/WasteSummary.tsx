@@ -5,7 +5,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { getImpact, saveWasteLog } from '@/lib/data';
-import type { FoodItem, User } from '@/types';
+import type { FoodItem, User, WasteLog } from '@/types';
 import { Loader2, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -64,14 +64,19 @@ export function WasteSummary() {
     });
 
     try {
-        await saveWasteLog({
+        const logData: Omit<WasteLog, 'id'> = {
           date: new Date().toISOString(),
           userId: user.uid,
           items: finalItems,
           totalPesoValue: impactData.totalPesoValue,
           totalCarbonFootprint: impactData.totalCarbonFootprint,
-          photoDataUri: photoDataUri ?? undefined,
-        });
+        };
+
+        if (photoDataUri) {
+          logData.photoDataUri = photoDataUri;
+        }
+        
+        await saveWasteLog(logData);
 
         toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
         reset(); // Clear the store
