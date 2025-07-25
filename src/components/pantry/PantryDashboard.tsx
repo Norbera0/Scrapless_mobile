@@ -48,18 +48,22 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
-     // Combine initial items with optimistic items from the store
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    // Defer merging optimistic items until after initial hydration
     if (optimisticItems.length > 0) {
       setItems(prevItems => {
-        const combined = [...optimisticItems, ...prevItems];
-        const uniqueItems = Array.from(new Map(combined.map(item => [item.id, item])).values());
-        return uniqueItems.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
+        const optimisticIds = new Set(optimisticItems.map(item => item.id));
+        const filteredPrevItems = prevItems.filter(item => !optimisticIds.has(item.id));
+        const combined = [...optimisticItems, ...filteredPrevItems];
+        return combined.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
       });
-      clearOptimisticPantryItems(); // Clear after consuming
+      clearOptimisticPantryItems();
     }
-    return () => unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optimisticItems]);
 
 
   const handleDelete = async (itemId: string) => {
@@ -140,3 +144,4 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
     </div>
   );
 }
+
