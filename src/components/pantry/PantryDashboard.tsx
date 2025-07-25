@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { deletePantryItem, getPantryItemsForUser } from '@/lib/data';
+import { deletePantryItem } from '@/lib/data';
 import type { PantryItem, User } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
 import { Badge } from '../ui/badge';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 const getFreshness = (expirationDate: string) => {
     const today = startOfToday();
@@ -42,13 +43,23 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  
+  const { optimisticItems, clearOptimisticPantryItems } = usePantryLogStore();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((fbUser) => {
-        setUser(fbUser);
-    });
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+     // Combine initial items with optimistic items from the store
+    if (optimisticItems.length > 0) {
+      setItems(prevItems => {
+        const combined = [...optimisticItems, ...prevItems];
+        const uniqueItems = Array.from(new Map(combined.map(item => [item.id, item])).values());
+        return uniqueItems.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
+      });
+      clearOptimisticPantryItems(); // Clear after consuming
+    }
     return () => unsubscribe();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
 
   const handleDelete = async (itemId: string) => {
