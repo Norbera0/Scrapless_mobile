@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Save, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -35,7 +35,7 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 export function ReviewPantryItems() {
   const router = useRouter();
-  const { items, photoDataUri, setItems, reset } = usePantryLogStore();
+  const { items, photoDataUri, reset } = usePantryLogStore();
   const [isReady, setIsReady] = useState(false);
   const [user, setUser] = useState<User | null>(auth.currentUser);
   const [isSaving, setIsSaving] = useState(false);
@@ -98,9 +98,10 @@ export function ReviewPantryItems() {
         router.push('/pantry');
     } catch (e) {
         console.error(e);
-        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items to the cloud. Please try again.' });
+        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items. Please try again.' });
+    } finally {
         setIsSaving(false);
-    };
+    }
   };
   
   if (!isReady) {
@@ -185,7 +186,7 @@ export function ReviewPantryItems() {
                     </CardContent>
                     <CardFooter>
                          <Button type="submit" className="w-full" disabled={fields.length === 0 || isSaving}>
-                            <Save className="mr-2 h-4 w-4" />
+                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                             {isSaving ? 'Saving...' : 'Save to Pantry'}
                         </Button>
                     </CardFooter>

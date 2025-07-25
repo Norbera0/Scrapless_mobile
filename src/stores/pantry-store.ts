@@ -1,6 +1,5 @@
 
 import { create } from 'zustand';
-import type { PantryItem } from '@/types';
 
 interface PantryLogItem {
   id: string;

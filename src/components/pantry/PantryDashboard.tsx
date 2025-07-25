@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { deletePantryItem } from '@/lib/data';
-import type { PantryItem } from '@/types';
+import type { PantryItem, User } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
   AlertDialog,
@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
+import { auth } from '@/lib/firebase';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 
 const getFreshness = (expirationDate: string) => {
@@ -39,14 +41,20 @@ const getFreshness = (expirationDate: string) => {
 export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
   const [items, setItems] = useState<PantryItem[]>(initialItems);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
 
   const { toast } = useToast();
   const router = useRouter();
 
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
   const handleDelete = async (itemId: string) => {
+    if (!user) return;
     setIsDeleting(itemId);
     try {
-        await deletePantryItem(itemId);
+        await deletePantryItem(itemId, user.uid);
         setItems(prevItems => prevItems.filter(item => item.id !== itemId));
         toast({ title: 'Success', description: 'Item deleted from pantry.' });
     } catch(e) {

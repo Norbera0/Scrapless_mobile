@@ -1,7 +1,7 @@
+
 // src/lib/firebase.ts
 import { initializeApp, getApps, getApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig: FirebaseOptions = {
   projectId: 'scrapless-66nyt',
@@ -16,6 +16,8 @@ const firebaseConfig: FirebaseOptions = {
 // Initialize Firebase
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 
-export { app, auth, db };
+// Firestore is no longer used for data, only Auth is needed.
+// const db = getFirestore(app);
+
+export { app, auth };

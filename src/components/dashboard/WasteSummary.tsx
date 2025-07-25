@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { getImpact, saveWasteLog } from '@/lib/data';
 import type { FoodItem, User, WasteLog } from '@/types';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +17,7 @@ export function WasteSummary() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [isSaving, setIsSaving] = useState(false);
   const { items, photoDataUri, reset } = useWasteLogStore();
 
   useEffect(() => {
@@ -25,7 +26,6 @@ export function WasteSummary() {
     });
 
     if (items.length === 0) {
-        // If there's no data, redirect to start the flow.
         router.replace('/log-waste?method=camera');
     }
 
@@ -44,12 +44,13 @@ export function WasteSummary() {
     );
   }, [items]);
 
-  const handleSaveLog = () => {
+  const handleSaveLog = async () => {
     if (!user) {
       toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
       return;
     }
-
+    setIsSaving(true);
+    
     const finalItems: FoodItem[] = items.map(item => {
         const { peso, co2e } = getImpact(item.name);
         return {
@@ -71,16 +72,17 @@ export function WasteSummary() {
       logData.photoDataUri = photoDataUri;
     }
     
-    // Optimistic UI: Redirect immediately.
-    toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
-    reset(); // Clear the store for the next log
-    router.push('/dashboard');
-    
-    // Save to Firestore in the background
-    saveWasteLog(logData).catch(e => {
+    try {
+        await saveWasteLog(logData)
+        toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
+        reset(); // Clear the store for the next log
+        router.push('/dashboard');
+    } catch(e) {
         console.error(e);
-        toast({ variant: 'destructive', title: 'Sync failed', description: 'Could not save your log to the cloud. Please try again later.' });
-    });
+        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
+    } finally {
+        setIsSaving(false);
+    }
   }
 
   return (
@@ -118,8 +120,9 @@ export function WasteSummary() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSaveLog} className="w-full">
-            <Save className="mr-2 h-4 w-4" /> Save Log & Finish
+        <Button onClick={handleSaveLog} className="w-full" disabled={isSaving}>
+            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {isSaving ? "Saving..." : "Save Log & Finish"}
         </Button>
       </CardFooter>
     </Card>

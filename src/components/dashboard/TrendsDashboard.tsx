@@ -45,11 +45,10 @@ export function TrendsDashboard() {
   }, [user]);
 
   const handleDelete = async (logId: string) => {
+    if(!user) return;
     try {
-        await deleteWasteLog(logId);
-        if(user) {
-            setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
-        }
+        await deleteWasteLog(logId, user.uid);
+        setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
         toast({ title: 'Success', description: 'Log deleted successfully.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete log.' });

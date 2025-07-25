@@ -1,19 +1,50 @@
 
+'use client';
 import { PantryDashboard } from '@/components/pantry/PantryDashboard';
 import { getPantryItemsForUser } from '@/lib/data';
-import { auth } from '@/lib/firebase/server';
-import type { PantryItem } from '@/types';
+import { auth } from '@/lib/firebase';
+import type { PantryItem, User } from '@/types';
+import { useEffect, useState } from 'react';
+import { onAuthStateChanged } from 'firebase/auth';
+import { Loader2 } from 'lucide-react';
 
-export default async function PantryPage() {
-  let items: PantryItem[] = [];
-  try {
-    const user = auth.currentUser;
+export default function PantryPage() {
+  const [items, setItems] = useState<PantryItem[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName,
+          email: firebaseUser.email,
+        });
+      }
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     if (user) {
-      items = await getPantryItemsForUser(user.uid);
+      const fetchItems = async () => {
+        setIsLoading(true);
+        const userItems = await getPantryItemsForUser(user.uid);
+        setItems(userItems);
+        setIsLoading(false);
+      };
+      fetchItems();
     }
-  } catch (e) {
-    console.error('Failed to fetch pantry items:', e);
-    // Handle error case, maybe show a message
+  }, [user]);
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center h-full p-4 md:p-6">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    )
   }
 
   return (
