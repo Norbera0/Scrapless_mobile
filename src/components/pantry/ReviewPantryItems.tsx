@@ -38,6 +38,7 @@ export function ReviewPantryItems() {
   const { items, photoDataUri, setItems, reset } = usePantryLogStore();
   const [isReady, setIsReady] = useState(false);
   const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ReviewFormValues>({
@@ -66,11 +67,12 @@ export function ReviewPantryItems() {
     }
   }, [items, router, form, isReady]);
 
-  const onSubmit = (data: ReviewFormValues) => {
+  const onSubmit = async (data: ReviewFormValues) => {
     if (!user) {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
         return;
     }
+    setIsSaving(true);
 
     const finalItems: PantryItem[] = data.items.map(item => {
         const { peso, co2e } = getImpact(item.name);
@@ -88,16 +90,16 @@ export function ReviewPantryItems() {
       logData.photoDataUri = photoDataUri;
     }
     
-    // Optimistic UI: Redirect immediately
-    toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
-    reset(); 
-    router.push('/pantry');
-    
-    // Save to Firestore in the background
-    savePantryLog(logData, user.uid).catch(e => {
+    try {
+        await savePantryLog(logData, user.uid)
+        toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
+        reset(); 
+        router.push('/pantry');
+    } catch (e) {
         console.error(e);
         toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items to the cloud. Please try again.' });
-    });
+        setIsSaving(false);
+    };
   };
   
   if (!isReady) {
@@ -181,9 +183,9 @@ export function ReviewPantryItems() {
                         </Button>
                     </CardContent>
                     <CardFooter>
-                         <Button type="submit" className="w-full" disabled={fields.length === 0}>
+                         <Button type="submit" className="w-full" disabled={fields.length === 0 || isSaving}>
                             <Save className="mr-2 h-4 w-4" />
-                            Save to Pantry
+                            {isSaving ? 'Saving...' : 'Save to Pantry'}
                         </Button>
                     </CardFooter>
                 </Card>
