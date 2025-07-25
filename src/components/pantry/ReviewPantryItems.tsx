@@ -99,6 +99,7 @@ export function ReviewPantryItems() {
         router.push('/pantry');
     } catch(e) {
         toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items. Please try again.' });
+    } finally {
         setIsSaving(false);
     }
   };
