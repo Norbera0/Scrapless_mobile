@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { getImpact, saveWasteLog } from '@/lib/data';
 import type { FoodItem, User, WasteLog } from '@/types';
-import { Loader2, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,6 @@ export function WasteSummary() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [isLoading, setIsLoading] = useState(false);
   const { items, photoDataUri, reset } = useWasteLogStore();
 
   useEffect(() => {
@@ -37,8 +36,6 @@ export function WasteSummary() {
     return items.reduce(
       (acc, item) => {
         const { peso, co2e } = getImpact(item.name);
-        // For simplicity, we assume the AI gives a reasonable unit and we calculate per unit.
-        // A more complex implementation might parse the amount string.
         acc.totalPesoValue += peso;
         acc.totalCarbonFootprint += co2e;
         return acc;
@@ -47,12 +44,11 @@ export function WasteSummary() {
     );
   }, [items]);
 
-  const handleSaveLog = async () => {
+  const handleSaveLog = () => {
     if (!user) {
       toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
       return;
     }
-    setIsLoading(true);
 
     const finalItems: FoodItem[] = items.map(item => {
         const { peso, co2e } = getImpact(item.name);
@@ -63,29 +59,28 @@ export function WasteSummary() {
         }
     });
 
-    try {
-        const logData: Omit<WasteLog, 'id'> = {
-          date: new Date().toISOString(),
-          userId: user.uid,
-          items: finalItems,
-          totalPesoValue: impactData.totalPesoValue,
-          totalCarbonFootprint: impactData.totalCarbonFootprint,
-        };
+    const logData: Omit<WasteLog, 'id'> = {
+      date: new Date().toISOString(),
+      userId: user.uid,
+      items: finalItems,
+      totalPesoValue: impactData.totalPesoValue,
+      totalCarbonFootprint: impactData.totalCarbonFootprint,
+    };
 
-        if (photoDataUri) {
-          logData.photoDataUri = photoDataUri;
-        }
-        
-        await saveWasteLog(logData);
-
-        toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
-        reset(); // Clear the store
-        router.push('/dashboard');
-    } catch(e) {
-        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
-    } finally {
-        setIsLoading(false);
+    if (photoDataUri) {
+      logData.photoDataUri = photoDataUri;
     }
+    
+    // Optimistic UI: Redirect immediately.
+    toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
+    reset(); // Clear the store for the next log
+    router.push('/dashboard');
+    
+    // Save to Firestore in the background
+    saveWasteLog(logData).catch(e => {
+        console.error(e);
+        toast({ variant: 'destructive', title: 'Sync failed', description: 'Could not save your log to the cloud. Please try again later.' });
+    });
   }
 
   return (
@@ -123,8 +118,7 @@ export function WasteSummary() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSaveLog} className="w-full" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <Button onClick={handleSaveLog} className="w-full">
             <Save className="mr-2 h-4 w-4" /> Save Log & Finish
         </Button>
       </CardFooter>

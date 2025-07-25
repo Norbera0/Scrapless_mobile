@@ -19,7 +19,6 @@ import { auth } from '@/lib/firebase';
 import type { User, PantryLog, PantryItem } from '@/types';
 import { getImpact, savePantryLog } from '@/lib/data';
 import { format } from 'date-fns';
-import { Loader2 } from 'lucide-react';
 
 const reviewSchema = z.object({
   items: z.array(
@@ -39,7 +38,6 @@ export function ReviewPantryItems() {
   const { items, photoDataUri, setItems, reset } = usePantryLogStore();
   const [isReady, setIsReady] = useState(false);
   const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ReviewFormValues>({
@@ -60,20 +58,19 @@ export function ReviewPantryItems() {
   }, []);
 
   useEffect(() => {
-    if (items.length === 0) {
-      router.replace('/add-to-pantry');
+    if (items.length === 0 && !isReady) {
+       router.replace('/add-to-pantry');
     } else {
       form.reset({ items });
       setIsReady(true);
     }
-  }, [items, router, form]);
+  }, [items, router, form, isReady]);
 
-  const onSubmit = async (data: ReviewFormValues) => {
+  const onSubmit = (data: ReviewFormValues) => {
     if (!user) {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
         return;
     }
-    setIsSaving(true);
 
     const finalItems: PantryItem[] = data.items.map(item => {
         const { peso, co2e } = getImpact(item.name);
@@ -85,23 +82,22 @@ export function ReviewPantryItems() {
         }
     });
 
-    try {
-        const logData: Omit<PantryLog, 'id' | 'date' | 'userId'> = { items: finalItems };
+    const logData: Omit<PantryLog, 'id' | 'date' | 'userId'> = { items: finalItems };
 
-        if (photoDataUri) {
-          logData.photoDataUri = photoDataUri;
-        }
-        
-        await savePantryLog(logData, user.uid);
-
-        toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
-        reset(); 
-        router.push('/pantry');
-    } catch(e) {
-        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items. Please try again.' });
-    } finally {
-        setIsSaving(false);
+    if (photoDataUri) {
+      logData.photoDataUri = photoDataUri;
     }
+    
+    // Optimistic UI: Redirect immediately
+    toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
+    reset(); 
+    router.push('/pantry');
+    
+    // Save to Firestore in the background
+    savePantryLog(logData, user.uid).catch(e => {
+        console.error(e);
+        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items to the cloud. Please try again.' });
+    });
   };
   
   if (!isReady) {
@@ -185,8 +181,8 @@ export function ReviewPantryItems() {
                         </Button>
                     </CardContent>
                     <CardFooter>
-                         <Button type="submit" className="w-full" disabled={isSaving || fields.length === 0}>
-                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                         <Button type="submit" className="w-full" disabled={fields.length === 0}>
+                            <Save className="mr-2 h-4 w-4" />
                             Save to Pantry
                         </Button>
                     </CardFooter>
