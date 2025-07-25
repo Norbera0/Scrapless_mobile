@@ -16,8 +16,6 @@ import {
   type LogPantryItemInput,
   type LogPantryItemOutput,
 } from '@/ai/schemas';
-import { getImpact } from '@/lib/data';
-import { addDays, formatISO } from 'date-fns';
 
 export async function logPantryItem(input: LogPantryItemInput): Promise<LogPantryItemOutput> {
   return logPantryItemFlow(input);
@@ -85,17 +83,6 @@ const logPantryItemFlow = ai.defineFlow(
         return { items: [] };
     }
 
-    // Post-process to refine expiration dates using our internal data
-    const processedItems = output.items.map(item => {
-        const { shelfLifeDays } = getImpact(item.name);
-        const expirationDate = addDays(new Date(), shelfLifeDays);
-        return {
-            ...item,
-            // AI gives a good estimate, but we can override with our DB for consistency
-            estimatedExpirationDate: formatISO(expirationDate, { representation: 'date' }),
-        };
-    });
-
-    return { items: processedItems };
+    return output;
   }
 );
