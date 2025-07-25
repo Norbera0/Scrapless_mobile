@@ -35,7 +35,7 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 export function ReviewPantryItems() {
   const router = useRouter();
-  const { items, photoDataUri, setItems, reset, setOptimisticItems } = usePantryLogStore();
+  const { items, photoDataUri, setItems, reset } = usePantryLogStore();
   const [isReady, setIsReady] = useState(false);
   const [user, setUser] = useState<User | null>(auth.currentUser);
   const [isSaving, setIsSaving] = useState(false);
@@ -81,7 +81,6 @@ export function ReviewPantryItems() {
             pesoValue: peso,
             carbonFootprint: co2e,
             addedDate: new Date().toISOString(),
-            // Ensure ID is a string for optimistic update
             id: typeof item.id === 'number' ? String(item.id) : item.id,
         }
     });
@@ -92,19 +91,14 @@ export function ReviewPantryItems() {
       logData.photoDataUri = photoDataUri;
     }
     
-    // Optimistic UI update
-    setOptimisticItems(finalItems);
-    toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
-    reset(); 
-    router.push('/pantry');
-    
     try {
         await savePantryLog(logData, user.uid)
-        // Background save is complete. No need to do anything else.
+        toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
+        reset(); 
+        router.push('/pantry');
     } catch (e) {
         console.error(e);
         toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items to the cloud. Please try again.' });
-        // Here you might want to implement a way to rollback the optimistic update
         setIsSaving(false);
     };
   };

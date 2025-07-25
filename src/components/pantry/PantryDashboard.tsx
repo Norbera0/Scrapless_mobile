@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { deletePantryItem } from '@/lib/data';
-import type { PantryItem, User } from '@/types';
+import type { PantryItem } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
   AlertDialog,
@@ -21,9 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { auth } from '@/lib/firebase';
 import { Badge } from '../ui/badge';
-import { usePantryLogStore } from '@/stores/pantry-store';
 
 
 const getFreshness = (expirationDate: string) => {
@@ -40,34 +38,10 @@ const getFreshness = (expirationDate: string) => {
 
 export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
   const [items, setItems] = useState<PantryItem[]>(initialItems);
-  const [user, setUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   const { toast } = useToast();
   const router = useRouter();
-
-  const optimisticItems = usePantryLogStore((state) => state.optimisticItems);
-  const clearOptimisticItems = usePantryLogStore((state) => state.clearOptimisticItems);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    setIsHydrated(true);
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    // Defer merging optimistic items until after initial hydration
-    if (isHydrated && optimisticItems.length > 0) {
-      setItems(prevItems => {
-        const optimisticIds = new Set(optimisticItems.map(item => item.id));
-        const filteredPrevItems = prevItems.filter(item => !optimisticIds.has(item.id));
-        return [...optimisticItems, ...filteredPrevItems].sort((a,b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
-      });
-      clearOptimisticItems();
-    }
-  }, [isHydrated, optimisticItems, clearOptimisticItems]);
-
 
   const handleDelete = async (itemId: string) => {
     setIsDeleting(itemId);
