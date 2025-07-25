@@ -43,17 +43,19 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
   
   const { optimisticItems, clearOptimisticPantryItems } = usePantryLogStore();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
+    setIsHydrated(true);
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    // Defer merging optimistic items until after initial hydration
-    if (optimisticItems.length > 0) {
+    // Defer merging optimistic items until after initial client-side hydration
+    if (isHydrated && optimisticItems.length > 0) {
       setItems(prevItems => {
         const optimisticIds = new Set(optimisticItems.map(item => item.id));
         const filteredPrevItems = prevItems.filter(item => !optimisticIds.has(item.id));
@@ -63,7 +65,7 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
       clearOptimisticPantryItems();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [optimisticItems]);
+  }, [isHydrated, optimisticItems]);
 
 
   const handleDelete = async (itemId: string) => {
@@ -144,4 +146,3 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
     </div>
   );
 }
-
