@@ -53,3 +53,35 @@ export const LogPantryItemOutputSchema = z.object({
     ).describe('A list of detected food items, their amounts, and estimated expiration dates.'),
 });
 export type LogPantryItemOutput = z.infer<typeof LogPantryItemOutputSchema>;
+
+// Recipe Schemas
+export const SuggestRecipesInputSchema = z.object({
+    pantryItems: z.array(z.string()).describe("A list of food items currently in the user's pantry."),
+    preferences: z.object({
+        quickMeals: z.boolean().optional().describe("Filter for meals that take 15 minutes or less to cook."),
+        filipinoDishes: z.boolean().optional().describe("Filter for Filipino cuisine."),
+        difficulty: z.enum(['beginner', 'intermediate', 'experienced']).optional().describe("The user's cooking skill level."),
+    }).optional(),
+    history: z.array(z.string()).optional().describe("A list of recipe names that have been suggested recently to avoid duplicates."),
+});
+export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
+
+export const SuggestRecipesOutputSchema = z.object({
+    recipes: z.array(
+        z.object({
+            name: z.string().describe("The name of the recipe."),
+            cuisine: z.string().describe("The type of cuisine (e.g., Filipino, Italian, Mexican)."),
+            difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The cooking difficulty of the recipe."),
+            cookingTime: z.string().describe("The estimated cooking time (e.g., '30 min')."),
+            ingredients: z.array(
+                z.object({
+                    name: z.string().describe("The name of the ingredient."),
+                    status: z.enum(['Have', 'Basic', 'Need']).describe("The status of the ingredient: 'Have' (in pantry), 'Basic' (assumed available like oil/salt), or 'Need' (must be purchased)."),
+                    estimatedCost: z.number().optional().describe("The estimated cost in PHP if the ingredient status is 'Need'."),
+                })
+            ),
+            instructions: z.array(z.string()).describe("A list of step-by-step cooking instructions."),
+        })
+    ).describe("A list of 3-5 recipe suggestions."),
+});
+export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutputSchema>;

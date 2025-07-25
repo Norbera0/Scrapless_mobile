@@ -5,3 +5,5 @@ config();
 import '@/ai/flows/log-food-waste.ts';
 import '@/ai/flows/log-food-waste-from-audio.ts';
 import '@/ai/flows/log-pantry-item.ts';
+import '@/ai/flows/suggest-recipes.ts';
+

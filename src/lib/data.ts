@@ -1,6 +1,6 @@
 
 'use client';
-import type { WasteLog, PantryItem, PantryLog, FoodItem } from '@/types';
+import type { WasteLog, PantryItem, PantryLog, Recipe } from '@/types';
 
 // Simplified mapping. In a real app, this would be in a database.
 const FOOD_DATA: Record<string, { peso: number; co2e: number, shelfLifeDays: number }> = {
@@ -86,3 +86,26 @@ export const deletePantryItem = async (itemId: string, userId: string) => {
     items = items.filter(item => item.id !== itemId);
     saveToStorage(`pantryItems_${userId}`, items);
 };
+
+
+// Recipe Functions
+export const getSavedRecipes = async (userId: string): Promise<Recipe[]> => {
+    const recipes = getFromStorage<Recipe[]>(`savedRecipes_${userId}`);
+    return recipes;
+}
+
+export const saveRecipe = async (recipe: Recipe, userId: string): Promise<string> => {
+    const recipes = await getSavedRecipes(userId);
+    const existing = recipes.find(r => r.name === recipe.name);
+    if(!existing) {
+        recipes.push(recipe);
+        saveToStorage(`savedRecipes_${userId}`, recipes);
+    }
+    return recipe.id;
+}
+
+export const unsaveRecipe = async (recipeId: string, userId: string) => {
+    let recipes = await getSavedRecipes(userId);
+    recipes = recipes.filter(r => r.id !== recipeId);
+    saveToStorage(`savedRecipes_${userId}`, recipes);
+}

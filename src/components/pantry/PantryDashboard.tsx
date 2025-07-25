@@ -23,7 +23,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
 import { auth } from '@/lib/firebase';
-import { usePantryLogStore } from '@/stores/pantry-store';
+import { RecipeSuggestions } from './RecipeSuggestions';
 
 
 const getFreshness = (expirationDate: string) => {
@@ -126,6 +126,8 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
                 </div>
             </CardContent>
         </Card>
+
+        {items.length > 0 && <RecipeSuggestions pantryItems={items} />}
     </div>
   );
 }

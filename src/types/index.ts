@@ -36,3 +36,20 @@ export interface PantryLog {
     items: PantryItem[];
     photoDataUri?: string;
 }
+
+// Recipe Types
+export interface RecipeIngredient {
+  name: string;
+  status: 'Have' | 'Basic' | 'Need';
+  estimatedCost?: number;
+}
+
+export interface Recipe {
+  id: string;
+  name: string;
+  cuisine: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  cookingTime: string;
+  ingredients: RecipeIngredient[];
+  instructions: string[];
+}
