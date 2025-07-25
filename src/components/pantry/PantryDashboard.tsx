@@ -39,33 +39,38 @@ const getFreshness = (expirationDate: string) => {
 
 export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
   const [items, setItems] = useState<PantryItem[]>(initialItems);
-  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [user, setUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   
   const { optimisticItems, clearOptimisticPantryItems } = usePantryLogStore();
 
   useEffect(() => {
+    // This effect runs only on the client, after the initial render.
+    // It safely sets the user and marks the component as "client-mounted".
     const unsubscribe = auth.onAuthStateChanged(setUser);
-    setIsHydrated(true);
+    setIsClient(true); 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    // Defer merging optimistic items until after initial client-side hydration
-    if (isHydrated && optimisticItems.length > 0) {
+    // This effect now safely depends on `isClient`.
+    // It will only run on the client, after the component has mounted,
+    // preventing any server/client mismatch.
+    if (isClient && optimisticItems.length > 0) {
       setItems(prevItems => {
         const optimisticIds = new Set(optimisticItems.map(item => item.id));
         const filteredPrevItems = prevItems.filter(item => !optimisticIds.has(item.id));
-        const combined = [...optimisticItems, ...filteredPrevItems];
+        const combined = [...filteredPrevItems, ...optimisticItems];
         return combined.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
       });
+      // Clear the optimistic items from the store after they've been merged.
       clearOptimisticPantryItems();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHydrated, optimisticItems]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient, optimisticItems]);
 
 
   const handleDelete = async (itemId: string) => {
