@@ -3,12 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { getPantryItemsForUser, deletePantryItem } from '@/lib/data';
+import { deletePantryItem, getPantryItemsForUser } from '@/lib/data';
 import type { PantryItem, User } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
@@ -38,52 +36,32 @@ const getFreshness = (expirationDate: string) => {
 };
 
 
-export function PantryDashboard() {
-  const [items, setItems] = useState<PantryItem[]>([]);
+export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
+  const [items, setItems] = useState<PantryItem[]>(initialItems);
   const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((fbUser) => {
         setUser(fbUser);
-        if (fbUser) {
-            fetchItems(fbUser.uid);
-        } else {
-            setIsLoading(false);
-        }
     });
-
     return () => unsubscribe();
   }, []);
 
-  const fetchItems = async (userId: string) => {
-    setIsLoading(true);
-    const userItems = await getPantryItemsForUser(userId);
-    setItems(userItems);
-    setIsLoading(false);
-  }
 
   const handleDelete = async (itemId: string) => {
+    setIsDeleting(itemId);
     try {
         await deletePantryItem(itemId);
-        if(user) {
-            setItems(prevItems => prevItems.filter(item => item.id !== itemId));
-        }
+        setItems(prevItems => prevItems.filter(item => item.id !== itemId));
         toast({ title: 'Success', description: 'Item deleted from pantry.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete item.' });
+    } finally {
+        setIsDeleting(null);
     }
-  }
-
-
-  if (isLoading) {
-    return (
-        <div className="flex justify-center items-center h-full p-4 md:p-6">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-    )
   }
 
   return (
@@ -118,7 +96,9 @@ export function PantryDashboard() {
                                      <Badge variant={freshness.color as any}>{freshness.label}</Badge>
                                      <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <Button variant="ghost" size="icon"><Trash2 className="h-4 w-4" /></Button>
+                                            <Button variant="ghost" size="icon" disabled={isDeleting === item.id}>
+                                                {isDeleting === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                            </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
