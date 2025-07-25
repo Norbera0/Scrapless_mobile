@@ -7,7 +7,7 @@ import type { PantryItem } from '@/types';
 export default async function PantryPage() {
   let items: PantryItem[] = [];
   try {
-    const user = await auth().currentUser;
+    const user = auth.currentUser;
     if (user) {
       items = await getPantryItemsForUser(user.uid);
     }
