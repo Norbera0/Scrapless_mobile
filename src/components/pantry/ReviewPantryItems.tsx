@@ -28,7 +28,7 @@ import { useAuth } from '@/hooks/use-auth';
 export function ReviewPantryItems() {
   const router = useRouter();
   const { toast } = useToast();
-  const { items, setItems } = usePantryLogStore();
+  const { items, setItems, reset } = usePantryLogStore();
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
 
@@ -55,7 +55,10 @@ export function ReviewPantryItems() {
         title: 'Success!',
         description: 'Your pantry has been updated.',
       });
+
+      reset();
       router.push('/pantry');
+      
     } catch (error) {
       console.error('Failed to save pantry items:', error);
       toast({

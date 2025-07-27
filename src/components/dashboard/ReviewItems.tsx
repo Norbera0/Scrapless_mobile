@@ -93,6 +93,7 @@ export function ReviewItems() {
           title: 'Success!',
           description: 'Your waste log has been saved.',
       });
+      
       reset();
       router.push('/dashboard');
       

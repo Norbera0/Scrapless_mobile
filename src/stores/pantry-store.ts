@@ -44,6 +44,5 @@ export const usePantryLogStore = create<PantryLogState>()((set) => ({
     photoDataUri: null,
     textInput: '',
     items: [],
-    // Do not reset liveItems or optimisticItems here
   }),
 }));
