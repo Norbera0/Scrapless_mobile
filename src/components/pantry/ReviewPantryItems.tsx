@@ -57,7 +57,7 @@ export function ReviewPantryItems() {
       });
 
       reset();
-      router.push('/pantry');
+      router.replace('/pantry');
       
     } catch (error) {
       console.error('Failed to save pantry items:', error);

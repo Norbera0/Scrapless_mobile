@@ -21,7 +21,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { DatePicker } from '@/components/ui/date-picker';
 import { useAuth } from '@/hooks/use-auth';
 import { saveWasteLog } from '@/lib/data';
 import { FOOD_DATA_MAP } from '@/lib/food-data';
@@ -95,7 +94,7 @@ export function ReviewItems() {
       });
       
       reset();
-      router.push('/dashboard');
+      router.replace('/dashboard');
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);
