@@ -60,7 +60,7 @@ export function ReviewPantryItems() {
       setTimeout(() => {
         reset();
         router.replace('/pantry');
-      }, 10);
+      }, 20);
       
     } catch (error) {
       console.error('Failed to save pantry items:', error);

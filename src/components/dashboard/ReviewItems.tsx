@@ -97,7 +97,7 @@ export function ReviewItems() {
       setTimeout(() => {
         reset();
         router.replace('/dashboard');
-      }, 10);
+      }, 20);
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);
