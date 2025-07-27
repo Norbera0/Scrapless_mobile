@@ -33,14 +33,14 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
     return () => unsubscribe();
   }, []);
 
-  const fetchRecipes = useCallback(async () => {
+  const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
     setIsLoading(true);
     try {
       const pantryItemNames = pantryItems.map((item) => item.name);
       const result = await suggestRecipes({
         pantryItems: pantryItemNames,
         preferences: filters,
-        history: recipes.map(r => r.name), // Pass current suggestions to avoid immediate duplicates
+        history: currentRecipes.map(r => r.name),
       });
       const recipesWithIds = result.recipes.map(r => ({...r, id: crypto.randomUUID()}));
       setRecipes(recipesWithIds);
@@ -54,14 +54,16 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [pantryItems, filters, recipes, toast]);
+  }, [pantryItems, filters, toast]);
   
   useEffect(() => {
-    // Initial fetch
-    if(pantryItems.length > 0) {
-        fetchRecipes();
+    if (pantryItems.length > 0) {
+      fetchRecipes([]); // Initial fetch with no history
+    } else {
+        setIsLoading(false);
+        setRecipes([]);
     }
-  }, [pantryItems, fetchRecipes]); // Fetch when pantry items change
+  }, [pantryItems, filters, fetchRecipes]);
 
   useEffect(() => {
     // Load saved recipes
@@ -113,7 +115,7 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
             <Button size="sm" variant={filters.filipinoDishes ? 'default' : 'outline'} onClick={() => handleToggleFilter('filipinoDishes')}>
                 🇵🇭 Filipino
             </Button>
-            <Button size="sm" variant="outline" onClick={fetchRecipes} disabled={isLoading}>
+            <Button size="sm" variant="outline" onClick={() => fetchRecipes(recipes)} disabled={isLoading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                 More Recipes
             </Button>
