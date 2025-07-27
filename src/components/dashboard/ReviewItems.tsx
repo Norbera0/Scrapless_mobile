@@ -93,8 +93,11 @@ export function ReviewItems() {
           description: 'Your waste log has been saved.',
       });
       
-      reset();
-      router.replace('/dashboard');
+      // Use a timeout to ensure state reset and navigation don't cause race conditions
+      setTimeout(() => {
+        reset();
+        router.replace('/dashboard');
+      }, 10);
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);
@@ -103,12 +106,11 @@ export function ReviewItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
-    } finally {
       setIsSaving(false);
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isSaving) {
     return (
       <div className="text-center text-muted-foreground">
         <p>No items to review. Log waste to get started.</p>

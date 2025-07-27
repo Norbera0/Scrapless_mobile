@@ -56,8 +56,11 @@ export function ReviewPantryItems() {
         description: 'Your pantry has been updated.',
       });
 
-      reset();
-      router.replace('/pantry');
+      // Use a timeout to ensure state reset and navigation don't cause race conditions
+      setTimeout(() => {
+        reset();
+        router.replace('/pantry');
+      }, 10);
       
     } catch (error) {
       console.error('Failed to save pantry items:', error);
@@ -66,12 +69,11 @@ export function ReviewPantryItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
-    } finally {
       setIsSaving(false);
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isSaving) {
     return (
       <div className="text-center text-muted-foreground">
         <p>No items to review. Add items from the pantry logger.</p>
