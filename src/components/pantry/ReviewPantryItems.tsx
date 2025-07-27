@@ -96,28 +96,12 @@ export function ReviewPantryItems() {
             addedDate: new Date().toISOString(),
         }
     });
-
-    // For optimistic UI
-    const tempItemsForCache: PantryItem[] = data.items.map(item => {
-        const { peso, co2e } = getImpact(item.name);
-        return {
-            id: item.id, // use temporary client-generated ID
-            name: item.name,
-            estimatedAmount: item.estimatedAmount,
-            estimatedExpirationDate: item.estimatedExpirationDate,
-            pesoValue: peso,
-            carbonFootprint: co2e,
-            addedDate: new Date().toISOString(),
-        }
-    })
-    
-    addOptimisticItems(tempItemsForCache);
-    reset(); 
-    router.push('/pantry');
     
     try {
         await savePantryItems(user.uid, itemsToSave);
         toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
+        reset(); 
+        router.push('/pantry');
     } catch (e) {
         console.error(e);
         toast({ variant: 'destructive', title: 'Sync failed', description: 'Could not save your items to the cloud.' });
@@ -202,7 +186,7 @@ export function ReviewPantryItems() {
                                 </Button>
                             </div>
                         ))}
-                         <Button type="button" variant="outline" className="w-full" onClick={() => append({ id: crypto.randomUUID(), name: '', estimatedAmount: '', estimatedExpirationDate: format(new Date(), 'yyyy-MM-dd') })}>
+                         <Button type="button" variant="outline" className="w-full" onClick={() => append({ id: crypto.randomUUID(), name: '', estimatedAmount: '', estimatedExpirationDate: format(new date(), 'yyyy-MM-dd') })}>
                             <Plus className="mr-2 h-4 w-4" /> Add Item Manually
                         </Button>
                     </CardContent>
