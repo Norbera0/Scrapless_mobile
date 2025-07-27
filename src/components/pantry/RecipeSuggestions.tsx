@@ -12,18 +12,26 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Loader2, RefreshCw } from 'lucide-react';
 import { RecipeCard } from './RecipeCard';
 import { getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface RecipeSuggestionsProps {
   pantryItems: PantryItem[];
 }
 
 export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
-  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [user, setUser] = useState<User | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({ quickMeals: false, filipinoDishes: false });
   const { toast } = useToast();
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+        setUser(fbUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const fetchRecipes = useCallback(async () => {
     setIsLoading(true);
@@ -53,7 +61,7 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
     if(pantryItems.length > 0) {
         fetchRecipes();
     }
-  }, [pantryItems]); // Fetch when pantry items change, but not on filter change.
+  }, [pantryItems, fetchRecipes]); // Fetch when pantry items change
 
   useEffect(() => {
     // Load saved recipes
@@ -75,7 +83,7 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
     const isSaved = savedRecipeIds.has(recipe.id);
     try {
         if (isSaved) {
-            await unsaveRecipe(recipe.id, user.uid);
+            await unsaveRecipe(user.uid, recipe.id);
             setSavedRecipeIds(prev => {
                 const newSet = new Set(prev);
                 newSet.delete(recipe.id);
@@ -83,7 +91,7 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
             });
             toast({ title: 'Recipe Unsaved' });
         } else {
-            await saveRecipe(recipe, user.uid);
+            await saveRecipe(user.uid, recipe);
             setSavedRecipeIds(prev => new Set(prev).add(recipe.id));
             toast({ title: 'Recipe Saved!' });
         }

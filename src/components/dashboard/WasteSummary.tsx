@@ -4,7 +4,7 @@
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { getImpact, saveWasteLog } from '@/lib/data';
+import { saveWasteLog } from '@/lib/data';
 import type { FoodItem, User, WasteLog } from '@/types';
 import { Save, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
+import { FOOD_DATA_MAP } from '@/lib/food-data';
 
 export function WasteSummary() {
   const router = useRouter();
@@ -31,6 +32,16 @@ export function WasteSummary() {
 
     return () => unsubscribe();
   }, [items, router]);
+  
+  const getImpact = (itemName: string): { peso: number; co2e: number, shelfLifeDays: number } => {
+    const lowerCaseItem = itemName.toLowerCase();
+    for (const key in FOOD_DATA_MAP) {
+      if (lowerCaseItem.includes(key)) {
+        return FOOD_DATA_MAP[key];
+      }
+    }
+    return { peso: 5, co2e: 0.1, shelfLifeDays: 7 }; // Default for unrecognized items
+  }
 
   const impactData = useMemo(() => {
     return items.reduce(
@@ -73,7 +84,7 @@ export function WasteSummary() {
     }
     
     try {
-        await saveWasteLog(logData)
+        await saveWasteLog(user.uid, logData);
         toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
         reset(); // Clear the store for the next log
         router.push('/dashboard');

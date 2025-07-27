@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
@@ -6,8 +7,9 @@ import { SidebarProvider, Sidebar, SidebarInset } from '@/components/ui/sidebar'
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import type { User } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { auth } from '@/lib/firebase';
+import { auth, cleanupFirestore } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { initializeUserCache, cleanupListeners } from '@/lib/data';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -17,18 +19,31 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser({
+        const currentUser = {
           uid: firebaseUser.uid,
           name: firebaseUser.displayName,
           email: firebaseUser.email,
-        });
+        };
+        setUser(currentUser);
+        // Initialize Firestore listeners for the logged-in user
+        initializeUserCache(currentUser.uid);
       } else {
+        // User is signed out
+        setUser(null);
+        // Clean up any active listeners
+        cleanupListeners();
+        // Optional: clear persistent storage if desired, though Firestore handles this well
+        // cleanupFirestore(); 
         router.replace('/login');
       }
       setIsLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+        unsubscribe();
+        // Final cleanup when the layout unmounts
+        cleanupListeners();
+    };
   }, [router]);
 
   if (isLoading) {

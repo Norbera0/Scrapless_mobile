@@ -24,31 +24,40 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 
 export function TrendsDashboard() {
   const [logs, setLogs] = useState<WasteLog[]>([]);
-  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    if(user) {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        setUser(fbUser);
         const fetchLogs = async () => {
             setIsLoading(true);
-            const userLogs = await getWasteLogsForUser(user.uid);
+            const userLogs = await getWasteLogsForUser(fbUser.uid);
             setLogs(userLogs);
             setIsLoading(false);
         }
         fetchLogs();
-    }
-  }, [user]);
+      } else {
+        setUser(null);
+        setLogs([]);
+        setIsLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleDelete = async (logId: string) => {
     if(!user) return;
     try {
-        await deleteWasteLog(logId, user.uid);
-        setLogs(prevLogs => prevLogs.filter(log => log.id !== logId));
+        await deleteWasteLog(user.uid, logId);
+        // Rely on Firestore listener to update the UI
         toast({ title: 'Success', description: 'Log deleted successfully.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete log.' });
@@ -165,8 +174,8 @@ export function TrendsDashboard() {
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-1 text-sm text-muted-foreground">
-                                {log.items.map(item => (
-                                <li key={item.id} className="flex justify-between">
+                                {log.items.map((item, index) => (
+                                <li key={index} className="flex justify-between">
                                     <span>{item.estimatedAmount} {item.name}</span>
                                     <span className="font-mono text-foreground">₱{item.pesoValue.toFixed(2)}</span>
                                 </li>

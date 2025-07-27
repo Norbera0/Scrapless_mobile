@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { deletePantryItem } from '@/lib/data';
+import { deletePantryItem, getPantryItemsForUser } from '@/lib/data';
 import type { PantryItem, User } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
 import { auth } from '@/lib/firebase';
 import { RecipeSuggestions } from './RecipeSuggestions';
+import { onAuthStateChanged } from 'firebase/auth';
 
 
 const getFreshness = (expirationDate: string) => {
@@ -41,27 +42,49 @@ const getFreshness = (expirationDate: string) => {
 export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
   const [items, setItems] = useState<PantryItem[]>(initialItems);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { toast } = useToast();
   const router = useRouter();
 
-  useEffect(() => {
-    setItems(initialItems);
-  }, [initialItems]);
+   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        setUser(fbUser);
+        setIsLoading(true);
+        const userItems = await getPantryItemsForUser(fbUser.uid);
+        setItems(userItems);
+        setIsLoading(false);
+      } else {
+        setUser(null);
+        setItems([]);
+        setIsLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleDelete = async (itemId: string) => {
     if (!user) return;
     setIsDeleting(itemId);
     try {
-        await deletePantryItem(itemId, user.uid);
-        setItems(prevItems => prevItems.filter(item => item.id !== itemId));
+        await deletePantryItem(user.uid, itemId);
+        // UI will update via Firestore listener
         toast({ title: 'Success', description: 'Item deleted from pantry.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete item.' });
     } finally {
         setIsDeleting(null);
     }
+  }
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center h-full p-4 md:p-6">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    )
   }
 
   return (

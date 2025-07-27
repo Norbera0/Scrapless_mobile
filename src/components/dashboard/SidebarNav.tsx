@@ -17,6 +17,7 @@ import {
 import type { User } from '@/types';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { cleanupListeners } from '@/lib/data';
 
 export function SidebarNav({ user }: { user: User }) {
   const pathname = usePathname();
@@ -24,7 +25,11 @@ export function SidebarNav({ user }: { user: User }) {
 
   const handleLogout = async () => {
     try {
+        // First, clean up all Firestore listeners
+        cleanupListeners();
+        // Then, sign out from Firebase Auth
         await signOut(auth);
+        // Finally, redirect to the login page
         router.push('/login');
     } catch (error) {
         console.error('Logout failed', error);

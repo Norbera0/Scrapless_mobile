@@ -16,9 +16,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
-import type { User, PantryLog, PantryItem } from '@/types';
-import { getImpact, savePantryLog } from '@/lib/data';
+import type { User, PantryItem } from '@/types';
+import { savePantryItems } from '@/lib/data';
 import { format } from 'date-fns';
+import { FOOD_DATA_MAP } from '@/lib/food-data';
 
 const reviewSchema = z.object({
   items: z.array(
@@ -66,6 +67,16 @@ export function ReviewPantryItems() {
       setIsReady(true);
     }
   }, [items, router, form, isReady]);
+  
+  const getImpact = (itemName: string): { peso: number; co2e: number, shelfLifeDays: number } => {
+    const lowerCaseItem = itemName.toLowerCase();
+    for (const key in FOOD_DATA_MAP) {
+      if (lowerCaseItem.includes(key)) {
+        return FOOD_DATA_MAP[key];
+      }
+    }
+    return { peso: 5, co2e: 0.1, shelfLifeDays: 7 }; // Default for unrecognized items
+  }
 
   const onSubmit = async (data: ReviewFormValues) => {
     if (!user) {
@@ -74,25 +85,20 @@ export function ReviewPantryItems() {
     }
     setIsSaving(true);
 
-    const finalItems: PantryItem[] = data.items.map(item => {
+    const finalItems: Omit<PantryItem, 'id'>[] = data.items.map(item => {
         const { peso, co2e } = getImpact(item.name);
         return {
-            ...item,
+            name: item.name,
+            estimatedAmount: item.estimatedAmount,
+            estimatedExpirationDate: item.estimatedExpirationDate,
             pesoValue: peso,
             carbonFootprint: co2e,
             addedDate: new Date().toISOString(),
-            id: typeof item.id === 'number' ? String(item.id) : item.id,
         }
     });
 
-    const logData: Omit<PantryLog, 'id' | 'date' | 'userId'> = { items: finalItems };
-
-    if (photoDataUri) {
-      logData.photoDataUri = photoDataUri;
-    }
-    
     try {
-        await savePantryLog(logData, user.uid)
+        await savePantryItems(user.uid, finalItems);
         toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
         reset(); 
         router.push('/pantry');

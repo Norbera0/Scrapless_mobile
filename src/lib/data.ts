@@ -1,111 +1,159 @@
 
 'use client';
-import type { WasteLog, PantryItem, PantryLog, Recipe } from '@/types';
+import { db } from './firebase';
+import type { WasteLog, PantryItem, Recipe, User } from '@/types';
+import { 
+    collection, 
+    addDoc, 
+    deleteDoc, 
+    doc, 
+    onSnapshot,
+    query,
+    where,
+    writeBatch,
+    Unsubscribe,
+    getDocs,
+    setDoc,
+    getDoc,
+    orderBy
+} from 'firebase/firestore';
 
-// Simplified mapping. In a real app, this would be in a database.
-const FOOD_DATA: Record<string, { peso: number; co2e: number, shelfLifeDays: number }> = {
-  'rice': { peso: 5, co2e: 0.1, shelfLifeDays: 365 }, // per cup
-  'bread': { peso: 10, co2e: 0.05, shelfLifeDays: 7 }, // per slice
-  'chicken': { peso: 40, co2e: 0.5, shelfLifeDays: 3 }, // per 100g
-  'beef': { peso: 80, co2e: 2.5, shelfLifeDays: 4 }, // per 100g
-  'pork': { peso: 60, co2e: 1.0, shelfLifeDays: 4 }, // per 100g
-  'fish': { peso: 50, co2e: 0.3, shelfLifeDays: 2 }, // per 100g
-  'lettuce': { peso: 15, co2e: 0.02, shelfLifeDays: 7 }, // per head
-  'tomato': { peso: 8, co2e: 0.03, shelfLifeDays: 10 }, // per piece
-  'apple': { peso: 20, co2e: 0.04, shelfLifeDays: 30 }, // per piece
-  'banana': { peso: 10, co2e: 0.08, shelfLifeDays: 5 }, // per piece
-  'orange': { peso: 15, co2e: 0.05, shelfLifeDays: 21 }, // per piece
-  'pasta': { peso: 25, co2e: 0.15, shelfLifeDays: 365 }, // per cup cooked
-  'potato': { peso: 12, co2e: 0.02, shelfLifeDays: 60 }, // per piece
-  'cheese': { peso: 50, co2e: 0.8, shelfLifeDays: 21 }, // per 50g slice
-  'egg': { peso: 9, co2e: 0.2, shelfLifeDays: 28 }, // per piece
-  'milk': { peso: 60, co2e: 0.3, shelfLifeDays: 7 }, // per liter
-  'yogurt': { peso: 30, co2e: 0.2, shelfLifeDays: 14 },
+// --- Listener Management ---
+// This will hold all active unsubscribe functions for the current user.
+const listenerManager: { [key: string]: Unsubscribe[] } = {
+    wasteLogs: [],
+    pantry: [],
+    userSettings: [],
+    savedRecipes: []
 };
 
-export function getImpact(itemName: string): { peso: number; co2e: number, shelfLifeDays: number } {
-  const lowerCaseItem = itemName.toLowerCase();
-  for (const key in FOOD_DATA) {
-    if (lowerCaseItem.includes(key)) {
-      return FOOD_DATA[key];
+// Function to unsubscribe from all active listeners for a specific key or all.
+export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes') => {
+    const unsubscribeAll = (keys: string[]) => {
+        keys.forEach(k => {
+            if (listenerManager[k]) {
+                listenerManager[k].forEach(unsub => unsub());
+                listenerManager[k] = []; // Clear the array
+                console.log(`Unsubscribed from all ${k} listeners.`);
+            }
+        });
+    };
+
+    if (key) {
+        unsubscribeAll([key]);
+    } else {
+        unsubscribeAll(Object.keys(listenerManager));
     }
-  }
-  return { peso: 5, co2e: 0.1, shelfLifeDays: 7 }; // Default for unrecognized items
-}
+};
 
-const getFromStorage = <T>(key: string): T => {
-    if (typeof window === 'undefined') return [] as T;
-    const items = localStorage.getItem(key);
-    return items ? JSON.parse(items) : [];
-}
+// --- Cache Initialization ---
+/**
+ * Initializes real-time listeners for all user-specific data.
+ * This should be called on user login.
+ */
+export const initializeUserCache = (userId: string) => {
+    console.log(`Initializing user cache for ${userId}...`);
+    // Ensure any previous listeners are cleaned up before starting new ones.
+    cleanupListeners();
 
-const saveToStorage = <T>(key: string, data: T) => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(key, JSON.stringify(data));
-}
+    // Listener for Waste Logs
+    const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
+    const wasteLogsUnsub = onSnapshot(wasteLogsQuery, (snapshot) => {
+        console.log(`Firestore: Received wasteLogs snapshot with ${snapshot.docs.length} documents.`);
+        // In a real app, you'd likely update a client-side store (like Zustand or React Context) here.
+        // For this implementation, we rely on Firestore's cache to serve data to get... functions.
+    }, (error) => {
+        console.error("Error with wasteLogs listener:", error);
+    });
+    listenerManager.wasteLogs.push(wasteLogsUnsub);
+    
+    // Listener for Pantry Items
+    const pantryQuery = query(collection(db, `users/${userId}/pantry`), orderBy('estimatedExpirationDate', 'asc'));
+    const pantryUnsub = onSnapshot(pantryQuery, (snapshot) => {
+        console.log(`Firestore: Received pantry snapshot with ${snapshot.docs.length} documents.`);
+    }, (error) => {
+        console.error("Error with pantry listener:", error);
+    });
+    listenerManager.pantry.push(pantryUnsub);
+    
+    // Listener for Saved Recipes
+    const savedRecipesQuery = query(collection(db, `users/${userId}/savedRecipes`));
+    const savedRecipesUnsub = onSnapshot(savedRecipesQuery, (snapshot) => {
+        console.log(`Firestore: Received savedRecipes snapshot with ${snapshot.docs.length} documents.`);
+    }, (error) => {
+        console.error("Error with savedRecipes listener:", error);
+    });
+    listenerManager.savedRecipes.push(savedRecipesUnsub);
+};
 
 
-export const saveWasteLog = async (newLog: Omit<WasteLog, 'id'>): Promise<string> => {
-    const logs = getFromStorage<WasteLog[]>(`wasteLogs_${newLog.userId}`);
-    const logWithId = { ...newLog, id: crypto.randomUUID() };
-    logs.push(logWithId);
-    saveToStorage(`wasteLogs_${newLog.userId}`, logs);
-    return logWithId.id;
+// --- Waste Log Functions ---
+export const saveWasteLog = async (userId: string, newLog: Omit<WasteLog, 'id'>): Promise<string> => {
+    const docRef = await addDoc(collection(db, `users/${userId}/wasteLogs`), newLog);
+    return docRef.id;
 };
 
 export const getWasteLogsForUser = async (userId: string): Promise<WasteLog[]> => {
-    const logs = getFromStorage<WasteLog[]>(`wasteLogs_${userId}`);
-    return logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const q = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WasteLog));
 };
 
-export const deleteWasteLog = async (logId: string, userId: string) => {
-    let logs = getFromStorage<WasteLog[]>(`wasteLogs_${userId}`);
-    logs = logs.filter(log => log.id !== logId);
-    saveToStorage(`wasteLogs_${userId}`, logs);
-}
+export const deleteWasteLog = async (userId: string, logId: string) => {
+    await deleteDoc(doc(db, `users/${userId}/wasteLogs`, logId));
+};
 
+// --- Pantry Functions ---
 export const getPantryItemsForUser = async (userId: string): Promise<PantryItem[]> => {
-    const items = getFromStorage<PantryItem[]>(`pantryItems_${userId}`);
-    return items.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
+    const q = query(collection(db, `users/${userId}/pantry`), orderBy('estimatedExpirationDate', 'asc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
 };
 
-export const savePantryLog = async (newLog: Omit<PantryLog, 'id' | 'date' | 'userId'>, userId: string): Promise<string> => {
-    const items = getFromStorage<PantryItem[]>(`pantryItems_${userId}`);
-    const newItemsWithIds = newLog.items.map(item => ({...item, id: crypto.randomUUID()}));
-    const allItems = [...items, ...newItemsWithIds];
-    saveToStorage(`pantryItems_${userId}`, allItems);
+export const savePantryItems = async (userId: string, newItems: Omit<PantryItem, 'id'>[]): Promise<string[]> => {
+    const batch = writeBatch(db);
+    const itemIds: string[] = [];
+    const pantryCollection = collection(db, `users/${userId}/pantry`);
     
-    // We don't really need to save the log itself, just the items.
-    // We'll return a dummy ID.
-    return crypto.randomUUID();
+    newItems.forEach(item => {
+        const docRef = doc(pantryCollection); // Create a new doc with a random ID
+        batch.set(docRef, item);
+        itemIds.push(docRef.id);
+    });
+
+    await batch.commit();
+    return itemIds;
+};
+
+export const deletePantryItem = async (userId: string, itemId: string) => {
+    await deleteDoc(doc(db, `users/${userId}/pantry`, itemId));
 };
 
 
-export const deletePantryItem = async (itemId: string, userId: string) => {
-    let items = getFromStorage<PantryItem[]>(`pantryItems_${userId}`);
-    items = items.filter(item => item.id !== itemId);
-    saveToStorage(`pantryItems_${userId}`, items);
-};
-
-
-// Recipe Functions
+// --- Recipe Functions ---
 export const getSavedRecipes = async (userId: string): Promise<Recipe[]> => {
-    const recipes = getFromStorage<Recipe[]>(`savedRecipes_${userId}`);
-    return recipes;
+    const querySnapshot = await getDocs(collection(db, `users/${userId}/savedRecipes`));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
 }
 
-export const saveRecipe = async (recipe: Recipe, userId: string): Promise<string> => {
-    const recipes = await getSavedRecipes(userId);
-    const existing = recipes.find(r => r.name === recipe.name);
-    if(!existing) {
-        recipes.push(recipe);
-        saveToStorage(`savedRecipes_${userId}`, recipes);
-    }
+export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string> => {
+    const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
+    await setDoc(recipeRef, recipe);
     return recipe.id;
 }
 
-export const unsaveRecipe = async (recipeId: string, userId: string) => {
-    let recipes = await getSavedRecipes(userId);
-    recipes = recipes.filter(r => r.id !== recipeId);
-    saveToStorage(`savedRecipes_${userId}`, recipes);
+export const unsaveRecipe = async (userId: string, recipeId: string) => {
+    await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
+
+// --- User Settings Functions ---
+export const getUserSettings = async (userId: string): Promise<any> => {
+    const docRef = doc(db, `users/${userId}/settings`, 'app');
+    const docSnap = await getDoc(docRef);
+    return docSnap.exists() ? docSnap.data() : {};
+};
+
+export const saveUserSettings = async (userId: string, settings: any) => {
+    const docRef = doc(db, `users/${userId}/settings`, 'app');
+    await setDoc(docRef, settings, { merge: true });
+};
