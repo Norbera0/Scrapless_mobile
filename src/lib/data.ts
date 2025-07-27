@@ -18,6 +18,7 @@ import {
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import type { PantryLogItem } from '@/stores/pantry-store';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -81,8 +82,8 @@ export const initializeUserCache = (userId: string) => {
 
 
 // --- Waste Log Functions ---
-export const saveWasteLog = async (userId: string, newLog: Omit<WasteLog, 'id'>): Promise<string> => {
-    const docRef = await addDoc(collection(db, `users/${userId}/wasteLogs`), newLog);
+export const saveWasteLog = async (logData: WasteLog): Promise<string> => {
+    const docRef = await addDoc(collection(db, `users/${logData.userId}/wasteLogs`), logData);
     return docRef.id;
 };
 
@@ -103,16 +104,23 @@ export const getPantryItemsForUser = async (userId: string): Promise<PantryItem[
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
 };
 
-export const savePantryItems = async (userId: string, newItems: Omit<PantryItem, 'id'>[]): Promise<PantryItem[]> => {
+export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem[]): Promise<PantryItem[]> => {
     const batch = writeBatch(db);
     const savedItems: PantryItem[] = [];
     const pantryCollection = collection(db, `users/${userId}/pantry`);
     
-    newItems.forEach(item => {
-        const docRef = doc(pantryCollection);
-        const newItemWithId = { ...item, id: docRef.id };
-        batch.set(docRef, item);
-        savedItems.push(newItemWithId as PantryItem);
+    itemsToSave.forEach(item => {
+        const docRef = doc(pantryCollection, item.id);
+        const newItem: Omit<PantryItem, 'id'> = {
+            name: item.name,
+            estimatedAmount: item.estimatedAmount,
+            estimatedExpirationDate: item.estimatedExpirationDate,
+            addedDate: new Date().toISOString(),
+            pesoValue: 0, // Default values, can be expanded later
+            carbonFootprint: 0,
+        }
+        batch.set(docRef, newItem);
+        savedItems.push({ ...newItem, id: item.id });
     });
 
     await batch.commit();

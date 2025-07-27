@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import type { WasteLog } from '@/types';
 
-interface LogItem {
+export interface WasteLogItem {
   id: string;
   name: string;
   estimatedAmount: string;
@@ -11,11 +11,11 @@ interface LogItem {
 interface WasteLogState {
   photoDataUri: string | null;
   photoPreview: string | null;
-  items: LogItem[];
+  items: WasteLogItem[];
   logs: WasteLog[];
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
-  setItems: (items: LogItem[]) => void;
+  setItems: (items: WasteLogItem[]) => void;
   setLogs: (logs: WasteLog[]) => void;
   reset: () => void;
 }

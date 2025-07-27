@@ -1,204 +1,172 @@
 
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, Save, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import Image from 'next/image';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { auth } from '@/lib/firebase';
-import type { User, PantryItem } from '@/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { DatePicker } from '@/components/ui/date-picker';
+import type { PantryLogItem } from '@/stores/pantry-store';
 import { savePantryItems } from '@/lib/data';
-import { format } from 'date-fns';
-import { FOOD_DATA_MAP } from '@/lib/food-data';
-
-const reviewSchema = z.object({
-  items: z.array(
-    z.object({
-      id: z.string(),
-      name: z.string().min(1, 'Item name is required.'),
-      estimatedAmount: z.string().min(1, 'Amount is required.'),
-      estimatedExpirationDate: z.string().min(1, 'Expiration date is required.'),
-    })
-  ),
-});
-
-type ReviewFormValues = z.infer<typeof reviewSchema>;
+import { useAuth } from '@/hooks/use-auth';
 
 export function ReviewPantryItems() {
   const router = useRouter();
-  const { items, photoDataUri, reset, addOptimisticItems } = usePantryLogStore();
-  const [isReady, setIsReady] = useState(false);
-  const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
+  const { items, setItems } = usePantryLogStore();
+  const [isSaving, setIsSaving] = useState(false);
+  const { user } = useAuth();
 
-  const form = useForm<ReviewFormValues>({
-    resolver: zodResolver(reviewSchema),
-    defaultValues: {
-      items: [],
-    },
-  });
+  const handleItemChange = (index: number, field: string, value: any) => {
+    const newItems = [...items];
+    (newItems[index] as any)[field] = value;
+    setItems(newItems);
+  };
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'items',
-  });
+  const handleRemoveItem = (index: number) => {
+    const newItems = items.filter((_, i) => i !== index);
+    setItems(newItems);
+  };
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (items.length === 0 && !isReady) {
-       router.replace('/add-to-pantry');
-    } else {
-      form.reset({ items });
-      setIsReady(true);
-    }
-  }, [items, router, form, isReady]);
-  
-  const getImpact = (itemName: string): { peso: number; co2e: number, shelfLifeDays: number } => {
-    const lowerCaseItem = itemName.toLowerCase();
-    for (const key in FOOD_DATA_MAP) {
-      if (lowerCaseItem.includes(key)) {
-        return FOOD_DATA_MAP[key];
-      }
-    }
-    return { peso: 5, co2e: 0.1, shelfLifeDays: 7 }; // Default for unrecognized items
-  }
-
-  const onSubmit = async (data: ReviewFormValues) => {
+  const handleConfirmAndSave = async () => {
     if (!user) {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
         return;
     }
     setIsSaving(true);
-
-    const itemsToSave: Omit<PantryItem, 'id'>[] = data.items.map(item => {
-        const { peso, co2e } = getImpact(item.name);
-        return {
-            name: item.name,
-            estimatedAmount: item.estimatedAmount,
-            estimatedExpirationDate: item.estimatedExpirationDate,
-            pesoValue: peso,
-            carbonFootprint: co2e,
-            addedDate: new Date().toISOString(),
-        }
-    });
-    
     try {
-        await savePantryItems(user.uid, itemsToSave);
-        toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
-        reset(); 
-        router.push('/pantry');
-    } catch (e) {
-        console.error(e);
-        toast({ variant: 'destructive', title: 'Sync failed', description: 'Could not save your items to the cloud.' });
+      await savePantryItems(user.uid, items);
+      toast({
+        title: 'Success!',
+        description: 'Your pantry has been updated.',
+      });
+      router.push('/pantry');
+    } catch (error) {
+      console.error('Failed to save pantry items:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to save items. Please try again.',
+        variant: 'destructive',
+      });
     } finally {
-        setIsSaving(false);
+      setIsSaving(false);
     }
   };
-  
-  if (!isReady) {
+
+  if (items.length === 0) {
     return (
-        <div className="grid md:grid-cols-2 gap-6">
-             <Card>
-                <CardHeader>
-                    <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="w-full aspect-video rounded-lg" />
-                </CardContent>
-             </Card>
-               <Card>
-                <CardHeader>
-                    <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex gap-2 items-end">
-                        <div className="w-1/3 space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
-                        <div className="flex-grow space-y-2"><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full" /></div>
-                        <Skeleton className="h-10 w-10" />
-                    </div>
-                </CardContent>
-             </Card>
-        </div>
-    )
+      <div className="text-center text-muted-foreground">
+        <p>No items to review. Add items from the pantry logger.</p>
+        <Button onClick={() => router.push('/add-to-pantry')} className="mt-4">
+          Add Items
+        </Button>
+      </div>
+    );
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-6">
-        {photoDataUri && (
-             <Card>
-                <CardHeader>
-                    <CardTitle>Captured Photo</CardTitle>
-                    <CardDescription>This is the photo you submitted for analysis.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Image src={photoDataUri} alt="Pantry items photo" width={500} height={400} className="rounded-lg object-cover w-full aspect-video" />
-                </CardContent>
-             </Card>
-        )}
-       
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <Card className="flex flex-col h-full">
-                    <CardHeader>
-                        <CardTitle>Review & Adjust Items</CardTitle>
-                        <CardDescription>Edit, add, or remove items before saving.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow space-y-4">
-                        {fields.map((field, index) => (
-                            <div key={field.id} className="flex gap-2 items-end">
-                                 <FormField control={form.control} name={`items.${index}.estimatedAmount`} render={({ field }) => (
-                                    <FormItem className="w-1/4">
-                                        <FormLabel className="text-xs">Amount</FormLabel>
-                                        <FormControl><Input {...field} /></FormControl>
-                                    </FormItem>
-                                )} />
-                                <FormField control={form.control} name={`items.${index}.name`} render={({ field }) => (
-                                    <FormItem className="flex-grow">
-                                        <FormLabel className="text-xs">Item</FormLabel>
-                                        <FormControl><Input {...field} /></FormControl>
-                                    </FormItem>
-                                )} />
-                                 <FormField control={form.control} name={`items.${index}.estimatedExpirationDate`} render={({ field }) => (
-                                    <FormItem className="w-1/4">
-                                        <FormLabel className="text-xs">Expires</FormLabel>
-                                        <FormControl><Input type='date' {...field} /></FormControl>
-                                    </FormItem>
-                                )} />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
-                         <Button type="button" variant="outline" className="w-full" onClick={() => append({ id: crypto.randomUUID(), name: '', estimatedAmount: '', estimatedExpirationDate: format(new date(), 'yyyy-MM-dd') })}>
-                            <Plus className="mr-2 h-4 w-4" /> Add Item Manually
-                        </Button>
-                    </CardContent>
-                    <CardFooter>
-                         <Button type="submit" className="w-full" disabled={fields.length === 0 || isSaving}>
-                            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                            {isSaving ? 'Saving...' : 'Save to Pantry'}
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </form>
-        </Form>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Detected Items</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {items.map((item: PantryLogItem, index: number) => {
+            return (
+              <div
+                key={item.id}
+                className="grid grid-cols-1 gap-4 rounded-lg border p-4 md:grid-cols-3"
+              >
+                <div className="flex items-center gap-4 md:col-span-1">
+                  <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
+                  <Input
+                    value={item.name}
+                    onChange={(e) =>
+                      handleItemChange(index, 'name', e.target.value)
+                    }
+                    className="text-lg font-semibold"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <Input
+                      value={item.estimatedAmount}
+                       onChange={(e) =>
+                        handleItemChange(index, 'estimatedAmount', e.target.value)
+                      }
+                      placeholder="Amount (e.g. 1kg)"
+                    />
+                    <DatePicker
+                      date={new Date(item.estimatedExpirationDate)}
+                      onDateChange={(date) =>
+                        handleItemChange(index, 'estimatedExpirationDate', date?.toISOString() ?? new Date().toISOString())
+                      }
+                    />
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-auto -mt-12 -mr-2"
+                  onClick={() => handleRemoveItem(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={isSaving}
+        >
+          Back
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button disabled={isSaving || items.length === 0}>
+              <Save className="mr-2 h-4 w-4" />
+              Save to Pantry
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action will add the reviewed items to your pantry.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmAndSave}
+                disabled={isSaving}
+              >
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirm & Save
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
