@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { deletePantryItem, getPantryItemsForUser } from '@/lib/data';
+import { deletePantryItem } from '@/lib/data';
 import type { PantryItem, User } from '@/types';
 import { format, differenceInDays, startOfToday } from 'date-fns';
 import {
@@ -24,8 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '../ui/badge';
 import { auth } from '@/lib/firebase';
 import { RecipeSuggestions } from './RecipeSuggestions';
-import { onAuthStateChanged } from 'firebase/auth';
-
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 const getFreshness = (expirationDate: string) => {
     const today = startOfToday();
@@ -38,39 +37,47 @@ const getFreshness = (expirationDate: string) => {
     return { label: 'Fresh', color: 'default', days: daysLeft };
 };
 
-
-export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]}) {
-  const [items, setItems] = useState<PantryItem[]>(initialItems);
+export function PantryDashboard() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
+  const { liveItems, optimisticItems, clearOptimisticItems } = usePantryLogStore();
+  const [isClient, setIsClient] = useState(false);
 
   const { toast } = useToast();
   const router = useRouter();
 
-   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
-      if (fbUser) {
-        setUser(fbUser);
-        setIsLoading(true);
-        const userItems = await getPantryItemsForUser(fbUser.uid);
-        setItems(userItems);
-        setIsLoading(false);
-      } else {
-        setUser(null);
-        setItems([]);
-        setIsLoading(false);
-      }
-    });
+  useEffect(() => {
+    setIsClient(true);
+    const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
   }, []);
+
+  const items = useMemo(() => {
+    if (!isClient) return liveItems; // Render server-fetched items initially
+    
+    const combined = [...optimisticItems, ...liveItems];
+    const uniqueItems = Array.from(new Map(combined.map(item => [item.id, item])).values());
+    uniqueItems.sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
+    return uniqueItems;
+  }, [liveItems, optimisticItems, isClient]);
+
+  // Clean up optimistic items after they've been replaced by the live listener
+  useEffect(() => {
+      if (optimisticItems.length > 0) {
+          const liveIds = new Set(liveItems.map(i => i.id));
+          const allOptimisticItemsAreLive = optimisticItems.every(item => liveIds.has(item.id));
+          if (allOptimisticItemsAreLive) {
+              clearOptimisticItems();
+          }
+      }
+  }, [liveItems, optimisticItems, clearOptimisticItems]);
+
 
   const handleDelete = async (itemId: string) => {
     if (!user) return;
     setIsDeleting(itemId);
     try {
         await deletePantryItem(user.uid, itemId);
-        // UI will update via Firestore listener
         toast({ title: 'Success', description: 'Item deleted from pantry.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete item.' });
@@ -78,15 +85,7 @@ export function PantryDashboard({ initialItems }: { initialItems: PantryItem[]})
         setIsDeleting(null);
     }
   }
-
-  if (isLoading) {
-    return (
-        <div className="flex justify-center items-center h-full p-4 md:p-6">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-    )
-  }
-
+  
   return (
     <div className="grid gap-6">
         <Card>

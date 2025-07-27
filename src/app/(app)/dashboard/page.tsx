@@ -6,41 +6,41 @@ import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, Mic } from 'lucide-react';
-import type { User, WasteLog } from '@/types';
+import type { User } from '@/types';
 import { auth } from '@/lib/firebase';
-import { getWasteLogsForUser } from '@/lib/data';
-import { format, isToday } from 'date-fns';
+import { useWasteLogStore } from '@/stores/waste-log-store';
+import { isToday } from 'date-fns';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(auth.currentUser);
+  const { logs, setLogs } = useWasteLogStore();
   const [isLoading, setIsLoading] = useState(true);
-  const [todayStats, setTodayStats] = useState({ totalPesoValue: 0, totalCarbonFootprint: 0 });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((fbUser) => {
       setUser(fbUser);
-      if (fbUser) {
-        fetchTodayStats(fbUser.uid);
-      } else {
-        setIsLoading(false);
-      }
+      setIsLoading(!fbUser);
     });
     return () => unsubscribe();
   }, []);
 
-  const fetchTodayStats = async (userId: string) => {
-    setIsLoading(true);
-    const logs = await getWasteLogsForUser(userId);
-    const todayLogs = logs.filter(log => isToday(new Date(log.date)));
-    const stats = todayLogs.reduce((acc, log) => {
-      acc.totalPesoValue += log.totalPesoValue;
-      acc.totalCarbonFootprint += log.totalCarbonFootprint;
-      return acc;
+  useEffect(() => {
+    // The listener in data.ts will populate the store.
+    // We just need to know when to stop showing the loader.
+    if (user && logs.length > 0) {
+      setIsLoading(false);
+    }
+  }, [user, logs]);
+
+
+  const todayStats = logs
+    .filter(log => isToday(new Date(log.date)))
+    .reduce((acc, log) => {
+        acc.totalPesoValue += log.totalPesoValue;
+        acc.totalCarbonFootprint += log.totalCarbonFootprint;
+        return acc;
     }, { totalPesoValue: 0, totalCarbonFootprint: 0 });
-    setTodayStats(stats);
-    setIsLoading(false);
-  };
 
   const userName = user?.displayName?.split(' ')[0] || 'there';
 
@@ -59,7 +59,7 @@ export default function DashboardPage() {
           <CardDescription>Your contribution to a less wasteful world today.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 text-center">
-            {isLoading ? (
+            {isLoading && logs.length === 0 ? (
                 <div className="col-span-2 flex justify-center items-center p-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>

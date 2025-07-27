@@ -7,8 +7,8 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Trash2 } from 'lucide-react';
-import { getWasteLogsForUser, deleteWasteLog } from '@/lib/data';
-import type { WasteLog, User } from '@/types';
+import { deleteWasteLog } from '@/lib/data';
+import type { User } from '@/types';
 import { format, subDays, startOfDay, isAfter } from 'date-fns';
 import Image from 'next/image';
 import {
@@ -24,31 +24,17 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useWasteLogStore } from '@/stores/waste-log-store';
 
 
 export function TrendsDashboard() {
-  const [logs, setLogs] = useState<WasteLog[]>([]);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { logs } = useWasteLogStore();
+  const [user, setUser] = useState<User | null>(auth.currentUser);
   const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
-      if (fbUser) {
-        setUser(fbUser);
-        const fetchLogs = async () => {
-            setIsLoading(true);
-            const userLogs = await getWasteLogsForUser(fbUser.uid);
-            setLogs(userLogs);
-            setIsLoading(false);
-        }
-        fetchLogs();
-      } else {
-        setUser(null);
-        setLogs([]);
-        setIsLoading(false);
-      }
+    const unsubscribe = auth.onAuthStateChanged((fbUser) => {
+      setUser(fbUser);
     });
     return () => unsubscribe();
   }, []);
@@ -57,7 +43,7 @@ export function TrendsDashboard() {
     if(!user) return;
     try {
         await deleteWasteLog(user.uid, logId);
-        // Rely on Firestore listener to update the UI
+        // UI will update via Firestore listener in data.ts -> waste-log-store.ts
         toast({ title: 'Success', description: 'Log deleted successfully.' });
     } catch(e) {
         toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete log.' });
@@ -94,14 +80,6 @@ export function TrendsDashboard() {
       label: "Peso Value (₱)",
       color: "hsl(var(--primary))",
     },
-  }
-
-  if (isLoading) {
-    return (
-        <div className="flex justify-center items-center h-full p-4 md:p-6">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-    )
   }
 
   return (

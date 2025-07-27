@@ -36,7 +36,7 @@ type ReviewFormValues = z.infer<typeof reviewSchema>;
 
 export function ReviewPantryItems() {
   const router = useRouter();
-  const { items, photoDataUri, reset } = usePantryLogStore();
+  const { items, photoDataUri, reset, addOptimisticItems } = usePantryLogStore();
   const [isReady, setIsReady] = useState(false);
   const [user, setUser] = useState<User | null>(auth.currentUser);
   const [isSaving, setIsSaving] = useState(false);
@@ -85,7 +85,7 @@ export function ReviewPantryItems() {
     }
     setIsSaving(true);
 
-    const finalItems: Omit<PantryItem, 'id'>[] = data.items.map(item => {
+    const itemsToSave: Omit<PantryItem, 'id'>[] = data.items.map(item => {
         const { peso, co2e } = getImpact(item.name);
         return {
             name: item.name,
@@ -97,14 +97,30 @@ export function ReviewPantryItems() {
         }
     });
 
+    // For optimistic UI
+    const tempItemsForCache: PantryItem[] = data.items.map(item => {
+        const { peso, co2e } = getImpact(item.name);
+        return {
+            id: item.id, // use temporary client-generated ID
+            name: item.name,
+            estimatedAmount: item.estimatedAmount,
+            estimatedExpirationDate: item.estimatedExpirationDate,
+            pesoValue: peso,
+            carbonFootprint: co2e,
+            addedDate: new Date().toISOString(),
+        }
+    })
+    
+    addOptimisticItems(tempItemsForCache);
+    reset(); 
+    router.push('/pantry');
+    
     try {
-        await savePantryItems(user.uid, finalItems);
+        await savePantryItems(user.uid, itemsToSave);
         toast({ title: 'Pantry updated!', description: 'Your new items have been saved.' });
-        reset(); 
-        router.push('/pantry');
     } catch (e) {
         console.error(e);
-        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your items. Please try again.' });
+        toast({ variant: 'destructive', title: 'Sync failed', description: 'Could not save your items to the cloud.' });
     } finally {
         setIsSaving(false);
     }

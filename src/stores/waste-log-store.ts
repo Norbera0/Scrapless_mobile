@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import type { WasteLog } from '@/types';
 
 interface LogItem {
   id: string;
@@ -11,9 +12,11 @@ interface WasteLogState {
   photoDataUri: string | null;
   photoPreview: string | null;
   items: LogItem[];
+  logs: WasteLog[];
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
   setItems: (items: LogItem[]) => void;
+  setLogs: (logs: WasteLog[]) => void;
   reset: () => void;
 }
 
@@ -21,6 +24,7 @@ const initialState = {
     photoDataUri: null,
     photoPreview: null,
     items: [],
+    logs: [],
 };
 
 export const useWasteLogStore = create<WasteLogState>()((set) => ({
@@ -28,5 +32,6 @@ export const useWasteLogStore = create<WasteLogState>()((set) => ({
   setPhotoDataUri: (uri) => set({ photoDataUri: uri }),
   setPhotoPreview: (uri) => set({ photoPreview: uri }),
   setItems: (items) => set({ items: items }),
+  setLogs: (logs) => set({ logs }),
   reset: () => set(initialState),
 }));
