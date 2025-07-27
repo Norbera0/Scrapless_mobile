@@ -1,3 +1,4 @@
+
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Utensils } from 'lucide-react';
@@ -14,7 +15,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl">Welcome!</CardTitle>
-          <CardDescription>Enter your details to start tracking waste.</CardDescription>
+          <CardDescription>Sign in or create an account to continue.</CardDescription>
         </CardHeader>
         <CardContent>
           <LoginForm />
