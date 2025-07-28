@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -85,6 +84,10 @@ export function ReviewItems() {
         totalCarbonFootprint: totalCarbonFootprint,
         ...(photoDataUri && { photoDataUri }),
       };
+
+      if (!logData.photoDataUri) {
+        delete logData.photoDataUri;
+      }
       
       await saveWasteLog(logData);
 
@@ -93,7 +96,6 @@ export function ReviewItems() {
           description: 'Your waste log has been saved.',
       });
       
-      // Use a timeout to ensure state reset and navigation don't cause race conditions
       setTimeout(() => {
         reset();
         router.replace('/dashboard');

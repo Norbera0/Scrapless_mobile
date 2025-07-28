@@ -82,7 +82,7 @@ export const initializeUserCache = (userId: string) => {
 
 
 // --- Waste Log Functions ---
-export const saveWasteLog = async (logData: WasteLog): Promise<string> => {
+export const saveWasteLog = async (logData: Omit<WasteLog, 'id'>): Promise<string> => {
     const docRef = await addDoc(collection(db, `users/${logData.userId}/wasteLogs`), logData);
     return docRef.id;
 };
