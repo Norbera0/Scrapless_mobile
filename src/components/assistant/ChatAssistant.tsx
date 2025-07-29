@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { Loader2, Send, Mic, Square } from 'lucide-react';
+import { Loader2, Send, Mic, Square, Volume2 } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { chatWithAssistant } from '@/ai/flows/chat-with-assistant';
 import { textToSpeech } from '@/ai/flows/text-to-speech';
@@ -17,10 +17,13 @@ import { type ChatWithAssistantInput } from '@/ai/schemas';
 import type { WasteLog } from '@/types';
 import { format, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
 
 interface Message {
   role: 'user' | 'model';
   text: string;
+  isGeneratingAudio?: boolean;
 }
 
 const getInitials = (name?: string | null) => {
@@ -119,22 +122,28 @@ export function ChatAssistant() {
           ...wasteAnalysis,
       };
       
+      // Step 1: Get the text response from the assistant first
       const result = await chatWithAssistant(assistantInput);
-      const assistantMessage: Message = { role: 'model', text: result.response };
+      const assistantMessage: Message = { role: 'model', text: result.response, isGeneratingAudio: true };
       setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false); // Stop main loading indicator
       
-      // Convert response to speech and play it
+      // Step 2: In parallel, generate and play the audio
       const { audioDataUri } = await textToSpeech({ text: result.response });
       if (audioPlayerRef.current) {
         audioPlayerRef.current.src = audioDataUri;
         audioPlayerRef.current.play();
       }
+
+      // Step 3: Update the message to remove the "speaking" indicator
+      setMessages(prev => prev.map(msg => 
+          msg.text === assistantMessage.text ? { ...msg, isGeneratingAudio: false } : msg
+      ));
   
     } catch (error) {
         console.error('Chat assistant error:', error);
         const errorMessage: Message = { role: 'model', text: 'Sorry, I ran into a problem. Please try again.' };
         setMessages(prev => [...prev, errorMessage]);
-    } finally {
         setIsLoading(false);
     }
   };
@@ -157,7 +166,6 @@ export function ChatAssistant() {
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
           const base64Audio = reader.result as string;
-          // For voice, we don't know the message text yet, so we don't add a user message bubble.
           await processAndRespond({ audioDataUri: base64Audio }); 
         };
       };
@@ -196,9 +204,17 @@ export function ChatAssistant() {
                   <AvatarFallback>AI</AvatarFallback>
                 </Avatar>
               )}
-              <Card className={`max-w-md ${message.role === 'user' ? 'bg-primary text-primary-foreground' : ''}`}>
+              <Card className={cn("max-w-md", message.role === 'user' ? 'bg-primary text-primary-foreground' : '')}>
                 <CardContent className="p-3 text-sm">
-                  <p>{message.text}</p>
+                  <div className="flex items-center gap-2">
+                    <p>{message.text}</p>
+                    {message.isGeneratingAudio && (
+                      <div className="flex items-center text-muted-foreground text-xs gap-1">
+                        <Volume2 className="h-4 w-4 animate-pulse" />
+                        <span>Speaking...</span>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
               {message.role === 'user' && (
