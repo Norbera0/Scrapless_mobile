@@ -84,7 +84,7 @@ export const SuggestRecipesOutputSchema = z.object({
         })
     ).describe("A list of 3-5 recipe suggestions."),
 });
-export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutputSchema>;
+export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutput>;
 
 // Chat Assistant Schemas
 const ChatMessageSchema = z.object({
@@ -120,3 +120,24 @@ export const ChatWithAssistantOutputSchema = z.object({
     transcribedQuery: z.string().optional().describe("The transcribed text if the input was audio."),
 });
 export type ChatWithAssistantOutput = z.infer<typeof ChatWithAssistantOutputSchema>;
+
+// Consumption Analysis Schemas
+export const AnalyzeConsumptionPatternsInputSchema = z.object({
+    userName: z.string().describe("The user's first name."),
+    pantryItems: z.array(
+        z.object({
+            name: z.string(),
+            estimatedExpirationDate: z.string(),
+            estimatedAmount: z.string(),
+        })
+    ).describe("A list of items currently in the user's pantry."),
+    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects (last 30 days)."),
+});
+export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
+
+export const AnalyzeConsumptionPatternsOutputSchema = z.object({
+    keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
+    patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
+    smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
+});
+export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
