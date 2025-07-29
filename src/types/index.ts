@@ -33,6 +33,12 @@ export interface PantryItem {
     addedDate: string; // ISO string for when the item was added
     pesoValue: number; 
     carbonFootprint: number;
+    // Optional details
+    storageLocation?: 'refrigerator' | 'freezer' | 'pantry' | 'counter';
+    useByTimeline?: 'today' | 'this_week' | 'next_week' | 'this_month';
+    purchaseSource?: 'supermarket' | 'wet_market' | 'online' | 'bulk_store';
+    priceAmount?: number;
+    priceUnit?: string;
 }
   
 export interface PantryLog {

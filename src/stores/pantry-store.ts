@@ -2,11 +2,17 @@
 import { create } from 'zustand';
 import type { PantryItem } from '@/types';
 
-interface PantryLogItem {
+export interface PantryLogItem {
   id: string;
   name: string;
   estimatedAmount: string;
   estimatedExpirationDate: string;
+  // Optional details
+  storageLocation?: 'refrigerator' | 'freezer' | 'pantry' | 'counter';
+  useByTimeline?: 'today' | 'this_week' | 'next_week' | 'this_month';
+  purchaseSource?: 'supermarket' | 'wet_market' | 'online' | 'bulk_store';
+  priceAmount?: number;
+  priceUnit?: string;
 }
 
 interface PantryLogState {

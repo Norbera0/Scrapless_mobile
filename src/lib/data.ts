@@ -111,16 +111,26 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     
     itemsToSave.forEach(item => {
         const docRef = doc(pantryCollection, item.id);
-        const newItem: Omit<PantryItem, 'id'> = {
-            name: item.name,
-            estimatedAmount: item.estimatedAmount,
-            estimatedExpirationDate: item.estimatedExpirationDate,
+        const { id, ...itemData } = item;
+
+        const newItemData: Omit<PantryItem, 'id'> = {
+            name: itemData.name,
+            estimatedAmount: itemData.estimatedAmount,
+            estimatedExpirationDate: itemData.estimatedExpirationDate,
             addedDate: new Date().toISOString(),
-            pesoValue: 0, // Default values, can be expanded later
+            pesoValue: 0, // Default values
             carbonFootprint: 0,
-        }
-        batch.set(docRef, newItem);
-        savedItems.push({ ...newItem, id: item.id });
+        };
+        
+        // Add optional fields only if they have a value
+        if (itemData.storageLocation) newItemData.storageLocation = itemData.storageLocation;
+        if (itemData.useByTimeline) newItemData.useByTimeline = itemData.useByTimeline;
+        if (itemData.purchaseSource) newItemData.purchaseSource = itemData.purchaseSource;
+        if (itemData.priceAmount) newItemData.priceAmount = itemData.priceAmount;
+        if (itemData.priceUnit) newItemData.priceUnit = itemData.priceUnit;
+
+        batch.set(docRef, newItemData);
+        savedItems.push({ ...newItemData, id: item.id });
     });
 
     await batch.commit();
