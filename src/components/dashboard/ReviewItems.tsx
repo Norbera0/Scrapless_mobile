@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, type NextRouter } from 'next/navigation';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
 
 const wasteReasons = [
   "Got spoiled/rotten",
@@ -33,10 +34,21 @@ const wasteReasons = [
   "Other reason"
 ];
 
+const safelyResetThenNavigate = async (
+    resetFn: () => void,
+    router: NextRouter,
+    path: string
+) => {
+    resetFn();
+    // Use a small timeout to let the state reset render and avoid race conditions
+    await new Promise((res) => setTimeout(res, 20));
+    router.replace(path);
+};
+
 export function ReviewItems() {
   const router = useRouter();
   const { toast } = useToast();
-  const { items, setItems, photoDataUri, reset, sessionWasteReason, setSessionWasteReason } = useWasteLogStore();
+  const { items, setItems, photoDataUri, reset, sessionWasteReason, setSessionWasteReason, otherWasteReasonText, setOtherWasteReasonText } = useWasteLogStore();
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
 
@@ -84,6 +96,8 @@ export function ReviewItems() {
 
       let totalPesoValue = 0;
       let totalCarbonFootprint = 0;
+      
+      const reasonToSave = sessionWasteReason === 'Other reason' ? otherWasteReasonText : sessionWasteReason;
 
       const finalItems: FoodItem[] = items.map(item => {
           const { peso, co2e } = getImpact(item.name);
@@ -95,7 +109,7 @@ export function ReviewItems() {
               estimatedAmount: item.estimatedAmount,
               pesoValue: peso,
               carbonFootprint: co2e,
-              wasteReason: sessionWasteReason, // Apply session-level reason
+              wasteReason: reasonToSave, // Apply session-level reason
           }
       });
   
@@ -105,7 +119,7 @@ export function ReviewItems() {
         items: finalItems,
         totalPesoValue: totalPesoValue,
         totalCarbonFootprint: totalCarbonFootprint,
-        sessionWasteReason: sessionWasteReason,
+        sessionWasteReason: reasonToSave,
       };
 
       if (photoDataUri) {
@@ -119,11 +133,7 @@ export function ReviewItems() {
           description: 'Your waste log has been saved.',
       });
       
-      // Use a small timeout to ensure state reset completes before navigation
-      setTimeout(() => {
-        reset();
-        router.replace('/dashboard');
-      }, 20);
+      await safelyResetThenNavigate(reset, router, "/dashboard");
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);
@@ -132,7 +142,8 @@ export function ReviewItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
-      setIsSaving(false);
+    } finally {
+        setIsSaving(false);
     }
   };
   
@@ -146,6 +157,8 @@ export function ReviewItems() {
       </div>
     );
   }
+  
+  const isSaveDisabled = isSaving || items.length === 0 || !sessionWasteReason || (sessionWasteReason === 'Other reason' && !otherWasteReasonText.trim());
 
   return (
     <div className="space-y-6">
@@ -204,6 +217,14 @@ export function ReviewItems() {
                       ))}
                   </SelectContent>
               </Select>
+               {sessionWasteReason === 'Other reason' && (
+                <Textarea
+                  placeholder="Please specify the reason for the waste..."
+                  value={otherWasteReasonText}
+                  onChange={(e) => setOtherWasteReasonText(e.target.value)}
+                  className="mt-2"
+                />
+              )}
            </div>
         </CardFooter>
       </Card>
@@ -215,7 +236,7 @@ export function ReviewItems() {
         >
           Back
         </Button>
-        <Button onClick={handleConfirmAndSave} disabled={isSaving || items.length === 0 || !sessionWasteReason}>
+        <Button onClick={handleConfirmAndSave} disabled={isSaveDisabled}>
             {isSaving ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (

@@ -15,11 +15,13 @@ interface WasteLogState {
   items: WasteLogItem[];
   logs: WasteLog[];
   sessionWasteReason: string | null;
+  otherWasteReasonText: string;
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
   setItems: (items: WasteLogItem[]) => void;
   setLogs: (logs: WasteLog[]) => void;
   setSessionWasteReason: (reason: string | null) => void;
+  setOtherWasteReasonText: (text: string) => void;
   reset: () => void;
 }
 
@@ -29,6 +31,7 @@ const initialState = {
     items: [],
     logs: [],
     sessionWasteReason: null,
+    otherWasteReasonText: '',
 };
 
 export const useWasteLogStore = create<WasteLogState>()((set) => ({
@@ -38,5 +41,6 @@ export const useWasteLogStore = create<WasteLogState>()((set) => ({
   setItems: (items) => set({ items: items }),
   setLogs: (logs) => set({ logs }),
   setSessionWasteReason: (reason) => set({ sessionWasteReason: reason }),
+  setOtherWasteReasonText: (text) => set({ otherWasteReasonText: text }),
   reset: () => set(initialState),
 }));
