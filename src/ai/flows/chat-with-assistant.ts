@@ -10,6 +10,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 import {
   ChatWithAssistantInputSchema,
   ChatWithAssistantOutputSchema,
@@ -21,7 +22,7 @@ export async function chatWithAssistant(input: ChatWithAssistantInput): Promise<
   return chatWithAssistantFlow(input);
 }
 
-const prompt = ai.definePrompt({
+const mainPrompt = ai.definePrompt({
   name: 'chatWithAssistantPrompt',
   input: { schema: ChatWithAssistantInputSchema },
   output: { schema: ChatWithAssistantOutputSchema },
@@ -74,17 +75,21 @@ Conversation History:
 - {{this.role}}: {{this.text}}
 {{/each}}
 
-{{#if audioDataUri}}
-User's new message (from audio):
-{{media url=audioDataUri}}
-{{else}}
-User's new message (from text):
+User's new message:
 "{{{query}}}"
-{{/if}}
 
 Your response:
 `,
 });
+
+const transcriptionPrompt = ai.definePrompt({
+    name: 'transcribeUserQueryPrompt',
+    input: { schema: z.object({ audioDataUri: z.string() }) },
+    output: { schema: z.object({ transcribedText: z.string() }) },
+    prompt: `Transcribe the following audio message accurately into text.
+Audio: {{media url=audioDataUri}}`,
+  });
+  
 
 const chatWithAssistantFlow = ai.defineFlow(
   {
@@ -93,12 +98,32 @@ const chatWithAssistantFlow = ai.defineFlow(
     outputSchema: ChatWithAssistantOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    let userQuery = input.query;
+    let transcribedQuery: string | undefined = undefined;
+
+    // If audio is provided, transcribe it first.
+    if (input.audioDataUri) {
+      const { output: transcriptionOutput } = await transcriptionPrompt({ audioDataUri: input.audioDataUri });
+      userQuery = transcriptionOutput?.transcribedText ?? '';
+      transcribedQuery = userQuery;
+    }
+
+    if (!userQuery) {
+        return { response: "I couldn't hear you clearly. Could you please try again?" };
+    }
+    
+    // Construct the input for the main chat prompt
+    const chatPromptInput = {
+      ...input,
+      query: userQuery,
+    };
+    
+    const { output } = await mainPrompt(chatPromptInput);
     
     if (!output) {
       return { response: "I'm not sure how to answer that. Can you try asking differently?" };
     }
 
-    return output;
+    return { ...output, transcribedQuery };
   }
 );

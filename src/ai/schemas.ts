@@ -117,16 +117,6 @@ export type ChatWithAssistantInput = z.infer<typeof ChatWithAssistantInputSchema
 
 export const ChatWithAssistantOutputSchema = z.object({
     response: z.string().describe("The AI assistant's text response to the user."),
+    transcribedQuery: z.string().optional().describe("The transcribed text if the input was audio."),
 });
 export type ChatWithAssistantOutput = z.infer<typeof ChatWithAssistantOutputSchema>;
-
-// TTS Schemas
-export const TextToSpeechInputSchema = z.object({
-    text: z.string().describe('The text to convert to speech.'),
-});
-export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
-
-export const TextToSpeechOutputSchema = z.object({
-    audioDataUri: z.string().describe('The output audio as a base64-encoded WAV data URI.'),
-});
-export type TextToSpeechOutput = z.infer<typeof TextToSpeechOutputSchema>;

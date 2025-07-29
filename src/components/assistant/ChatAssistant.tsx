@@ -9,10 +9,9 @@ import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { Loader2, Send, Mic, Square, Volume2 } from 'lucide-react';
+import { Loader2, Send, Mic, Square } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { chatWithAssistant } from '@/ai/flows/chat-with-assistant';
-import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { type ChatWithAssistantInput } from '@/ai/schemas';
 import type { WasteLog } from '@/types';
 import { format, parseISO } from 'date-fns';
@@ -23,7 +22,6 @@ import { cn } from '@/lib/utils';
 interface Message {
   role: 'user' | 'model';
   text: string;
-  isGeneratingAudio?: boolean;
 }
 
 const getInitials = (name?: string | null) => {
@@ -72,7 +70,6 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const audioPlayerRef = useRef<HTMLAudioElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const [isRecording, setIsRecording] = useState(false);
@@ -93,11 +90,13 @@ export function ChatAssistant() {
     }
   }, [user, messages.length]);
 
-  const processAndRespond = async (inputData: { query?: string; audioDataUri?: string; userMessageText?: string }) => {
+  const processAndRespond = async (inputData: { query?: string; audioDataUri?: string; }) => {
     if (!user) return;
-  
-    if (inputData.userMessageText) {
-      const userMessage: Message = { role: 'user', text: inputData.userMessageText };
+    
+    // If it's a text message, add it to the chat immediately.
+    // For audio, we'll add the transcribed message later.
+    if (inputData.query) {
+      const userMessage: Message = { role: 'user', text: inputData.query };
       setMessages(prev => [...prev, userMessage]);
     }
     
@@ -116,34 +115,28 @@ export function ChatAssistant() {
       const assistantInput: ChatWithAssistantInput = {
           ...inputData,
           userName: user.name?.split(' ')[0] || 'User',
-          history: messages, // Send history before the new message
+          history: messages,
           pantryItems: pantryData,
           wasteLogs,
           ...wasteAnalysis,
       };
       
-      // Step 1: Get the text response from the assistant first
       const result = await chatWithAssistant(assistantInput);
-      const assistantMessage: Message = { role: 'model', text: result.response, isGeneratingAudio: true };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false); // Stop main loading indicator
       
-      // Step 2: In parallel, generate and play the audio
-      const { audioDataUri } = await textToSpeech({ text: result.response });
-      if (audioPlayerRef.current) {
-        audioPlayerRef.current.src = audioDataUri;
-        audioPlayerRef.current.play();
+      // If the input was audio, display the transcribed text as the user's message.
+      if (result.transcribedQuery) {
+        const userMessage: Message = { role: 'user', text: result.transcribedQuery };
+        setMessages(prev => [...prev, userMessage]);
       }
 
-      // Step 3: Update the message to remove the "speaking" indicator
-      setMessages(prev => prev.map(msg => 
-          msg.text === assistantMessage.text ? { ...msg, isGeneratingAudio: false } : msg
-      ));
+      const assistantMessage: Message = { role: 'model', text: result.response };
+      setMessages(prev => [...prev, assistantMessage]);
   
     } catch (error) {
         console.error('Chat assistant error:', error);
         const errorMessage: Message = { role: 'model', text: 'Sorry, I ran into a problem. Please try again.' };
         setMessages(prev => [...prev, errorMessage]);
+    } finally {
         setIsLoading(false);
     }
   };
@@ -151,7 +144,7 @@ export function ChatAssistant() {
   const handleTextSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
-    await processAndRespond({ query: input, userMessageText: input });
+    await processAndRespond({ query: input });
   };
   
   const startRecording = async () => {
@@ -194,7 +187,6 @@ export function ChatAssistant() {
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100%-100px)]">
-      <audio ref={audioPlayerRef} className="hidden" />
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-6">
           {messages.map((message, index) => (
@@ -206,15 +198,7 @@ export function ChatAssistant() {
               )}
               <Card className={cn("max-w-md", message.role === 'user' ? 'bg-primary text-primary-foreground' : '')}>
                 <CardContent className="p-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <p>{message.text}</p>
-                    {message.isGeneratingAudio && (
-                      <div className="flex items-center text-muted-foreground text-xs gap-1">
-                        <Volume2 className="h-4 w-4 animate-pulse" />
-                        <span>Speaking...</span>
-                      </div>
-                    )}
-                  </div>
+                  <p>{message.text}</p>
                 </CardContent>
               </Card>
               {message.role === 'user' && (
