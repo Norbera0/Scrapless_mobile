@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -6,24 +7,27 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
+import { Trash2, Loader2, Save, UtensilsCrossed, Plus, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WasteLog, FoodItem } from '@/types';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { saveWasteLog } from '@/lib/data';
 import { FOOD_DATA_MAP } from '@/lib/food-data';
 import type { WasteLogItem } from '@/stores/waste-log-store';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
+const wasteReasons = [
+  "spoiled", "expired", "cooked_too_much", "forgot_about_it",
+  "didn't_like_taste", "got_moldy", "family_member_didn't_eat",
+  "changed_meal_plans", "bought_too_much"
+];
 
 export function ReviewItems() {
   const router = useRouter();
@@ -31,6 +35,7 @@ export function ReviewItems() {
   const { items, setItems, photoDataUri, reset } = useWasteLogStore();
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
+  const [openCollapsibles, setOpenCollapsibles] = useState<Record<string, boolean>>({});
 
   const handleItemChange = (index: number, field: keyof WasteLogItem, value: any) => {
     const newItems = [...items];
@@ -73,6 +78,7 @@ export function ReviewItems() {
               estimatedAmount: item.estimatedAmount,
               pesoValue: peso,
               carbonFootprint: co2e,
+              wasteReason: item.wasteReason,
           }
       });
   
@@ -82,11 +88,10 @@ export function ReviewItems() {
         items: finalItems,
         totalPesoValue: totalPesoValue,
         totalCarbonFootprint: totalCarbonFootprint,
-        ...(photoDataUri && { photoDataUri }),
       };
 
-      if (!logData.photoDataUri) {
-        delete logData.photoDataUri;
+      if (photoDataUri) {
+        logData.photoDataUri = photoDataUri;
       }
       
       await saveWasteLog(logData);
@@ -111,6 +116,10 @@ export function ReviewItems() {
       setIsSaving(false);
     }
   };
+  
+  const toggleCollapsible = (id: string) => {
+    setOpenCollapsibles(prev => ({ ...prev, [id]: !prev[id] }));
+  }
 
   if (items.length === 0 && !isSaving) {
     return (
@@ -130,42 +139,69 @@ export function ReviewItems() {
           <CardTitle>Detected Waste Items</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {items.map((item, index) => {
-            return (
-              <div
-                key={item.id}
-                className="grid grid-cols-1 gap-4 rounded-lg border p-4 md:grid-cols-3"
-              >
-                <div className="flex items-center gap-4 md:col-span-1">
+          {items.map((item, index) => (
+            <Collapsible
+              key={item.id}
+              open={openCollapsibles[item.id] || false}
+              onOpenChange={() => toggleCollapsible(item.id)}
+              className="space-y-2 rounded-lg border p-4"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex flex-1 items-center gap-4">
                   <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
-                  <Input
-                    value={item.name}
-                    onChange={(e) =>
-                      handleItemChange(index, 'name', e.target.value)
-                    }
-                    className="text-lg font-semibold"
-                  />
-                </div>
-                <div className="md:col-span-2">
+                  <div className="flex-1 grid gap-2">
+                    <Input
+                      value={item.name}
+                      onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                      className="text-lg font-semibold"
+                      placeholder="Item Name"
+                    />
                     <Input
                       value={item.estimatedAmount}
-                      onChange={(e) =>
-                        handleItemChange(index, 'estimatedAmount', e.target.value)
-                      }
+                      onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
                       placeholder="Amount (e.g. 1 cup)"
                     />
+                  </div>
                 </div>
-                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto -mt-12 -mr-2"
-                  onClick={() => handleRemoveItem(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2 ml-4">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Info className="mr-2 h-4 w-4" />
+                        {openCollapsibles[item.id] ? 'Hide Details' : 'Add Details'}
+                      </Button>
+                    </CollapsibleTrigger>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveItem(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
               </div>
-            );
-          })}
+
+              <CollapsibleContent className="space-y-4 pt-4">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium">Why did it go to waste?</label>
+                  <Select
+                    value={item.wasteReason}
+                    onValueChange={(value) => handleItemChange(index, 'wasteReason', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a reason..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {wasteReasons.map((reason) => (
+                        <SelectItem key={reason} value={reason}>
+                          {reason.replace(/_/g, ' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
         </CardContent>
       </Card>
       <div className="flex justify-end gap-2">
@@ -176,32 +212,14 @@ export function ReviewItems() {
         >
           Back
         </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button disabled={isSaving || items.length === 0}>
+        <Button onClick={handleConfirmAndSave} disabled={isSaving || items.length === 0}>
+            {isSaving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
               <Save className="mr-2 h-4 w-4" />
-              Save Log
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action will save the reviewed waste log to your history.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleConfirmAndSave}
-                disabled={isSaving}
-              >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Confirm & Save
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+            )}
+            {isSaving ? 'Saving...' : 'Save Log'}
+        </Button>
       </div>
     </div>
   );

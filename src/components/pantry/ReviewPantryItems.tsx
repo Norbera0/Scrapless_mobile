@@ -9,17 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { DatePicker } from '@/components/ui/date-picker';
 import type { PantryLogItem } from '@/stores/pantry-store';
 import { savePantryItems } from '@/lib/data';
@@ -56,7 +45,6 @@ export function ReviewPantryItems() {
         description: 'Your pantry has been updated.',
       });
 
-      // Use a timeout to ensure state reset and navigation don't cause race conditions
       setTimeout(() => {
         reset();
         router.replace('/pantry');
@@ -145,32 +133,14 @@ export function ReviewPantryItems() {
         >
           Back
         </Button>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button disabled={isSaving || items.length === 0}>
-              <Save className="mr-2 h-4 w-4" />
-              Save to Pantry
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action will add the reviewed items to your pantry.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleConfirmAndSave}
-                disabled={isSaving}
-              >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Confirm & Save
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button onClick={handleConfirmAndSave} disabled={isSaving || items.length === 0}>
+          {isSaving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {isSaving ? 'Saving...' : 'Save to Pantry'}
+        </Button>
       </div>
     </div>
   );
