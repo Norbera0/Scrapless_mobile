@@ -92,7 +92,8 @@ const ChatMessageSchema = z.object({
     text: z.string(),
 });
 export const ChatWithAssistantInputSchema = z.object({
-    query: z.string().describe("The user's most recent message to the assistant."),
+    query: z.string().optional().describe("The user's most recent message to the assistant (if text)."),
+    audioDataUri: z.string().optional().describe("The user's most recent message as an audio data URI (if voice)."),
     userName: z.string().describe("The user's first name."),
     history: z.array(ChatMessageSchema).describe("The conversation history."),
     pantryItems: z.array(
@@ -118,3 +119,14 @@ export const ChatWithAssistantOutputSchema = z.object({
     response: z.string().describe("The AI assistant's text response to the user."),
 });
 export type ChatWithAssistantOutput = z.infer<typeof ChatWithAssistantOutputSchema>;
+
+// TTS Schemas
+export const TextToSpeechInputSchema = z.object({
+    text: z.string().describe('The text to convert to speech.'),
+});
+export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
+
+export const TextToSpeechOutputSchema = z.object({
+    audioDataUri: z.string().describe('The output audio as a base64-encoded WAV data URI.'),
+});
+export type TextToSpeechOutput = z.infer<typeof TextToSpeechOutputSchema>;

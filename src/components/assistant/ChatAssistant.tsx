@@ -9,12 +9,14 @@ import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Mic, Square } from 'lucide-react';
 import { Card, CardContent } from '../ui/card';
 import { chatWithAssistant } from '@/ai/flows/chat-with-assistant';
+import { textToSpeech } from '@/ai/flows/text-to-speech';
 import { type ChatWithAssistantInput } from '@/ai/schemas';
-import type { PantryItem, WasteLog } from '@/types';
+import type { WasteLog } from '@/types';
 import { format, parseISO } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   role: 'user' | 'model';
@@ -59,7 +61,6 @@ function calculateWasteAnalysis(wasteLogs: WasteLog[]) {
     };
 }
 
-
 export function ChatAssistant() {
   const { user } = useAuth();
   const { liveItems: pantryItems } = usePantryLogStore();
@@ -68,17 +69,20 @@ export function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const audioPlayerRef = useRef<HTMLAudioElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-        // A bit of a hack to scroll to the bottom.
         const viewport = scrollAreaRef.current.querySelector('div');
         if(viewport) viewport.scrollTop = viewport.scrollHeight;
     }
   }, [messages]);
   
   useEffect(() => {
-    // Start with a greeting from the assistant
     if (user && messages.length === 0) {
       setMessages([
         { role: 'model', text: `Hi ${user.name?.split(' ')[0] || ''}! How can I help you be less wasteful today? You can ask me for recipe ideas, why you're wasting food, or how to manage your pantry.` }
@@ -86,38 +90,46 @@ export function ChatAssistant() {
     }
   }, [user, messages.length]);
 
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading || !user) return;
-
-    const userMessage: Message = { role: 'user', text: input };
-    setMessages(prev => [...prev, userMessage]);
+  const processAndRespond = async (inputData: { query?: string; audioDataUri?: string; userMessageText?: string }) => {
+    if (!user) return;
+  
+    if (inputData.userMessageText) {
+      const userMessage: Message = { role: 'user', text: inputData.userMessageText };
+      setMessages(prev => [...prev, userMessage]);
+    }
+    
     setInput('');
     setIsLoading(true);
-
+  
     try {
-        const pantryData = pantryItems.map(item => ({
-            name: item.name,
-            estimatedExpirationDate: format(parseISO(item.estimatedExpirationDate), 'MMM d, yyyy'),
-            estimatedAmount: item.estimatedAmount,
-        }));
-
-        const wasteAnalysis = calculateWasteAnalysis(wasteLogs);
-        
-        const assistantInput: ChatWithAssistantInput = {
-            query: input,
-            userName: user.name?.split(' ')[0] || 'User',
-            history: [...messages, userMessage],
-            pantryItems: pantryData,
-            wasteLogs,
-            ...wasteAnalysis,
-        };
-
-        const result = await chatWithAssistant(assistantInput);
-        const assistantMessage: Message = { role: 'model', text: result.response };
-        setMessages(prev => [...prev, assistantMessage]);
-
+      const pantryData = pantryItems.map(item => ({
+          name: item.name,
+          estimatedExpirationDate: format(parseISO(item.estimatedExpirationDate), 'MMM d, yyyy'),
+          estimatedAmount: item.estimatedAmount,
+      }));
+  
+      const wasteAnalysis = calculateWasteAnalysis(wasteLogs);
+      
+      const assistantInput: ChatWithAssistantInput = {
+          ...inputData,
+          userName: user.name?.split(' ')[0] || 'User',
+          history: messages, // Send history before the new message
+          pantryItems: pantryData,
+          wasteLogs,
+          ...wasteAnalysis,
+      };
+      
+      const result = await chatWithAssistant(assistantInput);
+      const assistantMessage: Message = { role: 'model', text: result.response };
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      // Convert response to speech and play it
+      const { audioDataUri } = await textToSpeech({ text: result.response });
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.src = audioDataUri;
+        audioPlayerRef.current.play();
+      }
+  
     } catch (error) {
         console.error('Chat assistant error:', error);
         const errorMessage: Message = { role: 'model', text: 'Sorry, I ran into a problem. Please try again.' };
@@ -127,8 +139,54 @@ export function ChatAssistant() {
     }
   };
 
+  const handleTextSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    await processAndRespond({ query: input, userMessageText: input });
+  };
+  
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      mediaRecorderRef.current.ondataavailable = event => audioChunksRef.current.push(event.data);
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = reader.result as string;
+          // For voice, we don't know the message text yet, so we don't add a user message bubble.
+          await processAndRespond({ audioDataUri: base64Audio }); 
+        };
+      };
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      toast({ title: 'Recording...', description: 'Tap the microphone again to stop.' });
+    } catch (err) {
+      toast({ variant: 'destructive', title: 'Microphone Error', description: 'Could not access the microphone.' });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const handleMicClick = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col h-[calc(100%-100px)]">
+      <audio ref={audioPlayerRef} className="hidden" />
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-6">
           {messages.map((message, index) => (
@@ -166,15 +224,19 @@ export function ChatAssistant() {
         </div>
       </ScrollArea>
       <div className="p-4 border-t bg-background">
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+        <form onSubmit={handleTextSubmit} className="flex items-center gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask for recipes, waste tips, etc."
-            disabled={isLoading}
+            disabled={isLoading || isRecording}
             autoComplete='off'
           />
-          <Button type="submit" disabled={isLoading || !input.trim()}>
+          <Button type="button" size="icon" onClick={handleMicClick} disabled={isLoading} variant={isRecording ? 'destructive' : 'outline'}>
+            {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            <span className="sr-only">Record message</span>
+          </Button>
+          <Button type="submit" disabled={isLoading || isRecording || !input.trim()}>
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             <span className="sr-only">Send</span>
           </Button>

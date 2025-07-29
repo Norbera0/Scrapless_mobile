@@ -74,8 +74,13 @@ Conversation History:
 - {{this.role}}: {{this.text}}
 {{/each}}
 
-User's new message:
+{{#if audioDataUri}}
+User's new message (from audio):
+{{media url=audioDataUri}}
+{{else}}
+User's new message (from text):
 "{{{query}}}"
+{{/if}}
 
 Your response:
 `,
