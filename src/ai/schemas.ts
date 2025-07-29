@@ -85,3 +85,36 @@ export const SuggestRecipesOutputSchema = z.object({
     ).describe("A list of 3-5 recipe suggestions."),
 });
 export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutputSchema>;
+
+// Chat Assistant Schemas
+const ChatMessageSchema = z.object({
+    role: z.enum(['user', 'model']),
+    text: z.string(),
+});
+export const ChatWithAssistantInputSchema = z.object({
+    query: z.string().describe("The user's most recent message to the assistant."),
+    userName: z.string().describe("The user's first name."),
+    history: z.array(ChatMessageSchema).describe("The conversation history."),
+    pantryItems: z.array(
+        z.object({
+            name: z.string(),
+            estimatedExpirationDate: z.string(),
+            estimatedAmount: z.string(),
+        })
+    ).describe("A list of items currently in the user's pantry."),
+    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects."),
+    totalPesoValueWasted: z.number().describe("Total peso value wasted in the last 30 days."),
+    totalCarbonFootprintWasted: z.number().describe("Total carbon footprint wasted in the last 30 days."),
+    topWastedItem: z.object({ name: z.string(), count: z.number() }).describe("The most frequently wasted item."),
+    mostCommonWasteReason: z.string().describe("The most common reason for waste."),
+    preferences: z.object({
+        dietaryRestrictions: z.array(z.string()).optional(),
+        favoriteCuisines: z.array(z.string()).optional(),
+    }).optional().describe("User's food preferences."),
+});
+export type ChatWithAssistantInput = z.infer<typeof ChatWithAssistantInputSchema>;
+
+export const ChatWithAssistantOutputSchema = z.object({
+    response: z.string().describe("The AI assistant's text response to the user."),
+});
+export type ChatWithAssistantOutput = z.infer<typeof ChatWithAssistantOutputSchema>;
