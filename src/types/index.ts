@@ -34,9 +34,9 @@ export interface PantryItem {
     pesoValue: number; 
     carbonFootprint: number;
     // Optional details
-    storageLocation?: 'refrigerator' | 'freezer' | 'pantry' | 'counter';
-    useByTimeline?: 'today' | 'this_week' | 'next_week' | 'this_month';
-    purchaseSource?: 'supermarket' | 'wet_market' | 'online' | 'bulk_store';
+    storageLocation?: string;
+    useByTimeline?: string;
+    purchaseSource?: string;
     priceAmount?: number;
     priceUnit?: string;
 }

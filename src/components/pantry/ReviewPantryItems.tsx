@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, type NextRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,25 +20,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const storageLocations = [
   { value: 'refrigerator', label: 'Refrigerator' },
   { value: 'freezer', label: 'Freezer' },
-  { value: 'pantry', label: 'Pantry' },
-  { value: 'counter', label: 'Counter' },
+  { value: 'pantry', label: 'Pantry/Cabinet' },
+  { value: 'counter', label: 'Counter (room temp)' },
 ];
 
 const useByTimelines = [
-  { value: 'today', label: 'Today' },
+  { value: 'today_tomorrow', label: 'Today/Tomorrow' },
   { value: 'this_week', label: 'This Week' },
-  { value: 'next_week', label: 'Next Week' },
-  { value: 'this_month', label: 'This Month' },
+  { value: 'next_week', 'label': 'Next Week' },
+  { value: 'this_month', 'label': 'This Month' },
 ];
 
 const purchaseSources = [
   { value: 'supermarket', label: 'Supermarket' },
-  { value: 'wet_market', label: 'Wet Market' },
-  { value: 'online', label: 'Online' },
-  { value: 'bulk_store', label: 'Bulk Store' },
+  { value: 'wet_market', label: 'Wet Market/Palengke' },
+  { value: 'online', label: 'Online Grocery' },
+  { value: 'bulk_store', label: 'Bulk/Wholesale Store' },
+  { value: 'home_grown', label: 'Home Grown'},
+  { value: 'gift_shared', label: 'Gift/Shared' },
 ];
 
-const priceUnits = ['piece', 'kg', 'g', 'pack', 'box', 'liter', 'ml'];
+const priceUnits = ['piece', 'kg', 'g', 'pack', 'box', 'liter', 'ml', 'can', 'bag', 'bottle'];
+
+const safelyResetThenNavigate = async (
+    resetFn: () => void,
+    router: NextRouter,
+    path: string
+) => {
+    resetFn();
+    await new Promise((res) => setTimeout(res, 20)); 
+    router.replace(path);
+};
 
 export function ReviewPantryItems() {
   const router = useRouter();
@@ -81,10 +93,7 @@ export function ReviewPantryItems() {
         description: 'Your pantry has been updated.',
       });
 
-      setTimeout(() => {
-        reset();
-        router.replace('/pantry');
-      }, 20);
+      await safelyResetThenNavigate(reset, router, "/pantry");
       
     } catch (error) {
       console.error('Failed to save pantry items:', error);
@@ -99,7 +108,7 @@ export function ReviewPantryItems() {
 
   if (items.length === 0 && !isSaving) {
     return (
-      <div className="text-center text-muted-foreground">
+      <div className="text-center text-muted-foreground py-10">
         <p>No items to review. Add items from the pantry logger.</p>
         <Button onClick={() => router.push('/add-to-pantry')} className="mt-4">
           Add Items
@@ -123,89 +132,91 @@ export function ReviewPantryItems() {
         <CardContent className="space-y-4">
           {items.map((item: PantryLogItem, index: number) => {
             return (
-              <Collapsible key={item.id} className="space-y-2 rounded-lg border p-4">
-                <div className="flex items-start justify-between">
-                    <div className="flex-1 grid gap-2">
-                        <div className="flex items-center gap-4">
-                            <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
+              <Collapsible key={item.id} className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 grid gap-3">
+                      <Input
+                          value={item.name}
+                          onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                          className="text-lg font-semibold h-11"
+                          placeholder="Item Name"
+                      />
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                             <Input
-                                value={item.name}
-                                onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                                className="text-lg font-semibold"
-                                placeholder="Item Name"
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                             <Input
-                                value={item.estimatedAmount}
-                                onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
-                                placeholder="Amount (e.g. 1kg)"
-                            />
-                            <DatePicker
-                                date={new Date(item.estimatedExpirationDate)}
-                                onDateChange={(date) =>
-                                    handleItemChange(index, 'estimatedExpirationDate', date?.toISOString() ?? new Date().toISOString())
-                                }
-                            />
-                        </div>
-                    </div>
-                     <Button variant="ghost" size="icon" className="ml-2" onClick={() => handleRemoveItem(index)}>
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
+                              value={item.estimatedAmount}
+                              onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
+                              placeholder="Amount (e.g. 1kg)"
+                              className="h-11"
+                          />
+                          <DatePicker
+                              date={new Date(item.estimatedExpirationDate)}
+                              onDateChange={(date) =>
+                                  handleItemChange(index, 'estimatedExpirationDate', date?.toISOString() ?? new Date().toISOString())
+                              }
+                              className="h-11"
+                          />
+                      </div>
+                  </div>
+                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => handleRemoveItem(index)}>
+                      <Trash2 className="h-5 w-5" />
+                  </Button>
                 </div>
 
                 <CollapsibleTrigger asChild>
-                    <Button variant="link" className="p-0 h-auto text-sm">
-                        <ChevronDown className="h-4 w-4 mr-2 transition-transform data-[state=open]:rotate-180" />
-                        Add details (optional)
+                    <Button variant="outline" className="w-full border-dashed data-[state=open]:border-solid">
+                        <ChevronDown className="h-4 w-4 mr-2 transition-transform duration-300 data-[state=open]:rotate-180" />
+                        <span className="data-[state=open]:hidden">Add details (optional)</span>
+                        <span className="data-[state=closed]:hidden">Hide details</span>
                     </Button>
                 </CollapsibleTrigger>
                 
-                <CollapsibleContent className="space-y-4 pt-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4">
-                        <div className="grid gap-1.5">
-                            <Label htmlFor={`storage-${item.id}`}>Store in:</Label>
-                            <Select value={item.storageLocation} onValueChange={(value) => handleItemChange(index, 'storageLocation', value)}>
-                                <SelectTrigger id={`storage-${item.id}`}><SelectValue placeholder="Select location..." /></SelectTrigger>
-                                <SelectContent>
-                                    {storageLocations.map(loc => <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-1.5">
-                            <Label htmlFor={`useby-${item.id}`}>Use by:</Label>
-                             <Select value={item.useByTimeline} onValueChange={(value) => handleItemChange(index, 'useByTimeline', value)}>
-                                <SelectTrigger id={`useby-${item.id}`}><SelectValue placeholder="Select timeline..." /></SelectTrigger>
-                                <SelectContent>
-                                    {useByTimelines.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-1.5">
-                             <Label htmlFor={`source-${item.id}`}>From:</Label>
-                             <Select value={item.purchaseSource} onValueChange={(value) => handleItemChange(index, 'purchaseSource', value)}>
-                                <SelectTrigger id={`source-${item.id}`}><SelectValue placeholder="Select source..." /></SelectTrigger>
-                                <SelectContent>
-                                    {purchaseSources.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-1.5">
-                            <Label>Price:</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    type="number"
-                                    value={item.priceAmount ?? ''}
-                                    onChange={(e) => handleItemChange(index, 'priceAmount', e.target.valueAsNumber || undefined)}
-                                    placeholder="₱ Amount"
-                                    className="flex-1"
-                                />
-                                 <Select value={item.priceUnit} onValueChange={(value) => handleItemChange(index, 'priceUnit', value)}>
-                                    <SelectTrigger className="w-[120px]"><SelectValue placeholder="per..." /></SelectTrigger>
+                <CollapsibleContent>
+                    <div className="space-y-4 rounded-md border-dashed border bg-secondary/50 p-4 mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid gap-1.5">
+                                <Label htmlFor={`storage-${item.id}`}>Store in:</Label>
+                                <Select value={item.storageLocation} onValueChange={(value) => handleItemChange(index, 'storageLocation', value)}>
+                                    <SelectTrigger id={`storage-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select location..." /></SelectTrigger>
                                     <SelectContent>
-                                        {priceUnits.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                        {storageLocations.map(loc => <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>)}
                                     </SelectContent>
                                 </Select>
+                            </div>
+                            <div className="grid gap-1.5">
+                                <Label htmlFor={`useby-${item.id}`}>Use by:</Label>
+                                <Select value={item.useByTimeline} onValueChange={(value) => handleItemChange(index, 'useByTimeline', value)}>
+                                    <SelectTrigger id={`useby-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select timeline..." /></SelectTrigger>
+                                    <SelectContent>
+                                        {useByTimelines.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-1.5">
+                                <Label htmlFor={`source-${item.id}`}>From:</Label>
+                                <Select value={item.purchaseSource} onValueChange={(value) => handleItemChange(index, 'purchaseSource', value)}>
+                                    <SelectTrigger id={`source-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select source..." /></SelectTrigger>
+                                    <SelectContent>
+                                        {purchaseSources.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid gap-1.5">
+                                <Label>Price:</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="number"
+                                        value={item.priceAmount ?? ''}
+                                        onChange={(e) => handleItemChange(index, 'priceAmount', e.target.valueAsNumber || undefined)}
+                                        placeholder="₱ Amount"
+                                        className="flex-1 h-11 bg-background"
+                                    />
+                                    <Select value={item.priceUnit} onValueChange={(value) => handleItemChange(index, 'priceUnit', value)}>
+                                        <SelectTrigger className="w-[120px] h-11 bg-background"><SelectValue placeholder="per..." /></SelectTrigger>
+                                        <SelectContent>
+                                            {priceUnits.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                         </div>
                     </div>
