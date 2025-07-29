@@ -7,7 +7,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
+import { Trash2, Loader2, Save, UtensilsCrossed, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WasteLog, FoodItem } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
@@ -49,6 +49,15 @@ export function ReviewItems() {
   const handleRemoveItem = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
+  };
+  
+  const handleAddItem = () => {
+    const newItem: WasteLogItem = {
+      id: crypto.randomUUID(),
+      name: '',
+      estimatedAmount: '',
+    };
+    setItems([...items, newItem]);
   };
 
   const handleConfirmAndSave = async () => {
@@ -142,7 +151,13 @@ export function ReviewItems() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Detected Waste Items</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Detected Waste Items</CardTitle>
+            <Button variant="outline" size="sm" onClick={handleAddItem}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Item
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {items.map((item, index) => (

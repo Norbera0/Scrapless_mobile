@@ -7,7 +7,7 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
+import { Trash2, Loader2, Save, UtensilsCrossed, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { DatePicker } from '@/components/ui/date-picker';
 import type { PantryLogItem } from '@/stores/pantry-store';
@@ -30,6 +30,16 @@ export function ReviewPantryItems() {
   const handleRemoveItem = (index: number) => {
     const newItems = items.filter((_, i) => i !== index);
     setItems(newItems);
+  };
+  
+  const handleAddItem = () => {
+    const newItem: PantryLogItem = {
+      id: crypto.randomUUID(),
+      name: '',
+      estimatedAmount: '',
+      estimatedExpirationDate: new Date().toISOString(),
+    };
+    setItems([...items, newItem]);
   };
 
   const handleConfirmAndSave = async () => {
@@ -76,7 +86,13 @@ export function ReviewPantryItems() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Detected Items</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Detected Items</CardTitle>
+            <Button variant="outline" size="sm" onClick={handleAddItem}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Item
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {items.map((item: PantryLogItem, index: number) => {
