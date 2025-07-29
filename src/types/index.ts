@@ -11,22 +11,28 @@ export interface FoodItem {
   estimatedAmount: string;
   pesoValue: number;
   carbonFootprint: number;
+  wasteReason: string;
 }
 
 export interface WasteLog {
-  id: string;
+  id:string;
   date: string; // ISO string
   userId: string;
   items: FoodItem[];
   totalPesoValue: number;
   totalCarbonFootprint: number;
   photoDataUri?: string;
+  sessionWasteReason?: string;
 }
 
-export interface PantryItem extends FoodItem {
+export interface PantryItem {
+    id: string;
+    name: string;
+    estimatedAmount: string;
+    estimatedExpirationDate: string;
     addedDate: string; // ISO string for when the item was added
-    estimatedExpirationDate: string; // ISO string for the predicted expiration
-    freshness?: 'Fresh' | 'Use Soon' | 'Expiring'; // Tag based on expiration
+    pesoValue: number; 
+    carbonFootprint: number;
 }
   
 export interface PantryLog {

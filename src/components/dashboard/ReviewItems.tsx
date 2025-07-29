@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Trash2, Loader2, Save, UtensilsCrossed, Plus, Info } from 'lucide-react';
+import { Trash2, Loader2, Save, UtensilsCrossed } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { WasteLog, FoodItem } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
@@ -21,21 +21,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Label } from '../ui/label';
 
 const wasteReasons = [
-  "spoiled", "expired", "cooked_too_much", "forgot_about_it",
-  "didn't_like_taste", "got_moldy", "family_member_didn't_eat",
-  "changed_meal_plans", "bought_too_much"
+  "Got spoiled/rotten",
+  "Past expiry date",
+  "Forgot about it",
+  "Cooked too much",
+  "Bought too much",
+  "Plans changed",
+  "Other reason"
 ];
 
 export function ReviewItems() {
   const router = useRouter();
   const { toast } = useToast();
-  const { items, setItems, photoDataUri, reset } = useWasteLogStore();
+  const { items, setItems, photoDataUri, reset, sessionWasteReason, setSessionWasteReason } = useWasteLogStore();
   const [isSaving, setIsSaving] = useState(false);
   const { user } = useAuth();
-  const [openCollapsibles, setOpenCollapsibles] = useState<Record<string, boolean>>({});
 
   const handleItemChange = (index: number, field: keyof WasteLogItem, value: any) => {
     const newItems = [...items];
@@ -53,7 +56,12 @@ export function ReviewItems() {
         toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
         return;
     }
+     if (!sessionWasteReason) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please select a reason for the waste.' });
+      return;
+    }
     setIsSaving(true);
+
     try {
       const getImpact = (itemName: string): { peso: number; co2e: number } => {
         const lowerCaseItem = itemName.toLowerCase();
@@ -78,7 +86,7 @@ export function ReviewItems() {
               estimatedAmount: item.estimatedAmount,
               pesoValue: peso,
               carbonFootprint: co2e,
-              wasteReason: item.wasteReason,
+              wasteReason: sessionWasteReason, // Apply session-level reason
           }
       });
   
@@ -88,6 +96,7 @@ export function ReviewItems() {
         items: finalItems,
         totalPesoValue: totalPesoValue,
         totalCarbonFootprint: totalCarbonFootprint,
+        sessionWasteReason: sessionWasteReason,
       };
 
       if (photoDataUri) {
@@ -101,6 +110,7 @@ export function ReviewItems() {
           description: 'Your waste log has been saved.',
       });
       
+      // Use a small timeout to ensure state reset completes before navigation
       setTimeout(() => {
         reset();
         router.replace('/dashboard');
@@ -117,13 +127,9 @@ export function ReviewItems() {
     }
   };
   
-  const toggleCollapsible = (id: string) => {
-    setOpenCollapsibles(prev => ({ ...prev, [id]: !prev[id] }));
-  }
-
   if (items.length === 0 && !isSaving) {
     return (
-      <div className="text-center text-muted-foreground">
+      <div className="text-center text-muted-foreground py-10">
         <p>No items to review. Log waste to get started.</p>
         <Button onClick={() => router.push('/log-waste?method=camera')} className="mt-4">
           Log Waste
@@ -140,69 +146,51 @@ export function ReviewItems() {
         </CardHeader>
         <CardContent className="space-y-4">
           {items.map((item, index) => (
-            <Collapsible
-              key={item.id}
-              open={openCollapsibles[item.id] || false}
-              onOpenChange={() => toggleCollapsible(item.id)}
-              className="space-y-2 rounded-lg border p-4"
-            >
-              <div className="flex items-center justify-between">
+             <div key={item.id} className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex flex-1 items-center gap-4">
-                  <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
-                  <div className="flex-1 grid gap-2">
+                    <UtensilsCrossed className="h-6 w-6 text-muted-foreground" />
+                    <div className="flex-1 grid gap-2">
                     <Input
-                      value={item.name}
-                      onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                      className="text-lg font-semibold"
-                      placeholder="Item Name"
+                        value={item.name}
+                        onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                        className="text-lg font-semibold"
+                        placeholder="Item Name"
                     />
                     <Input
-                      value={item.estimatedAmount}
-                      onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
-                      placeholder="Amount (e.g. 1 cup)"
+                        value={item.estimatedAmount}
+                        onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
+                        placeholder="Amount (e.g. 1 cup)"
                     />
-                  </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 ml-4">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <Info className="mr-2 h-4 w-4" />
-                        {openCollapsibles[item.id] ? 'Hide Details' : 'Add Details'}
-                      </Button>
-                    </CollapsibleTrigger>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleRemoveItem(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                </div>
-              </div>
-
-              <CollapsibleContent className="space-y-4 pt-4">
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium">Why did it go to waste?</label>
-                  <Select
-                    value={item.wasteReason}
-                    onValueChange={(value) => handleItemChange(index, 'wasteReason', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a reason..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {wasteReasons.map((reason) => (
-                        <SelectItem key={reason} value={reason}>
-                          {reason.replace(/_/g, ' ')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleRemoveItem(index)}
+                    className="ml-4"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
           ))}
         </CardContent>
+        <CardFooter className="flex-col items-start gap-4">
+           <div className="grid w-full gap-2">
+              <Label htmlFor="waste-reason">💭 Why did these items go to waste?</Label>
+              <Select value={sessionWasteReason ?? ''} onValueChange={setSessionWasteReason}>
+                  <SelectTrigger id="waste-reason">
+                      <SelectValue placeholder="Select a reason..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {wasteReasons.map((reason) => (
+                      <SelectItem key={reason} value={reason}>
+                          {reason}
+                      </SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
+           </div>
+        </CardFooter>
       </Card>
       <div className="flex justify-end gap-2">
         <Button
@@ -212,7 +200,7 @@ export function ReviewItems() {
         >
           Back
         </Button>
-        <Button onClick={handleConfirmAndSave} disabled={isSaving || items.length === 0}>
+        <Button onClick={handleConfirmAndSave} disabled={isSaving || items.length === 0 || !sessionWasteReason}>
             {isSaving ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (

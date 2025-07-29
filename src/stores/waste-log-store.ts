@@ -6,6 +6,7 @@ export interface WasteLogItem {
   id: string;
   name: string;
   estimatedAmount: string;
+  wasteReason?: string;
 }
 
 interface WasteLogState {
@@ -13,10 +14,12 @@ interface WasteLogState {
   photoPreview: string | null;
   items: WasteLogItem[];
   logs: WasteLog[];
+  sessionWasteReason: string | null;
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
   setItems: (items: WasteLogItem[]) => void;
   setLogs: (logs: WasteLog[]) => void;
+  setSessionWasteReason: (reason: string | null) => void;
   reset: () => void;
 }
 
@@ -25,6 +28,7 @@ const initialState = {
     photoPreview: null,
     items: [],
     logs: [],
+    sessionWasteReason: null,
 };
 
 export const useWasteLogStore = create<WasteLogState>()((set) => ({
@@ -33,5 +37,6 @@ export const useWasteLogStore = create<WasteLogState>()((set) => ({
   setPhotoPreview: (uri) => set({ photoPreview: uri }),
   setItems: (items) => set({ items: items }),
   setLogs: (logs) => set({ logs }),
+  setSessionWasteReason: (reason) => set({ sessionWasteReason: reason }),
   reset: () => set(initialState),
 }));
