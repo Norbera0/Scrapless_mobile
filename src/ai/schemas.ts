@@ -154,3 +154,30 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
     similarUserStory: z.string().describe("An encouraging story about similar users (e.g., 'Users who fixed this pattern typically saved ₱200/month')."),
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
+
+
+// Shopping Recommendations Schemas
+export const GenerateShoppingRecommendationsInputSchema = z.object({
+    userName: z.string(),
+    pantryItems: z.array(z.any()),
+    wasteLogs: z.array(z.any()),
+    topWastedCategory: z.string(),
+});
+export type GenerateShoppingRecommendationsInput = z.infer<typeof GenerateShoppingRecommendationsInputSchema>;
+
+export const GenerateShoppingRecommendationsOutputSchema = z.object({
+    shoppingIntelligence: z.object({
+        shoppingPattern: z.string(),
+        topOptimizationCategory: z.string(),
+        estimatedMonthlySavings: z.number(),
+    }),
+    recommendations: z.array(
+        z.object({
+            itemName: z.string(),
+            currentBehavior: z.string(),
+            optimalBehavior: z.string(),
+            savingsOrResult: z.string(),
+        })
+    ),
+});
+export type GenerateShoppingRecommendationsOutput = z.infer<typeof GenerateShoppingRecommendationsOutputSchema>;

@@ -74,7 +74,7 @@ function PredictionZoneCard() {
                                      <ShoppingCart className="h-5 w-5 text-primary mt-0.5" />
                                     <p className="text-sm">{latestInsight.smartShoppingPlan}</p>
                                 </div>
-                                <Button size="sm" variant="secondary" onClick={() => { /* Placeholder for future /shopping page */ }}>
+                                <Button size="sm" variant="secondary" onClick={() => router.push('/shopping')}>
                                     View All Shopping Tips
                                 </Button>
                             </div>

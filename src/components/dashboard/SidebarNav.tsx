@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb } from 'lucide-react';
+import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
     { href: '/trends', label: 'Trends', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
+    { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/saved-recipes', label: 'Saved Recipes', icon: Bookmark },
   ];
   
