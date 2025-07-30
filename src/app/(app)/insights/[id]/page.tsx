@@ -7,7 +7,7 @@ import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, Lightbulb, AlertTriangle, Sparkles, Target, Wallet, Users, Check } from 'lucide-react';
+import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
