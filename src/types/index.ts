@@ -65,3 +65,26 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   instructions: string[];
 }
+
+// Insight Types
+export interface InsightSolution {
+    solution: string;
+    successRate: number; // e.g., 0.75 for 75%
+}
+
+export interface Insight {
+    id: string;
+    userId: string;
+    date: string; // ISO string
+    keyObservation: string;
+    patternAlert: string;
+    smartTip: string;
+    // Deep dive fields
+    whatsReallyHappening: string;
+    whyThisPatternExists: string;
+    financialImpact: string;
+    solutions: InsightSolution[];
+    similarUserStory: string;
+    // User interaction
+    status: 'new' | 'acknowledged' | 'acted_on' | 'ignored';
+}

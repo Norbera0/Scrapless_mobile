@@ -1,7 +1,7 @@
 
 'use client';
 import { db } from './firebase';
-import type { WasteLog, PantryItem, Recipe, User } from '@/types';
+import type { Insight, WasteLog, PantryItem, Recipe, User } from '@/types';
 import { 
     collection, 
     addDoc, 
@@ -15,10 +15,12 @@ import {
     setDoc,
     getDoc,
     orderBy,
-    limit
+    limit,
+    updateDoc
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useInsightStore } from '@/stores/insight-store';
 import type { PantryLogItem } from '@/stores/pantry-store';
 
 // --- Listener Management ---
@@ -26,10 +28,11 @@ const listenerManager: { [key: string]: Unsubscribe[] } = {
     wasteLogs: [],
     pantry: [],
     userSettings: [],
-    savedRecipes: []
+    savedRecipes: [],
+    insights: [],
 };
 
-export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes') => {
+export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes' | 'insights') => {
     const unsubscribeAll = (keys: string[]) => {
         keys.forEach(k => {
             if (listenerManager[k]) {
@@ -51,6 +54,7 @@ export const initializeUserCache = (userId: string) => {
     cleanupListeners();
     useWasteLogStore.getState().setLogsInitialized(false);
     usePantryLogStore.getState().setPantryInitialized(false);
+    useInsightStore.getState().setInsightsInitialized(false);
 
     // Listener for Waste Logs
     const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
@@ -60,7 +64,7 @@ export const initializeUserCache = (userId: string) => {
         useWasteLogStore.getState().setLogsInitialized(true);
     }, (error) => {
         console.error("Error with wasteLogs listener:", error);
-        useWasteLogStore.getState().setLogsInitialized(true); // Still mark as initialized on error
+        useWasteLogStore.getState().setLogsInitialized(true); 
     });
     listenerManager.wasteLogs.push(wasteLogsUnsub);
     
@@ -76,15 +80,17 @@ export const initializeUserCache = (userId: string) => {
     });
     listenerManager.pantry.push(pantryUnsub);
     
-    // Listener for Saved Recipes
-    const savedRecipesQuery = query(collection(db, `users/${userId}/savedRecipes`));
-    const savedRecipesUnsub = onSnapshot(savedRecipesQuery, (snapshot) => {
-        const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
-        // In a real app, you would update a store for saved recipes here.
+    // Listener for Insights
+    const insightsQuery = query(collection(db, `users/${userId}/insights`), orderBy('date', 'desc'));
+    const insightsUnsub = onSnapshot(insightsQuery, (snapshot) => {
+        const insights = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Insight));
+        useInsightStore.getState().setInsights(insights);
+        useInsightStore.getState().setInsightsInitialized(true);
     }, (error) => {
-        console.error("Error with savedRecipes listener:", error);
+        console.error("Error with insights listener:", error);
+        useInsightStore.getState().setInsightsInitialized(true);
     });
-    listenerManager.savedRecipes.push(savedRecipesUnsub);
+    listenerManager.insights.push(insightsUnsub);
 };
 
 
@@ -164,6 +170,27 @@ export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string
 export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
+
+// --- Insight Functions ---
+export const getLatestInsight = async (userId: string): Promise<Insight | null> => {
+    const q = query(collection(db, `users/${userId}/insights`), orderBy('date', 'desc'), limit(1));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+        return null;
+    }
+    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Insight;
+};
+
+export const saveInsight = async (insightData: Omit<Insight, 'id'>): Promise<string> => {
+    const docRef = await addDoc(collection(db, `users/${insightData.userId}/insights`), insightData);
+    return docRef.id;
+};
+
+export const updateInsightStatus = async (userId: string, insightId: string, status: Insight['status']) => {
+    const insightRef = doc(db, `users/${userId}/insights`, insightId);
+    await updateDoc(insightRef, { status });
+};
+
 
 // --- User Settings Functions ---
 export const getUserSettings = async (userId: string): Promise<any> => {

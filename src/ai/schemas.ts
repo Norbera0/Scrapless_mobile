@@ -139,5 +139,16 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
     keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
     patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
     smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
+    // Deep dive fields
+    whatsReallyHappening: z.string().describe("A detailed explanation of what is happening, citing specific data from user logs."),
+    whyThisPatternExists: z.string().describe("The AI's analysis of the root cause of this behavior pattern."),
+    financialImpact: z.string().describe("The estimated financial cost of this pattern (e.g., '₱180 in vegetables wasted over 4 weekends')."),
+    solutions: z.array(
+        z.object({
+            solution: z.string().describe("A specific, actionable solution to address the pattern."),
+            successRate: z.number().min(0).max(1).describe("The estimated success rate of this solution (e.g., 0.75 for 75%)."),
+        })
+    ).describe("A list of 3-4 actionable alternative solutions."),
+    similarUserStory: z.string().describe("An encouraging story about similar users (e.g., 'Users who fixed this pattern typically saved ₱200/month')."),
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;

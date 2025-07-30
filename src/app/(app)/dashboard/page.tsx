@@ -6,66 +6,32 @@ import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb, Check, History, MessageSquareMore } from 'lucide-react';
-import type { User } from '@/types';
+import type { User, Insight } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useInsightStore } from '@/stores/insight-store';
 import { isToday } from 'date-fns';
-import { analyzeConsumptionPatterns } from '@/ai/flows/analyze-consumption-patterns';
-import { type AnalyzeConsumptionPatternsOutput } from '@/ai/schemas';
 
 function AiInsightCard() {
-    const [insight, setInsight] = useState<AnalyzeConsumptionPatternsOutput | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const { user, isLoading: isAuthLoading } = useAuth();
-    const { logs, logsInitialized } = useWasteLogStore();
-    const { liveItems, pantryInitialized } = usePantryLogStore();
+    const router = useRouter();
+    const { insights, insightsInitialized } = useInsightStore();
+    const [latestInsight, setLatestInsight] = useState<Insight | null>(null);
 
     useEffect(() => {
-        // Don't do anything until auth and stores are initialized
-        if (isAuthLoading || !logsInitialized || !pantryInitialized) {
-            return;
-        }
-
-        const hasData = logs.length > 0 || liveItems.length > 0;
-
-        if (user) {
-            if (hasData) {
-                const fetchInsights = async () => {
-                    setIsLoading(true);
-                    try {
-                        const result = await analyzeConsumptionPatterns({
-                            userName: user.displayName?.split(' ')[0] || 'User',
-                            pantryItems: liveItems.map(item => ({
-                                name: item.name,
-                                estimatedExpirationDate: item.estimatedExpirationDate,
-                                estimatedAmount: item.estimatedAmount
-                            })),
-                            wasteLogs: logs,
-                        });
-                        setInsight(result);
-                    } catch (error) {
-                        console.error("Failed to fetch AI insights:", error);
-                        setInsight(null); // Clear insight on error
-                    } finally {
-                        setIsLoading(false);
-                    }
-                };
-                fetchInsights();
-            } else {
-                // Handle case for existing user with no data
-                setIsLoading(false);
-                setInsight({
-                    keyObservation: "Welcome to your AI-powered dashboard!",
-                    patternAlert: "Start by adding items to your pantry or logging waste.",
-                    smartTip: "The more you log, the smarter your insights will become!",
-                });
-            }
+        if (insightsInitialized && insights.length > 0) {
+            setLatestInsight(insights[0]); // Insights are sorted by date descending
         } else {
-            // No user, stop loading
-            setIsLoading(false);
+            setLatestInsight(null);
         }
-    }, [user, isAuthLoading, logs, liveItems, logsInitialized, pantryInitialized]);
+    }, [insights, insightsInitialized]);
+
+    const handleAcknowledge = () => {
+        if (!latestInsight) return;
+        // In a real app, you'd call a function to update the insight's status in Firestore
+        // e.g., updateInsightStatus(latestInsight.id, 'acknowledged');
+        console.log("Acknowledged insight:", latestInsight.id);
+    };
 
     return (
         <Card>
@@ -77,18 +43,18 @@ function AiInsightCard() {
                 <CardDescription>AI-powered tips to help you reduce waste.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {isLoading ? (
+                {!insightsInitialized ? (
                     <div className="flex items-center justify-center p-4">
                         <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
-                ) : insight ? (
+                ) : latestInsight ? (
                     <div className="space-y-3">
                         <div className="flex items-start gap-3">
                             <div className="mt-1 flex-shrink-0">
                                 <Sparkles className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                                <p className="font-semibold text-foreground">{insight.keyObservation}</p>
+                                <p className="font-semibold text-foreground">{latestInsight.keyObservation}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
@@ -97,7 +63,7 @@ function AiInsightCard() {
                             </div>
                             <div>
                                 <p className="font-semibold text-foreground">Pattern Alert</p>
-                                <p className="text-sm text-muted-foreground">{insight.patternAlert}</p>
+                                <p className="text-sm text-muted-foreground">{latestInsight.patternAlert}</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-3">
@@ -106,27 +72,27 @@ function AiInsightCard() {
                             </div>
                             <div>
                                 <p className="font-semibold text-foreground">Smart Tip</p>
-                                <p className="text-sm text-muted-foreground">{insight.smartTip}</p>
+                                <p className="text-sm text-muted-foreground">{latestInsight.smartTip}</p>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <p className="text-center text-muted-foreground p-4">
-                        Could not load insights at the moment.
+                        Start logging your waste and pantry items to unlock personalized insights!
                     </p>
                 )}
             </CardContent>
-             {!isLoading && insight && (
+             {insightsInitialized && latestInsight && (
                 <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={handleAcknowledge}>
                         <Check className="mr-2 h-4 w-4" />
                         Got it
                     </Button>
-                    <Button>
+                    <Button onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                          <MessageSquareMore className="mr-2 h-4 w-4" />
                         Tell me more
                     </Button>
-                     <Button variant="secondary">
+                     <Button variant="secondary" onClick={() => router.push('/insights/history')}>
                         <History className="mr-2 h-4 w-4" />
                         History
                     </Button>

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot } from 'lucide-react';
+import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
     { href: '/trends', label: 'Trends', icon: BarChart },
+    { href: '/insights/history', label: 'Insights', icon: Lightbulb },
     { href: '/saved-recipes', label: 'Saved Recipes', icon: Bookmark },
   ];
   
@@ -58,6 +59,10 @@ export function SidebarNav({ user }: { user: User }) {
     const itemBase = itemHref.split('?')[0];
     if (itemBase === '/dashboard') {
         return pathname === itemBase;
+    }
+    // Special handling for insights
+    if (itemBase === '/insights/history') {
+        return pathname.startsWith('/insights');
     }
     return pathname.startsWith(itemBase);
   }
