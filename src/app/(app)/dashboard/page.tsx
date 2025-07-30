@@ -3,9 +3,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb, Check, History, MessageSquareMore } from 'lucide-react';
 import type { User } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -116,6 +116,22 @@ function AiInsightCard() {
                     </p>
                 )}
             </CardContent>
+             {!isLoading && insight && (
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline">
+                        <Check className="mr-2 h-4 w-4" />
+                        Got it
+                    </Button>
+                    <Button>
+                         <MessageSquareMore className="mr-2 h-4 w-4" />
+                        Tell me more
+                    </Button>
+                     <Button variant="secondary">
+                        <History className="mr-2 h-4 w-4" />
+                        History
+                    </Button>
+                </CardFooter>
+            )}
         </Card>
     );
 }
