@@ -47,16 +47,18 @@ CONTEXT DATA:
 {{/if}}
 
 YOUR TASK:
-Analyze all the provided data. Based on the analysis, provide a single, impactful insight package with the following parts. Be specific and use the data provided.
+Analyze all the provided data. Based on the analysis, provide a single, impactful insight package.
 
-1.  **keyObservation**: A brief, one-sentence summary of the most significant pattern you found. (e.g., "You're on track to reduce waste this month!" or "Your biggest source of waste is vegetables that spoil.").
-2.  **patternAlert**: A one-sentence description of a specific, recurring behavior that leads to waste. (e.g., "You frequently waste vegetables bought on weekends.").
-3.  **smartTip**: A concrete, actionable tip to address the pattern. (e.g., "Try buying vegetables twice a week in smaller amounts instead of a large haul on Saturdays.").
-4.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data. (e.g., "Over the last 4 weekends, your logs show you wasted kangkong, pechay, and tomatoes that were purchased on Friday or Saturday.").
-5.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens because weekend meal plans change unexpectedly, causing fresh produce bought on Friday to sit unused until it's no longer fresh by Tuesday.").
-6.  **financialImpact**: The estimated financial cost of this specific pattern. (e.g., "This pattern has led to an estimated ₱180 in vegetable waste over the past month.").
-7.  **solutions**: A list of 3 actionable, alternative solutions. (e.g., [{solution: "Plan one specific weekend meal before shopping", successRate: 0.8}, {solution: "Store leafy greens in paper towels to extend freshness", successRate: 0.6}, {solution: "Buy pre-chopped veggies for one quick meal", successRate: 0.5}]).
-8.  **similarUserStory**: An encouraging, relatable story. (e.g., "Many users who start planning just one weekend meal in advance cut their vegetable waste by 50% within a month!").
+**Insight Package Components:**
+1.  **predictionAlertBody (Optional)**: If you detect a very strong, high-confidence pattern about likely imminent waste, formulate a predictive alert. For example: "Based on your pattern, you'll likely waste vegetables this weekend. You've done this 3 of the last 4 weekends." If no high-confidence prediction is possible, leave this field blank.
+2.  **keyObservation**: A brief, one-sentence summary of the most significant pattern you found. (e.g., "You're on track to reduce waste this month!" or "Your biggest source of waste is vegetables that spoil.").
+3.  **patternAlert**: A one-sentence description of a specific, recurring behavior that leads to waste. (e.g., "You frequently waste vegetables bought on weekends.").
+4.  **smartTip**: A concrete, actionable tip to address the pattern. (e.g., "Try buying vegetables twice a week in smaller amounts instead of a large haul on Saturdays.").
+5.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data. (e.g., "Over the last 4 weekends, your logs show you wasted kangkong, pechay, and tomatoes that were purchased on Friday or Saturday.").
+6.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens because weekend meal plans change unexpectedly, causing fresh produce bought on Friday to sit unused until it's no longer fresh by Tuesday.").
+7.  **financialImpact**: The estimated financial cost of this specific pattern. (e.g., "This pattern has led to an estimated ₱180 in vegetable waste over the past month.").
+8.  **solutions**: A list of 3 actionable, alternative solutions. (e.g., [{solution: "Plan one specific weekend meal before shopping", successRate: 0.8}, {solution: "Store leafy greens in paper towels to extend freshness", successRate: 0.6}, {solution: "Buy pre-chopped veggies for one quick meal", successRate: 0.5}]).
+9.  **similarUserStory**: An encouraging, relatable story. (e.g., "Many users who start planning just one weekend meal in advance cut their vegetable waste by 50% within a month!").
 
 Keep the tone encouraging, positive, and helpful. Focus on the single most important pattern you can find. If there is not enough data, provide a generic welcome/encouragement message for all fields.
 `,

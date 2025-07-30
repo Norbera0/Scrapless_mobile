@@ -76,6 +76,7 @@ export interface Insight {
     id: string;
     userId: string;
     date: string; // ISO string
+    predictionAlertBody?: string;
     keyObservation: string;
     patternAlert: string;
     smartTip: string;

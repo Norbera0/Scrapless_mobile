@@ -136,6 +136,7 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 
 export const AnalyzeConsumptionPatternsOutputSchema = z.object({
+    predictionAlertBody: z.string().optional().describe("A high-confidence prediction about likely future waste, if any is detected."),
     keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
     patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
     smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
