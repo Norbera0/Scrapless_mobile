@@ -54,11 +54,12 @@ Analyze all the provided data. Based on the analysis, provide a single, impactfu
 2.  **keyObservation**: A brief, one-sentence summary of the most significant pattern you found. (e.g., "You're on track to reduce waste this month!" or "Your biggest source of waste is vegetables that spoil.").
 3.  **patternAlert**: A one-sentence description of a specific, recurring behavior that leads to waste. (e.g., "You frequently waste vegetables bought on weekends.").
 4.  **smartTip**: A concrete, actionable tip to address the pattern. (e.g., "Try buying vegetables twice a week in smaller amounts instead of a large haul on Saturdays.").
-5.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data. (e.g., "Over the last 4 weekends, your logs show you wasted kangkong, pechay, and tomatoes that were purchased on Friday or Saturday.").
-6.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens because weekend meal plans change unexpectedly, causing fresh produce bought on Friday to sit unused until it's no longer fresh by Tuesday.").
-7.  **financialImpact**: The estimated financial cost of this specific pattern. (e.g., "This pattern has led to an estimated ₱180 in vegetable waste over the past month.").
-8.  **solutions**: A list of 3 actionable, alternative solutions. (e.g., [{solution: "Plan one specific weekend meal before shopping", successRate: 0.8}, {solution: "Store leafy greens in paper towels to extend freshness", successRate: 0.6}, {solution: "Buy pre-chopped veggies for one quick meal", successRate: 0.5}]).
-9.  **similarUserStory**: An encouraging, relatable story. (e.g., "Many users who start planning just one weekend meal in advance cut their vegetable waste by 50% within a month!").
+5.  **smartShoppingPlan**: A concise, one-sentence shopping tip related to the analysis. For example: "Next time, buy 4 tomatoes instead of 6 to save an estimated ₱80/month." or "Consider buying leafy greens on Wednesdays for maximum freshness."
+6.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data. (e.g., "Over the last 4 weekends, your logs show you wasted kangkong, pechay, and tomatoes that were purchased on Friday or Saturday.").
+7.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens because weekend meal plans change unexpectedly, causing fresh produce bought on Friday to sit unused until it's no longer fresh by Tuesday.").
+8.  **financialImpact**: The estimated financial cost of this specific pattern. (e.g., "This pattern has led to an estimated ₱180 in vegetable waste over the past month.").
+9.  **solutions**: A list of 3 actionable, alternative solutions. (e.g., [{solution: "Plan one specific weekend meal before shopping", successRate: 0.8}, {solution: "Store leafy greens in paper towels to extend freshness", successRate: 0.6}, {solution: "Buy pre-chopped veggies for one quick meal", successRate: 0.5}]).
+10. **similarUserStory**: An encouraging, relatable story. (e.g., "Many users who start planning just one weekend meal in advance cut their vegetable waste by 50% within a month!").
 
 Keep the tone encouraging, positive, and helpful. Focus on the single most important pattern you can find. If there is not enough data, provide a generic welcome/encouragement message for all fields.
 `,
@@ -79,6 +80,7 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
         keyObservation: defaultMessage,
         patternAlert: "The more you log, the smarter your insights will be.",
         smartTip: "Try logging your first item today to see how it works!",
+        smartShoppingPlan: "Unlock smart shopping tips by logging your groceries.",
         whatsReallyHappening: "Once you start logging, I can show you exactly what's happening in your kitchen.",
         whyThisPatternExists: "I'm ready to find the 'why' behind your food waste patterns.",
         financialImpact: "Unlock insights into how much money you can save.",
@@ -98,6 +100,7 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
             keyObservation: errorMessage,
             patternAlert: "We need a bit more data to identify your unique patterns.",
             smartTip: "Log your next grocery trip or any food waste to begin your analysis.",
+            smartShoppingPlan: "Add items to your pantry to get shopping recommendations.",
             whatsReallyHappening: "I'm standing by to analyze your data as soon as it comes in.",
             whyThisPatternExists: "Your food habits hold the key to reducing waste.",
             financialImpact: "Let's find out how much you can save together.",

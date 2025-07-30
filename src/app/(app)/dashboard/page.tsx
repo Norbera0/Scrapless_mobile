@@ -5,45 +5,96 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb, Check, History, MessageSquareMore } from 'lucide-react';
+import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb, Check, History, MessageSquareMore, ShoppingCart, CheckCircle } from 'lucide-react';
 import type { User, Insight } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { isToday } from 'date-fns';
+import { Separator } from '@/components/ui/separator';
 
-function PredictionAlertCard({ insight, onDismiss }: { insight: Insight; onDismiss: () => void }) {
-    if (!insight.predictionAlertBody) return null;
+function PredictionZoneCard() {
+    const router = useRouter();
+    const { insights, insightsInitialized } = useInsightStore();
+    const [latestInsight, setLatestInsight] = useState<Insight | null>(null);
+
+    useEffect(() => {
+        if (insightsInitialized && insights.length > 0) {
+            setLatestInsight(insights[0]);
+        } else {
+            setLatestInsight(null);
+        }
+    }, [insights, insightsInitialized]);
 
     return (
-        <Card className="border-primary/50 bg-primary/5 text-primary-foreground">
+        <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary">
-                    <Sparkles className="h-6 w-6" />
-                    Prediction Alert
+                <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                    Prediction Zone
                 </CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-foreground">{insight.predictionAlertBody}</p>
+            <CardContent className="space-y-4">
+                 {!insightsInitialized ? (
+                    <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                 ) : !latestInsight ? (
+                     <p className="text-center text-muted-foreground p-4">
+                        Start logging your waste and pantry items to unlock personalized predictions!
+                    </p>
+                 ) : (
+                    <>
+                        <div>
+                            <h3 className="font-semibold text-sm mb-2">ACTIVE ALERTS</h3>
+                            {latestInsight.predictionAlertBody ? (
+                                <div className="border border-destructive/50 bg-destructive/5 rounded-lg p-3 space-y-3">
+                                    <div className="flex items-start gap-2">
+                                        <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                                        <p className="text-sm">{latestInsight.predictionAlertBody}</p>
+                                    </div>
+                                    <Button size="sm" variant="secondary" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                                        View Prevention Plan
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="border border-dashed rounded-lg p-3">
+                                    <div className="flex items-start gap-2">
+                                        <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
+                                        <p className="text-sm text-muted-foreground">No waste risks detected. Your patterns look good this week!</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <Separator />
+                        <div>
+                            <h3 className="font-semibold text-sm mb-2">SMART SHOPPING</h3>
+                            <div className="border border-dashed rounded-lg p-3 space-y-3">
+                                <div className="flex items-start gap-2">
+                                     <ShoppingCart className="h-5 w-5 text-primary mt-0.5" />
+                                    <p className="text-sm">{latestInsight.smartShoppingPlan}</p>
+                                </div>
+                                <Button size="sm" variant="secondary" onClick={() => { /* Placeholder for future /shopping page */ }}>
+                                    View All Shopping Tips
+                                </Button>
+                            </div>
+                        </div>
+                    </>
+                 )}
             </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={onDismiss}>Not now</Button>
-                <Button size="sm" onClick={() => { /* Placeholder for future action */ }}>Help me prevent this</Button>
-            </CardFooter>
         </Card>
     );
 }
+
 
 function AiInsightCard() {
     const router = useRouter();
     const { insights, insightsInitialized } = useInsightStore();
     const [latestInsight, setLatestInsight] = useState<Insight | null>(null);
-    const [showPrediction, setShowPrediction] = useState(true);
 
     useEffect(() => {
         if (insightsInitialized && insights.length > 0) {
             setLatestInsight(insights[0]); // Insights are sorted by date descending
-            setShowPrediction(true); // Show prediction when a new insight arrives
         } else {
             setLatestInsight(null);
         }
@@ -57,76 +108,71 @@ function AiInsightCard() {
     };
 
     return (
-        <div className="space-y-4">
-            {latestInsight?.predictionAlertBody && showPrediction && (
-                 <PredictionAlertCard insight={latestInsight} onDismiss={() => setShowPrediction(false)} />
-            )}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Sparkles className="h-6 w-6 text-primary" />
-                        This Week's Insights
-                    </CardTitle>
-                    <CardDescription>AI-powered tips to help you reduce waste.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {!insightsInitialized ? (
-                        <div className="flex items-center justify-center p-4">
-                            <Loader2 className="h-6 w-6 animate-spin" />
-                        </div>
-                    ) : latestInsight ? (
-                        <div className="space-y-3">
-                            <div className="flex items-start gap-3">
-                                <div className="mt-1 flex-shrink-0">
-                                    <Sparkles className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">{latestInsight.keyObservation}</p>
-                                </div>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-6 w-6 text-primary" />
+                    This Week's Insights
+                </CardTitle>
+                <CardDescription>AI-powered tips to help you reduce waste.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {!insightsInitialized ? (
+                    <div className="flex items-center justify-center p-4">
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                ) : latestInsight ? (
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                            <div className="mt-1 flex-shrink-0">
+                                <Sparkles className="h-5 w-5 text-primary" />
                             </div>
-                            <div className="flex items-start gap-3">
-                                <div className="mt-1 flex-shrink-0">
-                                    <AlertTriangle className="h-5 w-5 text-destructive" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">Pattern Alert</p>
-                                    <p className="text-sm text-muted-foreground">{latestInsight.patternAlert}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-3">
-                                <div className="mt-1 flex-shrink-0">
-                                    <Lightbulb className="h-5 w-5 text-yellow-500" />
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-foreground">Smart Tip</p>
-                                    <p className="text-sm text-muted-foreground">{latestInsight.smartTip}</p>
-                                </div>
+                            <div>
+                                <p className="font-semibold text-foreground">{latestInsight.keyObservation}</p>
                             </div>
                         </div>
-                    ) : (
-                        <p className="text-center text-muted-foreground p-4">
-                            Start logging your waste and pantry items to unlock personalized insights!
-                        </p>
-                    )}
-                </CardContent>
-                 {insightsInitialized && latestInsight && (
-                    <CardFooter className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={handleAcknowledge}>
-                            <Check className="mr-2 h-4 w-4" />
-                            Got it
-                        </Button>
-                        <Button onClick={() => router.push(`/insights`)}>
-                             <MessageSquareMore className="mr-2 h-4 w-4" />
-                            Tell me more
-                        </Button>
-                         <Button variant="secondary" onClick={() => router.push('/insights/history')}>
-                            <History className="mr-2 h-4 w-4" />
-                            History
-                        </Button>
-                    </CardFooter>
+                        <div className="flex items-start gap-3">
+                            <div className="mt-1 flex-shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-destructive" />
+                            </div>
+                            <div>
+                                <p className="font-semibold text-foreground">Pattern Alert</p>
+                                <p className="text-sm text-muted-foreground">{latestInsight.patternAlert}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                            <div className="mt-1 flex-shrink-0">
+                                <Lightbulb className="h-5 w-5 text-yellow-500" />
+                            </div>
+                            <div>
+                                <p className="font-semibold text-foreground">Smart Tip</p>
+                                <p className="text-sm text-muted-foreground">{latestInsight.smartTip}</p>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-center text-muted-foreground p-4">
+                        Start logging your waste and pantry items to unlock personalized insights!
+                    </p>
                 )}
-            </Card>
-        </div>
+            </CardContent>
+             {insightsInitialized && latestInsight && (
+                <CardFooter className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={handleAcknowledge}>
+                        <Check className="mr-2 h-4 w-4" />
+                        Got it
+                    </Button>
+                    <Button onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                         <MessageSquareMore className="mr-2 h-4 w-4" />
+                        Tell me more
+                    </Button>
+                     <Button variant="secondary" onClick={() => router.push('/insights/history')}>
+                        <History className="mr-2 h-4 w-4" />
+                        History
+                    </Button>
+                </CardFooter>
+            )}
+        </Card>
     );
 }
 
@@ -163,6 +209,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      <PredictionZoneCard />
       <AiInsightCard />
 
       <Card>

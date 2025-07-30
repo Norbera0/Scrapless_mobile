@@ -140,6 +140,7 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
     keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
     patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
     smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
+    smartShoppingPlan: z.string().describe("A concise, one-sentence shopping tip related to the analysis."),
     // Deep dive fields
     whatsReallyHappening: z.string().describe("A detailed explanation of what is happening, citing specific data from user logs."),
     whyThisPatternExists: z.string().describe("The AI's analysis of the root cause of this behavior pattern."),

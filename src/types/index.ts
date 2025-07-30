@@ -80,6 +80,7 @@ export interface Insight {
     keyObservation: string;
     patternAlert: string;
     smartTip: string;
+    smartShoppingPlan: string;
     // Deep dive fields
     whatsReallyHappening: string;
     whyThisPatternExists: string;
