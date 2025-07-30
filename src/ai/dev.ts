@@ -9,3 +9,4 @@ import '@/ai/flows/suggest-recipes.ts';
 import '@/ai/flows/chat-with-assistant.ts';
 import '@/ai/flows/analyze-consumption-patterns.ts';
 
+

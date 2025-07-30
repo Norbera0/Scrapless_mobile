@@ -84,7 +84,7 @@ export const SuggestRecipesOutputSchema = z.object({
         })
     ).describe("A list of 3-5 recipe suggestions."),
 });
-export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutput>;
+export type SuggestRecipesOutput = z.infer<typeof SuggestRecipesOutputSchema>;
 
 // Chat Assistant Schemas
 const ChatMessageSchema = z.object({
