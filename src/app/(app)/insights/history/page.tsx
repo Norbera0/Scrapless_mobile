@@ -7,6 +7,8 @@ import { Loader2, Lightbulb, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 const statusConfig = {
     new: { icon: Lightbulb, color: 'default', label: 'New' },
@@ -22,11 +24,16 @@ export default function InsightHistoryPage() {
 
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6">
-            <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">Insight History</h1>
-                <p className="text-muted-foreground">
-                    Review your past AI-powered insights and track your progress.
-                </p>
+            <div className="flex items-center gap-4">
+                 <Button variant="outline" size="icon" onClick={() => router.push('/insights')}>
+                    <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight">Insight History</h1>
+                    <p className="text-muted-foreground">
+                        Review your past AI-powered insights and track your progress.
+                    </p>
+                </div>
             </div>
             
             <Card>

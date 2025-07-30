@@ -115,7 +115,7 @@ function AiInsightCard() {
                             <Check className="mr-2 h-4 w-4" />
                             Got it
                         </Button>
-                        <Button onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                        <Button onClick={() => router.push(`/insights`)}>
                              <MessageSquareMore className="mr-2 h-4 w-4" />
                             Tell me more
                         </Button>

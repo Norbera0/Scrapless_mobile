@@ -42,7 +42,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
     { href: '/trends', label: 'Trends', icon: BarChart },
-    { href: '/insights/history', label: 'Insights', icon: Lightbulb },
+    { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/saved-recipes', label: 'Saved Recipes', icon: Bookmark },
   ];
   
@@ -57,11 +57,12 @@ export function SidebarNav({ user }: { user: User }) {
 
   const isActive = (itemHref: string) => {
     const itemBase = itemHref.split('?')[0];
+    // Exact match for dashboard
     if (itemBase === '/dashboard') {
         return pathname === itemBase;
     }
-    // Special handling for insights
-    if (itemBase === '/insights/history') {
+    // Broader match for insights to cover detail and history pages
+    if (itemBase === '/insights') {
         return pathname.startsWith('/insights');
     }
     return pathname.startsWith(itemBase);
