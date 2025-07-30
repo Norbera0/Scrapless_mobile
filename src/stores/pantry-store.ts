@@ -21,12 +21,14 @@ interface PantryLogState {
   items: PantryLogItem[];
   liveItems: PantryItem[];
   optimisticItems: PantryItem[];
+  pantryInitialized: boolean;
   setPhotoDataUri: (uri: string | null) => void;
   setTextInput: (text: string) => void;
   setItems: (items: PantryLogItem[]) => void;
   setLiveItems: (items: PantryItem[]) => void;
   addOptimisticItems: (items: PantryItem[]) => void;
   clearOptimisticItems: () => void;
+  setPantryInitialized: (initialized: boolean) => void;
   reset: () => void;
 }
 
@@ -36,6 +38,7 @@ const initialState = {
     items: [],
     liveItems: [],
     optimisticItems: [],
+    pantryInitialized: false,
 };
 
 export const usePantryLogStore = create<PantryLogState>()((set) => ({
@@ -46,9 +49,11 @@ export const usePantryLogStore = create<PantryLogState>()((set) => ({
   setLiveItems: (items) => set({ liveItems: items }),
   addOptimisticItems: (items) => set((state) => ({ optimisticItems: [...state.optimisticItems, ...items] })),
   clearOptimisticItems: () => set({ optimisticItems: [] }),
+  setPantryInitialized: (initialized) => set({ pantryInitialized: initialized }),
   reset: () => set({ 
     photoDataUri: null,
     textInput: '',
     items: [],
+    // Do not reset liveItems, optimisticItems, or initialized status
   }),
 }));

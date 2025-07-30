@@ -14,7 +14,8 @@ import {
     getDocs,
     setDoc,
     getDoc,
-    orderBy
+    orderBy,
+    limit
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
@@ -48,14 +49,18 @@ export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' |
 // --- Cache Initialization ---
 export const initializeUserCache = (userId: string) => {
     cleanupListeners();
+    useWasteLogStore.getState().setLogsInitialized(false);
+    usePantryLogStore.getState().setPantryInitialized(false);
 
     // Listener for Waste Logs
     const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
     const wasteLogsUnsub = onSnapshot(wasteLogsQuery, (snapshot) => {
         const logs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as WasteLog));
         useWasteLogStore.getState().setLogs(logs);
+        useWasteLogStore.getState().setLogsInitialized(true);
     }, (error) => {
         console.error("Error with wasteLogs listener:", error);
+        useWasteLogStore.getState().setLogsInitialized(true); // Still mark as initialized on error
     });
     listenerManager.wasteLogs.push(wasteLogsUnsub);
     
@@ -64,8 +69,10 @@ export const initializeUserCache = (userId: string) => {
     const pantryUnsub = onSnapshot(pantryQuery, (snapshot) => {
         const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
         usePantryLogStore.getState().setLiveItems(items);
+        usePantryLogStore.getState().setPantryInitialized(true);
     }, (error) => {
         console.error("Error with pantry listener:", error);
+        usePantryLogStore.getState().setPantryInitialized(true);
     });
     listenerManager.pantry.push(pantryUnsub);
     

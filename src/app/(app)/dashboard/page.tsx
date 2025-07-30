@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Camera, Loader2, Mic, Sparkles, AlertTriangle, Lightbulb } from 'lucide-react';
 import type { User } from '@/types';
-import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { isToday } from 'date-fns';
@@ -17,45 +17,55 @@ import { type AnalyzeConsumptionPatternsOutput } from '@/ai/schemas';
 function AiInsightCard() {
     const [insight, setInsight] = useState<AnalyzeConsumptionPatternsOutput | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { user } = auth;
-    const { logs } = useWasteLogStore();
-    const { liveItems } = usePantryLogStore();
+    const { user, isLoading: isAuthLoading } = useAuth();
+    const { logs, logsInitialized } = useWasteLogStore();
+    const { liveItems, pantryInitialized } = usePantryLogStore();
 
     useEffect(() => {
-        const fetchInsights = async () => {
-            if (user) {
-                try {
-                    const result = await analyzeConsumptionPatterns({
-                        userName: user.displayName?.split(' ')[0] || 'User',
-                        pantryItems: liveItems.map(item => ({
-                            name: item.name,
-                            estimatedExpirationDate: item.estimatedExpirationDate,
-                            estimatedAmount: item.estimatedAmount
-                        })),
-                        wasteLogs: logs,
-                    });
-                    setInsight(result);
-                } catch (error) {
-                    console.error("Failed to fetch AI insights:", error);
-                    setInsight(null); // Clear insight on error
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-        };
-        // Fetch insights only when there's a user and some data to analyze
-        if(user && (logs.length > 0 || liveItems.length > 0)) {
-            fetchInsights();
-        } else if (user) {
-            // Handle case for new user with no data yet
-            setIsLoading(false);
-            setInsight({
-                keyObservation: "Welcome to your AI-powered dashboard!",
-                patternAlert: "Start by adding items to your pantry or logging waste.",
-                smartTip: "The more you log, the smarter your insights will become!",
-            });
+        // Don't do anything until auth and stores are initialized
+        if (isAuthLoading || !logsInitialized || !pantryInitialized) {
+            return;
         }
-    }, [user, logs, liveItems]);
+
+        const hasData = logs.length > 0 || liveItems.length > 0;
+
+        if (user) {
+            if (hasData) {
+                const fetchInsights = async () => {
+                    setIsLoading(true);
+                    try {
+                        const result = await analyzeConsumptionPatterns({
+                            userName: user.displayName?.split(' ')[0] || 'User',
+                            pantryItems: liveItems.map(item => ({
+                                name: item.name,
+                                estimatedExpirationDate: item.estimatedExpirationDate,
+                                estimatedAmount: item.estimatedAmount
+                            })),
+                            wasteLogs: logs,
+                        });
+                        setInsight(result);
+                    } catch (error) {
+                        console.error("Failed to fetch AI insights:", error);
+                        setInsight(null); // Clear insight on error
+                    } finally {
+                        setIsLoading(false);
+                    }
+                };
+                fetchInsights();
+            } else {
+                // Handle case for existing user with no data
+                setIsLoading(false);
+                setInsight({
+                    keyObservation: "Welcome to your AI-powered dashboard!",
+                    patternAlert: "Start by adding items to your pantry or logging waste.",
+                    smartTip: "The more you log, the smarter your insights will become!",
+                });
+            }
+        } else {
+            // No user, stop loading
+            setIsLoading(false);
+        }
+    }, [user, isAuthLoading, logs, liveItems, logsInitialized, pantryInitialized]);
 
     return (
         <Card>
@@ -113,26 +123,16 @@ function AiInsightCard() {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(auth.currentUser);
-  const { logs, setLogs } = useWasteLogStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { logs, logsInitialized } = useWasteLogStore();
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((fbUser) => {
-      setUser(fbUser);
-      setIsLoading(!fbUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    // The listener in data.ts will populate the store.
-    // We just need to know when to stop showing the loader.
-    if (user && logs.length > 0) {
-      setIsLoading(false);
+    // Determine loading state based on auth and store initialization
+    if (!isAuthLoading && logsInitialized) {
+        setIsDataLoading(false);
     }
-  }, [user, logs]);
-
+  }, [isAuthLoading, logsInitialized]);
 
   const todayStats = logs
     .filter(log => isToday(new Date(log.date)))
@@ -161,7 +161,7 @@ export default function DashboardPage() {
           <CardDescription>Your contribution to a less wasteful world today.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 text-center">
-            {isLoading && logs.length === 0 ? (
+            {isDataLoading ? (
                 <div className="col-span-2 flex justify-center items-center p-8">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>

@@ -14,12 +14,14 @@ interface WasteLogState {
   photoPreview: string | null;
   items: WasteLogItem[];
   logs: WasteLog[];
+  logsInitialized: boolean;
   sessionWasteReason: string | null;
   otherWasteReasonText: string;
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
   setItems: (items: WasteLogItem[]) => void;
   setLogs: (logs: WasteLog[]) => void;
+  setLogsInitialized: (initialized: boolean) => void;
   setSessionWasteReason: (reason: string | null) => void;
   setOtherWasteReasonText: (text: string) => void;
   reset: () => void;
@@ -30,6 +32,7 @@ const initialState = {
     photoPreview: null,
     items: [],
     logs: [],
+    logsInitialized: false,
     sessionWasteReason: null,
     otherWasteReasonText: '',
 };
@@ -40,7 +43,12 @@ export const useWasteLogStore = create<WasteLogState>()((set) => ({
   setPhotoPreview: (uri) => set({ photoPreview: uri }),
   setItems: (items) => set({ items: items }),
   setLogs: (logs) => set({ logs }),
+  setLogsInitialized: (initialized) => set({ logsInitialized: initialized }),
   setSessionWasteReason: (reason) => set({ sessionWasteReason: reason }),
   setOtherWasteReasonText: (text) => set({ otherWasteReasonText: text }),
-  reset: () => set(initialState),
+  reset: () => set({
+    ...initialState,
+    logs: [], // Keep logs from previous sessions
+    logsInitialized: true,
+  }),
 }));
