@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Textarea } from '../ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 export function PantryLogger() {
@@ -37,6 +38,7 @@ export function PantryLogger() {
 
   const { toast } = useToast();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const handleAnalyze = async (source: 'camera' | 'voice' | 'text', data: string) => {
     setIsLoading(true);
@@ -65,7 +67,10 @@ export function PantryLogger() {
   useEffect(() => {
     const getCameraPermission = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        const constraints = {
+            video: isMobile ? { facingMode: 'environment' } : true
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         setHasCameraPermission(true);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -83,7 +88,7 @@ export function PantryLogger() {
             stream.getTracks().forEach(track => track.stop());
         }
     }
-  }, []);
+  }, [isMobile]);
 
   const stopCameraStream = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -97,7 +102,10 @@ export function PantryLogger() {
     setPhotoDataUri(null);
     setPhotoPreview(null);
     const getCameraPermission = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        const constraints = {
+            video: isMobile ? { facingMode: 'environment' } : true
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         if (videoRef.current) {
             videoRef.current.srcObject = stream;
         }

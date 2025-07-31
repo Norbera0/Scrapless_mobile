@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useWasteLogStore } from '@/stores/waste-log-store';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 
 interface WasteLoggerProps {
@@ -39,13 +40,17 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   const { toast } = useToast();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   // Camera Permission Effect
   useEffect(() => {
     const getCameraPermission = async () => {
       if (method !== 'camera') return;
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        const constraints = {
+            video: isMobile ? { facingMode: 'environment' } : true
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         setHasCameraPermission(true);
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -69,7 +74,7 @@ export function WasteLogger({ method }: WasteLoggerProps) {
             stream.getTracks().forEach(track => track.stop());
         }
     }
-  }, [method, toast]);
+  }, [method, toast, isMobile]);
 
   const stopCameraStream = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -84,7 +89,10 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     setPhotoPreview(null);
     if(method === 'camera') {
         const getCameraPermission = async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({video: true});
+            const constraints = {
+                video: isMobile ? { facingMode: 'environment' } : true
+            };
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
