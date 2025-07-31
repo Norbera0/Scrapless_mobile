@@ -174,7 +174,7 @@ export function TrendsDashboard() {
                     <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
                     <YAxis tickFormatter={(value) => chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`} />
                     <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-                    <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
+                    <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={false} activeDot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
                 </LineChart>
             </ChartContainer>
         </CardContent>
