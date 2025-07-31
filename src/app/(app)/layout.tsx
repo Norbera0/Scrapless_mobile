@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { auth, cleanupFirestore } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { initializeUserCache, cleanupListeners } from '@/lib/data';
+import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </Sidebar>
       <SidebarInset>
         {children}
+        <FloatingChatAssistant />
       </SidebarInset>
     </SidebarProvider>
   );
