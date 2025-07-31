@@ -13,6 +13,7 @@ import { deletePantryItem } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
+import { PantryOverview } from '@/components/pantry/PantryOverview';
 
 
 export default function PantryPage() {
@@ -145,6 +146,9 @@ export default function PantryPage() {
                             <span className='hidden md:inline'>Add Item</span>
                         </Button>
                     </div>
+
+                    <PantryOverview stats={pantryStats} />
+
                      <div className="relative">
                         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input 
@@ -219,4 +223,3 @@ export default function PantryPage() {
         </>
     );
 }
-
