@@ -2,11 +2,11 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Virus } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
@@ -14,8 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from './TrendsKPI';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
@@ -32,6 +30,17 @@ const getCategory = (itemName: string): string => {
     if (['chicken', 'beef', 'pork', 'fish'].some(v => lowerItem.includes(v))) return 'Meat/Fish';
     return 'Other';
 };
+
+const reasonIconMap: { [key: string]: React.ElementType } = {
+    "Got spoiled/rotten": Virus,
+    "Past expiry date": CalendarClock,
+    "Forgot about it": Brain,
+    "Cooked too much": Soup,
+    "Bought too much": Users, // Using 'Users' to represent 'Family Didn't Like' from mockup
+    "Plans changed": Users,
+    "Other reason": Lightbulb,
+};
+
 
 export function TrendsDashboard() {
   const { logs, logsInitialized } = useWasteLogStore();
@@ -127,28 +136,30 @@ export function TrendsDashboard() {
         <TrendsKPI logs={logs} />
     
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
+        <CardHeader className="flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Waste Impact Over Time</CardTitle>
             <CardDescription>
                 {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
             </CardDescription>
           </div>
-          <div className="flex items-center space-x-2 bg-muted p-1 rounded-lg">
-             <Button
-                size="sm"
-                onClick={() => setChartMetric('totalPesoValue')}
-                className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-              >
-                ₱ Value
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => setChartMetric('totalCarbonFootprint')}
-                className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-              >
-                CO₂e
-              </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-2 bg-muted p-1 rounded-lg">
+                <Button
+                    size="sm"
+                    onClick={() => setChartMetric('totalPesoValue')}
+                    className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+                >
+                    ₱ Value
+                </Button>
+                <Button
+                    size="sm"
+                    onClick={() => setChartMetric('totalCarbonFootprint')}
+                    className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+                >
+                    CO₂e
+                </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -172,24 +183,29 @@ export function TrendsDashboard() {
        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>Waste by Food Category</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <BarChart2 className="h-5 w-5" />
+                        Waste by Food Category
+                    </CardTitle>
                     <CardDescription>What you're wasting most</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
-                        <PieChart>
-                            <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-                            <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
-                                const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                                const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                                return ( <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs fill-muted-foreground" > {`${(percent * 100).toFixed(0)}%`} </text> );
-                            }}>
-                                {categoryData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                        </PieChart>
+                        <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                                <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                    const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
+                                    const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                                    const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                                    return ( <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs fill-muted-foreground" > {`${(percent * 100).toFixed(0)}%`} </text> );
+                                }}>
+                                    {categoryData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </ResponsiveContainer>
                     </ChartContainer>
                 </CardContent>
             </Card>
@@ -199,23 +215,30 @@ export function TrendsDashboard() {
                     <CardTitle>Why Food Gets Wasted</CardTitle>
                     <CardDescription>Root cause breakdown</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                    {reasonData.length > 0 ? reasonData.map(reason => (
-                         <div key={reason.name} className="flex justify-between items-center text-sm">
-                            <span>{reason.name}</span>
-                            <div className='text-right'>
-                                <span className='font-semibold'>₱{reason.value.toFixed(2)}</span>
-                                <span className='text-muted-foreground ml-2'>({reason.percentage}%)</span>
+                <CardContent className="space-y-2">
+                    {reasonData.length > 0 ? reasonData.map(reason => {
+                         const Icon = reasonIconMap[reason.name] || Lightbulb;
+                         return (
+                            <div key={reason.name} className="flex items-center text-sm py-2 border-b last:border-b-0">
+                                <Icon className="h-5 w-5 mr-3 text-muted-foreground" />
+                                <span className="flex-1">{reason.name}</span>
+                                <div className='text-right'>
+                                    <span className='font-semibold text-destructive'>₱{reason.value.toFixed(0)}</span>
+                                    <p className='text-xs text-muted-foreground'>{reason.percentage}% of waste</p>
+                                </div>
                             </div>
-                         </div>
-                    )) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
+                         );
+                    }) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
             </Card>
         </div>
       
       <Card>
         <CardHeader>
-            <CardTitle>AI Waste Insights</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                AI Waste Insights
+            </CardTitle>
             <CardDescription>Smart patterns & predictions from your data</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
