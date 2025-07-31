@@ -305,12 +305,12 @@ export default function TrendsPage() {
                           {log.photoDataUri ? (
                                <Image src={log.photoDataUri} alt="Wasted food" width={48} height={48} className="rounded-lg mr-4 object-cover" data-ai-hint="food waste" />
                           ) : (
-                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xl mr-4">
+                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xl mr-4 shrink-0">
                                   <span>{log.items[0]?.name.charAt(0) || '📝'}</span>
                               </div>
                           )}
                           <div className="flex-1 overflow-hidden">
-                              <p className="font-semibold truncate">{log.items.map(i => i.name).join(', ')}</p>
+                              <p className="font-semibold">{log.items.map(i => i.name).join(', ')}</p>
                               <p className="text-sm text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a')} • {log.sessionWasteReason}</p>
                           </div>
                           <div className='text-right ml-4'>
@@ -333,5 +333,4 @@ export default function TrendsPage() {
       )}
     </div>
   );
-
-    
+}
