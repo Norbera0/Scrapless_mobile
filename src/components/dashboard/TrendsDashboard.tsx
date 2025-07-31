@@ -326,5 +326,3 @@ export function TrendsDashboard() {
     </div>
   );
 }
-
-    
