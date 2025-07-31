@@ -136,37 +136,37 @@ export function TrendsDashboard() {
         <TrendsKPI logs={logs} />
     
       <Card>
-        <CardHeader className="flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Waste Impact Over Time</CardTitle>
-            <CardDescription>
-                {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center space-x-2 bg-muted p-1 rounded-lg">
-                <Button
-                    size="sm"
-                    onClick={() => setChartMetric('totalPesoValue')}
-                    className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-                >
-                    ₱ Value
-                </Button>
-                <Button
-                    size="sm"
-                    onClick={() => setChartMetric('totalCarbonFootprint')}
-                    className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-                >
-                    CO₂e
-                </Button>
+        <CardHeader className="flex flex-wrap items-center justify-between gap-y-4">
+            <div className="flex-grow">
+                <CardTitle>Waste Impact Over Time</CardTitle>
+                <CardDescription>
+                    {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
+                </CardDescription>
             </div>
-          </div>
+            <div className="flex items-center gap-2">
+                <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
+                    <Button
+                        size="sm"
+                        onClick={() => setChartMetric('totalPesoValue')}
+                        className={cn('h-auto px-2 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+                    >
+                        ₱ Value
+                    </Button>
+                    <Button
+                        size="sm"
+                        onClick={() => setChartMetric('totalCarbonFootprint')}
+                        className={cn('h-auto px-2 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+                    >
+                        CO₂e
+                    </Button>
+                </div>
+            </div>
         </CardHeader>
-        <CardContent>
-            <div className='flex gap-2 mb-4'>
-                 <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7 Days</Button>
-                 <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30 Days</Button>
-                 <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>3 Months</Button>
+        <CardContent className="space-y-4">
+            <div className='flex gap-2'>
+                 <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7d</Button>
+                 <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30d</Button>
+                 <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>3m</Button>
             </div>
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
                 <LineChart accessibilityLayer data={chartData}>
