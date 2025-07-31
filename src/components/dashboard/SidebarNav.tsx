@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart } from 'lucide-react';
+import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart, Utensils } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
+    { href: '/recipes', label: 'Recipes', icon: Utensils },
     { href: '/trends', label: 'Trends', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
@@ -57,19 +58,13 @@ export function SidebarNav({ user }: { user: User }) {
 
   const isActive = (itemHref: string) => {
     const itemBase = itemHref.split('?')[0];
-    // Exact match for dashboard
-    if (itemBase === '/dashboard') {
-        return pathname === itemBase;
-    }
-    // Broader match for insights to cover detail and history pages
-    if (itemBase === '/insights') {
-        return pathname.startsWith('/insights');
-    }
-    // Broader match for saves
-    if (itemBase === '/saves') {
-        return pathname.startsWith('/saves');
-    }
-    return pathname.startsWith(itemBase);
+    
+    if (pathname === itemBase) return true;
+
+    // Broader match for nested routes
+    if (pathname.startsWith(`${itemBase}/`)) return true;
+    
+    return false;
   }
 
 

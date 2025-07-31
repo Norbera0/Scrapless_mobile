@@ -10,21 +10,20 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Loader2, RefreshCw } from 'lucide-react';
-import { RecipeCard } from './RecipeCard';
+import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
 import { onAuthStateChanged } from 'firebase/auth';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
-interface RecipeSuggestionsProps {
-  pantryItems: PantryItem[];
-}
 
-export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
+export function RecipeGenerator() {
   const [user, setUser] = useState<User | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({ quickMeals: false, filipinoDishes: false });
   const { toast } = useToast();
+  const { liveItems: pantryItems, pantryInitialized } = usePantryLogStore();
   
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
@@ -37,6 +36,10 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
     setIsLoading(true);
     try {
       const pantryItemNames = pantryItems.map((item) => item.name);
+      if (pantryItemNames.length === 0) {
+          setRecipes([]);
+          return;
+      }
       const result = await suggestRecipes({
         pantryItems: pantryItemNames,
         preferences: filters,
@@ -44,7 +47,7 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
       });
       const recipesWithIds = result.recipes.map(r => ({...r, id: crypto.randomUUID()}));
       setRecipes(recipesWithIds);
-    } catch (error) {
+    } catch (error) => {
       console.error('Failed to fetch recipes:', error);
       toast({
         variant: 'destructive',
@@ -57,13 +60,10 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
   }, [pantryItems, filters, toast]);
   
   useEffect(() => {
-    if (pantryItems.length > 0) {
+    if (pantryInitialized) {
       fetchRecipes([]); // Initial fetch with no history
-    } else {
-        setIsLoading(false);
-        setRecipes([]);
     }
-  }, [pantryItems, filters, fetchRecipes]);
+  }, [pantryInitialized, filters, fetchRecipes]);
 
   useEffect(() => {
     // Load saved recipes
@@ -115,14 +115,14 @@ export function RecipeSuggestions({ pantryItems }: RecipeSuggestionsProps) {
             <Button size="sm" variant={filters.filipinoDishes ? 'default' : 'outline'} onClick={() => handleToggleFilter('filipinoDishes')}>
                 🇵🇭 Filipino
             </Button>
-            <Button size="sm" variant="outline" onClick={() => fetchRecipes(recipes)} disabled={isLoading}>
+            <Button size="sm" variant="outline" onClick={() => fetchRecipes(recipes)} disabled={isLoading || pantryItems.length === 0}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                 More Recipes
             </Button>
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading || !pantryInitialized ? (
           <div className="flex justify-center items-center h-40">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
