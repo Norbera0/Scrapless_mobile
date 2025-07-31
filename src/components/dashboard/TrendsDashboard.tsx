@@ -6,7 +6,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Virus } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
@@ -32,11 +32,11 @@ const getCategory = (itemName: string): string => {
 };
 
 const reasonIconMap: { [key: string]: React.ElementType } = {
-    "Got spoiled/rotten": Virus,
+    "Got spoiled/rotten": Bug,
     "Past expiry date": CalendarClock,
     "Forgot about it": Brain,
     "Cooked too much": Soup,
-    "Bought too much": Users, // Using 'Users' to represent 'Family Didn't Like' from mockup
+    "Bought too much": Users, 
     "Plans changed": Users,
     "Other reason": Lightbulb,
 };
