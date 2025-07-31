@@ -44,7 +44,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/trends', label: 'Trends', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
-    { href: '/saved-recipes', label: 'Saved Recipes', icon: Bookmark },
+    { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
   
   const getInitials = (name?: string | null) => {
@@ -65,6 +65,10 @@ export function SidebarNav({ user }: { user: User }) {
     // Broader match for insights to cover detail and history pages
     if (itemBase === '/insights') {
         return pathname.startsWith('/insights');
+    }
+    // Broader match for saves
+    if (itemBase === '/saves') {
+        return pathname.startsWith('/saves');
     }
     return pathname.startsWith(itemBase);
   }
