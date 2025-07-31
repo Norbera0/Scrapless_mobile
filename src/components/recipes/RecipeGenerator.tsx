@@ -47,7 +47,7 @@ export function RecipeGenerator() {
       });
       const recipesWithIds = result.recipes.map(r => ({...r, id: crypto.randomUUID()}));
       setRecipes(recipesWithIds);
-    } catch (error) => {
+    } catch (error) {
       console.error('Failed to fetch recipes:', error);
       toast({
         variant: 'destructive',
