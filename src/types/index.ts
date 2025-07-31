@@ -31,14 +31,12 @@ export interface PantryItem {
     estimatedAmount: string;
     estimatedExpirationDate: string;
     addedDate: string; // ISO string for when the item was added
-    pesoValue: number; 
     carbonFootprint: number;
     // Optional details
     storageLocation?: string;
     useByTimeline?: string;
     purchaseSource?: string;
-    priceAmount?: number;
-    priceUnit?: string;
+    estimatedCost?: number;
 }
   
 export interface PantryLog {

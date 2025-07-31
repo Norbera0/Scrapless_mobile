@@ -8,12 +8,11 @@ export interface PantryLogItem {
   estimatedAmount: string;
   estimatedExpirationDate: string;
   carbonFootprint?: number;
+  estimatedCost?: number;
   // Optional details
   storageLocation?: string;
   useByTimeline?: string;
   purchaseSource?: string;
-  priceAmount?: number;
-  priceUnit?: string;
 }
 
 interface PantryLogState {

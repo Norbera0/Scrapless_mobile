@@ -131,7 +131,6 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
             estimatedAmount: itemData.estimatedAmount,
             estimatedExpirationDate: itemData.estimatedExpirationDate,
             addedDate: new Date().toISOString(),
-            pesoValue: 0, // Default values
             carbonFootprint: itemData.carbonFootprint || 0,
         };
         
@@ -139,8 +138,7 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
         if (itemData.storageLocation) newItemData.storageLocation = itemData.storageLocation;
         if (itemData.useByTimeline) newItemData.useByTimeline = itemData.useByTimeline;
         if (itemData.purchaseSource) newItemData.purchaseSource = itemData.purchaseSource;
-        if (itemData.priceAmount) newItemData.priceAmount = itemData.priceAmount;
-        if (itemData.priceUnit) newItemData.priceUnit = itemData.priceUnit;
+        if (itemData.estimatedCost) newItemData.estimatedCost = itemData.estimatedCost;
 
         batch.set(docRef, newItemData);
         savedItems.push({ ...newItemData, id: item.id });

@@ -40,8 +40,6 @@ const purchaseSources = [
   { value: 'gift_shared', label: 'Gift/Shared' },
 ];
 
-const priceUnits = ['piece', 'kg', 'g', 'pack', 'box', 'liter', 'ml', 'can', 'bag', 'bottle'];
-
 const safelyResetThenNavigate = async (
     resetFn: () => void,
     router: NextRouter,
@@ -77,6 +75,7 @@ export function ReviewPantryItems() {
       estimatedAmount: '',
       estimatedExpirationDate: new Date().toISOString(),
       carbonFootprint: 0,
+      estimatedCost: 0,
     };
     setItems([...items, newItem]);
   };
@@ -88,7 +87,16 @@ export function ReviewPantryItems() {
     }
     setIsSaving(true);
     try {
+      // Optimistically add items to the UI right away
+      const optimisticPantryItems = items.map(logItem => ({
+        ...logItem,
+        id: logItem.id,
+        addedDate: new Date().toISOString(),
+      }));
+      usePantryLogStore.getState().addOptimisticItems(optimisticPantryItems);
+
       await savePantryItems(user.uid, items);
+      
       toast({
         title: 'Success!',
         description: 'Your pantry has been updated.',
@@ -202,22 +210,15 @@ export function ReviewPantryItems() {
                                 </Select>
                             </div>
                             <div className="grid gap-1.5">
-                                <Label>Price:</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="number"
-                                        value={item.priceAmount ?? ''}
-                                        onChange={(e) => handleItemChange(index, 'priceAmount', e.target.valueAsNumber || undefined)}
-                                        placeholder="₱ Amount"
-                                        className="flex-1 h-11 bg-background"
-                                    />
-                                    <Select value={item.priceUnit} onValueChange={(value) => handleItemChange(index, 'priceUnit', value)}>
-                                        <SelectTrigger className="w-[120px] h-11 bg-background"><SelectValue placeholder="per..." /></SelectTrigger>
-                                        <SelectContent>
-                                            {priceUnits.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                                <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
+                                <Input
+                                    id={`price-${item.id}`}
+                                    type="number"
+                                    value={item.estimatedCost ?? ''}
+                                    onChange={(e) => handleItemChange(index, 'estimatedCost', e.target.valueAsNumber || undefined)}
+                                    placeholder="e.g. 150.00"
+                                    className="h-11 bg-background"
+                                />
                             </div>
                         </div>
                     </div>
