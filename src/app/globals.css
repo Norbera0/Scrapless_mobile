@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -65,4 +66,37 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+    .prediction-panel {
+        transform: translateY(-120%);
+        transition: transform 0.3s ease-in-out;
+    }
+    .prediction-panel.show {
+        transform: translateY(0);
+    }
+    .notification-badge {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 12px;
+    }
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: hsl(var(--muted-foreground) / 0.4);
+        transition: background-color 0.3s ease;
+    }
+    .dot.active {
+        background-color: hsl(var(--foreground));
+    }
 }

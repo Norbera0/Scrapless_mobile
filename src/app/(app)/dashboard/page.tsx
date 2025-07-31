@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, ShoppingCart, Utensils, CheckCircle, PackagePlus } from 'lucide-react';
+import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, Utensils, CheckCircle, PackagePlus, X, Lightbulb, ShoppingCart } from 'lucide-react';
 import type { User, Insight } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState("Good morning");
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPredictionPanelOpen, setIsPredictionPanelOpen] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -78,6 +79,7 @@ export default function DashboardPage() {
     carouselApi?.scrollTo(index)
   }, [carouselApi])
 
+  const hasNotification = itemsExpiringSoon.length > 0 || (latestInsight && latestInsight.smartShoppingPlan);
 
   return (
     <div className="gradient-bg min-h-screen">
@@ -93,14 +95,55 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500">Let's reduce waste together</p>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <Button variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800">
+                        <Button variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800" onClick={() => setIsPredictionPanelOpen(true)}>
                             <Bell className="w-6 h-6" />
-                            <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full notification-badge"></span>
+                            {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full notification-badge"></span>}
                         </Button>
                         <Avatar className="w-8 h-8">
                            <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                         </Avatar>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Prediction Panel (Hidden by default) */}
+        <div id="predictionPanel" className={cn("fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel", isPredictionPanelOpen && 'show')}>
+            <div className="px-4 py-4">
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-medium text-gray-800">AI Notifications</h3>
+                    <Button variant="ghost" size="icon" onClick={() => setIsPredictionPanelOpen(false)} className="p-1 text-gray-400 hover:text-gray-600">
+                        <X className="w-5 h-5" />
+                    </Button>
+                </div>
+                <div className="space-y-2">
+                    {itemsExpiringSoon.length > 0 && (
+                        <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <div className="flex items-start space-x-2">
+                                <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="text-sm font-medium text-yellow-800">Expiring Soon</p>
+                                    <p className="text-sm text-yellow-700">{itemsExpiringSoon.length} items in your pantry expire in the next 3 days.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {latestInsight && latestInsight.smartShoppingPlan && (
+                         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div className="flex items-start space-x-2">
+                                <ShoppingCart className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="text-sm font-medium text-blue-800">Smart Shopping Tip</p>
+                                    <p className="text-sm text-blue-700">{latestInsight.smartShoppingPlan}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                     {!hasNotification && (
+                         <div className="text-center text-gray-500 py-4">
+                             <p>No new notifications right now.</p>
+                         </div>
+                    )}
                 </div>
             </div>
         </div>
