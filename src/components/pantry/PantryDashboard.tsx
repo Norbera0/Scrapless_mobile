@@ -25,6 +25,7 @@ import { Badge } from '../ui/badge';
 import { auth } from '@/lib/firebase';
 import { RecipeSuggestions } from './RecipeSuggestions';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { PantryHealthScore } from '../dashboard/PantryHealthScore';
 
 const getFreshness = (expirationDate: string) => {
     const today = startOfToday();
@@ -88,6 +89,7 @@ export function PantryDashboard() {
   
   return (
     <div className="grid gap-6">
+        <PantryHealthScore />
         <Card>
             <CardHeader className='flex-row items-center justify-between'>
                 <div className='space-y-1'>

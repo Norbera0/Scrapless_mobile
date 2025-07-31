@@ -170,8 +170,6 @@ export function TrendsDashboard() {
         </CardContent>
       </Card>
 
-      <PantryHealthScore />
-
       <div>
         <h2 className="text-xl font-semibold mb-4">Recent Waste Logs</h2>
         <div className="space-y-3">
