@@ -17,6 +17,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { PantryHealthScore } from '@/components/dashboard/PantryHealthScore';
+
 
 const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -276,6 +278,8 @@ export default function DashboardPage() {
                 </div>
             </div>
 
+            <PantryHealthScore />
+
             {/* Main Impact Card */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
                 <CardContent className="p-6">
@@ -359,3 +363,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
