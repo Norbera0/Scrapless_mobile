@@ -2,38 +2,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History } from 'lucide-react';
+import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight } from 'lucide-react';
 import { getSavedRecipes } from '@/lib/data';
-import { auth } from '@/lib/firebase';
-import type { Recipe, User } from '@/types';
+import type { Recipe, User, Insight } from '@/types';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { useToast } from '@/hooks/use-toast';
 import { unsaveRecipe } from '@/lib/data';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { useAuth } from '@/hooks/use-auth';
+import { useInsightStore } from '@/stores/insight-store';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
 
 
 export default function SavedItemsPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
+  const router = useRouter();
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
+  const { insights, insightsInitialized } = useInsightStore();
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
-      setUser(fbUser);
-      if (fbUser) {
-        loadSavedRecipes(fbUser.uid);
-      } else {
-        setIsLoading(false);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+    if (user) {
+        loadSavedRecipes(user.uid);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && insightsInitialized) {
+      setIsLoading(false);
+    }
+  }, [user, insightsInitialized]);
 
   const loadSavedRecipes = async (uid: string) => {
-    setIsLoading(true);
     try {
       const recipes = await getSavedRecipes(uid);
       setSavedRecipes(recipes);
@@ -44,8 +47,6 @@ export default function SavedItemsPage() {
         title: 'Error',
         description: 'Could not load your saved recipes.',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -59,6 +60,8 @@ export default function SavedItemsPage() {
         toast({ variant: 'destructive', title: 'Error', description: 'Could not update saved recipes.' });
     }
   };
+  
+  const solutionsImTrying = insights.filter(i => i.status === 'acted_on');
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -111,15 +114,50 @@ export default function SavedItemsPage() {
           </Card>
         </AccordionItem>
         
-        {/* Placeholder for Solutions */}
+        {/* Solutions I'm Trying */}
          <AccordionItem value="solutions" className="border-none">
              <Card>
-                <AccordionTrigger className="p-6 border-b hover:no-underline" disabled>
+                <AccordionTrigger className="p-6 border-b hover:no-underline">
                   <CardHeader className="p-0 text-left">
-                    <CardTitle className="flex items-center gap-2 text-muted-foreground"><Lightbulb /> Solutions I'm Trying (0)</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><Lightbulb /> Solutions I'm Trying ({solutionsImTrying.length})</CardTitle>
                     <CardDescription>Solutions you've committed to from your insights.</CardDescription>
                   </CardHeader>
                 </AccordionTrigger>
+                <AccordionContent>
+                    <CardContent className="pt-6">
+                        {isLoading ? (
+                             <div className="flex justify-center items-center py-10">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : solutionsImTrying.length > 0 ? (
+                           <div className="space-y-3">
+                                {solutionsImTrying.map(insight => (
+                                    <Card 
+                                        key={insight.id} 
+                                        className="hover:bg-muted/50 transition-colors"
+                                    >
+                                        <CardContent className="p-4 flex items-center justify-between">
+                                            <div>
+                                                <p className="font-semibold">{insight.patternAlert}</p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    Committed on {format(new Date(insight.date), 'MMMM d, yyyy')}
+                                                </p>
+                                            </div>
+                                            <Button variant="ghost" size="sm" onClick={() => router.push(`/insights/${insight.id}`)}>
+                                                View Details <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                           </div>
+                        ) : (
+                             <div className="text-center text-muted-foreground py-10">
+                                <p>You aren't actively trying any solutions.</p>
+                                <p className="text-sm">Visit the Insights page to commit to a new solution.</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </AccordionContent>
              </Card>
         </AccordionItem>
 
@@ -138,10 +176,10 @@ export default function SavedItemsPage() {
         {/* Placeholder for Insights History */}
         <AccordionItem value="insights-history" className="border-none">
              <Card>
-                <AccordionTrigger className="p-6 border-b hover:no-underline" disabled>
+                <AccordionTrigger className="p-6 border-b hover:no-underline" onClick={() => router.push('/insights/history')}>
                   <CardHeader className="p-0 text-left">
-                    <CardTitle className="flex items-center gap-2 text-muted-foreground"><History /> My Insights History (0)</CardTitle>
-                    <CardDescription>Your log of all past AI-powered insights.</CardDescription>
+                    <CardTitle className="flex items-center gap-2"><History /> My Full Insights History</CardTitle>
+                    <CardDescription>Review your log of all past AI-powered insights.</CardDescription>
                   </CardHeader>
                 </AccordionTrigger>
              </Card>

@@ -13,7 +13,7 @@ import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
-function SolutionCard({ solution, onSelect }: { solution: InsightSolution, onSelect: () => void }) {
+function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolution, onSelect: () => void, disabled: boolean }) {
     return (
         <Card className="bg-secondary/50">
             <CardContent className="p-4 space-y-3">
@@ -25,8 +25,9 @@ function SolutionCard({ solution, onSelect }: { solution: InsightSolution, onSel
                     </div>
                     <Progress value={solution.successRate * 100} className="h-2" />
                 </div>
-                 <Button size="sm" className="w-full" onClick={onSelect}>
-                    <Check className="mr-2 h-4 w-4" /> I'll try this
+                 <Button size="sm" className="w-full" onClick={onSelect} disabled={disabled}>
+                    <Check className="mr-2 h-4 w-4" /> 
+                    {disabled ? "Working on it!" : "I'll try this"}
                  </Button>
             </CardContent>
         </Card>
@@ -53,10 +54,14 @@ export default function InsightDetailPage() {
         try {
             await updateInsightStatus(user.uid, insight.id, 'acted_on');
             toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
+            // Optimistically update the local state to reflect the change immediately
+            setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not update insight status.' });
         }
     }
+    
+    const isActedOn = insight?.status === 'acted_on';
 
     if (!insightsInitialized) {
         return (
@@ -119,7 +124,7 @@ export default function InsightDetailPage() {
                 <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Solutions</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {insight.solutions.map((solution, index) => (
-                        <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} />
+                        <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} disabled={isActedOn} />
                     ))}
                 </div>
             </div>
