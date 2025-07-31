@@ -27,6 +27,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from './TrendsKPI';
+import { PantryHealthScore } from './PantryHealthScore';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 
@@ -168,6 +169,8 @@ export function TrendsDashboard() {
             )}
         </CardContent>
       </Card>
+
+      <PantryHealthScore />
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Recent Waste Logs</h2>
