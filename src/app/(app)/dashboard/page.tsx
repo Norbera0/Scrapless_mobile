@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 
 const getInitials = (name?: string | null) => {
     if (!name) return 'U';
