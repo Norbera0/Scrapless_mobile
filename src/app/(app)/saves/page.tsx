@@ -14,10 +14,11 @@ import { useAuth } from '@/hooks/use-auth';
 import { useInsightStore } from '@/stores/insight-store';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { Button } from '@/components/ui/button';
 
 
 export default function SavedItemsPage() {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
   const { insights, insightsInitialized } = useInsightStore();
@@ -25,16 +26,17 @@ export default function SavedItemsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!isAuthLoading && insightsInitialized) {
+      setIsLoading(false);
+    }
+  }, [isAuthLoading, insightsInitialized]);
+
+  useEffect(() => {
     if (user) {
         loadSavedRecipes(user.uid);
     }
   }, [user]);
 
-  useEffect(() => {
-    if (user && insightsInitialized) {
-      setIsLoading(false);
-    }
-  }, [user, insightsInitialized]);
 
   const loadSavedRecipes = async (uid: string) => {
     try {
@@ -63,6 +65,14 @@ export default function SavedItemsPage() {
   
   const solutionsImTrying = insights.filter(i => i.status === 'acted_on');
 
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center py-20">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
@@ -84,11 +94,7 @@ export default function SavedItemsPage() {
               </AccordionTrigger>
               <AccordionContent>
                 <CardContent className="pt-6">
-                    {isLoading ? (
-                        <div className="flex justify-center items-center py-10">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                    ) : savedRecipes.length > 0 ? (
+                    {savedRecipes.length > 0 ? (
                         <Accordion type="single" collapsible className="w-full">
                             {savedRecipes.map((recipe, index) => (
                                 <AccordionItem value={`item-${index}`} key={recipe.id}>
@@ -125,11 +131,7 @@ export default function SavedItemsPage() {
                 </AccordionTrigger>
                 <AccordionContent>
                     <CardContent className="pt-6">
-                        {isLoading ? (
-                             <div className="flex justify-center items-center py-10">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            </div>
-                        ) : solutionsImTrying.length > 0 ? (
+                        {solutionsImTrying.length > 0 ? (
                            <div className="space-y-3">
                                 {solutionsImTrying.map(insight => (
                                     <Card 
