@@ -2,14 +2,16 @@ import { TrendsDashboard } from '@/components/dashboard/TrendsDashboard';
 
 export default function TrendsPage() {
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Waste Trends</h1>
-        <p className="text-muted-foreground">
-          Review your food waste history and trends over time.
-        </p>
+    <div className="bg-muted/30">
+      <div className="bg-gradient-to-b from-primary to-primary/90 text-primary-foreground">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 className="text-3xl font-bold">Trends & Analytics</h1>
+            <p className="opacity-90">Your waste patterns & insights</p>
+        </div>
       </div>
-      <TrendsDashboard />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <TrendsDashboard />
+      </div>
     </div>
   );
 }
