@@ -37,6 +37,10 @@ export default function DashboardPage() {
   const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPredictionPanelOpen, setIsPredictionPanelOpen] = useState(false);
+  const [hasBeenViewed, setHasBeenViewed] = useState(false);
+
+  const predictionPanelRef = useRef<HTMLDivElement>(null);
+  const bellButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -52,6 +56,23 @@ export default function DashboardPage() {
       setCurrentSlide(carouselApi.selectedScrollSnap())
     })
   }, [carouselApi])
+  
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isPredictionPanelOpen &&
+        predictionPanelRef.current &&
+        !predictionPanelRef.current.contains(event.target as Node) &&
+        bellButtonRef.current &&
+        !bellButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsPredictionPanelOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isPredictionPanelOpen]);
 
   const latestInsight = insights.length > 0 ? insights[0] : null;
 
@@ -79,7 +100,16 @@ export default function DashboardPage() {
     carouselApi?.scrollTo(index)
   }, [carouselApi])
 
-  const hasNotification = itemsExpiringSoon.length > 0 || (latestInsight && latestInsight.smartShoppingPlan);
+  const hasUnseenNotification = (itemsExpiringSoon.length > 0 || (latestInsight && latestInsight.smartShoppingPlan));
+  const hasNotification = hasUnseenNotification && !hasBeenViewed;
+
+  const handleBellClick = () => {
+    setIsPredictionPanelOpen(!isPredictionPanelOpen);
+    if (hasUnseenNotification) {
+        setHasBeenViewed(true);
+    }
+  }
+
 
   return (
     <div className="gradient-bg min-h-screen">
@@ -95,7 +125,7 @@ export default function DashboardPage() {
                         <p className="text-sm text-gray-500">Let's reduce waste together</p>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <Button variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800" onClick={() => setIsPredictionPanelOpen(true)}>
+                        <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800" onClick={handleBellClick}>
                             <Bell className="w-6 h-6" />
                             {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full notification-badge"></span>}
                         </Button>
@@ -108,7 +138,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Prediction Panel (Hidden by default) */}
-        <div id="predictionPanel" className={cn("fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel", isPredictionPanelOpen && 'show')}>
+        <div id="predictionPanel" ref={predictionPanelRef} className={cn("fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel", isPredictionPanelOpen && 'show')}>
             <div className="px-4 py-4">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium text-gray-800">AI Notifications</h3>
@@ -139,7 +169,7 @@ export default function DashboardPage() {
                             </div>
                         </div>
                     )}
-                     {!hasNotification && (
+                     {!hasUnseenNotification && (
                          <div className="text-center text-gray-500 py-4">
                              <p>No new notifications right now.</p>
                          </div>
