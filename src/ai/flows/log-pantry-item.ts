@@ -25,7 +25,7 @@ const cameraPrompt = ai.definePrompt({
     name: 'logPantryItemCameraPrompt',
     input: { schema: LogPantryItemInputSchema },
     output: { schema: LogPantryItemOutputSchema },
-    prompt: `You are an AI assistant that analyzes images of groceries, receipts, or handwritten lists. Your task is to identify each food item, estimate its quantity, and predict its expiration date based on common shelf-life. Provide the current date for reference: ${new Date().toLocaleDateString()}
+    prompt: `You are an AI assistant that analyzes images of groceries, receipts, or handwritten lists. Your task is to identify each food item, estimate its quantity, predict its expiration date based on common shelf-life, and estimate its carbon footprint in kg of CO2 equivalent. Provide the current date for reference: ${new Date().toLocaleDateString()}
   
     Analyze the following photo and provide a structured list.
   
@@ -37,7 +37,7 @@ const voicePrompt = ai.definePrompt({
     name: 'logPantryItemVoicePrompt',
     input: { schema: LogPantryItemInputSchema },
     output: { schema: LogPantryItemOutputSchema },
-    prompt: `You are an AI assistant that transcribes audio of a person listing their new groceries. Your task is to intelligently extract only the food items and their quantities, filtering out all filler words, pauses, and irrelevant phrases. Then, predict an expiration date for each item based on common shelf-life. Provide the current date for reference: ${new Date().toLocaleDateString()}
+    prompt: `You are an AI assistant that transcribes audio of a person listing their new groceries. Your task is to intelligently extract only the food items and their quantities, filtering out all filler words. Then, predict an expiration date for each item based on common shelf-life and estimate its carbon footprint in kg of CO2 equivalent. Provide the current date for reference: ${new Date().toLocaleDateString()}
 
     Listen to the following audio and provide a structured list.
     
@@ -49,7 +49,7 @@ const textPrompt = ai.definePrompt({
     name: 'logPantryItemTextPrompt',
     input: { schema: LogPantryItemInputSchema },
     output: { schema: LogPantryItemOutputSchema },
-    prompt: `You are an AI assistant that processes a text list of new groceries. Your task is to identify each food item, estimate its quantity, and predict its expiration date based on common shelf-life. Provide the current date for reference: ${new Date().toLocaleDateString()}
+    prompt: `You are an AI assistant that processes a text list of new groceries. Your task is to identify each food item, estimate its quantity, predict its expiration date based on common shelf-life, and estimate its carbon footprint in kg of CO2 equivalent. Provide the current date for reference: ${new Date().toLocaleDateString()}
     
     Analyze the following text and provide a structured list.
 

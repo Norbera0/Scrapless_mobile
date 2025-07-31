@@ -76,6 +76,7 @@ export function ReviewPantryItems() {
       name: '',
       estimatedAmount: '',
       estimatedExpirationDate: new Date().toISOString(),
+      carbonFootprint: 0,
     };
     setItems([...items, newItem]);
   };

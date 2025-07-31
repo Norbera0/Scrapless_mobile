@@ -7,6 +7,7 @@ export interface PantryLogItem {
   name: string;
   estimatedAmount: string;
   estimatedExpirationDate: string;
+  carbonFootprint?: number;
   // Optional details
   storageLocation?: string;
   useByTimeline?: string;

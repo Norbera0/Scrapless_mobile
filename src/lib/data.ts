@@ -132,7 +132,7 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
             estimatedExpirationDate: itemData.estimatedExpirationDate,
             addedDate: new Date().toISOString(),
             pesoValue: 0, // Default values
-            carbonFootprint: 0,
+            carbonFootprint: itemData.carbonFootprint || 0,
         };
         
         // Add optional fields only if they have a value
