@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
@@ -15,8 +14,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from './TrendsKPI';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
+type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
 
 const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899'];
 
@@ -34,6 +36,7 @@ export function TrendsDashboard() {
   const { logs, logsInitialized } = useWasteLogStore();
   const { insights, insightsInitialized } = useInsightStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
+  const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
@@ -52,6 +55,7 @@ export function TrendsDashboard() {
     const dailyData = dateRange.map(date => ({
       date: format(date, 'MMM d'),
       totalPesoValue: 0,
+      totalCarbonFootprint: 0,
     }));
 
     logs.forEach(log => {
@@ -61,6 +65,7 @@ export function TrendsDashboard() {
         const dayData = dailyData.find(d => d.date === formattedDate);
         if (dayData) {
           dayData.totalPesoValue += log.totalPesoValue;
+          dayData.totalCarbonFootprint += log.totalCarbonFootprint;
         }
       }
     });
@@ -95,6 +100,10 @@ export function TrendsDashboard() {
       label: "Waste Value (₱)",
       color: "hsl(var(--destructive))",
     },
+    totalCarbonFootprint: {
+        label: "CO₂e (kg)",
+        color: "hsl(var(--primary))",
+    }
   }
   
   const categoryChartConfig = {
@@ -117,9 +126,22 @@ export function TrendsDashboard() {
         <TrendsKPI logs={logs} />
     
       <Card>
-        <CardHeader>
-          <CardTitle>Waste Value Over Time</CardTitle>
-          <CardDescription>Daily peso value of wasted food</CardDescription>
+        <CardHeader className="flex-row items-center justify-between">
+          <div>
+            <CardTitle>Waste Impact Over Time</CardTitle>
+            <CardDescription>
+                {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
+            </CardDescription>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="metric-switch" className={chartMetric === 'totalPesoValue' ? 'font-semibold text-destructive' : 'text-muted-foreground'}>Peso (₱)</Label>
+            <Switch
+                id="metric-switch"
+                checked={chartMetric === 'totalCarbonFootprint'}
+                onCheckedChange={(checked) => setChartMetric(checked ? 'totalCarbonFootprint' : 'totalPesoValue')}
+            />
+            <Label htmlFor="metric-switch" className={chartMetric === 'totalCarbonFootprint' ? 'font-semibold text-primary' : 'text-muted-foreground'}>CO₂e (kg)</Label>
+          </div>
         </CardHeader>
         <CardContent>
             <div className='flex gap-2 mb-4'>
@@ -131,9 +153,9 @@ export function TrendsDashboard() {
                 <LineChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
-                    <YAxis tickFormatter={(value) => `₱${value}`} />
+                    <YAxis tickFormatter={(value) => chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`} />
                     <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-                    <Line dataKey="totalPesoValue" type="monotone" stroke="var(--color-totalPesoValue)" strokeWidth={3} dot={{r: 6, fill: 'var(--color-totalPesoValue)'}} fill="var(--color-totalPesoValue)" />
+                    <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
                 </LineChart>
             </ChartContainer>
         </CardContent>
