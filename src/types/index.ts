@@ -64,6 +64,7 @@ export interface Recipe {
   cookingTime: string;
   ingredients: RecipeIngredient[];
   instructions: string[];
+  photoDataUri?: string;
 }
 
 // Insight Types

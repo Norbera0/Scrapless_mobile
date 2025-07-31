@@ -2,10 +2,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, Bookmark } from 'lucide-react';
+import { Clock, ChefHat, Bookmark, ImageOff } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 
 interface RecipeCardProps {
@@ -28,6 +29,15 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
 
   return (
     <div className="space-y-4">
+        {recipe.photoDataUri ? (
+            <div className="aspect-video w-full relative rounded-md overflow-hidden" data-ai-hint="recipe food">
+                <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
+            </div>
+        ) : (
+             <div className="aspect-video w-full rounded-md bg-muted flex items-center justify-center text-muted-foreground">
+                <ImageOff className="h-10 w-10" />
+            </div>
+        )}
         <div className="flex flex-wrap gap-x-4 gap-y-2 items-center text-sm text-muted-foreground">
             <Badge variant="outline">{recipe.cuisine}</Badge>
             <div className="flex items-center gap-1">
@@ -58,10 +68,15 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                    <DialogTitle>{recipe.name}</DialogTitle>
-                    <DialogDescription>
-                        {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime}
-                    </DialogDescription>
+                        {recipe.photoDataUri && (
+                             <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
+                                <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
+                            </div>
+                        )}
+                        <DialogTitle>{recipe.name}</DialogTitle>
+                        <DialogDescription>
+                            {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime}
+                        </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div>

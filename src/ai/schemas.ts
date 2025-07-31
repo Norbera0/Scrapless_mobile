@@ -81,6 +81,7 @@ export const SuggestRecipesOutputSchema = z.object({
                 })
             ),
             instructions: z.array(z.string()).describe("A list of step-by-step cooking instructions."),
+            photoDataUri: z.string().optional().describe("A data URI of a generated image of the recipe."),
         })
     ).describe("A list of 3-5 recipe suggestions."),
 });

@@ -17,6 +17,22 @@ import {
   type SuggestRecipesOutput,
 } from '@/ai/schemas';
 
+async function generateRecipeImage(recipeName: string): Promise<string | undefined> {
+    try {
+        const { media } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash-preview-image-generation',
+            prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
+        });
+        return media?.url;
+    } catch (error) {
+        console.error(`Failed to generate image for ${recipeName}:`, error);
+        return undefined;
+    }
+}
+
 export async function suggestRecipes(input: SuggestRecipesInput): Promise<SuggestRecipesOutput> {
   return suggestRecipesFlow(input);
 }
@@ -61,6 +77,15 @@ const suggestRecipesFlow = ai.defineFlow(
     if (!output || !output.recipes) {
       return { recipes: [] };
     }
-    return output;
+
+    // Generate images for each recipe in parallel
+    const recipesWithImages = await Promise.all(
+        output.recipes.map(async (recipe) => {
+            const photoDataUri = await generateRecipeImage(recipe.name);
+            return { ...recipe, photoDataUri };
+        })
+    );
+
+    return { recipes: recipesWithImages };
   }
 );
