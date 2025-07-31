@@ -14,6 +14,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -42,6 +43,7 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 
 
 export default function TrendsPage() {
+  const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
   const { insights, insightsInitialized } = useInsightStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
@@ -196,7 +198,7 @@ export default function TrendsPage() {
                           />
                           <YAxis tickFormatter={(value) => chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`} />
                           <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-                          <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={false} activeDot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
+                          <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={false} activeDot={{r: 6, fill: `var(--color-${chartMetric})`}} />
                       </LineChart>
                   </ChartContainer>
               </CardContent>
@@ -277,7 +279,7 @@ export default function TrendsPage() {
                                   </div>
                               </div>
                           )}
-                           <div className="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-lg">
+                           <div className="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-lg" onClick={() => router.push(`/insights/${latestInsight.id}`)} role='button'>
                                <div className="flex items-start gap-3">
                                   <Lightbulb className="h-5 w-5 text-amber-600 mt-0.5"/>
                                   <div>
@@ -307,7 +309,7 @@ export default function TrendsPage() {
                                   <span>{log.items[0]?.name.charAt(0) || '📝'}</span>
                               </div>
                           )}
-                          <div className="flex-1">
+                          <div className="flex-1 overflow-hidden">
                               <p className="font-semibold truncate">{log.items.map(i => i.name).join(', ')}</p>
                               <p className="text-sm text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a')} • {log.sessionWasteReason}</p>
                           </div>
@@ -331,4 +333,5 @@ export default function TrendsPage() {
       )}
     </div>
   );
-}
+
+    
