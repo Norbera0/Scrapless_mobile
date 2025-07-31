@@ -9,12 +9,12 @@ import { generateShoppingRecommendations } from '@/ai/flows/generate-shopping-re
 import { type GenerateShoppingRecommendationsOutput } from '@/ai/schemas';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, BadgeCheck, BellRing, ShoppingBasket, Tomato, PackagePlus } from 'lucide-react';
+import { Loader2, BadgeCheck, BellRing, ShoppingBasket, PackagePlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '../ui/separator';
 
 const iconMap: { [key: string]: React.ElementType } = {
-    "Tomatoes": Tomato,
+    "Tomatoes": ShoppingBasket, // Replaced Tomato with ShoppingBasket
     "Default": ShoppingBasket,
 };
 
