@@ -30,6 +30,8 @@
     --chart-4: 90 30% 40%;
     --chart-5: 25 40% 60%;
     --radius: 0.5rem;
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
   }
   .dark {
     --background: 25 48% 10%;
@@ -71,7 +73,7 @@
 @layer utilities {
     .prediction-panel {
         transform: translateY(-120%);
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.3s ease-in-out, left 0.2s ease-in-out;
     }
     .prediction-panel.show {
         transform: translateY(0);

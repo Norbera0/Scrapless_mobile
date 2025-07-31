@@ -115,8 +115,8 @@ export default function DashboardPage() {
     <div className="gradient-bg min-h-screen">
       <div className="min-h-screen pb-20 relative">
         {/* Header */}
-        <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
-            <div className="px-4 py-4">
+        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
+            <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-xl font-semibold text-gray-800">
@@ -135,11 +135,19 @@ export default function DashboardPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
 
         {/* Prediction Panel (Hidden by default) */}
-        <div id="predictionPanel" ref={predictionPanelRef} className={cn("fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel", isPredictionPanelOpen && 'show')}>
-            <div className="px-4 py-4">
+        <div 
+          id="predictionPanel" 
+          ref={predictionPanelRef} 
+          className={cn(
+            "fixed top-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel",
+            "left-0 md:left-[var(--sidebar-width-icon)] group-data-[state=expanded]:md:left-[var(--sidebar-width)]",
+            isPredictionPanelOpen && 'show'
+          )}
+        >
+            <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-medium text-gray-800">AI Notifications</h3>
                     <Button variant="ghost" size="icon" onClick={() => setIsPredictionPanelOpen(false)} className="p-1 text-gray-400 hover:text-gray-600">
@@ -178,7 +186,7 @@ export default function DashboardPage() {
             </div>
         </div>
 
-        <div className="px-4 py-6 space-y-5">
+        <div className="px-4 md:px-6 py-6 space-y-5">
             {/* Today's Focus Carousel */}
             <div className="relative">
                 <Carousel setApi={setCarouselApi}>
