@@ -16,6 +16,7 @@ import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from './TrendsKPI';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -133,14 +134,21 @@ export function TrendsDashboard() {
                 {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
             </CardDescription>
           </div>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="metric-switch" className={chartMetric === 'totalPesoValue' ? 'font-semibold text-destructive' : 'text-muted-foreground'}>Peso (₱)</Label>
-            <Switch
-                id="metric-switch"
-                checked={chartMetric === 'totalCarbonFootprint'}
-                onCheckedChange={(checked) => setChartMetric(checked ? 'totalCarbonFootprint' : 'totalPesoValue')}
-            />
-            <Label htmlFor="metric-switch" className={chartMetric === 'totalCarbonFootprint' ? 'font-semibold text-primary' : 'text-muted-foreground'}>CO₂e (kg)</Label>
+          <div className="flex items-center space-x-2 bg-muted p-1 rounded-lg">
+             <Button
+                size="sm"
+                onClick={() => setChartMetric('totalPesoValue')}
+                className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+              >
+                ₱ Value
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => setChartMetric('totalCarbonFootprint')}
+                className={cn('h-auto px-3 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
+              >
+                CO₂e
+              </Button>
           </div>
         </CardHeader>
         <CardContent>
