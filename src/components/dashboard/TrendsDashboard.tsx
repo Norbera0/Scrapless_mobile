@@ -1,53 +1,40 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trash2, Lightbulb, AlertTriangle } from 'lucide-react';
-import { deleteWasteLog } from '@/lib/data';
-import type { User, WasteLog } from '@/types';
+import { Loader2, Lightbulb, AlertTriangle } from 'lucide-react';
+import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from './TrendsKPI';
-import { PantryHealthScore } from './PantryHealthScore';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 
+const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899'];
+
+const getCategory = (itemName: string): string => {
+    const lowerItem = itemName.toLowerCase();
+    if (['lettuce', 'tomato', 'potato', 'onion', 'kangkong', 'pechay', 'carrots'].some(v => lowerItem.includes(v))) return 'Vegetables';
+    if (['apple', 'banana', 'orange'].some(v => lowerItem.includes(v))) return 'Fruits';
+    if (['milk', 'cheese', 'yogurt'].some(v => lowerItem.includes(v))) return 'Dairy';
+    if (['bread', 'rice', 'pasta'].some(v => lowerItem.includes(v))) return 'Grains';
+    if (['chicken', 'beef', 'pork', 'fish'].some(v => lowerItem.includes(v))) return 'Meat/Fish';
+    return 'Other';
+};
+
 export function TrendsDashboard() {
-  const { user } = useAuth();
   const { logs, logsInitialized } = useWasteLogStore();
   const { insights, insightsInitialized } = useInsightStore();
-  const { toast } = useToast();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
 
-  const handleDelete = async (logId: string) => {
-    if(!user) return;
-    try {
-        await deleteWasteLog(user.uid, logId);
-        toast({ title: 'Success', description: 'Log deleted successfully.' });
-    } catch(e) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to delete log.' });
-    }
-  }
-  
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
           case '30d': return 30;
@@ -60,7 +47,6 @@ export function TrendsDashboard() {
     const days = getDaysFromTimeframe(timeframe);
     const startDate = startOfDay(subDays(new Date(), days - 1));
     const endDate = endOfDay(new Date());
-
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
     const dailyData = dateRange.map(date => ({
@@ -81,12 +67,39 @@ export function TrendsDashboard() {
 
     return dailyData;
   }, [logs, timeframe]);
+
+  const { categoryData, reasonData } = useMemo(() => {
+    const categoryTotals: Record<string, number> = {};
+    const reasonTotals: Record<string, number> = {};
+    let totalWasteValue = 0;
+
+    logs.forEach(log => {
+        totalWasteValue += log.totalPesoValue;
+        if(log.sessionWasteReason) {
+            reasonTotals[log.sessionWasteReason] = (reasonTotals[log.sessionWasteReason] || 0) + log.totalPesoValue;
+        }
+        log.items.forEach(item => {
+            const category = getCategory(item.name);
+            categoryTotals[category] = (categoryTotals[category] || 0) + item.pesoValue;
+        });
+    });
+
+    const categoryData = Object.entries(categoryTotals).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+    const reasonData = Object.entries(reasonTotals).map(([name, value]) => ({ name, value, percentage: totalWasteValue > 0 ? ((value / totalWasteValue) * 100).toFixed(0) : 0 })).sort((a,b) => b.value - a.value);
+    
+    return { categoryData, reasonData };
+  }, [logs]);
   
   const chartConfig = {
     totalPesoValue: {
-      label: "Peso Value (₱)",
+      label: "Waste Value (₱)",
       color: "hsl(var(--destructive))",
     },
+  }
+  
+  const categoryChartConfig = {
+      value: { label: 'Value' },
+      ...categoryData.reduce((acc, cur) => ({...acc, [cur.name]: { label: cur.name, color: COLORS[categoryData.indexOf(cur) % COLORS.length] } }), {}),
   }
   
   const latestInsight = insights.length > 0 ? insights[0] : null;
@@ -105,39 +118,74 @@ export function TrendsDashboard() {
     
       <Card>
         <CardHeader>
-          <CardTitle>Waste Value Trends</CardTitle>
+          <CardTitle>Waste Value Over Time</CardTitle>
           <CardDescription>Daily peso value of wasted food</CardDescription>
         </CardHeader>
         <CardContent>
             <div className='flex gap-2 mb-4'>
-                 <Button size="sm" variant={timeframe === '7d' ? 'default' : 'outline'} onClick={() => setTimeframe('7d')}>7 Days</Button>
-                 <Button size="sm" variant={timeframe === '30d' ? 'default' : 'outline'} onClick={() => setTimeframe('30d')}>30 Days</Button>
-                 <Button size="sm" variant={timeframe === '90d' ? 'default' : 'outline'} onClick={() => setTimeframe('90d')}>3 Months</Button>
+                 <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7 Days</Button>
+                 <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30 Days</Button>
+                 <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>3 Months</Button>
             </div>
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
                 <LineChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="date"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                    />
-                    <YAxis
-                        tickFormatter={(value) => `₱${value}`}
-                    />
-                    <Tooltip
-                        content={<ChartTooltipContent indicator="dot" />}
-                    />
+                    <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
+                    <YAxis tickFormatter={(value) => `₱${value}`} />
+                    <Tooltip content={<ChartTooltipContent indicator="dot" />} />
                     <Line dataKey="totalPesoValue" type="monotone" stroke="var(--color-totalPesoValue)" strokeWidth={3} dot={{r: 6, fill: 'var(--color-totalPesoValue)'}} fill="var(--color-totalPesoValue)" />
                 </LineChart>
             </ChartContainer>
         </CardContent>
       </Card>
+
+       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Waste by Food Category</CardTitle>
+                    <CardDescription>What you're wasting most</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
+                        <PieChart>
+                            <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                            <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+                                const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
+                                const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                                const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                                return ( <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs fill-muted-foreground" > {`${(percent * 100).toFixed(0)}%`} </text> );
+                            }}>
+                                {categoryData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Why Food Gets Wasted</CardTitle>
+                    <CardDescription>Root cause breakdown</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {reasonData.length > 0 ? reasonData.map(reason => (
+                         <div key={reason.name} className="flex justify-between items-center text-sm">
+                            <span>{reason.name}</span>
+                            <div className='text-right'>
+                                <span className='font-semibold'>₱{reason.value.toFixed(2)}</span>
+                                <span className='text-muted-foreground ml-2'>({reason.percentage}%)</span>
+                            </div>
+                         </div>
+                    )) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
+                </CardContent>
+            </Card>
+        </div>
       
       <Card>
         <CardHeader>
-            <CardTitle>AI Insights & Predictions</CardTitle>
+            <CardTitle>AI Waste Insights</CardTitle>
             <CardDescription>Smart patterns & predictions from your data</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -171,7 +219,7 @@ export function TrendsDashboard() {
       </Card>
 
       <div>
-        <h2 className="text-xl font-semibold mb-4">Recent Waste Logs</h2>
+        <h2 className="text-xl font-semibold mb-4">Recent Waste History</h2>
         <div className="space-y-3">
           {logs.length > 0 ? (
             logs.slice(0, 5).map(log => (
