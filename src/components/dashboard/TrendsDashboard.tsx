@@ -64,6 +64,7 @@ export function TrendsDashboard() {
 
     const dailyData = dateRange.map(date => ({
       date: format(date, 'MMM d'),
+      fullDate: date,
       totalPesoValue: 0,
       totalCarbonFootprint: 0,
     }));
@@ -82,6 +83,16 @@ export function TrendsDashboard() {
 
     return dailyData;
   }, [logs, timeframe]);
+  
+  const tickFormatter = (value: string, index: number) => {
+    if (timeframe === '7d') return value;
+    const date = parseISO(chartData[index].fullDate.toISOString());
+    // Show full date for first, last, and every 7th day for longer ranges
+    if (index === 0 || index === chartData.length - 1 || (index + 1) % 7 === 0) {
+        return format(date, 'MMM d');
+    }
+    return format(date, 'd');
+  }
 
   const { categoryData, reasonData } = useMemo(() => {
     const categoryTotals: Record<string, number> = {};
@@ -136,7 +147,7 @@ export function TrendsDashboard() {
         <TrendsKPI logs={logs} />
     
       <Card>
-        <CardHeader className="flex flex-wrap items-center justify-between gap-y-4">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-y-4">
             <div className="flex-grow">
                 <CardTitle>Waste Impact Over Time</CardTitle>
                 <CardDescription>
@@ -171,7 +182,14 @@ export function TrendsDashboard() {
             <ChartContainer config={chartConfig} className="h-[250px] w-full">
                 <LineChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
-                    <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
+                    <XAxis 
+                        dataKey="date" 
+                        tickLine={false} 
+                        tickMargin={10} 
+                        axisLine={false} 
+                        tickFormatter={tickFormatter}
+                        interval="auto"
+                    />
                     <YAxis tickFormatter={(value) => chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`} />
                     <Tooltip content={<ChartTooltipContent indicator="dot" />} />
                     <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={false} activeDot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
@@ -308,3 +326,5 @@ export function TrendsDashboard() {
     </div>
   );
 }
+
+    
