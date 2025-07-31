@@ -142,8 +142,7 @@ export default function DashboardPage() {
           id="predictionPanel" 
           ref={predictionPanelRef} 
           className={cn(
-            "fixed top-0 right-0 bg-white border-b border-gray-200 shadow-lg z-10 prediction-panel",
-            "left-0 md:left-[var(--sidebar-width-icon)] group-data-[state=expanded]:md:left-[var(--sidebar-width)]",
+            "fixed top-0 right-0 w-full md:w-1/2 md:max-w-md bg-white border-b md:border-l border-gray-200 shadow-lg z-30 prediction-panel",
             isPredictionPanelOpen && 'show'
           )}
         >
