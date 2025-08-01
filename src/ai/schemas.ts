@@ -71,6 +71,7 @@ export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 export const SuggestRecipesOutputSchema = z.object({
     recipes: z.array(
         z.object({
+            id: z.string().describe("A unique ID for the recipe, in slug format (e.g. 'chicken-adobo')."),
             name: z.string().describe("The name of the recipe."),
             cuisine: z.string().describe("The type of cuisine (e.g., Filipino, Italian, Mexican)."),
             difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The cooking difficulty of the recipe."),
