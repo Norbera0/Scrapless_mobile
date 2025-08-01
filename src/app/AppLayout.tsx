@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -18,7 +19,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/pantry')) return 'Pantry';
     if (pathname.startsWith('/log-waste')) return 'Log Waste';
     if (pathname.startsWith('/add-to-pantry')) return 'Add to Pantry';
-    if (pathname.startsWith('/trends')) return 'Waste Analytics';
+    if (pathname.startsWith('/my-waste')) return 'My Waste';
     if (pathname.startsWith('/insights')) return 'AI Insights';
     if (pathname.startsWith('/shopping')) return 'Shopping Hub';
     if (pathname.startsWith('/saves')) return 'My Saves';

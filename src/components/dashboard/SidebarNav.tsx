@@ -43,7 +43,7 @@ export function SidebarNav({ user }: { user: User }) {
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
-    { href: '/trends', label: 'Trends', icon: BarChart },
+    { href: '/my-waste', label: 'My Waste', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/saves', label: 'My Saves', icon: Bookmark },

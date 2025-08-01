@@ -42,7 +42,7 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 };
 
 
-export default function TrendsPage() {
+export default function MyWastePage() {
   const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
   const { insights, insightsInitialized } = useInsightStore();
@@ -139,7 +139,7 @@ export default function TrendsPage() {
     <div className="flex flex-col gap-6 p-4 md:p-6">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Waste Analytics</h1>
+                <h1 className="text-3xl font-bold tracking-tight">My Waste</h1>
                 <p className="text-muted-foreground">
                     Track patterns, view insights, and reduce your waste.
                 </p>
