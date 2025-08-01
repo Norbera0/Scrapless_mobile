@@ -16,99 +16,89 @@ interface RecipeCardProps {
   onToggleSave: (recipe: Recipe) => void;
 }
 
-const getEmoji = (name: string) => {
-    const lower = name.toLowerCase();
-    if (lower.includes('salad')) return '🥗';
-    if (lower.includes('soup')) return '🥣';
-    if (lower.includes('chicken')) return '🍗';
-    if (lower.includes('beef')) return '🥩';
-    if (lower.includes('pork')) return '🥓';
-    if (lower.includes('fish')) return '🐟';
-    if (lower.includes('pasta')) return '🍝';
-    if (lower.includes('rice')) return '🍚';
-    return '🧑‍🍳';
-}
-
 export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
     const isUrgent = recipe.tags?.includes('Urgent');
 
     return (
-        <Card className={cn("overflow-hidden h-full flex flex-col", isUrgent ? "bg-amber-50 border-amber-200" : "bg-green-50" )}>
-            <CardHeader className="p-4">
-                 <div className="flex justify-between items-start gap-2">
-                     <div className="space-y-1">
+        <Dialog>
+            <Card className={cn("overflow-hidden h-full flex flex-col group", isUrgent ? "bg-amber-50 border-amber-200" : "bg-white" )}>
+                <CardHeader className="p-0 relative">
+                    <DialogTrigger asChild>
+                        <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
+                            {recipe.photoDataUri ? (
+                                <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                            ) : (
+                                <div className="w-full h-full bg-muted flex items-center justify-center">
+                                    <ImageOff className="w-10 h-10 text-muted-foreground" />
+                                </div>
+                            )}
+                            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
+                        </div>
+                    </DialogTrigger>
+                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                         {recipe.tags?.map(tag => (
-                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'default'} className="mr-1">
+                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'default'} className="shadow-lg">
                                 {tag === 'Urgent' ? <Zap className="h-3 w-3 mr-1" /> : <Leaf className="h-3 w-3 mr-1" />}
                                 {tag}
                             </Badge>
                         ))}
-                        <h3 className="font-bold text-lg leading-tight">{recipe.name}</h3>
                     </div>
-                    <div className="text-4xl">{getEmoji(recipe.name)}</div>
-                 </div>
-            </CardHeader>
-            <CardContent className="p-4 flex-1">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                    <div className="flex items-center gap-1"><Clock className="h-4 w-4" /> {recipe.cookingTime}</div>
-                    <div className="flex items-center gap-1"><Users className="h-4 w-4" /> {recipe.servings} Servings</div>
-                </div>
-
-                <div className={cn("rounded-lg p-3 text-sm", isUrgent ? "bg-amber-100" : "bg-green-100")}>
-                    <p className={cn("font-semibold mb-1", isUrgent ? "text-amber-800" : "text-green-800")}>
-                        {isUrgent ? 'Uses Your Expiring Items:' : 'Uses Your Fresh Items:'}
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                        {recipe.ingredients.filter(i => i.status === 'Have').slice(0, 3).map((ing, i) => (
-                            <Badge key={i} variant="secondary" className="font-normal">{ing.name}</Badge>
-                        ))}
+                     <Button size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm" onClick={() => onToggleSave(recipe)}>
+                        <Bookmark className={cn("h-4 w-4 text-white", isSaved && "fill-white")} />
+                     </Button>
+                </CardHeader>
+                <CardContent className="p-4 flex-1">
+                     <DialogTrigger asChild>
+                        <h3 className="font-bold text-lg leading-tight cursor-pointer hover:underline">{recipe.name}</h3>
+                    </DialogTrigger>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
+                        <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recipe.cookingTime}</div>
+                        <div className="flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> {recipe.difficulty}</div>
                     </div>
-                </div>
-            </CardContent>
-            <CardFooter className="p-4 bg-background/50">
-                 <div className="flex flex-col w-full">
-                    <div className="flex items-center text-xs text-primary font-semibold mb-2">
+                </CardContent>
+                <CardFooter className="p-4 bg-background/30">
+                     <div className="flex items-center text-xs text-primary font-semibold">
                        <Globe className="h-3 w-3 mr-1.5" />
                        <p>{recipe.benefit}</p>
                     </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="secondary" size="sm" className="w-full">View Recipe</Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                                {recipe.photoDataUri && (
-                                    <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
-                                        <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
-                                    </div>
-                                )}
-                                <DialogTitle>{recipe.name}</DialogTitle>
-                                <DialogDescription>
-                                    {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Ingredients</h3>
-                                    <ul className="list-disc list-inside space-y-1">
-                                        {recipe.ingredients.map((ing, i) => (
-                                            <li key={i}>{ing.name}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Instructions</h3>
-                                    <ol className="list-decimal list-inside space-y-2">
-                                    {recipe.instructions.map((step, i) => (
-                                        <li key={i}>{step}</li>
-                                    ))}
-                                    </ol>
-                                </div>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
-                 </div>
-            </CardFooter>
-        </Card>
+                </CardFooter>
+            </Card>
+
+            {/* Modal Content */}
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    {recipe.photoDataUri && (
+                        <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
+                            <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
+                        </div>
+                    )}
+                    <DialogTitle>{recipe.name}</DialogTitle>
+                    <DialogDescription>
+                        {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div>
+                        <h3 className="font-semibold text-lg mb-2">Ingredients</h3>
+                        <ul className="list-disc list-inside space-y-1">
+                            {recipe.ingredients.map((ing, i) => (
+                                <li key={i} className={cn(ing.status === 'Need' && 'text-muted-foreground')}>
+                                    {ing.name}
+                                    {ing.status === 'Need' && <Badge variant="outline" className="ml-2">Need</Badge>}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 className="font-semibold text-lg mb-2">Instructions</h3>
+                        <ol className="list-decimal list-inside space-y-2">
+                        {recipe.instructions.map((step, i) => (
+                            <li key={i}>{step}</li>
+                        ))}
+                        </ol>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
