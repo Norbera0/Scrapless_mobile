@@ -10,6 +10,22 @@ import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 import { Button } from '@/components/ui/button';
 import { PanelLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+
+const getPageTitle = (pathname: string) => {
+    if (pathname.startsWith('/dashboard')) return 'Dashboard';
+    if (pathname.startsWith('/pantry')) return 'Pantry';
+    if (pathname.startsWith('/log-waste')) return 'Log Waste';
+    if (pathname.startsWith('/add-to-pantry')) return 'Add to Pantry';
+    if (pathname.startsWith('/trends')) return 'Waste Analytics';
+    if (pathname.startsWith('/insights')) return 'AI Insights';
+    if (pathname.startsWith('/shopping')) return 'Shopping Hub';
+    if (pathname.startsWith('/saves')) return 'My Saves';
+    if (pathname.startsWith('/review-items')) return 'Review Items';
+    if (pathname.startsWith('/review-pantry-items')) return 'Review Pantry Items';
+    return 'Scrapless';
+}
 
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -51,14 +67,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
-            <div className="flex items-center gap-2">
-                <SidebarTrigger>
-                    <PanelLeft />
-                </SidebarTrigger>
-            </div>
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
+            <SidebarTrigger className="md:flex" />
+            <h1 className="text-lg font-semibold md:text-xl">{getPageTitle(pathname)}</h1>
             <div className="flex-1">
-                 {/* Can add page titles here in the future */}
+                 {/* Can add other header items here in the future */}
             </div>
             {/* Add other header items like avatar here if needed */}
         </header>

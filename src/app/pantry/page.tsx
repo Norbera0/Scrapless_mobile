@@ -209,121 +209,112 @@ export default function PantryPage() {
 
     return (
         <>
-            <div className="min-h-full relative pb-24">
-                <header className="glass-card sticky top-0 z-40 px-4 md:px-6 py-4 rounded-b-2xl shadow-lg">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-2 md:space-x-4">
-                            <Button variant="ghost" size="icon" onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                                <ChevronLeft className="w-6 h-6 text-gray-600" />
-                            </Button>
-                            <div>
-                                <h1 className="text-xl md:text-2xl font-bold text-gray-900">Virtual Pantry</h1>
-                                <p className="text-xs md:text-sm text-gray-500">{liveItems.length} items • ₱{pantryStats.totalValue.toFixed(2)} total value</p>
-                            </div>
+            <div className="min-h-full relative pb-24 p-4 md:p-6 space-y-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <p className="text-muted-foreground">
+                        {liveItems.length} items • ₱{pantryStats.totalValue.toFixed(2)} total value
+                    </p>
+                    <div className="flex items-center gap-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Search your pantry..." 
+                                className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all search-focus"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                        <Button onClick={() => router.push('/add-to-pantry')} className="gradient-bg text-white px-3 py-2 md:px-4 md:py-2.5 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all">
-                             <Plus className="w-5 h-5 md:inline md:mr-2" />
+                        <Button onClick={() => router.push('/add-to-pantry')} className="whitespace-nowrap">
+                            <Plus className="w-5 h-5 md:mr-2" />
                             <span className='hidden md:inline'>Add Item</span>
                         </Button>
                     </div>
+                </div>
 
-                    <PantryOverview stats={pantryStats} />
+                <PantryOverview stats={pantryStats} />
 
-                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input 
-                            type="text" 
-                            placeholder="Search your pantry..." 
-                            className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-xl focus:bg-white focus:outline-none transition-all search-focus"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                </header>
-
-                <main className="px-4 md:px-6 py-6 space-y-6">
-                     <div className="flex space-x-2 overflow-x-auto pb-2">
-                        <button onClick={() => setFilter('all')} className={`location-chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === 'all' ? 'bg-primary text-primary-foreground' : ''}`}>
-                            All Items
+                 <div className="flex space-x-2 overflow-x-auto pb-2">
+                    <button onClick={() => setFilter('all')} className={`location-chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${filter === 'all' ? 'bg-primary text-primary-foreground' : ''}`}>
+                        All Items
+                    </button>
+                    {locationFilters.map(loc => (
+                        <button key={loc} onClick={() => setFilter(loc!.toLowerCase())} className={`location-chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all capitalize ${filter === loc!.toLowerCase() ? 'bg-primary text-primary-foreground' : ''}`}>
+                            {loc}
                         </button>
-                        {locationFilters.map(loc => (
-                            <button key={loc} onClick={() => setFilter(loc!.toLowerCase())} className={`location-chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all capitalize ${filter === loc!.toLowerCase() ? 'bg-primary text-primary-foreground' : ''}`}>
-                                {loc}
-                            </button>
-                        ))}
-                    </div>
-                    
-                    {urgentItems.length > 0 && (
-                        <section id="urgentSection" className="space-y-3">
-                            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                                <span className="w-2 h-2 bg-red-500 rounded-full mr-3 animate-pulse"></span>
-                                Use Soon ( expiring in ≤ 2 days )
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {urgentItems.map(item => (
-                                    <PantryItemCard key={item.id} item={item} onSelect={setSelectedItem} isDeleting={isDeleting === item.id} onDelete={handleDelete} />
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                     {freshItems.length > 0 && (
-                        <section id="freshSection" className="space-y-3">
-                            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                                <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                                Fresh & Good
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {freshItems.map(item => (
-                                     <PantryItemCard key={item.id} item={item} onSelect={setSelectedItem} isDeleting={isDeleting === item.id} onDelete={handleDelete} />
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                    
-                    {filteredItems.length === 0 && (
-                        <div className='text-center py-10 text-gray-500'>
-                            <p>No items found.</p>
-                            <p className='text-sm'>Try adjusting your search or filters.</p>
+                    ))}
+                </div>
+                
+                {urgentItems.length > 0 && (
+                    <section id="urgentSection" className="space-y-3">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <span className="w-2 h-2 bg-red-500 rounded-full mr-3 animate-pulse"></span>
+                            Use Soon ( expiring in ≤ 2 days )
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {urgentItems.map(item => (
+                                <PantryItemCard key={item.id} item={item} onSelect={setSelectedItem} isDeleting={isDeleting === item.id} onDelete={handleDelete} />
+                            ))}
                         </div>
-                    )}
-                    
-                    <section id="recipeSection" className="space-y-3">
-                         <div className="flex items-center justify-between">
-                             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                                <BookOpen className="w-5 h-5 mr-3 text-primary" />
-                                Perfect Recipes For You
-                            </h2>
-                             <Button variant="link" size="sm" onClick={() => fetchRecipes(recipes)} disabled={isLoadingRecipes}>
-                                {isLoadingRecipes ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                                <span className="ml-2">New ideas</span>
-                            </Button>
-                         </div>
-                        
-                         {isLoadingRecipes ? (
-                             <div className="flex justify-center items-center h-40">
-                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                             </div>
-                         ) : recipes.length > 0 ? (
-                            <Carousel opts={{ align: "start", loop: false }}>
-                                <CarouselContent className="-ml-2">
-                                    {recipes.map(recipe => (
-                                        <CarouselItem key={recipe.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
-                                            <div className="p-1">
-                                                <RecipeCard recipe={recipe} onToggleSave={handleToggleSave} isSaved={savedRecipeIds.has(recipe.id)} />
-                                            </div>
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-                             </Carousel>
-                         ) : (
-                             <p className="text-center text-muted-foreground py-8">
-                                 No recipe suggestions available. Try adding more items to your pantry!
-                             </p>
-                         )}
                     </section>
+                )}
 
-                </main>
+                 {freshItems.length > 0 && (
+                    <section id="freshSection" className="space-y-3">
+                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                            Fresh & Good
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {freshItems.map(item => (
+                                 <PantryItemCard key={item.id} item={item} onSelect={setSelectedItem} isDeleting={isDeleting === item.id} onDelete={handleDelete} />
+                            ))}
+                        </div>
+                    </section>
+                )}
+                
+                {filteredItems.length === 0 && (
+                    <div className='text-center py-10 text-gray-500'>
+                        <p>No items found.</p>
+                        <p className='text-sm'>Try adjusting your search or filters.</p>
+                    </div>
+                )}
+                
+                <section id="recipeSection" className="space-y-3">
+                     <div className="flex items-center justify-between">
+                         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                            <BookOpen className="w-5 h-5 mr-3 text-primary" />
+                            Perfect Recipes For You
+                        </h2>
+                         <Button variant="link" size="sm" onClick={() => fetchRecipes(recipes)} disabled={isLoadingRecipes}>
+                            {isLoadingRecipes ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                            <span className="ml-2">New ideas</span>
+                        </Button>
+                     </div>
+                    
+                     {isLoadingRecipes ? (
+                         <div className="flex justify-center items-center h-40">
+                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                         </div>
+                     ) : recipes.length > 0 ? (
+                        <Carousel opts={{ align: "start", loop: false }}>
+                            <CarouselContent className="-ml-2">
+                                {recipes.map(recipe => (
+                                    <CarouselItem key={recipe.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
+                                        <div className="p-1">
+                                            <RecipeCard recipe={recipe} onToggleSave={handleToggleSave} isSaved={savedRecipeIds.has(recipe.id)} />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                         </Carousel>
+                     ) : (
+                         <p className="text-center text-muted-foreground py-8">
+                             No recipe suggestions available. Try adding more items to your pantry!
+                         </p>
+                     )}
+                </section>
+
             </div>
             {selectedItem && (
                  <PantryItemDetails 
