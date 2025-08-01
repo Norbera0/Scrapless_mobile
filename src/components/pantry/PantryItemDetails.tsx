@@ -1,9 +1,9 @@
 
 'use client';
 import { Button } from '../ui/button';
-import { PantryItem, Recipe } from '@/types';
+import { PantryItem, ItemInsights } from '@/types';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import { X, Bot, Utensils, Trash2, Edit, Loader2 } from 'lucide-react';
+import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot } from 'lucide-react';
 import Image from 'next/image';
 
 interface PantryItemDetailsProps {
@@ -11,12 +11,12 @@ interface PantryItemDetailsProps {
     isOpen: boolean;
     onClose: () => void;
     onDelete: (itemId: string) => void;
-    onGetRecipes: (item: PantryItem) => void;
-    isFetchingRecipes: boolean;
-    recipes: Recipe[];
+    onGetInsights: (item: PantryItem) => void;
+    isFetchingInsights: boolean;
+    insights: ItemInsights | null;
 }
 
-export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetRecipes, isFetchingRecipes, recipes }: PantryItemDetailsProps) {
+export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsights, isFetchingInsights, insights }: PantryItemDetailsProps) {
     if (!isOpen || !item) return null;
 
     const addedDate = new Date(item.addedDate);
@@ -63,33 +63,51 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetRecipe
                     </div>
                     
                     <div className="mb-6">
-                        <Button onClick={() => onGetRecipes(item)} className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center" disabled={isFetchingRecipes}>
-                            {isFetchingRecipes ? <Loader2 className="w-6 h-6 mr-3 animate-spin" /> : <Bot className="w-6 h-6 mr-3" />}
-                            {isFetchingRecipes ? 'Finding Recipes...' : 'Get Recipe Ideas'}
-                        </Button>
+                        {!insights && (
+                            <Button onClick={() => onGetInsights(item)} className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center" disabled={isFetchingInsights}>
+                                {isFetchingInsights ? <Loader2 className="w-6 h-6 mr-3 animate-spin" /> : <Bot className="w-6 h-6 mr-3" />}
+                                {isFetchingInsights ? 'Getting Insights...' : 'Get AI-Powered Insights'}
+                            </Button>
+                        )}
                     </div>
                     
-                     {recipes.length > 0 && (
-                         <div className="recipe-card rounded-2xl p-5 mb-6">
-                            <h4 className="font-semibold text-yellow-900 mb-3 flex items-center">
-                                <Utensils className="text-lg mr-2" /> Quick Recipe Ideas
-                            </h4>
-                            <div className="space-y-2">
-                                {recipes.slice(0,3).map(recipe => (
-                                    <div key={recipe.id} className="flex items-center justify-between bg-white bg-opacity-50 rounded-lg p-3">
-                                        <div className='flex items-center gap-3'>
-                                            {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} width={40} height={40} className='rounded-md object-cover'/>}
-                                            <span className="font-medium">{recipe.name}</span>
-                                        </div>
-                                        <span className="text-sm text-yellow-700">{recipe.cookingTime}</span>
-                                    </div>
-                                ))}
+                     {insights && (
+                         <div className="space-y-4">
+                            <div className="ai-insight-card rounded-2xl p-5">
+                                <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
+                                    <Info className="text-lg mr-2" /> Storage Tip
+                                </h4>
+                                <p className="text-sm text-purple-800">{insights.storageTip}</p>
                             </div>
+                            <div className="tip-card rounded-2xl p-5">
+                                <h4 className="font-semibold text-green-900 mb-2 flex items-center">
+                                    <Info className="text-lg mr-2" /> Waste Prevention
+                                </h4>
+                                <p className="text-sm text-green-800">{insights.wastePreventionTip}</p>
+                            </div>
+                            {insights.recipes && insights.recipes.length > 0 && (
+                                <div className="recipe-card rounded-2xl p-5">
+                                    <h4 className="font-semibold text-yellow-900 mb-3 flex items-center">
+                                        <CookingPot className="text-lg mr-2" /> Recipe Ideas
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {insights.recipes.map(recipe => (
+                                            <div key={recipe.id} className="flex items-center justify-between bg-white bg-opacity-50 rounded-lg p-3">
+                                                <div className='flex items-center gap-3'>
+                                                    {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} width={40} height={40} className='rounded-md object-cover'/>}
+                                                    <span className="font-medium text-sm">{recipe.name}</span>
+                                                </div>
+                                                <span className="text-xs text-yellow-700">{recipe.cookingTime}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3 mt-6">
                         <Button className="gradient-bg text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
                             <Utensils className="w-5 h-5 inline mr-2" />
                             Log as Waste
@@ -109,4 +127,3 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetRecipe
         </div>
     );
 }
-

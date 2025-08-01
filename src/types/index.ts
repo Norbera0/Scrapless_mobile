@@ -89,3 +89,19 @@ export interface Insight {
     // User interaction
     status: 'new' | 'acknowledged' | 'acted_on' | 'ignored';
 }
+
+// Item-specific AI Insights
+export interface ItemRecipeSuggestion {
+    id: string;
+    name: string;
+    description: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    cookingTime: string;
+    photoDataUri?: string;
+}
+
+export interface ItemInsights {
+    storageTip: string;
+    wastePreventionTip: string;
+    recipes: ItemRecipeSuggestion[];
+}

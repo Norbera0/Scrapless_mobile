@@ -6,13 +6,13 @@ import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
 import { Loader2, Plus, Search, ChevronLeft } from 'lucide-react';
-import type { PantryItem, Recipe } from '@/types';
+import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
 import { PantryItemDetails } from '@/components/pantry/PantryItemDetails';
 import { deletePantryItem } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { suggestRecipes } from '@/ai/flows/suggest-recipes';
+import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { PantryOverview } from '@/components/pantry/PantryOverview';
 
 
@@ -27,12 +27,19 @@ export default function PantryPage() {
     const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isClient, setIsClient] = useState(false);
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [isFetchingRecipes, setIsFetchingRecipes] = useState(false);
+    const [itemInsights, setItemInsights] = useState<ItemInsights | null>(null);
+    const [isFetchingInsights, setIsFetchingInsights] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+    
+    useEffect(() => {
+        // When a new item is selected, reset the insights.
+        if (selectedItem) {
+            setItemInsights(null);
+        }
+    }, [selectedItem]);
 
     const pantryStats = useMemo(() => {
         const totalValue = liveItems.reduce((acc, item) => acc + (item.estimatedCost || 0), 0);
@@ -94,22 +101,21 @@ export default function PantryPage() {
         }
     }
     
-    const handleGetRecipes = async (item: PantryItem) => {
-        if (!pantryInitialized) return;
-        setIsFetchingRecipes(true);
+    const handleGetInsights = async (item: PantryItem) => {
+        setIsFetchingInsights(true);
         try {
-            const result = await suggestRecipes({
-                pantryItems: [item.name, ...liveItems.filter(i => i.id !== item.id).slice(0,4).map(i => i.name)],
-                preferences: { filipinoDishes: true },
-                history: [],
+            const result = await getItemInsights({
+                name: item.name,
+                estimatedAmount: item.estimatedAmount,
+                estimatedExpirationDate: item.estimatedExpirationDate,
+                estimatedCost: item.estimatedCost,
             });
-            const recipesWithIds = result.recipes.map(r => ({...r, id: crypto.randomUUID()}));
-            setRecipes(recipesWithIds);
+            setItemInsights(result);
         } catch (error) {
             console.error(error);
-            toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch recipe ideas.' });
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch AI insights.' });
         } finally {
-            setIsFetchingRecipes(false);
+            setIsFetchingInsights(false);
         }
     }
 
@@ -215,9 +221,9 @@ export default function PantryPage() {
                     isOpen={!!selectedItem}
                     onClose={() => setSelectedItem(null)}
                     onDelete={handleDelete}
-                    onGetRecipes={handleGetRecipes}
-                    isFetchingRecipes={isFetchingRecipes}
-                    recipes={recipes}
+                    onGetInsights={handleGetInsights}
+                    isFetchingInsights={isFetchingInsights}
+                    insights={itemInsights}
                 />
             )}
         </>

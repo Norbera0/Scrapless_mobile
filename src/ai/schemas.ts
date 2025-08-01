@@ -184,3 +184,29 @@ export const GenerateShoppingRecommendationsOutputSchema = z.object({
     ),
 });
 export type GenerateShoppingRecommendationsOutput = z.infer<typeof GenerateShoppingRecommendationsOutputSchema>;
+
+
+// Item-specific Insights Schemas
+export const GetItemInsightsInputSchema = z.object({
+    name: z.string().describe('The name of the food item.'),
+    estimatedAmount: z.string().describe('The estimated amount of the food item.'),
+    estimatedExpirationDate: z.string().describe("The estimated expiration date in 'YYYY-MM-DD' format."),
+    estimatedCost: z.number().optional().describe("The estimated cost of the item in PHP."),
+  });
+export type GetItemInsightsInput = z.infer<typeof GetItemInsightsInputSchema>;
+  
+export const GetItemInsightsOutputSchema = z.object({
+    storageTip: z.string().describe("An actionable storage tip to maximize freshness."),
+    wastePreventionTip: z.string().describe("A smart tip to prevent this item from being wasted."),
+    recipes: z.array(
+      z.object({
+        id: z.string().describe("A unique ID for the recipe."),
+        name: z.string().describe("The name of the recipe."),
+        description: z.string().describe("A short, enticing description of the recipe."),
+        difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The cooking difficulty."),
+        cookingTime: z.string().describe("The estimated cooking time (e.g., '15 min')."),
+        photoDataUri: z.string().optional().describe("A data URI of a generated image of the recipe."),
+      })
+    ).describe('A list of 2-3 simple recipe ideas.'),
+  });
+export type GetItemInsightsOutput = z.infer<typeof GetItemInsightsOutputSchema>;
