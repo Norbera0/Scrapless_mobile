@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
@@ -9,6 +8,8 @@ import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import { Sidebar, SidebarInset, SidebarRail, SidebarTrigger } from '@/components/ui/sidebar';
 import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
+import { Button } from '@/components/ui/button';
+import { PanelLeft } from 'lucide-react';
 
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -50,6 +51,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
+            <div className="flex items-center gap-2">
+                <SidebarTrigger>
+                    <PanelLeft />
+                </SidebarTrigger>
+            </div>
+            <div className="flex-1">
+                 {/* Can add page titles here in the future */}
+            </div>
+            {/* Add other header items like avatar here if needed */}
+        </header>
         {children}
       </SidebarInset>
       <FloatingChatAssistant />
