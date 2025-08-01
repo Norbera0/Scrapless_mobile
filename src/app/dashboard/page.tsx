@@ -96,7 +96,10 @@ export default function DashboardPage() {
   const focusCards = [
       itemsExpiringToday.length > 0 && 'urgent',
       latestInsight && 'insight',
-      'progress'
+      'progress',
+      'shopping',
+      'recipes',
+      'log_waste'
   ].filter(Boolean);
   
   const handleDotClick = useCallback((index: number) => {
@@ -116,7 +119,7 @@ export default function DashboardPage() {
 
   return (
     <div className="gradient-bg min-h-screen">
-      <div className="min-h-screen pb-20 relative">
+      <div className="min-h-screen pb-20">
         {/* Header */}
         <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
             <div className="px-4 py-4 md:px-6">
@@ -192,12 +195,12 @@ export default function DashboardPage() {
 
         <div className="px-4 md:px-6 py-6 space-y-5">
             {/* Today's Focus Carousel */}
-            <div className="relative">
-                <Carousel setApi={setCarouselApi}>
-                    <CarouselContent className="-ml-0">
+            <div className="overflow-hidden">
+                <Carousel setApi={setCarouselApi} opts={{ align: "start" }}>
+                    <CarouselContent className="-ml-4">
                         {itemsExpiringToday.length > 0 && (
-                            <CarouselItem className="pl-0">
-                                <Card className="focus-card bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm">
+                            <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                                <Card className="focus-card bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm h-full">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
@@ -223,8 +226,8 @@ export default function DashboardPage() {
                             </CarouselItem>
                         )}
                         {latestInsight && (
-                            <CarouselItem className="pl-4">
-                                 <Card className="focus-card bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl shadow-sm">
+                            <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                                 <Card className="focus-card bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl shadow-sm h-full">
                                      <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
@@ -247,8 +250,8 @@ export default function DashboardPage() {
                                 </Card>
                             </CarouselItem>
                         )}
-                        <CarouselItem className="pl-4">
-                             <Card className="focus-card bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl shadow-sm">
+                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                             <Card className="focus-card bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl shadow-sm h-full">
                                  <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
@@ -266,8 +269,77 @@ export default function DashboardPage() {
                                         </div>
                                         <Progress value={65} className="h-2 [&>div]:bg-green-600" />
                                     </div>
-                                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => router.push('/trends')}>
+                                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => router.push('/my-waste')}>
                                         View Your Trends →
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </CarouselItem>
+                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <Card className="focus-card bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl shadow-sm h-full">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h2 className="text-lg font-semibold text-blue-900">🛒 Shop Smart</h2>
+                                            <p className="text-sm text-blue-700">Plan your next grocery run</p>
+                                        </div>
+                                        <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+                                            <ShoppingCart className="w-4 h-4 text-blue-700" />
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
+                                        <p className="text-sm text-blue-800 leading-relaxed">
+                                            Generate a shopping list based on what's running low in your pantry to avoid overbuying.
+                                        </p>
+                                    </div>
+                                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={() => router.push('/shopping')}>
+                                        Go to Shopping Hub →
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </CarouselItem>
+                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <Card className="focus-card bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl shadow-sm h-full">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h2 className="text-lg font-semibold text-yellow-900">🍳 Find a Recipe</h2>
+                                            <p className="text-sm text-yellow-700">Use what you have</p>
+                                        </div>
+                                        <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
+                                            <Utensils className="w-4 h-4 text-yellow-700" />
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
+                                        <p className="text-sm text-yellow-800 leading-relaxed">
+                                            Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
+                                        </p>
+                                    </div>
+                                    <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => router.push('/pantry')}>
+                                        Find Recipes →
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </CarouselItem>
+                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <Card className="focus-card bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl shadow-sm h-full">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <h2 className="text-lg font-semibold text-red-900">🗑️ Log Waste</h2>
+                                            <p className="text-sm text-red-700">Track to get smarter</p>
+                                        </div>
+                                        <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
+                                            <Trash className="w-4 h-4 text-red-700" />
+                                        </div>
+                                    </div>
+                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
+                                        <p className="text-sm text-red-800 leading-relaxed">
+                                            Quickly log any food you waste to help the AI find your patterns and save you money.
+                                        </p>
+                                    </div>
+                                    <Button className="w-full bg-red-600 hover:bg-red-700 text-white" onClick={() => router.push('/log-waste?method=camera')}>
+                                        Log Waste Now →
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -280,8 +352,6 @@ export default function DashboardPage() {
                     ))}
                 </div>
             </div>
-
-            <PantryHealthScore />
 
             {/* Main Impact Card */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
@@ -297,11 +367,13 @@ export default function DashboardPage() {
                             <div className="text-sm text-gray-600">🌍 Carbon Footprint</div>
                         </div>
                     </div>
-                    <Button variant="link" className="w-full mt-4 text-blue-600 hover:text-blue-800" onClick={() => router.push('/trends')}>
+                    <Button variant="link" className="w-full mt-4 text-blue-600 hover:text-blue-800" onClick={() => router.push('/my-waste')}>
                         View 7-Day Trend →
                     </Button>
                 </CardContent>
             </Card>
+
+            <PantryHealthScore />
 
             {/* Primary Action Buttons */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
