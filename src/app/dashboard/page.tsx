@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, Utensils, CheckCircle, PackagePlus, X, Lightbulb, ShoppingCart } from 'lucide-react';
+import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, Utensils, CheckCircle, PackagePlus, X, Lightbulb, ShoppingCart, PanelLeft } from 'lucide-react';
 import type { User, Insight } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -18,6 +18,7 @@ import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/com
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { PantryHealthScore } from '@/components/dashboard/PantryHealthScore';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 
 const getInitials = (name?: string | null) => {
@@ -120,11 +121,16 @@ export default function DashboardPage() {
         <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-xl font-semibold text-gray-800">
-                           {greeting}, {user?.name?.split(' ')[0] || 'User'}! 👋
-                        </h1>
-                        <p className="text-sm text-gray-500">Let's reduce waste together</p>
+                    <div className="flex items-center gap-2">
+                        <SidebarTrigger className="md:hidden">
+                            <PanelLeft />
+                        </SidebarTrigger>
+                        <div>
+                            <h1 className="text-xl font-semibold text-gray-800">
+                               {greeting}, {user?.name?.split(' ')[0] || 'User'}! 👋
+                            </h1>
+                            <p className="text-sm text-gray-500">Let's reduce waste together</p>
+                        </div>
                     </div>
                     <div className="flex items-center space-x-3">
                         <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800" onClick={handleBellClick}>
