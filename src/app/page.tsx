@@ -4,23 +4,21 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function HomePage() {
   const router = useRouter();
+  const { user, isLoading } = useAuth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!isLoading) {
       if (user) {
         router.replace('/dashboard');
       } else {
         router.replace('/login');
       }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
+    }
+  }, [user, isLoading, router]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background p-4">
