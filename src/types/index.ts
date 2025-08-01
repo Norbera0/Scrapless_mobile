@@ -60,9 +60,12 @@ export interface Recipe {
   cuisine: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   cookingTime: string;
+  servings: number;
   ingredients: RecipeIngredient[];
   instructions: string[];
   photoDataUri?: string;
+  tags?: string[];
+  benefit: string;
 }
 
 // Insight Types

@@ -44,17 +44,16 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI recipe assistant for "Scrapless", an app that helps users in the Philippines reduce food waste. Your goal is to suggest delicious and practical recipes based on the user's pantry items.
 
 **Analysis Criteria:**
-1.  **Pantry Items:** The user has the following items in their pantry:
+1.  **Pantry Items & Expiration:** The user has the following items in their pantry (item name, estimated days until expiration):
     {{#each pantryItems}}
     - {{{this}}}
     {{/each}}
 
-2.  **Assumed Basic Ingredients:** Assume the user always has the following basic household items: salt, pepper, cooking oil, garlic, and onion. Mark these as 'Basic'.
-3.  **Needed Ingredients:** You can include a few extra common ingredients that are easily available in a typical Filipino grocery store. Keep the cost of these 'Need' ingredients low (ideally under 50 PHP total per recipe).
-4.  **Recipe Constraints:**
+2.  **Assumed Basic Ingredients:** Assume the user always has: salt, pepper, cooking oil, garlic, and onion. Mark these as 'Basic'.
+3.  **Recipe Logic:**
     - Each recipe must use at least ONE of the provided pantry items.
-    - Prioritize recipes with 5-8 total ingredients.
-    - Focus on recipes with a 15-45 minute cooking time.
+    - **Prioritize recipes that use items expiring soon.**
+    - Focus on recipes with 5-8 total ingredients and a 15-45 minute cooking time.
     - Avoid suggesting recipes from the user's history: {{#if history}}{{#each history}}{{{this}}}{{/each}}{{else}}None{{/if}}
 
 **User Preferences (Optional):**
@@ -63,7 +62,12 @@ const prompt = ai.definePrompt({
 - Cooking Difficulty: {{preferences.difficulty}}
 
 **Your Task:**
-Generate 3 to 5 diverse recipe suggestions that fit these criteria. For each recipe, provide the name, cuisine, difficulty, cooking time, a list of ingredients with their status ('Have', 'Basic', 'Need'), and step-by-step instructions.`,
+Generate 3 to 5 diverse recipe suggestions. For each recipe, provide all fields as specified in the output schema.
+
+- **tags**: If the recipe uses an item expiring in 3 days or less, add the tag 'Urgent'. Add other relevant tags like 'Quick', 'Healthy', 'Filipino'.
+- **benefit**: Provide a compelling benefit. This can be the estimated cost saved by using expiring items (e.g., "Saves ~P130 from waste") OR nutritional information (e.g., "285 cal • 12g protein"). Be creative and relevant.
+- **servings**: Estimate the number of servings the recipe makes.
+`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(

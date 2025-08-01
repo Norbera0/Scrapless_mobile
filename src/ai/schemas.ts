@@ -75,6 +75,7 @@ export const SuggestRecipesOutputSchema = z.object({
             cuisine: z.string().describe("The type of cuisine (e.g., Filipino, Italian, Mexican)."),
             difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The cooking difficulty of the recipe."),
             cookingTime: z.string().describe("The estimated cooking time (e.g., '30 min')."),
+            servings: z.number().describe("The number of servings the recipe makes."),
             ingredients: z.array(
                 z.object({
                     name: z.string().describe("The name of the ingredient."),
@@ -84,6 +85,8 @@ export const SuggestRecipesOutputSchema = z.object({
             ),
             instructions: z.array(z.string()).describe("A list of step-by-step cooking instructions."),
             photoDataUri: z.string().optional().describe("A data URI of a generated image of the recipe."),
+            tags: z.array(z.string()).optional().describe("Informative tags like 'Urgent' (if it uses expiring items), 'Quick', 'Healthy'."),
+            benefit: z.string().describe("A short, compelling benefit of making this recipe, e.g., 'Saves P120 from waste' or '285 cal • 12g protein'."),
         })
     ).describe("A list of 3-5 recipe suggestions."),
 });

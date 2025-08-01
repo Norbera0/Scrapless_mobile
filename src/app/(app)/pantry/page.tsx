@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus, Search, ChevronLeft, RefreshCw } from 'lucide-react';
+import { Loader2, Plus, Search, ChevronLeft, RefreshCw, BookOpen } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
 import { PantryItemDetails } from '@/components/pantry/PantryItemDetails';
@@ -15,9 +15,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { PantryOverview } from '@/components/pantry/PantryOverview';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 
 export default function PantryPage() {
@@ -32,11 +31,9 @@ export default function PantryPage() {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isClient, setIsClient] = useState(false);
     
-    // Per-item state for AI insights
     const [itemInsights, setItemInsights] = useState<Map<string, ItemInsights>>(new Map());
     const [isFetchingInsights, setIsFetchingInsights] = useState<Set<string>>(new Set());
 
-    // State for recipe generator
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
     const [isLoadingRecipes, setIsLoadingRecipes] = useState(true);
@@ -108,7 +105,7 @@ export default function PantryPage() {
     }
     
     const handleGetInsights = useCallback(async (item: PantryItem) => {
-        if (itemInsights.has(item.id)) return; // Already fetched
+        if (itemInsights.has(item.id)) return;
 
         setIsFetchingInsights(prev => new Set(prev).add(item.id));
         try {
@@ -136,7 +133,6 @@ export default function PantryPage() {
         return Array.from(locations);
     }, [liveItems]);
 
-    // --- Recipe Generator Logic ---
     const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
         setIsLoadingRecipes(true);
         try {
@@ -166,7 +162,7 @@ export default function PantryPage() {
 
     useEffect(() => {
         if (pantryInitialized) {
-            fetchRecipes([]); // Initial fetch
+            fetchRecipes([]);
         }
     }, [pantryInitialized, recipeFilters, fetchRecipes]);
     
@@ -180,10 +176,6 @@ export default function PantryPage() {
         loadSaved();
     }, [user]);
     
-    const handleToggleRecipeFilter = (filter: 'quickMeals' | 'filipinoDishes') => {
-        setRecipeFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
-    }
-
     const handleToggleSave = async (recipe: Recipe) => {
         if (!user) return;
         const isSaved = savedRecipeIds.has(recipe.id);
@@ -296,50 +288,40 @@ export default function PantryPage() {
                         </div>
                     )}
                     
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>🍳 Recipe Ideas</CardTitle>
-                            <CardDescription>AI-powered suggestions based on your pantry items.</CardDescription>
-                            <div className="flex gap-2 pt-2">
-                                <Button size="sm" variant={recipeFilters.quickMeals ? 'default' : 'outline'} onClick={() => handleToggleRecipeFilter('quickMeals')}>
-                                    ⚡ Quick Meals
-                                </Button>
-                                <Button size="sm" variant={recipeFilters.filipinoDishes ? 'default' : 'outline'} onClick={() => handleToggleRecipeFilter('filipinoDishes')}>
-                                    🇵🇭 Filipino
-                                </Button>
-                                <Button size="sm" variant="outline" onClick={() => fetchRecipes(recipes)} disabled={isLoadingRecipes || liveItems.length === 0}>
-                                    <RefreshCw className={`mr-2 h-4 w-4 ${isLoadingRecipes ? 'animate-spin' : ''}`} />
-                                    More Recipes
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {isLoadingRecipes ? (
-                                <div className="flex justify-center items-center h-40">
-                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                </div>
-                            ) : recipes.length > 0 ? (
-                                <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
-                                    {recipes.map((recipe, index) => (
-                                        <AccordionItem value={`item-${index}`} key={recipe.id}>
-                                            <AccordionTrigger className='font-semibold'>{recipe.name}</AccordionTrigger>
-                                            <AccordionContent>
-                                                <RecipeCard
-                                                    recipe={recipe}
-                                                    isSaved={savedRecipeIds.has(recipe.id)}
-                                                    onToggleSave={handleToggleSave}
-                                                />
-                                            </AccordionContent>
-                                        </AccordionItem>
+                    <section id="recipeSection" className="space-y-3">
+                         <div className="flex items-center justify-between">
+                             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                                <BookOpen className="w-5 h-5 mr-3 text-primary" />
+                                Perfect Recipes For You
+                            </h2>
+                             <Button variant="link" size="sm" onClick={() => fetchRecipes(recipes)} disabled={isLoadingRecipes}>
+                                {isLoadingRecipes ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                                <span className="ml-2">New ideas</span>
+                            </Button>
+                         </div>
+                        
+                         {isLoadingRecipes ? (
+                             <div className="flex justify-center items-center h-40">
+                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                             </div>
+                         ) : recipes.length > 0 ? (
+                            <Carousel opts={{ align: "start", loop: false }}>
+                                <CarouselContent className="-ml-2">
+                                    {recipes.map(recipe => (
+                                        <CarouselItem key={recipe.id} className="pl-2 basis-full md:basis-1/2 lg:basis-1/3">
+                                            <div className="p-1">
+                                                <RecipeCard recipe={recipe} onToggleSave={handleToggleSave} isSaved={savedRecipeIds.has(recipe.id)} />
+                                            </div>
+                                        </CarouselItem>
                                     ))}
-                                </Accordion>
-                            ) : (
-                                <p className="text-center text-muted-foreground py-8">
-                                    No recipe suggestions available. Try adding more items to your pantry!
-                                </p>
-                            )}
-                        </CardContent>
-                    </Card>
+                                </CarouselContent>
+                             </Carousel>
+                         ) : (
+                             <p className="text-center text-muted-foreground py-8">
+                                 No recipe suggestions available. Try adding more items to your pantry!
+                             </p>
+                         )}
+                    </section>
 
                 </main>
             </div>
