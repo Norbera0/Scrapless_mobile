@@ -1,10 +1,10 @@
-
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 export default function HomePage() {
   const router = useRouter();
