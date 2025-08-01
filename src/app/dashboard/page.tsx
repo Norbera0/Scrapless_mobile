@@ -122,7 +122,7 @@ export default function DashboardPage() {
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <SidebarTrigger className="md:hidden">
+                        <SidebarTrigger>
                             <PanelLeft />
                         </SidebarTrigger>
                         <div>

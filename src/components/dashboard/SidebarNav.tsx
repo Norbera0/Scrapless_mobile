@@ -78,9 +78,6 @@ export function SidebarNav({ user }: { user: User }) {
           <Bot className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold">Scrapless</span>
         </div>
-        <SidebarTrigger>
-            <PanelLeft />
-        </SidebarTrigger>
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
