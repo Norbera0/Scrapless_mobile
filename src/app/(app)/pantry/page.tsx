@@ -31,8 +31,10 @@ export default function PantryPage() {
     const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [isClient, setIsClient] = useState(false);
-    const [itemInsights, setItemInsights] = useState<ItemInsights | null>(null);
-    const [isFetchingInsights, setIsFetchingInsights] = useState(false);
+    
+    // Per-item state for AI insights
+    const [itemInsights, setItemInsights] = useState<Map<string, ItemInsights>>(new Map());
+    const [isFetchingInsights, setIsFetchingInsights] = useState<Set<string>>(new Set());
 
     // State for recipe generator
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -45,13 +47,6 @@ export default function PantryPage() {
         setIsClient(true);
     }, []);
     
-    useEffect(() => {
-        // When a new item is selected, reset the insights.
-        if (selectedItem) {
-            setItemInsights(null);
-        }
-    }, [selectedItem]);
-
     const pantryStats = useMemo(() => {
         const totalValue = liveItems.reduce((acc, item) => acc + (item.estimatedCost || 0), 0);
         const totalFootprint = liveItems.reduce((acc, item) => acc + (item.carbonFootprint || 0), 0);
@@ -112,8 +107,10 @@ export default function PantryPage() {
         }
     }
     
-    const handleGetInsights = async (item: PantryItem) => {
-        setIsFetchingInsights(true);
+    const handleGetInsights = useCallback(async (item: PantryItem) => {
+        if (itemInsights.has(item.id)) return; // Already fetched
+
+        setIsFetchingInsights(prev => new Set(prev).add(item.id));
         try {
             const result = await getItemInsights({
                 name: item.name,
@@ -121,14 +118,18 @@ export default function PantryPage() {
                 estimatedExpirationDate: item.estimatedExpirationDate,
                 estimatedCost: item.estimatedCost,
             });
-            setItemInsights(result);
+            setItemInsights(prev => new Map(prev).set(item.id, result));
         } catch (error) {
             console.error(error);
             toast({ variant: 'destructive', title: 'Error', description: 'Could not fetch AI insights.' });
         } finally {
-            setIsFetchingInsights(false);
+            setIsFetchingInsights(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(item.id);
+                return newSet;
+            });
         }
-    }
+    }, [itemInsights, toast]);
 
     const locationFilters = useMemo(() => {
         const locations = new Set(liveItems.map(i => i.storageLocation).filter(Boolean));
@@ -349,8 +350,8 @@ export default function PantryPage() {
                     onClose={() => setSelectedItem(null)}
                     onDelete={handleDelete}
                     onGetInsights={handleGetInsights}
-                    isFetchingInsights={isFetchingInsights}
-                    insights={itemInsights}
+                    isFetchingInsights={isFetchingInsights.has(selectedItem.id)}
+                    insights={itemInsights.get(selectedItem.id) || null}
                 />
             )}
         </>
