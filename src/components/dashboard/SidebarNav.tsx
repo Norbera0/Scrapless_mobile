@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 export function SidebarNav({ user }: { user: User }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { state: sidebarState } = useSidebar();
+  const { state: sidebarState, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
     try {
@@ -38,6 +38,11 @@ export function SidebarNav({ user }: { user: User }) {
     } catch (error) {
         console.error('Logout failed', error);
     }
+  };
+  
+  const handleNavigation = (href: string) => {
+    setOpenMobile(false);
+    router.push(href);
   };
 
   const menuItems = [
@@ -83,7 +88,7 @@ export function SidebarNav({ user }: { user: User }) {
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
-                onClick={() => router.push(item.href)}
+                onClick={() => handleNavigation(item.href)}
                 isActive={isActive(item.href)}
                 className="w-full justify-start text-base h-12"
                 tooltip={item.label}
