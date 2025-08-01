@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
-import { Sidebar, SidebarInset } from '@/components/ui/sidebar';
+import { Sidebar, SidebarInset, SidebarRail } from '@/components/ui/sidebar';
 import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 
@@ -47,6 +47,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarNav user={user} />
+        <SidebarRail />
       </Sidebar>
       <SidebarInset>{children}</SidebarInset>
       <FloatingChatAssistant />
