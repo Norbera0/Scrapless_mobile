@@ -40,7 +40,6 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
-    { href: '/recipes', label: 'Recipes', icon: Utensils },
     { href: '/trends', label: 'Trends', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },

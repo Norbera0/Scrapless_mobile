@@ -1,19 +1,23 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus, Search, ChevronLeft } from 'lucide-react';
+import { Loader2, Plus, Search, ChevronLeft, RefreshCw } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
 import { PantryItemDetails } from '@/components/pantry/PantryItemDetails';
-import { deletePantryItem } from '@/lib/data';
+import { deletePantryItem, getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
+import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { PantryOverview } from '@/components/pantry/PantryOverview';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { RecipeCard } from '@/components/pantry/RecipeCard';
 
 
 export default function PantryPage() {
@@ -29,6 +33,13 @@ export default function PantryPage() {
     const [isClient, setIsClient] = useState(false);
     const [itemInsights, setItemInsights] = useState<ItemInsights | null>(null);
     const [isFetchingInsights, setIsFetchingInsights] = useState(false);
+
+    // State for recipe generator
+    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
+    const [isLoadingRecipes, setIsLoadingRecipes] = useState(true);
+    const [recipeFilters, setRecipeFilters] = useState({ quickMeals: false, filipinoDishes: false });
+
 
     useEffect(() => {
         setIsClient(true);
@@ -124,6 +135,76 @@ export default function PantryPage() {
         return Array.from(locations);
     }, [liveItems]);
 
+    // --- Recipe Generator Logic ---
+    const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
+        setIsLoadingRecipes(true);
+        try {
+            const pantryItemNames = liveItems.map((item) => item.name);
+            if (pantryItemNames.length === 0) {
+                setRecipes([]);
+                return;
+            }
+            const result = await suggestRecipes({
+                pantryItems: pantryItemNames,
+                preferences: recipeFilters,
+                history: currentRecipes.map(r => r.name),
+            });
+            const recipesWithIds = result.recipes.map(r => ({ ...r, id: crypto.randomUUID() }));
+            setRecipes(recipesWithIds);
+        } catch (error) {
+            console.error('Failed to fetch recipes:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Could not get recipes',
+                description: 'An error occurred while generating recipe ideas. Please try again.',
+            });
+        } finally {
+            setIsLoadingRecipes(false);
+        }
+    }, [liveItems, recipeFilters, toast]);
+
+    useEffect(() => {
+        if (pantryInitialized) {
+            fetchRecipes([]); // Initial fetch
+        }
+    }, [pantryInitialized, recipeFilters, fetchRecipes]);
+    
+    useEffect(() => {
+        const loadSaved = async () => {
+            if(user) {
+                const saved = await getSavedRecipes(user.uid);
+                setSavedRecipeIds(new Set(saved.map(r => r.id)));
+            }
+        }
+        loadSaved();
+    }, [user]);
+    
+    const handleToggleRecipeFilter = (filter: 'quickMeals' | 'filipinoDishes') => {
+        setRecipeFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
+    }
+
+    const handleToggleSave = async (recipe: Recipe) => {
+        if (!user) return;
+        const isSaved = savedRecipeIds.has(recipe.id);
+        try {
+            if (isSaved) {
+                await unsaveRecipe(user.uid, recipe.id);
+                setSavedRecipeIds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(recipe.id);
+                    return newSet;
+                });
+                toast({ title: 'Recipe Unsaved' });
+            } else {
+                await saveRecipe(user.uid, recipe);
+                setSavedRecipeIds(prev => new Set(prev).add(recipe.id));
+                toast({ title: 'Recipe Saved!' });
+            }
+        } catch(e) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Could not update saved recipes.' });
+        }
+    };
+
 
     if (!isClient || !pantryInitialized) {
         return (
@@ -213,6 +294,52 @@ export default function PantryPage() {
                             <p className='text-sm'>Try adjusting your search or filters.</p>
                         </div>
                     )}
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>🍳 Recipe Ideas</CardTitle>
+                            <CardDescription>AI-powered suggestions based on your pantry items.</CardDescription>
+                            <div className="flex gap-2 pt-2">
+                                <Button size="sm" variant={recipeFilters.quickMeals ? 'default' : 'outline'} onClick={() => handleToggleRecipeFilter('quickMeals')}>
+                                    ⚡ Quick Meals
+                                </Button>
+                                <Button size="sm" variant={recipeFilters.filipinoDishes ? 'default' : 'outline'} onClick={() => handleToggleRecipeFilter('filipinoDishes')}>
+                                    🇵🇭 Filipino
+                                </Button>
+                                <Button size="sm" variant="outline" onClick={() => fetchRecipes(recipes)} disabled={isLoadingRecipes || liveItems.length === 0}>
+                                    <RefreshCw className={`mr-2 h-4 w-4 ${isLoadingRecipes ? 'animate-spin' : ''}`} />
+                                    More Recipes
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {isLoadingRecipes ? (
+                                <div className="flex justify-center items-center h-40">
+                                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                </div>
+                            ) : recipes.length > 0 ? (
+                                <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
+                                    {recipes.map((recipe, index) => (
+                                        <AccordionItem value={`item-${index}`} key={recipe.id}>
+                                            <AccordionTrigger className='font-semibold'>{recipe.name}</AccordionTrigger>
+                                            <AccordionContent>
+                                                <RecipeCard
+                                                    recipe={recipe}
+                                                    isSaved={savedRecipeIds.has(recipe.id)}
+                                                    onToggleSave={handleToggleSave}
+                                                />
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            ) : (
+                                <p className="text-center text-muted-foreground py-8">
+                                    No recipe suggestions available. Try adding more items to your pantry!
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+
                 </main>
             </div>
             {selectedItem && (
