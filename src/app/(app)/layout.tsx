@@ -1,68 +1,36 @@
 
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { SidebarProvider, Sidebar, SidebarInset } from '@/components/ui/sidebar';
+import { useEffect, type ReactNode } from 'react';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
-import type { User } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
-import { auth, cleanupFirestore } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { initializeUserCache, cleanupListeners } from '@/lib/data';
+import { Sidebar, SidebarInset } from '@/components/ui/sidebar';
+import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 
+
 export default function AppLayout({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        const currentUser = {
-          uid: firebaseUser.uid,
-          name: firebaseUser.displayName,
-          email: firebaseUser.email,
-        };
-        setUser(currentUser);
-        // Initialize Firestore listeners for the logged-in user
-        initializeUserCache(currentUser.uid);
-      } else {
-        // User is signed out
-        setUser(null);
-        // Clean up any active listeners
-        cleanupListeners();
-        // Optional: clear persistent storage if desired, though Firestore handles this well
-        // cleanupFirestore(); 
-        router.replace('/login');
-      }
-      setIsLoading(false);
-    });
+    if (!isLoading && !user) {
+      router.replace('/login');
+    }
+    if (user) {
+        initializeUserCache(user.uid);
+    }
+  }, [user, isLoading, router]);
 
-    return () => {
-        unsubscribe();
-        // Final cleanup when the layout unmounts
-        cleanupListeners();
-    };
-  }, [router]);
-
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
-      <div className="flex h-screen w-full items-center justify-center p-4">
-         <div className="flex items-center space-x-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-            </div>
-          </div>
+      <div className="flex h-screen items-center justify-center">
+        {/* You can replace this with a proper loading spinner component */}
+        <div>Loading...</div>
       </div>
     );
-  }
-  
-  if (!user) {
-      return null; // The router will redirect.
   }
 
   return (
@@ -70,10 +38,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <Sidebar>
         <SidebarNav user={user} />
       </Sidebar>
-      <SidebarInset>
-        {children}
-        <FloatingChatAssistant />
-      </SidebarInset>
+      <SidebarInset>{children}</SidebarInset>
+      <FloatingChatAssistant />
     </SidebarProvider>
   );
 }
