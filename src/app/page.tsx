@@ -20,6 +20,7 @@ export default function HomePage() {
     }
   }, [user, isLoading, router]);
 
+  // Render a loading state while checking auth status
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background p-4">
       <div className="flex flex-col items-center gap-4">
