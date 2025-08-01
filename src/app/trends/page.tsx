@@ -2,11 +2,12 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
 import Image from 'next/image';
@@ -42,6 +43,7 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 
 
 export default function TrendsPage() {
+  const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
   const { insights, insightsInitialized } = useInsightStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
@@ -135,12 +137,18 @@ export default function TrendsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Waste Analytics</h1>
-        <p className="text-muted-foreground">
-          Track patterns, view insights, and reduce your waste.
-        </p>
-      </div>
+       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Waste Analytics</h1>
+                <p className="text-muted-foreground">
+                    Track patterns, view insights, and reduce your waste.
+                </p>
+            </div>
+            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap">
+                <Trash className="w-5 h-5 md:mr-2" />
+                <span className='hidden md:inline'>Log Waste</span>
+            </Button>
+        </div>
 
       {!logsInitialized || !insightsInitialized ? (
           <div className="flex h-64 w-full items-center justify-center p-4">
