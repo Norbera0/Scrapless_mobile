@@ -42,7 +42,6 @@ export function SidebarNav({ user }: { user: User }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/log-waste?method=camera', label: 'Log Waste', icon: Camera },
     { href: '/pantry', label: 'Pantry', icon: Warehouse },
     { href: '/trends', label: 'Trends', icon: BarChart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
