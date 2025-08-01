@@ -200,7 +200,7 @@ export const GetItemInsightsOutputSchema = z.object({
     wastePreventionTip: z.string().describe("A smart tip to prevent this item from being wasted."),
     recipes: z.array(
       z.object({
-        id: z.string().describe("A unique ID for the recipe."),
+        id: z.string().describe("A unique ID for the recipe, in slug format (e.g. 'chicken-adobo')."),
         name: z.string().describe("The name of the recipe."),
         description: z.string().describe("A short, enticing description of the recipe."),
         difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The cooking difficulty."),

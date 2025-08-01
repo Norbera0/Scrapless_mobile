@@ -42,20 +42,20 @@ const prompt = ai.definePrompt({
   input: { schema: GetItemInsightsInputSchema },
   output: { schema: GetItemInsightsOutputSchema },
   prompt: `You are an AI assistant for "Scrapless", an app helping users in the Philippines reduce food waste.
-For the following food item, provide practical advice tailored to a Filipino household.
+Your task is to provide a complete and practical insight package for a single food item.
 
 **Food Item Details:**
 - Name: {{name}}
 - Amount: {{estimatedAmount}}
 - Estimated Expiration: {{estimatedExpirationDate}}
-- Estimated Cost: ₱{{estimatedCost}}
+- Estimated Cost: ₱{{#if estimatedCost}}{{estimatedCost}}{{else}}N/A{{/if}}
 
 **Your Task:**
-Generate a concise and helpful insight package for this single item.
+Generate a concise and helpful insight package. You **MUST** provide a value for all three of the following sections: 'storageTip', 'wastePreventionTip', and 'recipes'.
 
 1.  **Storage Optimization Tip (storageTip)**: Provide one clear, actionable tip on how to best store this specific item to maximize its freshness, considering a typical Filipino kitchen environment.
 2.  **Waste Prevention Tip (wastePreventionTip)**: Give one smart, actionable tip on how to use this item up before it spoils. Be encouraging and focus on the positive outcome (e.g., saving money).
-3.  **Recipe Ideas (recipes)**: Suggest 2-3 simple and practical recipes that prominently feature this item. The recipes should be easy to make and suitable for Filipino tastes. For each recipe, provide the name, a brief description, difficulty, and cooking time.
+3.  **Recipe Ideas (recipes)**: Suggest 2-3 simple and practical recipes that prominently feature this item. The recipes should be easy to make and suitable for Filipino tastes. For each recipe, provide the id, name, a brief description, difficulty, and cooking time.
 `,
 });
 
