@@ -102,93 +102,302 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Better mobile scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better mobile typography */
+  @media (max-width: 768px) {
+    html {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
   }
 }
 
 @layer utilities {
+    /* Enhanced mobile interactions */
+    .touch-target {
+        min-height: 44px; /* Apple's recommended minimum touch target */
+        min-width: 44px;
+    }
+    
+    .safe-area-inset-top {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .safe-area-inset-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* Improved mobile scrolling */
+    .scroll-smooth-mobile {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better mobile form inputs */
+    .mobile-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+        transform: translateZ(0); /* Force hardware acceleration */
+    }
+    
+    /* Enhanced mobile gestures */
+    .swipe-gesture {
+        touch-action: pan-y; /* Allow vertical scrolling but prevent horizontal */
+    }
+    
     .prediction-panel {
         transform: translateX(110%);
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
     }
     .prediction-panel.show {
         transform: translateX(0);
     }
+    
     .notification-badge {
         animation: pulse 2s infinite;
     }
+    
     @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+        0%, 100% { 
+            opacity: 1; 
+            transform: scale(1);
+        }
+        50% { 
+            opacity: 0.8; 
+            transform: scale(1.05);
+        }
     }
+    
+    /* Enhanced carousel with better mobile support */
     .carousel-dots {
         display: flex;
         justify-content: center;
-        gap: 6px;
-        margin-top: 12px;
+        gap: 8px;
+        margin-top: 16px;
+        padding: 8px;
     }
     .dot {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background-color: hsl(var(--muted-foreground) / 0.4);
-        transition: background-color 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        /* Better mobile touch targets */
+        position: relative;
+    }
+    .dot::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        border-radius: 50%;
+        /* Invisible touch area */
     }
     .dot.active {
-        background-color: hsl(var(--foreground));
+        background-color: hsl(var(--primary));
+        transform: scale(1.2);
     }
-
+    
+    /* Modern glass effects */
     .glass-card {
         @apply bg-card/80 backdrop-blur-lg border border-border/30;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
+    
+    .glass-subtle {
+        @apply bg-card/60 backdrop-blur-md border border-border/20;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+    
+    /* Enhanced gradients */
     .gradient-bg {
-       @apply bg-gradient-to-br from-[#0A400C] to-[#819067];
+       @apply bg-gradient-to-br from-primary to-primary/80;
     }
+    
+    .gradient-border {
+        background: linear-gradient(white, white) padding-box,
+                   linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.5)) border-box;
+        border: 2px solid transparent;
+    }
+    
+    /* Better modal animations */
     .modal-overlay {
         @apply bg-black/40 backdrop-blur-sm;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
     .modal {
         transform: translateY(100%);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
     }
     .modal.show {
         transform: translateY(0);
     }
+    
+    /* Enhanced pantry item interactions */
     .pantry-item {
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         transform: translateZ(0);
+        will-change: transform;
     }
     .pantry-item:hover {
-        transform: translateY(-2px);
-        @apply shadow-2xl;
+        transform: translateY(-4px) scale(1.02);
+        @apply shadow-xl;
     }
     .pantry-item:active {
-        transform: translateY(0);
+        transform: translateY(-1px) scale(0.98);
+        transition-duration: 0.1s;
     }
+    
+    /* Better mobile active states */
+    @media (max-width: 768px) {
+        .pantry-item:hover {
+            transform: none; /* Disable hover on mobile */
+        }
+        .pantry-item:active {
+            transform: scale(0.95);
+            transition-duration: 0.1s;
+        }
+    }
+    
+    /* Enhanced focus states for accessibility */
     .search-focus {
-        @apply focus:ring-2 focus:ring-ring/50;
+        @apply focus:ring-2 focus:ring-primary/50 focus:border-primary;
+        transition: all 0.2s ease;
     }
+    
+    /* Status indicators with better visual feedback */
     .status-urgent {
         @apply bg-gradient-to-r from-red-400 to-red-500;
+        box-shadow: 0 4px 12px hsl(0 100% 50% / 0.3);
     }
     .status-warning {
         @apply bg-gradient-to-r from-amber-400 to-amber-500;
+        box-shadow: 0 4px 12px hsl(45 100% 50% / 0.3);
     }
     .status-fresh {
         @apply bg-gradient-to-r from-green-400 to-green-500;
+        box-shadow: 0 4px 12px hsl(120 100% 50% / 0.3);
     }
+    
+    /* Interactive location chips */
     .location-chip {
         @apply bg-secondary text-secondary-foreground border border-border;
+        transition: all 0.2s ease;
+        cursor: pointer;
     }
     .location-chip:hover {
-        @apply bg-primary/20;
+        @apply bg-primary/20 border-primary/30;
+        transform: translateY(-1px);
     }
+    .location-chip:active {
+        transform: translateY(0);
+    }
+    
+    /* Enhanced card types with subtle animations */
     .ai-insight-card {
-        @apply bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-200;
+        @apply bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200;
+        animation: glow-purple 3s ease-in-out infinite alternate;
     }
+    
     .recipe-card {
-        @apply bg-gradient-to-r from-yellow-100 to-yellow-200 border border-yellow-200;
+        @apply bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200;
+        animation: glow-orange 3s ease-in-out infinite alternate;
     }
+    
     .tip-card {
-        @apply bg-gradient-to-r from-teal-100 to-teal-200 border border-teal-200;
+        @apply bg-gradient-to-br from-teal-50 to-teal-100 border border-teal-200;
+        animation: glow-teal 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow-purple {
+        0% { box-shadow: 0 0 5px hsl(250 100% 80% / 0.3); }
+        100% { box-shadow: 0 0 15px hsl(250 100% 80% / 0.5); }
+    }
+    
+    @keyframes glow-orange {
+        0% { box-shadow: 0 0 5px hsl(25 100% 80% / 0.3); }
+        100% { box-shadow: 0 0 15px hsl(25 100% 80% / 0.5); }
+    }
+    
+    @keyframes glow-teal {
+        0% { box-shadow: 0 0 5px hsl(180 100% 80% / 0.3); }
+        100% { box-shadow: 0 0 15px hsl(180 100% 80% / 0.5); }
+    }
+    
+    /* Better loading states */
+    .loading-pulse {
+        animation: loading-pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes loading-pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
+    /* Enhanced mobile navigation */
+    .mobile-nav {
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mobile-nav.show {
+        transform: translateY(0);
+    }
+    
+    /* Better responsive typography */
+    .responsive-text {
+        @apply text-sm sm:text-base md:text-lg;
+    }
+    
+    .responsive-heading {
+        @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
+    }
+    
+    /* Improved accessibility */
+    .focus-visible {
+        @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+    }
+    
+    /* Dark mode improvements */
+    @media (prefers-color-scheme: dark) {
+        .glass-card {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    }
+    
+    /* Reduced motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        .pantry-item,
+        .modal,
+        .prediction-panel,
+        .dot {
+            transition: none;
+            animation: none;
+        }
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+        .glass-card {
+            @apply bg-card border-2 border-border;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
     }
 }
