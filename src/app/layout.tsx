@@ -1,10 +1,11 @@
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { AppLayout } from './AppLayout';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const playfairDisplay = Playfair_Display({ subsets: ['latin'], weight: '700', variable: '--font-playfair-display' });
 
 export const metadata: Metadata = {
   title: 'Scrapless',
@@ -18,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${playfairDisplay.variable} font-body`}>
         <AppLayout>{children}</AppLayout>
         <Toaster />
       </body>

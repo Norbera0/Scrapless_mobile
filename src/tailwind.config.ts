@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
+        body: ['var(--font-inter)', 'sans-serif'],
+        playfair: ['var(--font-playfair-display)', 'serif'],
         headline: ['Inter', 'sans-serif'],
-        playfair: ['"Playfair Display"', 'serif'],
         code: ['monospace'],
       },
       colors: {
