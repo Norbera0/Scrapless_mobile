@@ -14,8 +14,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 165 73% 12%;
     
-    --primary: 34 89% 88%; /* #F2EDDB - Cream */
-    --primary-foreground: 165 73% 12%;
+    --primary: 122 81% 14%; /* #0A400C - Dark Green */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
     
     --secondary: 40 8% 90%; /* Light gray, slightly darker than background */
     --secondary-foreground: 165 73% 12%;
@@ -60,8 +60,8 @@
     --popover: 165 73% 12%;
     --popover-foreground: 40 11% 95%;
     
-    --primary: 34 89% 88%; /* #F2EDDB - Cream */
-    --primary-foreground: 165 73% 12%;
+    --primary: 122 81% 14%; /* #0A400C - Dark Green */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
     
     --secondary: 165 73% 20%;
     --secondary-foreground: 40 11% 95%;
