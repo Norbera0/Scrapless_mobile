@@ -76,7 +76,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
             {/* Add other header items like avatar here if needed */}
         </header>
-        {children}
+        <div className="bg-background">
+          {children}
+        </div>
       </SidebarInset>
       <FloatingChatAssistant />
     </SidebarProvider>
