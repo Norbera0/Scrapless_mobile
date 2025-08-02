@@ -13,7 +13,7 @@ export function FloatingChatAssistant() {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed top-6 right-6 z-50">
         <AnimatePresence>
           {!isOpen && (
             <motion.div
@@ -38,11 +38,11 @@ export function FloatingChatAssistant() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
+            exit={{ opacity: 0, y: -50 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="fixed bottom-6 right-6 z-50 w-[calc(100vw-48px)] max-w-md"
+            className="fixed top-24 right-6 z-50 w-[calc(100vw-48px)] max-w-md"
           >
             <Card className="h-[70vh] shadow-2xl flex flex-col">
               <CardHeader className="flex flex-row items-center justify-between border-b">
