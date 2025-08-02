@@ -21,7 +21,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
 
     return (
         <Dialog>
-            <Card className={cn("overflow-hidden h-full flex flex-col group", isUrgent ? "bg-amber-50 border-amber-200" : "bg-white" )}>
+            <Card className={cn("overflow-hidden h-full flex flex-col group", isUrgent ? "bg-amber-500/10 border-amber-500/30" : "bg-card" )}>
                 <CardHeader className="p-0 relative">
                     <DialogTrigger asChild>
                         <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
@@ -37,7 +37,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                     </DialogTrigger>
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                         {recipe.tags?.map(tag => (
-                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'default'} className="shadow-lg">
+                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg">
                                 {tag === 'Urgent' ? <Zap className="h-3 w-3 mr-1" /> : <Leaf className="h-3 w-3 mr-1" />}
                                 {tag}
                             </Badge>
@@ -56,7 +56,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         <div className="flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
-                <CardFooter className="p-4 bg-background/30">
+                <CardFooter className="p-4 bg-secondary/30">
                      <div className="flex items-center text-xs text-primary font-semibold">
                        <Globe className="h-3 w-3 mr-1.5" />
                        <p>{recipe.benefit}</p>

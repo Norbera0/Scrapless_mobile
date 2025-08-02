@@ -118,24 +118,24 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="gradient-bg min-h-screen">
+    <div className="gradient-bg min-h-screen text-white">
       <div className="min-h-screen pb-20">
         {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
+        <header className="bg-transparent backdrop-blur-sm sticky top-0 z-20">
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div>
-                            <h1 className="text-xl font-semibold text-gray-800">
+                            <h1 className="text-xl font-semibold">
                                {greeting}, {user?.name?.split(' ')[0] || 'User'}! 👋
                             </h1>
-                            <p className="text-sm text-gray-500">Let's reduce waste together</p>
+                            <p className="text-sm text-gray-300">Let's reduce waste together</p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-gray-600 hover:text-gray-800" onClick={handleBellClick}>
+                        <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-gray-300 hover:text-white" onClick={handleBellClick}>
                             <Bell className="w-6 h-6" />
-                            {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full notification-badge"></span>}
+                            {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full notification-badge"></span>}
                         </Button>
                         <Avatar className="w-8 h-8">
                            <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
@@ -150,13 +150,13 @@ export default function DashboardPage() {
           id="predictionPanel" 
           ref={predictionPanelRef} 
           className={cn(
-            "fixed top-0 right-0 w-full md:w-1/2 md:max-w-md bg-white border-b md:border-l border-gray-200 shadow-lg z-30 prediction-panel",
+            "fixed top-0 right-0 w-full md:w-1/2 md:max-w-md bg-white text-foreground border-b md:border-l border-border shadow-lg z-30 prediction-panel",
             isPredictionPanelOpen && 'show'
           )}
         >
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-lg font-medium text-gray-800">AI Notifications</h3>
+                    <h3 className="text-lg font-medium">AI Notifications</h3>
                     <Button variant="ghost" size="icon" onClick={() => setIsPredictionPanelOpen(false)} className="p-1 text-gray-400 hover:text-gray-600">
                         <X className="w-5 h-5" />
                     </Button>
@@ -200,25 +200,25 @@ export default function DashboardPage() {
                     <CarouselContent className="-ml-4">
                         {itemsExpiringToday.length > 0 && (
                             <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                                <Card className="focus-card bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl shadow-sm h-full">
+                                <Card className="focus-card bg-primary/80 border border-orange-400 rounded-xl shadow-sm h-full text-white">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
-                                                <h2 className="text-lg font-semibold text-amber-900">🚨 Use It Now!</h2>
-                                                <p className="text-sm text-amber-700">Items expiring today</p>
+                                                <h2 className="text-lg font-semibold">🚨 Use It Now!</h2>
+                                                <p className="text-sm text-orange-200">Items expiring today</p>
                                             </div>
-                                            <div className="w-8 h-8 bg-amber-200 rounded-full flex items-center justify-center">
-                                                <AlertTriangle className="w-4 h-4 text-amber-700" />
+                                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                                <AlertTriangle className="w-4 h-4" />
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-3 mb-4">
                                             {itemsExpiringToday.slice(0, 2).map(item => (
                                                 <div key={item.id} className="flex items-center space-x-2">
-                                                    <span className="text-sm font-medium text-gray-800">{item.name}</span>
+                                                    <span className="text-sm font-medium">{item.name}</span>
                                                 </div>
                                             ))}
                                         </div>
-                                        <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white" onClick={() => router.push('/pantry')}>
+                                        <Button className="w-full bg-white hover:bg-gray-200 text-primary" onClick={() => router.push('/pantry')}>
                                             Find Recipes for These Items →
                                         </Button>
                                     </CardContent>
@@ -227,23 +227,23 @@ export default function DashboardPage() {
                         )}
                         {latestInsight && (
                             <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                                 <Card className="focus-card bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl shadow-sm h-full">
+                                 <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
                                      <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
-                                                <h2 className="text-lg font-semibold text-purple-900">✨ {latestInsight.patternAlert}</h2>
-                                                <p className="text-sm text-purple-700">Fresh AI insight</p>
+                                                <h2 className="text-lg font-semibold">✨ {latestInsight.patternAlert}</h2>
+                                                <p className="text-sm text-gray-300">Fresh AI insight</p>
                                             </div>
-                                            <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-                                                <Brain className="w-4 h-4 text-purple-700" />
+                                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                                <Brain className="w-4 h-4" />
                                             </div>
                                         </div>
-                                        <div className="bg-white/60 rounded-lg p-4 mb-4">
-                                            <p className="text-sm text-purple-800 leading-relaxed">
+                                        <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                            <p className="text-sm leading-relaxed">
                                                 {latestInsight.smartTip}
                                             </p>
                                         </div>
-                                        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                                        <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                                             See Full Analysis →
                                         </Button>
                                     </CardContent>
@@ -251,94 +251,94 @@ export default function DashboardPage() {
                             </CarouselItem>
                         )}
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                             <Card className="focus-card bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl shadow-sm h-full">
+                             <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
                                  <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h2 className="text-lg font-semibold text-green-900">🎉 Great Progress!</h2>
-                                            <p className="text-sm text-green-700">This week's update</p>
+                                            <h2 className="text-lg font-semibold">🎉 Great Progress!</h2>
+                                            <p className="text-sm text-gray-300">This week's update</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
-                                            <LineChart className="w-4 h-4 text-green-700" />
+                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <LineChart className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
+                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
                                         <div className="flex items-center justify-between mb-2">
-                                            <span className="text-sm text-green-800">Waste budget</span>
-                                            <span className="text-sm font-medium text-green-800">65% used</span>
+                                            <span className="text-sm">Waste budget</span>
+                                            <span className="text-sm font-medium">65% used</span>
                                         </div>
-                                        <Progress value={65} className="h-2 [&>div]:bg-green-600" />
+                                        <Progress value={65} className="h-2 [&>div]:bg-primary" />
                                     </div>
-                                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => router.push('/my-waste')}>
+                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/my-waste')}>
                                         View Your Trends →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl shadow-sm h-full">
+                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h2 className="text-lg font-semibold text-blue-900">🛒 Shop Smart</h2>
-                                            <p className="text-sm text-blue-700">Plan your next grocery run</p>
+                                            <h2 className="text-lg font-semibold">🛒 Shop Smart</h2>
+                                            <p className="text-sm text-gray-300">Plan your next grocery run</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
-                                            <ShoppingCart className="w-4 h-4 text-blue-700" />
+                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <ShoppingCart className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
-                                        <p className="text-sm text-blue-800 leading-relaxed">
+                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                        <p className="text-sm leading-relaxed">
                                             Generate a shopping list based on what's running low in your pantry to avoid overbuying.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={() => router.push('/shopping')}>
+                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/shopping')}>
                                         Go to Shopping Hub →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                          <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl shadow-sm h-full">
+                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h2 className="text-lg font-semibold text-yellow-900">🍳 Find a Recipe</h2>
-                                            <p className="text-sm text-yellow-700">Use what you have</p>
+                                            <h2 className="text-lg font-semibold">🍳 Find a Recipe</h2>
+                                            <p className="text-sm text-gray-300">Use what you have</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
-                                            <Utensils className="w-4 h-4 text-yellow-700" />
+                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <Utensils className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
-                                        <p className="text-sm text-yellow-800 leading-relaxed">
+                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                        <p className="text-sm leading-relaxed">
                                             Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => router.push('/pantry')}>
+                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/pantry')}>
                                         Find Recipes →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl shadow-sm h-full">
+                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
-                                            <h2 className="text-lg font-semibold text-red-900">🗑️ Log Waste</h2>
-                                            <p className="text-sm text-red-700">Track to get smarter</p>
+                                            <h2 className="text-lg font-semibold">🗑️ Log Waste</h2>
+                                            <p className="text-sm text-gray-300">Track to get smarter</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
-                                            <Trash className="w-4 h-4 text-red-700" />
+                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <Trash className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-white/60 rounded-lg p-4 mb-4">
-                                        <p className="text-sm text-red-800 leading-relaxed">
+                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                        <p className="text-sm leading-relaxed">
                                             Quickly log any food you waste to help the AI find your patterns and save you money.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-red-600 hover:bg-red-700 text-white" onClick={() => router.push('/log-waste?method=camera')}>
+                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/log-waste?method=camera')}>
                                         Log Waste Now →
                                     </Button>
                                 </CardContent>
@@ -354,20 +354,20 @@ export default function DashboardPage() {
             </div>
 
             {/* Main Impact Card */}
-            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
                 <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">THIS WEEK'S IMPACT</h3>
+                    <h3 className="text-lg font-semibold mb-4">THIS WEEK'S IMPACT</h3>
                     <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-red-600 mb-1">₱{weeklyStats.totalPesoValue.toFixed(2)}</div>
-                            <div className="text-sm text-gray-600">💸 Financial Leakage</div>
+                            <div className="text-2xl font-bold text-primary mb-1">₱{weeklyStats.totalPesoValue.toFixed(2)}</div>
+                            <div className="text-sm text-gray-300">💸 Financial Leakage</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600 mb-1">{weeklyStats.totalCarbonFootprint.toFixed(1)}kg</div>
-                            <div className="text-sm text-gray-600">🌍 Carbon Footprint</div>
+                            <div className="text-2xl font-bold text-primary mb-1">{weeklyStats.totalCarbonFootprint.toFixed(1)}kg</div>
+                            <div className="text-sm text-gray-300">🌍 Carbon Footprint</div>
                         </div>
                     </div>
-                    <Button variant="link" className="w-full mt-4 text-blue-600 hover:text-blue-800" onClick={() => router.push('/my-waste')}>
+                    <Button variant="link" className="w-full mt-4 text-gray-300 hover:text-white" onClick={() => router.push('/my-waste')}>
                         View 7-Day Trend →
                     </Button>
                 </CardContent>
@@ -376,20 +376,20 @@ export default function DashboardPage() {
             <PantryHealthScore />
 
             {/* Primary Action Buttons */}
-            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm">
                 <CardContent className="p-5">
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="flex flex-col items-center justify-center p-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors" onClick={() => router.push('/add-to-pantry')}>
-                            <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center mb-2">
+                        <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-white" onClick={() => router.push('/add-to-pantry')}>
+                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mb-2">
                                 <PackagePlus className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-sm font-medium text-emerald-700">Add Groceries</span>
+                            <span className="text-sm font-medium">Add Groceries</span>
                         </button>
-                        <button className="flex flex-col items-center justify-center p-4 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors" onClick={() => router.push('/log-waste?method=camera')}>
-                            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mb-2">
+                        <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-white" onClick={() => router.push('/log-waste?method=camera')}>
+                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mb-2">
                                 <Trash className="w-5 h-5 text-white" />
                             </div>
-                            <span className="text-sm font-medium text-red-700">Log Food Waste</span>
+                            <span className="text-sm font-medium">Log Food Waste</span>
                         </button>
                     </div>
                 </CardContent>
@@ -397,15 +397,15 @@ export default function DashboardPage() {
 
             {/* Contextual AI Zone */}
              {latestInsight && (
-                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm">
+                <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
                     <CardContent className="p-5">
-                        <h3 className="text-base font-semibold text-blue-900 mb-3">💡 Your Smart Tip for Today</h3>
-                        <div className="bg-white/60 rounded-lg p-4 mb-4">
-                            <p className="text-sm text-blue-800 leading-relaxed">
+                        <h3 className="text-base font-semibold mb-3">💡 Your Smart Tip for Today</h3>
+                        <div className="bg-black/20 rounded-lg p-4 mb-4">
+                            <p className="text-sm leading-relaxed">
                                 {latestInsight.smartShoppingPlan}
                             </p>
                         </div>
-                        <Button variant="link" className="text-blue-700 hover:text-blue-900 p-0 h-auto" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                        <Button variant="link" className="text-gray-300 hover:text-white p-0 h-auto" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                             View Full Insight →
                         </Button>
                     </CardContent>
@@ -414,20 +414,20 @@ export default function DashboardPage() {
 
             {/* Virtual Pantry Peek */}
             {itemsExpiringSoon.length > 0 && (
-                <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
                     <CardContent className="p-5">
-                        <h3 className="text-base font-semibold text-gray-800 mb-4">PANTRY WATCHLIST</h3>
+                        <h3 className="text-base font-semibold mb-4">PANTRY WATCHLIST</h3>
                         <div className="space-y-3">
                             {itemsExpiringSoon.slice(0,2).map(item => (
-                                <div key={item.id} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <div key={item.id} className="flex items-center justify-between p-3 bg-primary/20 border border-orange-400 rounded-lg">
                                     <div className="flex items-center space-x-3">
-                                        <span className="text-sm font-medium text-gray-800">{item.name}</span>
+                                        <span className="text-sm font-medium">{item.name}</span>
                                     </div>
-                                    <span className="text-xs text-amber-700 font-medium">Expires in {Math.max(0, new Date(item.estimatedExpirationDate).getDate() - new Date().getDate())} days</span>
+                                    <span className="text-xs text-orange-200 font-medium">Expires in {Math.max(0, new Date(item.estimatedExpirationDate).getDate() - new Date().getDate())} days</span>
                                 </div>
                             ))}
                         </div>
-                         <Button variant="link" className="w-full mt-4 text-gray-600 hover:text-gray-800" onClick={() => router.push('/pantry')}>
+                         <Button variant="link" className="w-full mt-4 text-gray-300 hover:text-white" onClick={() => router.push('/pantry')}>
                             Go to Pantry →
                         </Button>
                     </CardContent>

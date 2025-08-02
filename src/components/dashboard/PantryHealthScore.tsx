@@ -78,10 +78,10 @@ export function PantryHealthScore() {
 
 
     return (
-        <Card>
+        <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
             <CardHeader>
                 <CardTitle>Pantry Health Score</CardTitle>
-                <CardDescription>Current inventory status</CardDescription>
+                <CardDescription className="text-gray-300">Current inventory status</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="flex items-center gap-4">
@@ -92,35 +92,35 @@ export function PantryHealthScore() {
                             background: `conic-gradient(hsl(var(--primary)) ${healthData.score * 3.6}deg, hsl(var(--muted)) 0deg)`,
                         }}
                     >
-                        <div className="absolute inset-2 bg-background rounded-full flex items-center justify-center">
+                        <div className="absolute inset-2 bg-foreground/50 rounded-full flex items-center justify-center">
                             <span className="text-xl font-bold">{healthData.score}%</span>
                         </div>
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Good Inventory Health</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-gray-300">
                             {healthData.fresh} items fresh, {healthData.expiring} expiring soon
                         </p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-green-100 text-green-800 p-2 rounded-lg">
+                    <div className="bg-green-500/20 text-white p-2 rounded-lg">
                         <p className="font-bold text-lg">{healthData.fresh}</p>
                         <p className="text-xs">Fresh Items</p>
                     </div>
-                     <div className="bg-yellow-100 text-yellow-800 p-2 rounded-lg">
+                     <div className="bg-yellow-500/20 text-white p-2 rounded-lg">
                         <p className="font-bold text-lg">{healthData.expiring}</p>
                         <p className="text-xs">Expiring Soon</p>
                     </div>
-                     <div className="bg-red-100 text-red-800 p-2 rounded-lg">
+                     <div className="bg-red-500/20 text-white p-2 rounded-lg">
                         <p className="font-bold text-lg">{healthData.expired}</p>
                         <p className="text-xs">Expired</p>
                     </div>
                 </div>
                 
                 {healthData.expiringThisWeek.length > 0 && (
-                    <div className="bg-secondary/50 p-3 rounded-lg">
+                    <div className="bg-black/20 p-3 rounded-lg">
                         <h4 className="text-sm font-semibold mb-2">Expiring This Week:</h4>
                          <div className="flex flex-wrap gap-2">
                              {healthData.expiringThisWeek.map((item, index) => (

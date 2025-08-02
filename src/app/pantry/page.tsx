@@ -220,7 +220,7 @@ export default function PantryPage() {
                             <input 
                                 type="text" 
                                 placeholder="Search your pantry..." 
-                                className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all search-focus"
+                                className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all search-focus"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -247,7 +247,7 @@ export default function PantryPage() {
                 
                 {urgentItems.length > 0 && (
                     <section id="urgentSection" className="space-y-3">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                        <h2 className="text-lg font-semibold flex items-center">
                             <span className="w-2 h-2 bg-red-500 rounded-full mr-3 animate-pulse"></span>
                             Use Soon ( expiring in ≤ 2 days )
                         </h2>
@@ -261,7 +261,7 @@ export default function PantryPage() {
 
                  {freshItems.length > 0 && (
                     <section id="freshSection" className="space-y-3">
-                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                        <h2 className="text-lg font-semibold flex items-center">
                             <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
                             Fresh & Good
                         </h2>
@@ -274,7 +274,7 @@ export default function PantryPage() {
                 )}
                 
                 {filteredItems.length === 0 && (
-                    <div className='text-center py-10 text-gray-500'>
+                    <div className='text-center py-10 text-muted-foreground'>
                         <p>No items found.</p>
                         <p className='text-sm'>Try adjusting your search or filters.</p>
                     </div>
@@ -282,7 +282,7 @@ export default function PantryPage() {
                 
                 <section id="recipeSection" className="space-y-3">
                      <div className="flex items-center justify-between">
-                         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                         <h2 className="text-lg font-semibold flex items-center">
                             <BookOpen className="w-5 h-5 mr-3 text-primary" />
                             Perfect Recipes For You
                         </h2>

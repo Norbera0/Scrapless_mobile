@@ -30,27 +30,27 @@ const getFreshness = (expirationDate: string) => {
 
     const daysLeft = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
-    if (daysLeft <= 0) return { label: `Expired`, color: 'status-urgent', textColor: 'text-red-800' };
-    if (daysLeft === 1) return { label: `1 day left`, color: 'status-warning', textColor: 'text-amber-800' };
-    if (daysLeft <= 3) return { label: `${daysLeft} days left`, color: 'status-warning', textColor: 'text-amber-800' };
-    return { label: 'Fresh', color: 'status-fresh', textColor: 'text-green-800' };
+    if (daysLeft <= 0) return { label: `Expired`, color: 'bg-red-500', textColor: 'text-white' };
+    if (daysLeft === 1) return { label: `1 day left`, color: 'bg-amber-500', textColor: 'text-white' };
+    if (daysLeft <= 3) return { label: `${daysLeft} days left`, color: 'bg-amber-500', textColor: 'text-white' };
+    return { label: 'Fresh', color: 'bg-green-500', textColor: 'text-white' };
 };
 
 export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryItemCardProps) {
     const freshness = getFreshness(item.estimatedExpirationDate);
 
     return (
-        <div className="pantry-item glass-card rounded-2xl p-4 cursor-pointer shadow-lg" onClick={() => onSelect(item)}>
+        <div className="pantry-item bg-card rounded-2xl p-4 cursor-pointer shadow-md" onClick={() => onSelect(item)}>
             <div className="flex items-center justify-between">
                 <div className="flex-1">
                     <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 text-base pr-2">{item.name}</h3>
+                        <h3 className="font-semibold text-foreground text-base pr-2">{item.name}</h3>
                         <span className={`${freshness.color} ${freshness.textColor} px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap`}>
                             {freshness.label.toUpperCase()}
                         </span>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center justify-between">
-                        <div className="flex items-center flex-wrap space-x-3 text-sm text-gray-600">
+                        <div className="flex items-center flex-wrap space-x-3 text-sm text-muted-foreground">
                              <span className="flex items-center whitespace-nowrap">
                                 <strong>Qty:</strong> {item.estimatedAmount}
                             </span>
@@ -66,12 +66,12 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
                            )}
                         </div>
                         <div className="flex space-x-1 mt-2 md:mt-0">
-                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); /* TODO: Implement edit */}} className="h-8 w-8 text-blue-500 hover:bg-blue-50">
+                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); /* TODO: Implement edit */}} className="h-8 w-8 text-muted-foreground hover:bg-secondary">
                                 <Edit className="w-4 h-4" />
                             </Button>
                              <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-8 w-8 text-red-500 hover:bg-red-50">
+                                    <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-8 w-8 text-destructive hover:bg-red-50">
                                         {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                     </Button>
                                 </AlertDialogTrigger>
