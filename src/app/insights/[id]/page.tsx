@@ -41,6 +41,7 @@ export default function InsightDetailPage() {
     const { toast } = useToast();
     const { insights, insightsInitialized } = useInsightStore();
     const [insight, setInsight] = useState<Insight | null>(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
     useEffect(() => {
         if (insightsInitialized) {
@@ -51,6 +52,7 @@ export default function InsightDetailPage() {
 
     const handleMarkAsActedOn = async () => {
         if (!user || !insight) return;
+        setIsUpdatingStatus(true);
         try {
             await updateInsightStatus(user.uid, insight.id, 'acted_on');
             toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
@@ -58,6 +60,8 @@ export default function InsightDetailPage() {
             setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not update insight status.' });
+        } finally {
+            setIsUpdatingStatus(false);
         }
     }
     
@@ -124,7 +128,7 @@ export default function InsightDetailPage() {
                 <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Solutions</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {insight.solutions.map((solution, index) => (
-                        <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} disabled={isActedOn} />
+                        <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} disabled={isActedOn || isUpdatingStatus} />
                     ))}
                 </div>
             </div>
