@@ -200,14 +200,14 @@ export default function DashboardPage() {
                     <CarouselContent className="-ml-4">
                         {itemsExpiringToday.length > 0 && (
                             <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                                <Card className="focus-card bg-destructive/80 border border-orange-400 rounded-xl shadow-sm h-full text-destructive-foreground">
+                                <Card className="focus-card bg-destructive/80 border-destructive rounded-xl shadow-sm h-full text-destructive-foreground">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <h2 className="text-lg font-semibold">🚨 Use It Now!</h2>
-                                                <p className="text-sm text-orange-200">Items expiring today</p>
+                                                <p className="text-sm">Items expiring today</p>
                                             </div>
-                                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <div className="w-8 h-8 bg-background/20 rounded-full flex items-center justify-center">
                                                 <AlertTriangle className="w-4 h-4" />
                                             </div>
                                         </div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <Button className="w-full bg-white hover:bg-gray-200 text-destructive" onClick={() => router.push('/pantry')}>
+                                        <Button className="w-full bg-background hover:bg-muted text-foreground" onClick={() => router.push('/pantry')}>
                                             Find Recipes for These Items →
                                         </Button>
                                     </CardContent>
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                                                 {latestInsight.smartTip}
                                             </p>
                                         </div>
-                                        <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                                        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                                             See Full Analysis →
                                         </Button>
                                     </CardContent>
@@ -267,9 +267,9 @@ export default function DashboardPage() {
                                             <span className="text-sm">Waste budget</span>
                                             <span className="text-sm font-medium">65% used</span>
                                         </div>
-                                        <Progress value={65} className="h-2 [&>div]:bg-orange-500" />
+                                        <Progress value={65} className="h-2 [&>div]:bg-primary" />
                                     </div>
-                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/my-waste')}>
+                                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80" onClick={() => router.push('/my-waste')}>
                                         View Your Trends →
                                     </Button>
                                 </CardContent>
@@ -292,7 +292,7 @@ export default function DashboardPage() {
                                             Generate a shopping list based on what's running low in your pantry to avoid overbuying.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/shopping')}>
+                                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80" onClick={() => router.push('/shopping')}>
                                         Go to Shopping Hub →
                                     </Button>
                                 </CardContent>
@@ -315,7 +315,7 @@ export default function DashboardPage() {
                                             Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/pantry')}>
+                                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80" onClick={() => router.push('/pantry')}>
                                         Find Recipes →
                                     </Button>
                                 </CardContent>
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                                             Quickly log any food you waste to help the AI find your patterns and save you money.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/log-waste?method=camera')}>
+                                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80" onClick={() => router.push('/log-waste?method=camera')}>
                                         Log Waste Now →
                                     </Button>
                                 </CardContent>
@@ -380,13 +380,13 @@ export default function DashboardPage() {
                 <CardContent className="p-5">
                     <div className="grid grid-cols-2 gap-4">
                         <button className="flex flex-col items-center justify-center p-4 bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-colors text-secondary-foreground" onClick={() => router.push('/add-to-pantry')}>
-                            <div className="w-10 h-10 bg-foreground/10 text-foreground rounded-full flex items-center justify-center mb-2">
+                            <div className="w-10 h-10 bg-background text-foreground rounded-full flex items-center justify-center mb-2">
                                 <PackagePlus className="w-5 h-5" />
                             </div>
                             <span className="text-sm font-medium">Add Groceries</span>
                         </button>
                         <button className="flex flex-col items-center justify-center p-4 bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-colors text-secondary-foreground" onClick={() => router.push('/log-waste?method=camera')}>
-                            <div className="w-10 h-10 bg-foreground/10 text-foreground rounded-full flex items-center justify-center mb-2">
+                            <div className="w-10 h-10 bg-background text-foreground rounded-full flex items-center justify-center mb-2">
                                 <Trash className="w-5 h-5" />
                             </div>
                             <span className="text-sm font-medium">Log Food Waste</span>

@@ -89,7 +89,7 @@ export function PantryHealthScore() {
                         className="relative h-20 w-20"
                         style={{
                             borderRadius: '50%',
-                            background: `conic-gradient(hsl(var(--ring)) ${healthData.score * 3.6}deg, hsl(var(--muted)) 0deg)`,
+                            background: `conic-gradient(hsl(var(--primary)) ${healthData.score * 3.6}deg, hsl(var(--muted)) 0deg)`,
                         }}
                     >
                         <div className="absolute inset-2 bg-background rounded-full flex items-center justify-center">
@@ -120,7 +120,7 @@ export function PantryHealthScore() {
                 </div>
                 
                 {healthData.expiringThisWeek.length > 0 && (
-                    <div className="bg-background p-3 rounded-lg">
+                    <div className="bg-secondary/50 p-3 rounded-lg">
                         <h4 className="text-sm font-semibold mb-2">Expiring This Week:</h4>
                          <div className="flex flex-wrap gap-2">
                              {healthData.expiringThisWeek.map((item, index) => (
