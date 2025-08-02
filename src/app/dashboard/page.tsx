@@ -368,9 +368,6 @@ export default function DashboardPage() {
                             <div className="text-sm text-muted-foreground">🌍 Carbon Footprint</div>
                         </div>
                     </div>
-                    <Button variant="link" className="w-full mt-4 text-muted-foreground hover:text-foreground" onClick={() => router.push('/my-waste')}>
-                        View 7-Day Trend →
-                    </Button>
                 </CardContent>
             </Card>
 
