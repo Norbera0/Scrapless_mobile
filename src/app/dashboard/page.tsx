@@ -138,7 +138,7 @@ export default function DashboardPage() {
                             {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full notification-badge"></span>}
                         </Button>
                         <Avatar className="w-8 h-8">
-                           <AvatarFallback className='bg-secondary'>{getInitials(user?.name)}</AvatarFallback>
+                           <AvatarFallback className='bg-primary text-primary-foreground'>{getInitials(user?.name)}</AvatarFallback>
                         </Avatar>
                     </div>
                 </div>
@@ -397,11 +397,11 @@ export default function DashboardPage() {
 
             {/* Contextual AI Zone */}
              {latestInsight && (
-                <Card className="bg-secondary border-border rounded-xl shadow-sm text-secondary-foreground">
+                <Card className="bg-primary/20 border-border rounded-xl shadow-sm text-primary-foreground">
                     <CardContent className="p-5">
-                        <h3 className="text-base font-semibold mb-3">💡 Your Smart Tip for Today</h3>
+                        <h3 className="text-base font-semibold mb-3 text-foreground">💡 Your Smart Tip for Today</h3>
                         <div className="bg-background/50 rounded-lg p-4 mb-4">
-                            <p className="text-sm leading-relaxed">
+                            <p className="text-sm leading-relaxed text-foreground">
                                 {latestInsight.smartShoppingPlan}
                             </p>
                         </div>

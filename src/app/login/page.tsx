@@ -12,7 +12,7 @@ export default function LoginPage() {
         </div>
         <h1 className="text-3xl font-bold text-center text-foreground">Scrapless</h1>
       </div>
-      <Card className="w-full max-w-sm shadow-lg">
+      <Card className="w-full max-w-sm shadow-lg bg-card text-card-foreground">
         <CardHeader>
           <CardTitle className="text-2xl">Welcome!</CardTitle>
           <CardDescription>Sign in or create an account to continue.</CardDescription>

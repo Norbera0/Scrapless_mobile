@@ -9,31 +9,39 @@
 
 @layer base {
   :root {
-    --background: 60 8% 95%; /* #F2F1F0 */
-    --foreground: 80 16% 48%; /* #819067 */
-    --card: 60 8% 95%; /* #F2F1F0 */
-    --card-foreground: 122 81% 14%;
-    --popover: 60 8% 95%;
-    --popover-foreground: 122 81% 14%;
-    --primary: 122 81% 14%; /* #0A400C */
-    --primary-foreground: 48 83% 94%;
-    --secondary: 55 18% 60%; /* #B1AB86 */
-    --secondary-foreground: 122 81% 14%;
-    --muted: 55 18% 60%;
-    --muted-foreground: 122 81% 25%;
-    --accent: 80 16% 48%;
-    --accent-foreground: 48 83% 94%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 55 18% 80%;
-    --input: 55 18% 80%;
-    --ring: 122 81% 14%;
+    --background: 40 11% 95%; /* #F2F1F0 */
+    --foreground: 165 73% 12%; /* #063627 */
+    
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 165 73% 12%; /* #063627 */
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 165 73% 12%;
+    
+    --primary: 34 89% 88%; /* #F2EDDB - Cream */
+    --primary-foreground: 165 73% 12%;
+    
+    --secondary: 40 8% 90%; /* Light gray, slightly darker than background */
+    --secondary-foreground: 165 73% 12%;
+    
+    --muted: 40 8% 90%;
+    --muted-foreground: 165 73% 25%;
+    
+    --accent: 34 89% 88%;
+    --accent-foreground: 165 73% 12%;
+    
+    --destructive: 13 100% 50%; /* #FF3C00 - Vibrant Orange */
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 40 8% 85%;
+    --input: 40 8% 85%;
+    --ring: 13 100% 50%; /* Vibrant Orange */
 
-    --chart-1: 80 16% 48%;
-    --chart-2: 122 81% 14%;
-    --chart-3: 55 18% 60%;
-    --chart-4: 80 30% 40%;
-    --chart-5: 122 50% 30%;
+    --chart-1: 165 73% 20%;
+    --chart-2: 13 100% 60%;
+    --chart-3: 34 89% 80%;
+    --chart-4: 165 40% 40%;
+    --chart-5: 13 80% 70%;
     --radius: 0.5rem;
     --sidebar-width: 16rem;
     --sidebar-width-icon: 3rem;
@@ -47,31 +55,40 @@
     --sidebar-ring: hsl(var(--ring));
   }
   .dark {
-    --background: 122 81% 14%; /* #0A400C */
-    --foreground: 48 83% 94%; /* #FEFAE0 */
-    --card: 122 81% 14%;
-    --card-foreground: 48 83% 94%;
-    --popover: 122 81% 14%;
-    --popover-foreground: 48 83% 94%;
-    --primary: 48 83% 94%; /* #FEFAE0 */
-    --primary-foreground: 122 81% 14%; /* #0A400C */
-    --secondary: 55 18% 30%; /* Darker #B1AB86 */
-    --secondary-foreground: 48 83% 94%;
-    --muted: 55 18% 30%;
-    --muted-foreground: 48 83% 80%;
-    --accent: 80 16% 48%;
-    --accent-foreground: 48 83% 94%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 55 18% 25%;
-    --input: 55 18% 25%;
-    --ring: 48 83% 94%;
+    --background: 165 73% 12%; /* #063627 */
+    --foreground: 40 11% 95%; /* #F2F1F0 */
     
-    --chart-1: 80 16% 48%;
-    --chart-2: 48 83% 94%;
-    --chart-3: 55 18% 60%;
-    --chart-4: 80 30% 60%;
-    --chart-5: 122 50% 50%;
+    --card: 165 73% 15%; 
+    --card-foreground: 40 11% 95%;
+    
+    --popover: 165 73% 12%;
+    --popover-foreground: 40 11% 95%;
+    
+    --primary: 34 89% 88%; /* #F2EDDB - Cream */
+    --primary-foreground: 165 73% 12%;
+    
+    --secondary: 165 73% 20%;
+    --secondary-foreground: 40 11% 95%;
+    
+    --muted: 165 73% 20%;
+    --muted-foreground: 40 11% 80%;
+    
+    --accent: 34 89% 88%;
+    --accent-foreground: 165 73% 12%;
+    
+    --destructive: 13 100% 50%; /* #FF3C00 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 165 73% 25%;
+    --input: 165 73% 25%;
+    --ring: 13 100% 50%;
+    
+    --chart-1: 40 11% 85%;
+    --chart-2: 13 100% 70%;
+    --chart-3: 34 89% 70%;
+    --chart-4: 165 40% 60%;
+    --chart-5: 13 80% 80%;
+    
     --sidebar-background: hsl(var(--background));
     --sidebar-foreground: hsl(var(--foreground));
     --sidebar-primary: hsl(var(--primary));
