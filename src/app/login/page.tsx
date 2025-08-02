@@ -10,7 +10,7 @@ export default function LoginPage() {
         <div className="bg-primary text-primary-foreground rounded-full p-4">
             <PackagePlus className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-bold text-center text-foreground font-playfair">Scrapless</h1>
+        <h1 className="text-3xl font-bold text-center text-foreground">Scrapless</h1>
       </div>
       <Card className="w-full max-w-sm shadow-lg bg-card text-card-foreground">
         <CardHeader>
