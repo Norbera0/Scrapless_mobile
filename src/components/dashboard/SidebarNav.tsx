@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart, Utensils, PanelLeft } from 'lucide-react';
+import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart, Utensils, PanelLeft, PackagePlus } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -79,7 +79,7 @@ export function SidebarNav({ user }: { user: User }) {
     <>
       <SidebarHeader className="p-4 flex items-center justify-between">
         <div className={cn("flex items-center gap-3", sidebarState === 'collapsed' && 'hidden')}>
-          <Bot className="h-8 w-8 text-primary" />
+          <PackagePlus className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold font-playfair">Scrapless</span>
         </div>
       </SidebarHeader>
