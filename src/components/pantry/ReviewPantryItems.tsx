@@ -77,7 +77,7 @@ export function ReviewPantryItems() {
       carbonFootprint: 0,
       estimatedCost: 0,
     };
-    setItems([...items, newItem]);
+    setItems([newItem, ...items]);
   };
 
   const handleConfirmAndSave = async () => {
