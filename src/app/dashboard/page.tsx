@@ -118,10 +118,10 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="gradient-bg min-h-screen text-white">
+    <div className="bg-background text-foreground min-h-screen">
       <div className="min-h-screen pb-20">
         {/* Header */}
-        <header className="bg-transparent backdrop-blur-sm sticky top-0 z-20">
+        <header className="bg-transparent sticky top-0 z-20">
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -129,16 +129,16 @@ export default function DashboardPage() {
                             <h1 className="text-xl font-semibold">
                                {greeting}, {user?.name?.split(' ')[0] || 'User'}! 👋
                             </h1>
-                            <p className="text-sm text-gray-300">Let's reduce waste together</p>
+                            <p className="text-sm text-muted-foreground">Let's reduce waste together</p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                        <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-gray-300 hover:text-white" onClick={handleBellClick}>
+                        <Button ref={bellButtonRef} variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground" onClick={handleBellClick}>
                             <Bell className="w-6 h-6" />
-                            {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full notification-badge"></span>}
+                            {hasNotification && <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full notification-badge"></span>}
                         </Button>
                         <Avatar className="w-8 h-8">
-                           <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
+                           <AvatarFallback className='bg-secondary'>{getInitials(user?.name)}</AvatarFallback>
                         </Avatar>
                     </div>
                 </div>
@@ -150,7 +150,7 @@ export default function DashboardPage() {
           id="predictionPanel" 
           ref={predictionPanelRef} 
           className={cn(
-            "fixed top-0 right-0 w-full md:w-1/2 md:max-w-md bg-white text-foreground border-b md:border-l border-border shadow-lg z-30 prediction-panel",
+            "fixed top-0 right-0 w-full md:w-1/2 md:max-w-md bg-card text-card-foreground border-b md:border-l border-border shadow-lg z-30 prediction-panel",
             isPredictionPanelOpen && 'show'
           )}
         >
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                         </div>
                     )}
                      {!hasUnseenNotification && (
-                         <div className="text-center text-gray-500 py-4">
+                         <div className="text-center text-muted-foreground py-4">
                              <p>No new notifications right now.</p>
                          </div>
                     )}
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                     <CarouselContent className="-ml-4">
                         {itemsExpiringToday.length > 0 && (
                             <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                                <Card className="focus-card bg-primary/80 border border-orange-400 rounded-xl shadow-sm h-full text-white">
+                                <Card className="focus-card bg-destructive/80 border border-orange-400 rounded-xl shadow-sm h-full text-destructive-foreground">
                                     <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                                                 </div>
                                             ))}
                                         </div>
-                                        <Button className="w-full bg-white hover:bg-gray-200 text-primary" onClick={() => router.push('/pantry')}>
+                                        <Button className="w-full bg-white hover:bg-gray-200 text-destructive" onClick={() => router.push('/pantry')}>
                                             Find Recipes for These Items →
                                         </Button>
                                     </CardContent>
@@ -227,23 +227,23 @@ export default function DashboardPage() {
                         )}
                         {latestInsight && (
                             <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                                 <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
+                                 <Card className="focus-card bg-secondary backdrop-blur-md border border-border rounded-xl shadow-sm h-full text-secondary-foreground">
                                      <CardContent className="p-6">
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <h2 className="text-lg font-semibold">✨ {latestInsight.patternAlert}</h2>
-                                                <p className="text-sm text-gray-300">Fresh AI insight</p>
+                                                <p className="text-sm text-muted-foreground">Fresh AI insight</p>
                                             </div>
-                                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                            <div className="w-8 h-8 bg-foreground/10 rounded-full flex items-center justify-center">
                                                 <Brain className="w-4 h-4" />
                                             </div>
                                         </div>
-                                        <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                        <div className="bg-background/50 rounded-lg p-4 mb-4">
                                             <p className="text-sm leading-relaxed">
                                                 {latestInsight.smartTip}
                                             </p>
                                         </div>
-                                        <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                                        <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                                             See Full Analysis →
                                         </Button>
                                     </CardContent>
@@ -251,94 +251,94 @@ export default function DashboardPage() {
                             </CarouselItem>
                         )}
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                             <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
+                             <Card className="focus-card bg-card backdrop-blur-md border border-border rounded-xl shadow-sm h-full text-card-foreground">
                                  <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <h2 className="text-lg font-semibold">🎉 Great Progress!</h2>
-                                            <p className="text-sm text-gray-300">This week's update</p>
+                                            <p className="text-sm text-muted-foreground">This week's update</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                        <div className="w-8 h-8 bg-foreground/10 rounded-full flex items-center justify-center">
                                             <LineChart className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                    <div className="bg-background/50 rounded-lg p-4 mb-4">
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-sm">Waste budget</span>
                                             <span className="text-sm font-medium">65% used</span>
                                         </div>
-                                        <Progress value={65} className="h-2 [&>div]:bg-primary" />
+                                        <Progress value={65} className="h-2 [&>div]:bg-orange-500" />
                                     </div>
-                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/my-waste')}>
+                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/my-waste')}>
                                         View Your Trends →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
+                            <Card className="focus-card bg-card backdrop-blur-md border border-border rounded-xl shadow-sm h-full text-card-foreground">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <h2 className="text-lg font-semibold">🛒 Shop Smart</h2>
-                                            <p className="text-sm text-gray-300">Plan your next grocery run</p>
+                                            <p className="text-sm text-muted-foreground">Plan your next grocery run</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                        <div className="w-8 h-8 bg-foreground/10 rounded-full flex items-center justify-center">
                                             <ShoppingCart className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                    <div className="bg-background/50 rounded-lg p-4 mb-4">
                                         <p className="text-sm leading-relaxed">
                                             Generate a shopping list based on what's running low in your pantry to avoid overbuying.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/shopping')}>
+                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/shopping')}>
                                         Go to Shopping Hub →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                          <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
+                            <Card className="focus-card bg-card backdrop-blur-md border border-border rounded-xl shadow-sm h-full text-card-foreground">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <h2 className="text-lg font-semibold">🍳 Find a Recipe</h2>
-                                            <p className="text-sm text-gray-300">Use what you have</p>
+                                            <p className="text-sm text-muted-foreground">Use what you have</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                        <div className="w-8 h-8 bg-foreground/10 rounded-full flex items-center justify-center">
                                             <Utensils className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                    <div className="bg-background/50 rounded-lg p-4 mb-4">
                                         <p className="text-sm leading-relaxed">
                                             Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/pantry')}>
+                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/pantry')}>
                                         Find Recipes →
                                     </Button>
                                 </CardContent>
                             </Card>
                         </CarouselItem>
                         <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
-                            <Card className="focus-card bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-sm h-full text-white">
+                            <Card className="focus-card bg-card backdrop-blur-md border border-border rounded-xl shadow-sm h-full text-card-foreground">
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between mb-3">
                                         <div>
                                             <h2 className="text-lg font-semibold">🗑️ Log Waste</h2>
-                                            <p className="text-sm text-gray-300">Track to get smarter</p>
+                                            <p className="text-sm text-muted-foreground">Track to get smarter</p>
                                         </div>
-                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                                        <div className="w-8 h-8 bg-foreground/10 rounded-full flex items-center justify-center">
                                             <Trash className="w-4 h-4" />
                                         </div>
                                     </div>
-                                    <div className="bg-black/20 rounded-lg p-4 mb-4">
+                                    <div className="bg-background/50 rounded-lg p-4 mb-4">
                                         <p className="text-sm leading-relaxed">
                                             Quickly log any food you waste to help the AI find your patterns and save you money.
                                         </p>
                                     </div>
-                                    <Button className="w-full bg-primary hover:bg-orange-600 text-white" onClick={() => router.push('/log-waste?method=camera')}>
+                                    <Button className="w-full bg-foreground text-background hover:bg-foreground/80" onClick={() => router.push('/log-waste?method=camera')}>
                                         Log Waste Now →
                                     </Button>
                                 </CardContent>
@@ -354,20 +354,20 @@ export default function DashboardPage() {
             </div>
 
             {/* Main Impact Card */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
+            <Card className="bg-card border-border rounded-xl shadow-sm text-card-foreground">
                 <CardContent className="p-6">
                     <h3 className="text-lg font-semibold mb-4">THIS WEEK'S IMPACT</h3>
                     <div className="grid grid-cols-2 gap-6">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-primary mb-1">₱{weeklyStats.totalPesoValue.toFixed(2)}</div>
-                            <div className="text-sm text-gray-300">💸 Financial Leakage</div>
+                            <div className="text-2xl font-bold text-destructive mb-1">₱{weeklyStats.totalPesoValue.toFixed(2)}</div>
+                            <div className="text-sm text-muted-foreground">💸 Financial Leakage</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-primary mb-1">{weeklyStats.totalCarbonFootprint.toFixed(1)}kg</div>
-                            <div className="text-sm text-gray-300">🌍 Carbon Footprint</div>
+                            <div className="text-2xl font-bold text-destructive mb-1">{weeklyStats.totalCarbonFootprint.toFixed(1)}kg</div>
+                            <div className="text-sm text-muted-foreground">🌍 Carbon Footprint</div>
                         </div>
                     </div>
-                    <Button variant="link" className="w-full mt-4 text-gray-300 hover:text-white" onClick={() => router.push('/my-waste')}>
+                    <Button variant="link" className="w-full mt-4 text-muted-foreground hover:text-foreground" onClick={() => router.push('/my-waste')}>
                         View 7-Day Trend →
                     </Button>
                 </CardContent>
@@ -376,18 +376,18 @@ export default function DashboardPage() {
             <PantryHealthScore />
 
             {/* Primary Action Buttons */}
-            <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm">
+            <Card className="bg-card border-border rounded-xl shadow-sm">
                 <CardContent className="p-5">
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-white" onClick={() => router.push('/add-to-pantry')}>
-                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mb-2">
-                                <PackagePlus className="w-5 h-5 text-white" />
+                        <button className="flex flex-col items-center justify-center p-4 bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-colors text-secondary-foreground" onClick={() => router.push('/add-to-pantry')}>
+                            <div className="w-10 h-10 bg-foreground/10 text-foreground rounded-full flex items-center justify-center mb-2">
+                                <PackagePlus className="w-5 h-5" />
                             </div>
                             <span className="text-sm font-medium">Add Groceries</span>
                         </button>
-                        <button className="flex flex-col items-center justify-center p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-white" onClick={() => router.push('/log-waste?method=camera')}>
-                            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center mb-2">
-                                <Trash className="w-5 h-5 text-white" />
+                        <button className="flex flex-col items-center justify-center p-4 bg-secondary hover:bg-secondary/80 border border-border rounded-lg transition-colors text-secondary-foreground" onClick={() => router.push('/log-waste?method=camera')}>
+                            <div className="w-10 h-10 bg-foreground/10 text-foreground rounded-full flex items-center justify-center mb-2">
+                                <Trash className="w-5 h-5" />
                             </div>
                             <span className="text-sm font-medium">Log Food Waste</span>
                         </button>
@@ -397,15 +397,15 @@ export default function DashboardPage() {
 
             {/* Contextual AI Zone */}
              {latestInsight && (
-                <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
+                <Card className="bg-secondary border-border rounded-xl shadow-sm text-secondary-foreground">
                     <CardContent className="p-5">
                         <h3 className="text-base font-semibold mb-3">💡 Your Smart Tip for Today</h3>
-                        <div className="bg-black/20 rounded-lg p-4 mb-4">
+                        <div className="bg-background/50 rounded-lg p-4 mb-4">
                             <p className="text-sm leading-relaxed">
                                 {latestInsight.smartShoppingPlan}
                             </p>
                         </div>
-                        <Button variant="link" className="text-gray-300 hover:text-white p-0 h-auto" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
+                        <Button variant="link" className="text-muted-foreground hover:text-foreground p-0 h-auto" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
                             View Full Insight →
                         </Button>
                     </CardContent>
@@ -414,20 +414,20 @@ export default function DashboardPage() {
 
             {/* Virtual Pantry Peek */}
             {itemsExpiringSoon.length > 0 && (
-                <Card className="bg-white/10 backdrop-blur-md border-white/20 rounded-xl shadow-sm text-white">
+                <Card className="bg-card border-border rounded-xl shadow-sm text-card-foreground">
                     <CardContent className="p-5">
                         <h3 className="text-base font-semibold mb-4">PANTRY WATCHLIST</h3>
                         <div className="space-y-3">
                             {itemsExpiringSoon.slice(0,2).map(item => (
-                                <div key={item.id} className="flex items-center justify-between p-3 bg-primary/20 border border-orange-400 rounded-lg">
+                                <div key={item.id} className="flex items-center justify-between p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
                                     <div className="flex items-center space-x-3">
                                         <span className="text-sm font-medium">{item.name}</span>
                                     </div>
-                                    <span className="text-xs text-orange-200 font-medium">Expires in {Math.max(0, new Date(item.estimatedExpirationDate).getDate() - new Date().getDate())} days</span>
+                                    <span className="text-xs text-destructive font-medium">Expires in {Math.max(0, new Date(item.estimatedExpirationDate).getDate() - new Date().getDate())} days</span>
                                 </div>
                             ))}
                         </div>
-                         <Button variant="link" className="w-full mt-4 text-gray-300 hover:text-white" onClick={() => router.push('/pantry')}>
+                         <Button variant="link" className="w-full mt-4 text-muted-foreground hover:text-foreground" onClick={() => router.push('/pantry')}>
                             Go to Pantry →
                         </Button>
                     </CardContent>

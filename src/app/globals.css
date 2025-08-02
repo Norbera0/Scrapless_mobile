@@ -1,5 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -7,30 +9,31 @@
 
 @layer base {
   :root {
-    --background: 30 17% 94%; /* warm light gray */
-    --foreground: 163 83% 12%; /* dark forest green */
+    --background: 40 17% 95%; /* warm light gray - #F2F1F0 */
+    --foreground: 158 82% 12%; /* dark forest green - #063627 */
     --card: 0 0% 100%; /* white */
-    --card-foreground: 163 83% 12%; /* dark forest green */
-    --popover: 0 0% 100%; /* white */
-    --popover-foreground: 163 83% 12%; /* dark forest green */
-    --primary: 14 100% 50%; /* vibrant orange */
-    --primary-foreground: 0 0% 100%; /* white */
-    --secondary: 47 44% 90%; /* cream */
-    --secondary-foreground: 163 83% 12%; /* dark forest green */
-    --muted: 47 44% 90%; /* cream */
-    --muted-foreground: 163 83% 25%;
-    --accent: 163 83% 12%; /* dark forest green */
-    --accent-foreground: 0 0% 100%; /* white */
+    --card-foreground: 158 82% 12%; /* dark forest green */
+    --popover: 0 0% 100%;
+    --popover-foreground: 158 82% 12%;
+    --primary: 48 48% 90%; /* cream - #F2EDDB */
+    --primary-foreground: 158 82% 12%; /* dark forest green for contrast */
+    --secondary: 40 17% 92%; /* Slightly darker warm gray */
+    --secondary-foreground: 158 82% 12%;
+    --muted: 40 17% 92%;
+    --muted-foreground: 158 82% 25%;
+    --accent: 158 82% 12%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 30 17% 88%;
-    --input: 30 17% 88%;
-    --ring: 14 100% 50%; /* vibrant orange */
+    --border: 40 17% 88%;
+    --input: 40 17% 88%;
+    --ring: 14 100% 50%; /* vibrant orange - #FF3C00 */
+
     --chart-1: 14 100% 50%;
-    --chart-2: 163 83% 20%;
-    --chart-3: 30 17% 80%;
+    --chart-2: 158 83% 20%;
+    --chart-3: 40 17% 80%;
     --chart-4: 14 80% 40%;
-    --chart-5: 163 50% 30%;
+    --chart-5: 158 50% 30%;
     --radius: 0.5rem;
     --sidebar-width: 16rem;
     --sidebar-width-icon: 3rem;
@@ -44,30 +47,30 @@
     --sidebar-ring: var(--ring);
   }
   .dark {
-    --background: 163 83% 8%; /* dark forest green (darker) */
-    --foreground: 30 17% 94%; /* warm light gray */
-    --card: 163 83% 12%; /* dark forest green */
-    --card-foreground: 30 17% 94%; /* warm light gray */
-    --popover: 163 83% 8%;
-    --popover-foreground: 30 17% 94%;
-    --primary: 14 100% 50%; /* vibrant orange */
-    --primary-foreground: 0 0% 100%; /* white */
-    --secondary: 163 83% 15%;
-    --secondary-foreground: 30 17% 94%;
-    --muted: 163 83% 15%;
-    --muted-foreground: 30 17% 80%;
-    --accent: 30 17% 94%;
-    --accent-foreground: 163 83% 8%;
+    --background: 158 83% 8%; /* dark forest green (darker) */
+    --foreground: 40 17% 95%; /* warm light gray */
+    --card: 158 83% 12%; /* dark forest green */
+    --card-foreground: 40 17% 95%;
+    --popover: 158 83% 8%;
+    --popover-foreground: 40 17% 95%;
+    --primary: 48 48% 90%; /* cream */
+    --primary-foreground: 158 82% 12%; /* dark forest green */
+    --secondary: 158 83% 15%;
+    --secondary-foreground: 40 17% 95%;
+    --muted: 158 83% 15%;
+    --muted-foreground: 40 17% 80%;
+    --accent: 40 17% 95%;
+    --accent-foreground: 158 83% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 163 83% 20%;
-    --input: 163 83% 20%;
+    --border: 158 83% 20%;
+    --input: 158 83% 20%;
     --ring: 14 100% 50%;
     --chart-1: 14 100% 50%;
-    --chart-2: 30 17% 70%;
-    --chart-3: 47 44% 80%;
+    --chart-2: 40 17% 70%;
+    --chart-3: 48 44% 80%;
     --chart-4: 14 80% 60%;
-    --chart-5: 163 50% 50%;
+    --chart-5: 158 50% 50%;
     --sidebar-background: var(--background);
     --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--primary);
@@ -124,7 +127,7 @@
         @apply bg-card/80 backdrop-blur-lg border border-border/30;
     }
     .gradient-bg {
-      @apply bg-gradient-to-br from-green-900 to-green-950;
+       @apply bg-gradient-to-br from-[#063627] to-[#0A4D39];
     }
     .modal-overlay {
         @apply bg-black/40 backdrop-blur-sm;
@@ -148,7 +151,7 @@
         transform: translateY(0);
     }
     .search-focus {
-        @apply focus:ring-2 focus:ring-primary/50;
+        @apply focus:ring-2 focus:ring-ring/50;
     }
     .status-urgent {
         @apply bg-gradient-to-r from-red-400 to-red-500;
