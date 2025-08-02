@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -112,7 +112,7 @@ export default function MyWastePage() {
     });
 
     const categoryData = Object.entries(categoryTotals).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-    const reasonData = Object.entries(reasonTotals).map(([name, value]) => ({ name, value, percentage: totalWasteValue > 0 ? ((value / totalWasteValue) * 100).toFixed(0) : 0 })).sort((a,b) => b.value - a.value);
+    const reasonData = Object.entries(reasonTotals).map(([name, value, percentage]) => ({ name, value, percentage: totalWasteValue > 0 ? ((value / totalWasteValue) * 100).toFixed(0) : 0 })).sort((a,b) => b.value - a.value);
     
     return { categoryData, reasonData };
   }, [logs]);
@@ -211,34 +211,36 @@ export default function MyWastePage() {
             </Card>
 
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                              <BarChart2 className="h-5 w-5" />
-                              Waste by Food Category
-                          </CardTitle>
-                          <CardDescription>What you're wasting most</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
-                              <ResponsiveContainer width="100%" height={250}>
-                                  <PieChart>
-                                      <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-                                      <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" labelLine={false} label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                                          const radius = innerRadius + (outerRadius - innerRadius) * 1.2;
-                                          const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                                          const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                                          return ( <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs fill-muted-foreground" > {`${(percent * 100).toFixed(0)}%`} </text> );
-                                      }}>
-                                          {categoryData.map((entry, index) => (
-                                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                          ))}
-                                      </Pie>
-                                  </PieChart>
-                              </ResponsiveContainer>
-                          </ChartContainer>
-                      </CardContent>
-                  </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <BarChart2 className="h-5 w-5" />
+                            Waste by Food Category
+                        </CardTitle>
+                        <CardDescription>What you're wasting most</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
+                            <ResponsiveContainer width="100%" height={250}>
+                                <PieChart>
+                                    <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+                                    <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label={false} labelLine={false}>
+                                        {categoryData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Legend
+                                      layout="vertical"
+                                      verticalAlign="middle"
+                                      align="right"
+                                      iconSize={10}
+                                      wrapperStyle={{ paddingLeft: '20px' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
 
                   <Card>
                       <CardHeader>
@@ -339,4 +341,5 @@ export default function MyWastePage() {
       )}
     </div>
   );
-}
+
+    
