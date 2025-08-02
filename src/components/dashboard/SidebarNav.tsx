@@ -80,7 +80,7 @@ export function SidebarNav({ user }: { user: User }) {
       <SidebarHeader className="p-4 flex items-center justify-between">
         <div className={cn("flex items-center gap-3", sidebarState === 'collapsed' && 'hidden')}>
           <Bot className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold">Scrapless</span>
+          <span className="text-xl font-bold font-playfair">Scrapless</span>
         </div>
       </SidebarHeader>
       <SidebarContent className="p-2">
