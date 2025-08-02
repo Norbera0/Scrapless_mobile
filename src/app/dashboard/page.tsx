@@ -125,6 +125,7 @@ export default function DashboardPage() {
             <div className="px-4 py-4 md:px-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                        <SidebarTrigger className="md:hidden" />
                         <div>
                             <h1 className="text-xl font-semibold">
                                {greeting}, {user?.name?.split(' ')[0] || 'User'}! 👋

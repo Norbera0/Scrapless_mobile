@@ -82,6 +82,7 @@ export function SidebarNav({ user }: { user: User }) {
           <PackagePlus className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold font-playfair">Scrapless</span>
         </div>
+        <SidebarTrigger className="md:hidden" />
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
