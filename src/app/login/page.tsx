@@ -1,4 +1,6 @@
 
+'use client';
+
 import { LoginForm } from '@/components/auth/LoginForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PackagePlus, Leaf, Sparkles, TrendingDown } from 'lucide-react';
