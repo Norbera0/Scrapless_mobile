@@ -63,23 +63,25 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <Sidebar>
-        <SidebarNav user={user} />
-        <SidebarRail />
-      </Sidebar>
-      <SidebarInset>
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
-            <SidebarTrigger className="md:flex" />
-            <h1 className="text-lg font-semibold md:text-xl">{getPageTitle(pathname)}</h1>
-            <div className="flex-1">
-                 {/* Can add other header items here in the future */}
-            </div>
-            {/* Add other header items like avatar here if needed */}
-        </header>
-        <div className="bg-background">
-          {children}
-        </div>
-      </SidebarInset>
+      <div className="flex min-h-screen w-full max-w-full overflow-x-hidden">
+        <Sidebar>
+          <SidebarNav user={user} />
+          <SidebarRail />
+        </Sidebar>
+        <SidebarInset className="flex-1 w-full max-w-full overflow-x-hidden">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
+              <SidebarTrigger className="md:flex" />
+              <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
+              <div className="flex-1">
+                   {/* Can add other header items here in the future */}
+              </div>
+              {/* Add other header items like avatar here if needed */}
+          </header>
+          <div className="bg-background w-full max-w-full overflow-x-hidden">
+            {children}
+          </div>
+        </SidebarInset>
+      </div>
       <FloatingChatAssistant />
     </SidebarProvider>
   );
