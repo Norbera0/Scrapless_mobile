@@ -5,7 +5,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, Utensils, CheckCircle, PackagePlus, X, Lightbulb, ShoppingCart, PanelLeft, TrendingUp, Award, Zap, BarChart3 } from 'lucide-react';
+import { AlertTriangle, Bell, Bot, Brain, Trash, LineChart, ShoppingBasket, Utensils, CheckCircle, PackagePlus, X, Lightbulb, ShoppingCart, PanelLeft, TrendingUp, Award, Zap, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { User, Insight } from '@/types';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -14,7 +14,6 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { isToday, isWithinInterval, add, format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel"
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -59,13 +58,13 @@ export default function DashboardPage() {
   const { liveItems, pantryInitialized } = usePantryLogStore();
   
   const [greeting, setGreeting] = useState("Good morning");
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isPredictionPanelOpen, setIsPredictionPanelOpen] = useState(false);
   const [hasBeenViewed, setHasBeenViewed] = useState(false);
 
   const predictionPanelRef = useRef<HTMLDivElement>(null);
   const bellButtonRef = useRef<HTMLButtonElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -73,14 +72,6 @@ export default function DashboardPage() {
     else if (hour < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
   }, []);
-
-  useEffect(() => {
-    if (!carouselApi) return;
-    setCurrentSlide(carouselApi.selectedScrollSnap())
-    carouselApi.on("select", () => {
-      setCurrentSlide(carouselApi.selectedScrollSnap())
-    })
-  }, [carouselApi])
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -114,18 +105,130 @@ export default function DashboardPage() {
       isWithinInterval(new Date(item.estimatedExpirationDate), { start: new Date(), end: add(new Date(), {days: 3}) })
   );
 
+  // Create focus cards array
   const focusCards = [
-      itemsExpiringToday.length > 0 && 'urgent',
-      latestInsight && 'insight',
-      'progress',
-      'shopping',
-      'recipes',
-      'log_waste'
-  ].filter(Boolean);
-  
-  const handleDotClick = useCallback((index: number) => {
-    carouselApi?.scrollTo(index)
-  }, [carouselApi])
+    ...(itemsExpiringToday.length > 0 ? [{
+      type: 'urgent',
+      title: '🚨 Use It Now!',
+      subtitle: 'Items expiring today',
+      badge: 'Urgent',
+      bgColor: 'bg-gradient-to-br from-destructive via-destructive to-destructive/90',
+      textColor: 'text-destructive-foreground',
+      action: () => router.push('/pantry'),
+      content: (
+        <div className="space-y-2 mb-4">
+          {itemsExpiringToday.slice(0, 2).map(item => (
+            <div key={item.id} className="flex items-center space-x-2 bg-white/10 rounded-lg p-2">
+              <span className="text-sm font-medium">{item.name}</span>
+            </div>
+          ))}
+        </div>
+      )
+    }] : []),
+    ...(latestInsight ? [{
+      type: 'insight',
+      title: `✨ ${latestInsight.patternAlert}`,
+      subtitle: 'Fresh AI insight',
+      badge: 'AI Powered',
+      bgColor: 'bg-gradient-to-br from-primary/10 via-primary/5 to-background',
+      textColor: 'text-foreground',
+      action: () => router.push(`/insights/${latestInsight.id}`),
+      content: (
+        <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 mb-4 border border-primary/10">
+          <p className="text-sm leading-relaxed">{latestInsight.smartTip}</p>
+        </div>
+      )
+    }] : []),
+    {
+      type: 'progress',
+      title: '🎉 Great Progress!',
+      subtitle: "This week's update",
+      badge: 'On Track',
+      bgColor: 'bg-gradient-to-br from-card via-card to-primary/5',
+      textColor: 'text-foreground',
+      action: () => router.push('/my-waste'),
+      content: (
+        <div className="bg-gradient-to-r from-green-50 to-green-100/50 rounded-xl p-4 mb-4 border border-green-200">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium">Waste budget</span>
+            <span className="text-sm font-bold text-green-700">65% used</span>
+          </div>
+          <Progress value={65} className="h-3" />
+        </div>
+      )
+    },
+    {
+      type: 'shopping',
+      title: '🛒 Shop Smart',
+      subtitle: 'Plan your next grocery run',
+      badge: 'Smart Planning',
+      bgColor: 'bg-gradient-to-br from-blue-50 via-blue-50/50 to-background',
+      textColor: 'text-blue-900',
+      action: () => router.push('/shopping'),
+      content: (
+        <div className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl p-4 mb-4 border border-blue-200">
+          <p className="text-sm leading-relaxed text-blue-800">
+            Generate a shopping list based on what's running low in your pantry to avoid overbuying.
+          </p>
+        </div>
+      )
+    },
+    {
+      type: 'recipes',
+      title: '🍳 Find a Recipe',
+      subtitle: 'Use what you have',
+      badge: 'Creative Cooking',
+      bgColor: 'bg-gradient-to-br from-orange-50 via-orange-50/50 to-background',
+      textColor: 'text-orange-900',
+      action: () => router.push('/pantry'),
+      content: (
+        <div className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-xl p-4 mb-4 border border-orange-200">
+          <p className="text-sm leading-relaxed text-orange-800">
+            Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
+          </p>
+        </div>
+      )
+    },
+    {
+      type: 'log_waste',
+      title: '🗑️ Log Waste',
+      subtitle: 'Track to get smarter',
+      badge: 'Learn & Improve',
+      bgColor: 'bg-gradient-to-br from-purple-50 via-purple-50/50 to-background',
+      textColor: 'text-purple-900',
+      action: () => router.push('/log-waste?method=camera'),
+      content: (
+        <div className="bg-gradient-to-r from-purple-100 to-purple-50 rounded-xl p-4 mb-4 border border-purple-200">
+          <p className="text-sm leading-relaxed text-purple-800">
+            Quickly log any food you waste to help the AI find your patterns and save you money.
+          </p>
+        </div>
+      )
+    }
+  ];
+
+  const totalSlides = focusCards.length;
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+    if (carouselRef.current) {
+      const slideWidth = carouselRef.current.offsetWidth;
+      carouselRef.current.scrollTo({
+        left: slideWidth * index,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const nextSlide = () => {
+    const nextIndex = (currentSlide + 1) % totalSlides;
+    goToSlide(nextIndex);
+  };
+
+  const prevSlide = () => {
+    const prevIndex = currentSlide === 0 ? totalSlides - 1 : currentSlide - 1;
+    goToSlide(prevIndex);
+  };
 
   const hasUnseenNotification = (itemsExpiringSoon.length > 0 || (latestInsight && latestInsight.smartShoppingPlan));
   const hasNotification = hasUnseenNotification && !hasBeenViewed;
@@ -289,227 +392,110 @@ export default function DashboardPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="px-4 md:px-6 py-6 space-y-8"
+          className="px-4 md:px-6 py-6 space-y-8 max-w-full"
         >
-            {/* Enhanced Focus Carousel */}
-            <motion.div variants={itemVariants} className="overflow-x-hidden">
+            {/* Custom Focus Carousel */}
+            <motion.div variants={itemVariants} className="w-full max-w-full">
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-foreground mb-2">Today's Focus</h2>
                   <p className="text-muted-foreground text-sm">Your personalized action items</p>
                 </div>
-                <Carousel setApi={setCarouselApi} opts={{ align: "start" }}>
-                    <CarouselContent className="md:-ml-4">
-                        {itemsExpiringToday.length > 0 && (
-                            <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                                <motion.div
-                                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                                  className="h-full"
-                                >
-                                  <Card className="bg-gradient-to-br from-destructive via-destructive to-destructive/90 border-destructive/20 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full text-destructive-foreground overflow-hidden relative">
-                                      <div className="absolute inset-0 bg-red-500/5 rounded-2xl"></div>
-                                      <CardContent className="p-6 relative z-10">
-                                          <div className="flex items-start justify-between mb-4">
-                                              <div>
-                                                  <h2 className="text-xl font-bold mb-1">🚨 Use It Now!</h2>
-                                                  <p className="text-destructive-foreground/80 text-sm">Items expiring today</p>
-                                                  <Badge variant="secondary" className="mt-2 bg-white/20 text-white border-white/30">
-                                                    Urgent
-                                                  </Badge>
-                                              </div>
-                                              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                                                  <AlertTriangle className="w-6 h-6" />
-                                              </div>
-                                          </div>
-                                          <div className="space-y-2 mb-4">
-                                              {itemsExpiringToday.slice(0, 2).map(item => (
-                                                  <div key={item.id} className="flex items-center space-x-2 bg-white/10 rounded-lg p-2">
-                                                      <span className="text-sm font-medium">{item.name}</span>
-                                                  </div>
-                                              ))}
-                                          </div>
-                                          <Button className="w-full bg-white hover:bg-white/90 text-destructive font-semibold transition-all duration-200" onClick={() => router.push('/pantry')}>
-                                              Find Recipes →
-                                          </Button>
-                                      </CardContent>
-                                  </Card>
-                                </motion.div>
-                            </CarouselItem>
-                        )}
-                        {latestInsight && (
-                            <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                                <motion.div
-                                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                                  className="h-full"
-                                >
-                                  <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative">
-                                      <div className="absolute inset-0 bg-primary/2 rounded-2xl"></div>
-                                      <CardContent className="p-6 relative z-10">
-                                          <div className="flex items-start justify-between mb-4">
-                                              <div>
-                                                  <h2 className="text-xl font-bold mb-1">✨ {latestInsight.patternAlert}</h2>
-                                                  <p className="text-muted-foreground text-sm">Fresh AI insight</p>
-                                                  <Badge variant="outline" className="mt-2 border-primary/30 text-primary">
-                                                    AI Powered
-                                                  </Badge>
-                                              </div>
-                                              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
-                                                  <Brain className="w-6 h-6 text-primary" />
-                                              </div>
-                                          </div>
-                                          <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 mb-4 border border-primary/10">
-                                              <p className="text-sm leading-relaxed">
-                                                  {latestInsight.smartTip}
-                                              </p>
-                                          </div>
-                                          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200" onClick={() => router.push(`/insights/${latestInsight.id}`)}>
-                                              See Full Analysis →
-                                          </Button>
-                                      </CardContent>
-                                  </Card>
-                                </motion.div>
-                            </CarouselItem>
-                        )}
-                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                            <motion.div
-                              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                              className="h-full"
-                            >
-                              <Card className="bg-gradient-to-br from-card via-card to-primary/5 border-border rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative">
-                                  <div className="absolute inset-0 bg-green-500/2 rounded-2xl"></div>
-                                  <CardContent className="p-6 relative z-10">
-                                      <div className="flex items-start justify-between mb-4">
-                                          <div>
-                                              <h2 className="text-xl font-bold mb-1">🎉 Great Progress!</h2>
-                                              <p className="text-muted-foreground text-sm">This week's update</p>
-                                              <Badge variant="outline" className="mt-2 border-green-300 text-green-700">
-                                                <TrendingUp className="w-3 h-3 mr-1" />
-                                                On Track
-                                              </Badge>
-                                          </div>
-                                          <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                                              <Award className="w-6 h-6 text-green-600" />
-                                          </div>
-                                      </div>
-                                      <div className="bg-gradient-to-r from-green-50 to-green-100/50 rounded-xl p-4 mb-4 border border-green-200">
-                                          <div className="flex items-center justify-between mb-3">
-                                              <span className="text-sm font-medium">Waste budget</span>
-                                              <span className="text-sm font-bold text-green-700">65% used</span>
-                                          </div>
-                                          <Progress value={65} className="h-3" />
-                                      </div>
-                                      <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200" onClick={() => router.push('/my-waste')}>
-                                          View Your Trends →
-                                      </Button>
-                                  </CardContent>
-                              </Card>
-                            </motion.div>
-                        </CarouselItem>
-                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                            <motion.div
-                              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                              className="h-full"
-                            >
-                              <Card className="bg-gradient-to-br from-blue-50 via-blue-50/50 to-background border-blue-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative">
-                                  <CardContent className="p-6 relative z-10">
-                                      <div className="flex items-start justify-between mb-4">
-                                          <div>
-                                              <h2 className="text-xl font-bold mb-1 text-blue-900">🛒 Shop Smart</h2>
-                                              <p className="text-blue-700 text-sm">Plan your next grocery run</p>
-                                              <Badge variant="outline" className="mt-2 border-blue-300 text-blue-700">
-                                                Smart Planning
-                                              </Badge>
-                                          </div>
-                                          <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-                                              <ShoppingCart className="w-6 h-6 text-blue-600" />
-                                          </div>
-                                      </div>
-                                      <div className="bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl p-4 mb-4 border border-blue-200">
-                                          <p className="text-sm leading-relaxed text-blue-800">
-                                              Generate a shopping list based on what's running low in your pantry to avoid overbuying.
-                                          </p>
-                                      </div>
-                                      <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200" onClick={() => router.push('/shopping')}>
-                                          Go to Shopping Hub →
-                                      </Button>
-                                  </CardContent>
-                              </Card>
-                            </motion.div>
-                        </CarouselItem>
-                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                            <motion.div
-                              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                              className="h-full"
-                            >
-                              <Card className="bg-gradient-to-br from-orange-50 via-orange-50/50 to-background border-orange-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative">
-                                  <CardContent className="p-6 relative z-10">
-                                      <div className="flex items-start justify-between mb-4">
-                                          <div>
-                                              <h2 className="text-xl font-bold mb-1 text-orange-900">🍳 Find a Recipe</h2>
-                                              <p className="text-orange-700 text-sm">Use what you have</p>
-                                              <Badge variant="outline" className="mt-2 border-orange-300 text-orange-700">
-                                                Creative Cooking
-                                              </Badge>
-                                          </div>
-                                          <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center">
-                                              <Utensils className="w-6 h-6 text-orange-600" />
-                                          </div>
-                                      </div>
-                                      <div className="bg-gradient-to-r from-orange-100 to-orange-50 rounded-xl p-4 mb-4 border border-orange-200">
-                                          <p className="text-sm leading-relaxed text-orange-800">
-                                              Get recipe ideas based on your pantry items to cook delicious meals and prevent waste.
-                                          </p>
-                                      </div>
-                                      <Button className="w-full bg-orange-600 text-white hover:bg-orange-700 transition-all duration-200" onClick={() => router.push('/pantry')}>
-                                          Find Recipes →
-                                      </Button>
-                                  </CardContent>
-                              </Card>
-                            </motion.div>
-                        </CarouselItem>
-                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
-                            <motion.div
-                              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                              className="h-full"
-                            >
-                              <Card className="bg-gradient-to-br from-purple-50 via-purple-50/50 to-background border-purple-200 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative">
-                                  <CardContent className="p-6 relative z-10">
-                                      <div className="flex items-start justify-between mb-4">
-                                          <div>
-                                              <h2 className="text-xl font-bold mb-1 text-purple-900">🗑️ Log Waste</h2>
-                                              <p className="text-purple-700 text-sm">Track to get smarter</p>
-                                              <Badge variant="outline" className="mt-2 border-purple-300 text-purple-700">
-                                                Learn & Improve
-                                              </Badge>
-                                          </div>
-                                          <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
-                                              <Trash className="w-6 h-6 text-purple-600" />
-                                          </div>
-                                      </div>
-                                      <div className="bg-gradient-to-r from-purple-100 to-purple-50 rounded-xl p-4 mb-4 border border-purple-200">
-                                          <p className="text-sm leading-relaxed text-purple-800">
-                                              Quickly log any food you waste to help the AI find your patterns and save you money.
-                                          </p>
-                                      </div>
-                                      <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 transition-all duration-200" onClick={() => router.push('/log-waste?method=camera')}>
-                                          Log Waste Now →
-                                      </Button>
-                                  </CardContent>
-                              </Card>
-                            </motion.div>
-                        </CarouselItem>
-                    </CarouselContent>
-                </Carousel>
-                <div className="carousel-dots">
-                    {Array.from({ length: focusCards.length }).map((_, index) => (
-                        <button 
-                          key={index} 
-                          onClick={() => handleDotClick(index)} 
-                          className={cn(
-                            "dot transition-all duration-200 hover:scale-125", 
-                            index === currentSlide ? 'active' : ''
-                          )} 
-                        />
+                
+                {/* Carousel Container */}
+                <div className="relative w-full max-w-full overflow-hidden">
+                  {/* Carousel Track */}
+                  <div 
+                    ref={carouselRef}
+                    className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory gap-4 w-full max-w-full pb-2"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {focusCards.map((card, index) => (
+                      <div 
+                        key={index} 
+                        className="flex-none snap-start w-full max-w-full md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+                      >
+                        <motion.div
+                          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                          className="h-full"
+                        >
+                          <Card className={cn(
+                            "border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden relative",
+                            card.bgColor
+                          )}>
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 rounded-2xl"></div>
+                            <CardContent className="p-6 relative z-10">
+                              <div className="flex items-start justify-between mb-4">
+                                <div>
+                                  <h2 className={cn("text-xl font-bold mb-1", card.textColor)}>{card.title}</h2>
+                                  <p className={cn("text-sm mb-2", card.textColor === 'text-destructive-foreground' ? 'text-destructive-foreground/80' : 'text-muted-foreground')}>{card.subtitle}</p>
+                                  <Badge variant="outline" className="mt-2">
+                                    {card.badge}
+                                  </Badge>
+                                </div>
+                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                                  {card.type === 'urgent' && <AlertTriangle className="w-6 h-6" />}
+                                  {card.type === 'insight' && <Brain className="w-6 h-6 text-primary" />}
+                                  {card.type === 'progress' && <Award className="w-6 h-6 text-green-600" />}
+                                  {card.type === 'shopping' && <ShoppingCart className="w-6 h-6 text-blue-600" />}
+                                  {card.type === 'recipes' && <Utensils className="w-6 h-6 text-orange-600" />}
+                                  {card.type === 'log_waste' && <Trash className="w-6 h-6 text-purple-600" />}
+                                </div>
+                              </div>
+                              {card.content}
+                              <Button 
+                                className="w-full transition-all duration-200" 
+                                onClick={card.action}
+                                variant={card.type === 'urgent' ? 'secondary' : 'default'}
+                              >
+                                {card.type === 'urgent' && 'Find Recipes →'}
+                                {card.type === 'insight' && 'See Full Analysis →'}
+                                {card.type === 'progress' && 'View Your Trends →'}
+                                {card.type === 'shopping' && 'Go to Shopping Hub →'}
+                                {card.type === 'recipes' && 'Find Recipes →'}
+                                {card.type === 'log_waste' && 'Log Waste Now →'}
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      </div>
                     ))}
+                  </div>
+
+                  {/* Navigation Buttons - Desktop Only */}
+                  <div className="hidden md:block">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+                      onClick={prevSlide}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+                      onClick={nextSlide}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Dots Indicator */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {focusCards.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={cn(
+                        "w-2 h-2 rounded-full transition-all duration-200 hover:scale-125",
+                        index === currentSlide 
+                          ? 'bg-primary scale-125' 
+                          : 'bg-muted-foreground/40'
+                      )}
+                    />
+                  ))}
                 </div>
             </motion.div>
 
