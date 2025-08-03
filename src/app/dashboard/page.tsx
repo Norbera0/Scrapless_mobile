@@ -298,9 +298,9 @@ export default function DashboardPage() {
                   <p className="text-muted-foreground text-sm">Your personalized action items</p>
                 </div>
                 <Carousel setApi={setCarouselApi} opts={{ align: "start" }}>
-                    <CarouselContent className="-ml-4">
+                    <CarouselContent className="md:-ml-4">
                         {itemsExpiringToday.length > 0 && (
-                            <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                                 <motion.div
                                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
                                   className="h-full"
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                             </CarouselItem>
                         )}
                         {latestInsight && (
-                            <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                            <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                                 <motion.div
                                   whileHover={{ y: -4, transition: { duration: 0.2 } }}
                                   className="h-full"
@@ -369,7 +369,7 @@ export default function DashboardPage() {
                                 </motion.div>
                             </CarouselItem>
                         )}
-                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                             <motion.div
                               whileHover={{ y: -4, transition: { duration: 0.2 } }}
                               className="h-full"
@@ -404,7 +404,7 @@ export default function DashboardPage() {
                               </Card>
                             </motion.div>
                         </CarouselItem>
-                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                             <motion.div
                               whileHover={{ y: -4, transition: { duration: 0.2 } }}
                               className="h-full"
@@ -435,7 +435,7 @@ export default function DashboardPage() {
                               </Card>
                             </motion.div>
                         </CarouselItem>
-                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                             <motion.div
                               whileHover={{ y: -4, transition: { duration: 0.2 } }}
                               className="h-full"
@@ -466,7 +466,7 @@ export default function DashboardPage() {
                               </Card>
                             </motion.div>
                         </CarouselItem>
-                        <CarouselItem className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3 md:pl-4">
                             <motion.div
                               whileHover={{ y: -4, transition: { duration: 0.2 } }}
                               className="h-full"
