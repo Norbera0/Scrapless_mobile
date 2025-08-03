@@ -292,7 +292,7 @@ export default function DashboardPage() {
           className="px-4 md:px-6 py-6 space-y-8"
         >
             {/* Enhanced Focus Carousel */}
-            <motion.div variants={itemVariants} className="overflow-hidden">
+            <motion.div variants={itemVariants} className="overflow-x-hidden">
                 <div className="mb-6">
                   <h2 className="text-lg font-semibold text-foreground mb-2">Today's Focus</h2>
                   <p className="text-muted-foreground text-sm">Your personalized action items</p>
