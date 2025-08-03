@@ -21,6 +21,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export function SidebarNav({ user }: { user: User }) {
   const pathname = usePathname();
@@ -79,7 +80,7 @@ export function SidebarNav({ user }: { user: User }) {
     <>
       <SidebarHeader className="p-4 flex items-center justify-between">
         <div className={cn("flex items-center gap-3", sidebarState === 'collapsed' && 'hidden')}>
-          <PackagePlus className="h-8 w-8 text-primary" />
+          <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
           <span className="text-xl font-bold">Scrapless</span>
         </div>
         <SidebarTrigger className="md:hidden" />

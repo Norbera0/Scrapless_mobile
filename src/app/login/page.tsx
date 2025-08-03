@@ -3,6 +3,7 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PackagePlus, Leaf, Sparkles, TrendingDown } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const stats = [
   { value: "40%", label: "Food waste reduction" },
@@ -54,9 +55,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center gap-3 mb-6"
             >
-              <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-2xl p-3 shadow-lg">
-                <PackagePlus className="h-8 w-8" />
-              </div>
+              <Image src="/logo.jpg" alt="Scrapless Logo" width={56} height={56} className="rounded-2xl shadow-lg" />
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                   Scrapless
