@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { addDays } from 'date-fns';
 
 const storageLocations = [
   { value: 'refrigerator', label: 'Refrigerator' },
@@ -73,7 +74,7 @@ export function ReviewPantryItems() {
       id: crypto.randomUUID(),
       name: '',
       estimatedAmount: '',
-      estimatedExpirationDate: new Date().toISOString(),
+      shelfLifeDays: 7, // Default shelf life
       carbonFootprint: 0,
       estimatedCost: 0,
     };
@@ -87,15 +88,24 @@ export function ReviewPantryItems() {
     }
     setIsSaving(true);
     try {
+      const itemsToSave = items.map(item => {
+        const expirationDate = addDays(new Date(), item.shelfLifeDays || 7);
+        return {
+            ...item,
+            estimatedExpirationDate: expirationDate.toISOString(),
+        }
+      });
+      
       // Optimistically add items to the UI right away
-      const optimisticPantryItems = items.map(logItem => ({
+      const optimisticPantryItems = itemsToSave.map(logItem => ({
         ...logItem,
         id: logItem.id,
         addedDate: new Date().toISOString(),
+        status: 'live' as const,
       }));
       usePantryLogStore.getState().addOptimisticItems(optimisticPantryItems);
 
-      await savePantryItems(user.uid, items);
+      await savePantryItems(user.uid, itemsToSave);
       
       toast({
         title: 'Success!',
@@ -140,6 +150,7 @@ export function ReviewPantryItems() {
         </CardHeader>
         <CardContent className="space-y-4">
           {items.map((item: PantryLogItem, index: number) => {
+            const calculatedExpiryDate = addDays(new Date(), item.shelfLifeDays || 0);
             return (
               <Collapsible key={item.id} className="space-y-3 rounded-lg border p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -158,10 +169,13 @@ export function ReviewPantryItems() {
                               className="h-11"
                           />
                           <DatePicker
-                              date={new Date(item.estimatedExpirationDate)}
-                              onDateChange={(date) =>
-                                  handleItemChange(index, 'estimatedExpirationDate', date?.toISOString() ?? new Date().toISOString())
-                              }
+                              date={calculatedExpiryDate}
+                              onDateChange={(date) => {
+                                  const today = new Date();
+                                  const newDate = date || today;
+                                  const shelfLife = Math.ceil((newDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                                  handleItemChange(index, 'shelfLifeDays', shelfLife);
+                              }}
                               className="h-11"
                           />
                       </div>
