@@ -15,20 +15,27 @@ import { useToast } from '@/hooks/use-toast';
 
 function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolution, onSelect: () => void, disabled: boolean }) {
     return (
-        <Card className="bg-secondary/50">
-            <CardContent className="p-4 space-y-3">
-                <p className="font-semibold">{solution.solution}</p>
-                <div className="space-y-1">
-                    <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>Success Rate</span>
-                        <span>{Math.round(solution.successRate * 100)}%</span>
-                    </div>
-                    <Progress value={solution.successRate * 100} className="h-2" />
+        <Card className="bg-secondary/50 flex flex-col">
+            <CardContent className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                    <p className="font-semibold">{solution.solution}</p>
+                    {solution.estimatedSavings && (
+                         <p className="text-sm font-bold text-green-600 my-2">💰 Estimated savings: ₱{solution.estimatedSavings}</p>
+                    )}
                 </div>
-                 <Button size="sm" className="w-full" onClick={onSelect} disabled={disabled}>
-                    <Check className="mr-2 h-4 w-4" /> 
-                    {disabled ? "Working on it!" : "I'll try this"}
-                 </Button>
+                <div className="space-y-3">
+                    <div className="space-y-1">
+                        <div className="flex justify-between items-center text-xs text-muted-foreground">
+                            <span>Success Rate</span>
+                            <span>{Math.round(solution.successRate * 100)}%</span>
+                        </div>
+                        <Progress value={solution.successRate * 100} className="h-2" />
+                    </div>
+                     <Button size="sm" className="w-full" onClick={onSelect} disabled={disabled}>
+                        <Check className="mr-2 h-4 w-4" /> 
+                        {disabled ? "Working on it!" : `I'll try this${solution.estimatedSavings ? ` - Save ₱${solution.estimatedSavings}` : ''}`}
+                     </Button>
+                </div>
             </CardContent>
         </Card>
     )

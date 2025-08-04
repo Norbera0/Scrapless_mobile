@@ -156,6 +156,7 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
         z.object({
             solution: z.string().describe("A specific, actionable solution to address the pattern."),
             successRate: z.number().min(0).max(1).describe("The estimated success rate of this solution (e.g., 0.75 for 75%)."),
+            estimatedSavings: z.number().optional().describe("The estimated financial savings in PHP if the user follows this solution."),
         })
     ).describe("A list of 3-4 actionable alternative solutions."),
     similarUserStory: z.string().describe("An encouraging story about similar users (e.g., 'Users who fixed this pattern typically saved ₱200/month')."),
