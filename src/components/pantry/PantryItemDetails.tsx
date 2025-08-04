@@ -1,10 +1,15 @@
 
 'use client';
 import { Button } from '../ui/button';
-import { PantryItem, ItemInsights } from '@/types';
+import { PantryItem, ItemInsights, User } from '@/types';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot } from 'lucide-react';
+import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot, Check, MinusCircle } from 'lucide-react';
 import Image from 'next/image';
+import { updatePantryItemStatus } from '@/lib/data';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { calculateAndSaveAvoidedExpiry } from '@/lib/savings';
+import { useState } from 'react';
 
 interface PantryItemDetailsProps {
     item: PantryItem | null;
@@ -17,10 +22,36 @@ interface PantryItemDetailsProps {
 }
 
 export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsights, isFetchingInsights, insights }: PantryItemDetailsProps) {
+    const { user } = useAuth();
+    const { toast } = useToast();
+    const [isUpdating, setIsUpdating] = useState(false);
+
     if (!isOpen || !item) return null;
 
     const addedDate = new Date(item.addedDate);
     const addedAgo = formatDistanceToNowStrict(addedDate, { addSuffix: true });
+
+    const handleStatusUpdate = async (status: 'used' | 'wasted') => {
+        if (!user || !item) return;
+        setIsUpdating(true);
+        try {
+            // Trigger savings calculation if item is used near expiry
+            if (status === 'used') {
+                await calculateAndSaveAvoidedExpiry(user, item);
+            }
+            // Update the item's status in the database
+            await updatePantryItemStatus(user.uid, item.id, status);
+            
+            toast({ title: `Item marked as ${status}`, description: `"${item.name}" has been updated.`});
+            onClose();
+        } catch (error) {
+            console.error(`Failed to mark item as ${status}`, error);
+            toast({ variant: 'destructive', title: 'Update Failed', description: 'Could not update the item status.' });
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
 
     return (
         <div className="fixed inset-0 z-50">
@@ -106,21 +137,28 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                         </div>
                     )}
 
-
                     <div className="grid grid-cols-2 gap-3 mt-6">
-                        <Button className="gradient-bg text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
-                            <Utensils className="w-5 h-5 inline mr-2" />
-                            Log as Waste
+                        <Button 
+                            className="bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                            onClick={() => handleStatusUpdate('used')}
+                            disabled={isUpdating}
+                        >
+                            {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5 inline mr-2" />}
+                            Mark as Used
                         </Button>
-                        <Button className="bg-blue-500 hover:bg-blue-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
-                            <Edit className="w-5 h-5 inline mr-2" />
-                            Edit Item
+                         <Button
+                            className="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                            onClick={() => handleStatusUpdate('wasted')}
+                            disabled={isUpdating}
+                        >
+                             {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <MinusCircle className="w-5 h-5 inline mr-2" />}
+                            Mark as Wasted
                         </Button>
                     </div>
                     
-                    <Button onClick={() => onDelete(item.id)} className="w-full mt-3 border-2 border-red-300 text-red-600 hover:bg-red-50 py-3 rounded-xl font-medium transition-colors">
+                    <Button onClick={() => onDelete(item.id)} className="w-full mt-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-100 py-3 rounded-xl font-medium transition-colors">
                         <Trash2 className="w-5 h-5 inline mr-2" />
-                        Delete Item
+                        Delete Item Permanently
                     </Button>
                 </div>
             </div>

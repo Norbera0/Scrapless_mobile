@@ -1,7 +1,7 @@
 
 'use client';
 import { db } from './firebase';
-import type { Insight, WasteLog, PantryItem, Recipe, User } from '@/types';
+import type { Insight, WasteLog, PantryItem, Recipe, User, SavingsEvent } from '@/types';
 import { 
     collection, 
     addDoc, 
@@ -132,6 +132,7 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
             estimatedExpirationDate: itemData.estimatedExpirationDate,
             addedDate: new Date().toISOString(),
             carbonFootprint: itemData.carbonFootprint || 0,
+            status: 'live', // New items are always live
         };
         
         // Add optional fields only if they have a value
@@ -147,6 +148,15 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     await batch.commit();
     return savedItems;
 };
+
+export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted') => {
+    const itemRef = doc(db, `users/${userId}/pantry`, itemId);
+    await updateDoc(itemRef, { status });
+    // This function only updates the status. The item is not deleted from the pantry collection.
+    // It will be filtered out in the UI based on its status.
+    // In a real app, you might move it to a different collection or have a cron job for cleanup.
+};
+
 
 export const deletePantryItem = async (userId: string, itemId: string) => {
     await deleteDoc(doc(db, `users/${userId}/pantry`, itemId));
@@ -200,4 +210,11 @@ export const getUserSettings = async (userId: string): Promise<any> => {
 export const saveUserSettings = async (userId: string, settings: any) => {
     const docRef = doc(db, `users/${userId}/settings`, 'app');
     await setDoc(docRef, settings, { merge: true });
+};
+
+// --- Savings Functions ---
+export const saveSavingsEvent = async (userId: string, event: Omit<SavingsEvent, 'id'>): Promise<string> => {
+    const savingsCollection = collection(db, `users/${userId}/savingsEvents`);
+    const docRef = await addDoc(savingsCollection, event);
+    return docRef.id;
 };

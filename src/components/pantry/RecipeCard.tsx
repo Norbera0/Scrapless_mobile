@@ -5,10 +5,13 @@ import Image from 'next/image';
 import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart } from 'lucide-react';
+import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { calculateAndSaveRecipeSavings } from '@/lib/savings';
+import { useAuth } from '@/hooks/use-auth';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -18,6 +21,18 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
     const isUrgent = recipe.tags?.includes('Urgent');
+    const { toast } = useToast();
+    const { user } = useAuth();
+
+    const handleMarkAsCooked = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!user) return;
+        await calculateAndSaveRecipeSavings(user, recipe);
+        toast({
+            title: "Nice one!",
+            description: `You've earned savings for cooking "${recipe.name}".`,
+        });
+    };
 
     return (
         <Dialog>
@@ -56,11 +71,14 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         <div className="flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
-                <CardFooter className="p-4 bg-secondary/30">
+                <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">
                      <div className="flex items-center text-xs text-primary font-semibold">
                        <Globe className="h-3 w-3 mr-1.5" />
                        <p>{recipe.benefit}</p>
                     </div>
+                    <Button size="sm" variant="ghost" className="h-auto px-2 py-1 text-xs" onClick={handleMarkAsCooked}>
+                        <CookingPot className="h-4 w-4 mr-1.5" /> Mark as Cooked
+                    </Button>
                 </CardFooter>
             </Card>
 
