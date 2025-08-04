@@ -32,6 +32,7 @@ export interface PantryItem {
     estimatedExpirationDate: string;
     addedDate: string; // ISO string for when the item was added
     carbonFootprint: number;
+    status: 'live' | 'used' | 'wasted'; // New status field
     // Optional details
     storageLocation?: string;
     useByTimeline?: string;
@@ -107,4 +108,44 @@ export interface ItemInsights {
     storageTip: string;
     wastePreventionTip: string;
     recipes: ItemRecipeSuggestion[];
+}
+
+// --- New Savings-Related Data Structures ---
+
+export interface SavingsEvent {
+    id: string;
+    userId: string;
+    date: string; // ISO string
+    type: 'avoided_expiry' | 'recipe_followed' | 'smart_shopping' | 'waste_reduction';
+    amount: number; // in PHP
+    description: string;
+    relatedPantryItemId?: string;
+    relatedWasteLogId?: string;
+    calculationMethod: string;
+    transferredToBank: boolean;
+    transferDate?: string; // ISO string
+}
+
+export interface SavingsCalculation {
+    id: string; // e.g., '2024-08'
+    userId: string;
+    month: string; // Format: 'YYYY-MM'
+    totalSavings: number;
+    breakdown: {
+        avoided_expiry: number;
+        recipe_followed: number;
+        smart_shopping: number;
+        waste_reduction: number;
+    };
+    amountTransferred: number;
+    amountAvailable: number;
+    calculationDate: string; // ISO string
+}
+
+export interface BaselineBehavior {
+    userId: string;
+    averageMonthlyWaste: number; // in PHP
+    spendingPerCategory: Record<string, number>;
+    baselineDate: string; // ISO string
+    isEstimated: boolean;
 }
