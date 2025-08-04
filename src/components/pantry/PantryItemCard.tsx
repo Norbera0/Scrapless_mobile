@@ -66,7 +66,7 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
                            )}
                         </div>
                         <div className="flex space-x-1 mt-2 md:mt-0">
-                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); /* TODO: Implement edit */}} className="h-8 w-8 text-muted-foreground hover:bg-secondary">
+                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-8 w-8 text-muted-foreground hover:bg-secondary">
                                 <Edit className="w-4 h-4" />
                             </Button>
                              <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
