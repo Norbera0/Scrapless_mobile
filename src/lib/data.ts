@@ -151,10 +151,23 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
 
 export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted') => {
     const itemRef = doc(db, `users/${userId}/pantry`, itemId);
-    await updateDoc(itemRef, { status });
-    // This function only updates the status. The item is not deleted from the pantry collection.
-    // It will be filtered out in the UI based on its status.
-    // In a real app, you might move it to a different collection or have a cron job for cleanup.
+    const itemSnap = await getDoc(itemRef);
+
+    if (itemSnap.exists()) {
+        const itemData = itemSnap.data() as Omit<PantryItem, 'id'>;
+        const batch = writeBatch(db);
+
+        // 1. Add to archived collection with the new status
+        const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
+        batch.set(archiveRef, { ...itemData, status });
+
+        // 2. Delete from the main pantry collection
+        batch.delete(itemRef);
+
+        await batch.commit();
+    } else {
+        throw new Error("Pantry item not found!");
+    }
 };
 
 
