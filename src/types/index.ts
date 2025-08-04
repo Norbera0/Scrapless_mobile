@@ -116,14 +116,27 @@ export interface SavingsEvent {
     id: string;
     userId: string;
     date: string; // ISO string
-    type: 'avoided_expiry' | 'recipe_followed' | 'smart_shopping' | 'waste_reduction';
+    type: 'avoided_expiry' | 'recipe_followed' | 'smart_shopping' | 'waste_reduction' | 'solution_implemented';
     amount: number; // in PHP
     description: string;
     relatedPantryItemId?: string;
     relatedWasteLogId?: string;
+    relatedSolutionId?: string;
     calculationMethod: string;
     transferredToBank: boolean;
     transferDate?: string; // ISO string
+}
+
+export interface SolutionSavings {
+    id: string;
+    userId: string;
+    insightId: string;
+    solutionDescription: string;
+    projectedSavings: number;
+    actualSavings: number;
+    implementationDate: string; // ISO string
+    status: 'tracking' | 'confirmed' | 'failed';
+    userCompliance: number; // 0 to 1
 }
 
 export interface SavingsCalculation {
@@ -136,6 +149,7 @@ export interface SavingsCalculation {
         recipe_followed: number;
         smart_shopping: number;
         waste_reduction: number;
+        solution_implemented: number;
     };
     amountTransferred: number;
     amountAvailable: number;
