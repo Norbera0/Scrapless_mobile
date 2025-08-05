@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { isWithinInterval, add } from 'date-fns';
+import { useSavingsStore } from '@/stores/savings-store';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function DashboardPage() {
   const { logs } = useWasteLogStore();
   const { insights } = useInsightStore();
   const { liveItems } = usePantryLogStore();
+  const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
 
@@ -36,10 +39,16 @@ export default function DashboardPage() {
       end: new Date() 
     }))
     .reduce((acc, log) => {
-      acc.totalPesoValue += log.totalPesoValue;
       acc.totalCarbonFootprint += log.totalCarbonFootprint;
       return acc;
-    }, { totalPesoValue: 0, totalCarbonFootprint: 0 });
+    }, { totalCarbonFootprint: 0 });
+
+  const weeklySavings = savingsEvents
+    .filter(event => isWithinInterval(new Date(event.date), {
+        start: new Date(new Date().setDate(new Date().getDate() - 7)),
+        end: new Date()
+    }))
+    .reduce((acc, event) => acc + event.amount, 0);
 
   // Calculate pantry health stats
   const freshItems = liveItems.filter(item => {
@@ -102,10 +111,10 @@ export default function DashboardPage() {
                   💸
                 </div>
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-red-600">
-                    ₱{weeklyStats.totalPesoValue.toFixed(2)}
+                  <div className="text-2xl md:text-3xl font-bold text-green-600">
+                    ₱{weeklySavings.toFixed(2)}
                   </div>
-                  <div className="text-sm text-red-500">Financial Leakage</div>
+                  <div className="text-sm text-green-500">Virtual Savings</div>
                 </div>
               </div>
             </div>

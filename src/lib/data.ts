@@ -24,6 +24,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useInsightStore } from '@/stores/insight-store';
 import type { PantryLogItem } from '@/stores/pantry-store';
+import { useSavingsStore } from '@/stores/savings-store';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -32,9 +33,10 @@ const listenerManager: { [key: string]: Unsubscribe[] } = {
     userSettings: [],
     savedRecipes: [],
     insights: [],
+    savingsEvents: [],
 };
 
-export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes' | 'insights') => {
+export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes' | 'insights' | 'savingsEvents') => {
     const unsubscribeAll = (keys: string[]) => {
         keys.forEach(k => {
             if (listenerManager[k]) {
@@ -57,6 +59,7 @@ export const initializeUserCache = (userId: string) => {
     useWasteLogStore.getState().setLogsInitialized(false);
     usePantryLogStore.getState().setPantryInitialized(false);
     useInsightStore.getState().setInsightsInitialized(false);
+    useSavingsStore.getState().setSavingsInitialized(false);
 
     // Listener for Waste Logs
     const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
@@ -103,6 +106,18 @@ export const initializeUserCache = (userId: string) => {
         useInsightStore.getState().setInsightsInitialized(true);
     });
     listenerManager.insights.push(insightsUnsub);
+
+    // Listener for Savings Events
+    const savingsQuery = query(collection(db, `users/${userId}/savingsEvents`), orderBy('date', 'desc'));
+    const savingsUnsub = onSnapshot(savingsQuery, (snapshot) => {
+        const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SavingsEvent));
+        useSavingsStore.getState().setSavingsEvents(events);
+        useSavingsStore.getState().setSavingsInitialized(true);
+    }, (error) => {
+        console.error("Error with savings listener:", error);
+        useSavingsStore.getState().setSavingsInitialized(true);
+    });
+    listenerManager.savingsEvents.push(savingsUnsub);
 };
 
 
@@ -168,7 +183,6 @@ export const updatePantryItemStatus = async (userId: string, itemId: string, sta
             // Logic for partial use: Update the quantity and keep it live
             // This requires quantity tracking, which we will simplify for now.
             // For now, we assume any "used" action that isn't 100% efficient still archives the item.
-            // A future implementation would update the `estimatedAmount`.
             
             // For simplicity in this step, we'll treat any "used" action as archiving the item.
             const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
