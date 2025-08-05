@@ -73,6 +73,7 @@ export interface Recipe {
 export interface InsightSolution {
     solution: string;
     successRate: number; // e.g., 0.75 for 75%
+    estimatedSavings?: number;
 }
 
 export interface Insight {

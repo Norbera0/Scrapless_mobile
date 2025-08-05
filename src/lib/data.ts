@@ -134,23 +134,14 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     
     itemsToSave.forEach(item => {
         const docRef = doc(pantryCollection, item.id);
-        const { id, ...itemData } = item;
+        const { id, shelfLifeByStorage, ...itemData } = item;
 
         const newItemData: Omit<PantryItem, 'id'> = {
-            name: itemData.name,
-            estimatedAmount: itemData.estimatedAmount,
-            estimatedExpirationDate: itemData.estimatedExpirationDate,
+            ...itemData,
             addedDate: new Date().toISOString(),
-            carbonFootprint: itemData.carbonFootprint || 0,
             status: 'live', // New items are always live
         };
         
-        // Add optional fields only if they have a value
-        if (itemData.storageLocation) newItemData.storageLocation = itemData.storageLocation;
-        if (itemData.useByTimeline) newItemData.useByTimeline = itemData.useByTimeline;
-        if (itemData.purchaseSource) newItemData.purchaseSource = itemData.purchaseSource;
-        if (itemData.estimatedCost) newItemData.estimatedCost = itemData.estimatedCost;
-
         batch.set(docRef, newItemData);
         savedItems.push({ ...newItemData, id: item.id });
     });
