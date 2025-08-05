@@ -33,67 +33,27 @@ interface PantryItemDetailsProps {
     insights: ItemInsights | null;
 }
 
-const UsageDialog = ({ item, onClose, onConfirm }: { item: PantryItem, onClose: () => void, onConfirm: (efficiency: number, notes: string) => void }) => {
-    const [usage, setUsage] = useState(1.0); // Default to "All"
-    const [notes, setNotes] = useState("");
-
-    const handleConfirm = () => {
-        onConfirm(usage, notes);
-    };
-
-    return (
-        <Dialog defaultOpen onOpenChange={(open) => !open && onClose()}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>How much of the "{item.name}" did you use?</DialogTitle>
-                    <DialogDescription>
-                        This helps us track your pantry more accurately and calculate your savings.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="grid grid-cols-3 gap-2">
-                        <Button variant={usage === 1.0 ? "default" : "outline"} onClick={() => setUsage(1.0)}><Package className="mr-2 h-4 w-4"/> All of it</Button>
-                        <Button variant={usage === 0.5 ? "default" : "outline"} onClick={() => setUsage(0.5)}><DivideCircle className="mr-2 h-4 w-4"/> Half</Button>
-                        <Button variant={usage === 0.25 ? "default" : "outline"} onClick={() => setUsage(0.25)}><PackageCheck className="mr-2 h-4 w-4"/> A little</Button>
-                    </div>
-                     <div className="space-y-1">
-                        <Label htmlFor="notes">Notes (optional)</Label>
-                        <Input id="notes" placeholder="e.g. Used for chicken adobo" value={notes} onChange={(e) => setNotes(e.target.value)} />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
-                    </DialogClose>
-                     <Button type="button" onClick={handleConfirm}>Confirm Usage</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsights, isFetchingInsights, insights }: PantryItemDetailsProps) {
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUpdating, setIsUpdating] = useState(false);
-    const [isUsageDialogOpen, setIsUsageDialogOpen] = useState(false);
 
     if (!isOpen || !item) return null;
 
     const addedDate = parseISO(item.addedDate);
     const addedAgo = formatDistanceToNowStrict(addedDate, { addSuffix: true });
 
-    const handleUsageConfirm = async (usageEfficiency: number, notes: string) => {
+    const handleMarkAsUsed = async () => {
         if (!user || !item) return;
-        setIsUsageDialogOpen(false);
         setIsUpdating(true);
         try {
-            await calculateAndSaveAvoidedExpiry(user, item, usageEfficiency);
+            // Assumes 100% usage (usageEfficiency = 1.0)
+            await calculateAndSaveAvoidedExpiry(user, item, 1.0);
 
-            // Update item status/quantity in DB
-            await updatePantryItemStatus(user.uid, item.id, 'used', usageEfficiency, notes);
+            // Update item status in DB
+            await updatePantryItemStatus(user.uid, item.id, 'used');
             
-            toast({ title: "Item usage logged!", description: `You've used a portion of "${item.name}".`});
+            toast({ title: "Item usage logged!", description: `You've used "${item.name}".`});
             onClose();
         } catch (error) {
             console.error(`Failed to mark item as used`, error);
@@ -108,7 +68,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         setIsUpdating(true);
         try {
             // Update item status to 'wasted'
-            await updatePantryItemStatus(user.uid, item.id, 'wasted', 1.0); // Assume full waste for now
+            await updatePantryItemStatus(user.uid, item.id, 'wasted');
             
             toast({ title: `Item marked as wasted`, description: `"${item.name}" has been moved to your waste log.`});
             onClose();
@@ -123,7 +83,6 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
 
     return (
         <div className="fixed inset-0 z-50">
-            {isUsageDialogOpen && <UsageDialog item={item} onClose={() => setIsUsageDialogOpen(false)} onConfirm={handleUsageConfirm} />}
             <div className="modal-overlay absolute inset-0" onClick={onClose}></div>
             <div className={`modal absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto ${isOpen ? 'show' : ''}`}>
                 <div className="p-6">
@@ -209,7 +168,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                     <div className="grid grid-cols-2 gap-3 mt-6">
                         <Button 
                             className="bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-                            onClick={() => setIsUsageDialogOpen(true)}
+                            onClick={handleMarkAsUsed}
                             disabled={isUpdating}
                         >
                             {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5 inline mr-2" />}

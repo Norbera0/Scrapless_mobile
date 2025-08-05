@@ -167,7 +167,7 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     return savedItems;
 };
 
-export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted', usageEfficiency: number, usageNotes?: string) => {
+export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted') => {
     const itemRef = doc(db, `users/${userId}/pantry`, itemId);
     
     await runTransaction(db, async (transaction) => {
@@ -177,27 +177,12 @@ export const updatePantryItemStatus = async (userId: string, itemId: string, sta
         }
 
         const itemData = itemSnap.data() as Omit<PantryItem, 'id'>;
-        const isPartialUse = status === 'used' && usageEfficiency < 1.0;
-
-        if (isPartialUse) {
-            // Logic for partial use: Update the quantity and keep it live
-            // This requires quantity tracking, which we will simplify for now.
-            // For now, we assume any "used" action that isn't 100% efficient still archives the item.
-            
-            // For simplicity in this step, we'll treat any "used" action as archiving the item.
-            const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
-            const archivedData = { ...itemData, status, usageEfficiency, usageNotes, usedDate: new Date().toISOString() };
-            transaction.set(archiveRef, archivedData);
-            transaction.delete(itemRef);
-
-        } else {
-            // Full consumption or waste: move to archived
-            const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
-            const finalStatus = status === 'used' ? 'used' : 'wasted';
-            const archivedData = { ...itemData, status: finalStatus, usageEfficiency, usageNotes, usedDate: new Date().toISOString() };
-            transaction.set(archiveRef, archivedData);
-            transaction.delete(itemRef);
-        }
+        
+        // Move to archived
+        const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
+        const archivedData = { ...itemData, status: status, usedDate: new Date().toISOString() };
+        transaction.set(archiveRef, archivedData);
+        transaction.delete(itemRef);
     });
 };
 
@@ -287,5 +272,3 @@ export const saveSavingsEvent = async (userId: string, event: Omit<SavingsEvent,
     const docRef = await addDoc(savingsCollection, event);
     return docRef.id;
 };
-
-    
