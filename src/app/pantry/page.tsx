@@ -134,19 +134,22 @@ export default function PantryPage() {
     }, [liveItems]);
 
     const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
+        if (liveItems.length === 0) {
+            toast({ title: 'Pantry is empty', description: 'Add items to your pantry to get recipe suggestions.' });
+            setRecipes([]);
+            return;
+        }
+
         setIsLoadingRecipes(true);
         try {
             const pantryItemNames = liveItems.map((item) => item.name);
-            if (pantryItemNames.length === 0) {
-                setRecipes([]);
-                return;
-            }
             const result = await suggestRecipes({
                 pantryItems: pantryItemNames,
                 preferences: recipeFilters,
                 history: currentRecipes.map(r => r.name),
             });
-            const recipesWithIds = result.recipes.map(r => ({ ...r, id: crypto.randomUUID() }));
+            // Use a stable ID generation method
+            const recipesWithIds = result.recipes.map(r => ({ ...r, id: r.id || crypto.randomUUID() }));
             setRecipes(recipesWithIds);
         } catch (error) {
             console.error('Failed to fetch recipes:', error);
@@ -161,10 +164,11 @@ export default function PantryPage() {
     }, [liveItems, recipeFilters, toast]);
 
     useEffect(() => {
-        if (pantryInitialized) {
+        if (pantryInitialized && recipes.length === 0) {
             fetchRecipes([]);
         }
-    }, [pantryInitialized, recipeFilters, fetchRecipes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pantryInitialized]);
     
     useEffect(() => {
         const loadSaved = async () => {
