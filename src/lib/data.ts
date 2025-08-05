@@ -232,3 +232,5 @@ export const saveSavingsEvent = async (userId: string, event: Omit<SavingsEvent,
     const docRef = await addDoc(savingsCollection, event);
     return docRef.id;
 };
+
+    
