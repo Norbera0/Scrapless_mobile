@@ -28,16 +28,30 @@ export interface WasteLog {
 export interface PantryItem {
     id: string;
     name: string;
-    estimatedAmount: string;
-    estimatedExpirationDate: string;
+    estimatedAmount: string; // e.g., "1kg", "500g", "1 box"
+    estimatedExpirationDate: string; // ISO String
     addedDate: string; // ISO string for when the item was added
+    status: 'live' | 'used' | 'wasted';
+    
+    // AI-generated data
+    shelfLifeByStorage: {
+        counter: number;
+        pantry: number;
+        refrigerator: number;
+        freezer: number;
+    };
     carbonFootprint: number;
-    status: 'live' | 'used' | 'wasted'; // New status field
-    // Optional details
-    storageLocation?: string;
+    estimatedCost?: number;
+    
+    // Optional user-provided details
+    storageLocation?: 'counter' | 'pantry' | 'refrigerator' | 'freezer';
     useByTimeline?: string;
     purchaseSource?: string;
-    estimatedCost?: number;
+
+    // Fields for tracking usage
+    usedDate?: string; // ISO string, set when item is used/wasted
+    usageEfficiency?: number; // 0.0 to 1.0, set on consumption
+    usageNotes?: string;
 }
   
 export interface PantryLog {

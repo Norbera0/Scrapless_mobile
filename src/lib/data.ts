@@ -16,7 +16,9 @@ import {
     getDoc,
     orderBy,
     limit,
-    updateDoc
+    updateDoc,
+    runTransaction,
+    collectionGroup
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
@@ -134,7 +136,7 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     
     itemsToSave.forEach(item => {
         const docRef = doc(pantryCollection, item.id);
-        const { id, shelfLifeByStorage, ...itemData } = item;
+        const { id, ...itemData } = item;
 
         const newItemData: Omit<PantryItem, 'id'> = {
             ...itemData,
@@ -150,31 +152,70 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
     return savedItems;
 };
 
-export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted') => {
+export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted', usageEfficiency: number, usageNotes?: string) => {
     const itemRef = doc(db, `users/${userId}/pantry`, itemId);
-    const itemSnap = await getDoc(itemRef);
+    
+    await runTransaction(db, async (transaction) => {
+        const itemSnap = await transaction.get(itemRef);
+        if (!itemSnap.exists()) {
+            throw new Error("Pantry item not found!");
+        }
 
-    if (itemSnap.exists()) {
         const itemData = itemSnap.data() as Omit<PantryItem, 'id'>;
-        const batch = writeBatch(db);
+        const isPartialUse = status === 'used' && usageEfficiency < 1.0;
 
-        // 1. Add to archived collection with the new status
-        const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
-        batch.set(archiveRef, { ...itemData, status });
+        if (isPartialUse) {
+            // Logic for partial use: Update the quantity and keep it live
+            // This requires quantity tracking, which we will simplify for now.
+            // For now, we assume any "used" action that isn't 100% efficient still archives the item.
+            // A future implementation would update the `estimatedAmount`.
+            
+            // For simplicity in this step, we'll treat any "used" action as archiving the item.
+            const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
+            const archivedData = { ...itemData, status, usageEfficiency, usageNotes, usedDate: new Date().toISOString() };
+            transaction.set(archiveRef, archivedData);
+            transaction.delete(itemRef);
 
-        // 2. Delete from the main pantry collection
-        batch.delete(itemRef);
-
-        await batch.commit();
-    } else {
-        throw new Error("Pantry item not found!");
-    }
+        } else {
+            // Full consumption or waste: move to archived
+            const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
+            const finalStatus = status === 'used' ? 'used' : 'wasted';
+            const archivedData = { ...itemData, status: finalStatus, usageEfficiency, usageNotes, usedDate: new Date().toISOString() };
+            transaction.set(archiveRef, archivedData);
+            transaction.delete(itemRef);
+        }
+    });
 };
-
 
 export const deletePantryItem = async (userId: string, itemId: string) => {
     await deleteDoc(doc(db, `users/${userId}/pantry`, itemId));
 };
+
+export const getUserWasteStats = async (userId: string): Promise<{ avgWasteRate: number; logsCount: number }> => {
+    const archivedItemsQuery = query(collection(db, `users/${userId}/archivedPantryItems`));
+    const querySnapshot = await getDocs(archivedItemsQuery);
+    
+    if (querySnapshot.empty) {
+        return { avgWasteRate: 0, logsCount: 0 };
+    }
+
+    let wastedCount = 0;
+    let usedCount = 0;
+
+    querySnapshot.forEach(doc => {
+        const item = doc.data() as PantryItem;
+        if (item.status === 'wasted') {
+            wastedCount++;
+        } else if (item.status === 'used') {
+            usedCount++;
+        }
+    });
+
+    const totalLogs = wastedCount + usedCount;
+    const avgWasteRate = totalLogs > 0 ? wastedCount / totalLogs : 0;
+    
+    return { avgWasteRate, logsCount: totalLogs };
+}
 
 
 // --- Recipe Functions ---
