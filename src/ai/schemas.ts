@@ -48,7 +48,12 @@ export const LogPantryItemOutputSchema = z.object({
       z.object({
         name: z.string().describe('The name of the food item.'),
         estimatedAmount: z.string().describe('The estimated amount of the food item (e.g., 1 kg, 2 pcs, 1 box).'),
-        shelfLifeDays: z.number().describe("The estimated shelf life of the item in days from purchase (e.g., 7 for one week)."),
+        shelfLifeByStorage: z.object({
+            counter: z.number().describe("Shelf life in days if stored on the counter."),
+            pantry: z.number().describe("Shelf life in days if stored in a pantry/cabinet."),
+            refrigerator: z.number().describe("Shelf life in days if stored in the refrigerator."),
+            freezer: z.number().describe("Shelf life in days if stored in the freezer."),
+        }).describe("The estimated shelf life of the item in days, broken down by storage method."),
         carbonFootprint: z.number().optional().describe("The estimated carbon footprint in kg CO2e."),
         estimatedCost: z.number().optional().describe("The estimated cost of the item in PHP."),
       })

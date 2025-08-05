@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, type NextRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addDays } from 'date-fns';
+import { addDays, differenceInDays, startOfToday } from 'date-fns';
 
 const storageLocations = [
+  { value: 'counter', label: 'Counter (room temp)' },
+  { value: 'pantry', label: 'Pantry/Cabinet' },
   { value: 'refrigerator', label: 'Refrigerator' },
   { value: 'freezer', label: 'Freezer' },
-  { value: 'pantry', label: 'Pantry/Cabinet' },
-  { value: 'counter', label: 'Counter (room temp)' },
 ];
 
 const useByTimelines = [
@@ -51,6 +51,127 @@ const safelyResetThenNavigate = async (
     router.replace(path);
 };
 
+const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: PantryLogItem, index: number, handleItemChange: Function, handleRemoveItem: Function }) => {
+    
+    useEffect(() => {
+        // Set default storage location if not already set
+        if (!item.storageLocation) {
+            handleItemChange(index, 'storageLocation', 'counter');
+        }
+    }, []); // Run only once on mount
+
+    const getShelfLife = () => {
+        if (!item.shelfLifeByStorage || !item.storageLocation) return 7; // default
+        return item.shelfLifeByStorage[item.storageLocation as keyof typeof item.shelfLifeByStorage] || 7;
+    }
+    
+    const calculatedExpiryDate = addDays(new Date(), getShelfLife());
+
+    const onStorageChange = (value: string) => {
+        handleItemChange(index, 'storageLocation', value);
+        // The expiry date will be recalculated automatically by the effect.
+    }
+
+    const onDateChange = (date?: Date) => {
+        const today = startOfToday();
+        const newDate = date || today;
+        const shelfLife = differenceInDays(newDate, today);
+        
+        // This is a bit of a workaround to keep shelfLifeByStorage in sync
+        // In a real app, you might want a more sophisticated way to handle manual date changes
+        const currentShelfLife = item.shelfLifeByStorage || { counter: 7, pantry: 14, refrigerator: 21, freezer: 365 };
+        const updatedShelfLife = {
+            ...currentShelfLife,
+            [item.storageLocation || 'counter']: shelfLife
+        };
+        handleItemChange(index, 'shelfLifeByStorage', updatedShelfLife);
+    }
+
+    return (
+        <Collapsible key={item.id} className="space-y-3 rounded-lg border p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 grid gap-3">
+                  <Input
+                      value={item.name}
+                      onChange={(e) => handleItemChange(index, 'name', e.target.value)}
+                      className="text-lg font-semibold h-11"
+                      placeholder="Item Name"
+                  />
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Input
+                          value={item.estimatedAmount}
+                          onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
+                          placeholder="Amount (e.g. 1kg)"
+                          className="h-11"
+                      />
+                      <DatePicker
+                          date={calculatedExpiryDate}
+                          onDateChange={onDateChange}
+                          className="h-11"
+                      />
+                  </div>
+              </div>
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => handleRemoveItem(index)}>
+                  <Trash2 className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <CollapsibleTrigger asChild>
+                <Button variant="outline" className="w-full border-dashed data-[state=open]:border-solid">
+                    <ChevronDown className="h-4 w-4 mr-2 transition-transform duration-300 data-[state=open]:rotate-180" />
+                    <span className="data-[state=open]:hidden">Add details (optional)</span>
+                    <span className="data-[state=closed]:hidden">Hide details</span>
+                </Button>
+            </CollapsibleTrigger>
+            
+            <CollapsibleContent>
+                <div className="space-y-4 rounded-md border-dashed border bg-secondary/50 p-4 mt-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid gap-1.5">
+                            <Label htmlFor={`storage-${item.id}`}>Store in:</Label>
+                            <Select value={item.storageLocation} onValueChange={onStorageChange}>
+                                <SelectTrigger id={`storage-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select location..." /></SelectTrigger>
+                                <SelectContent>
+                                    {storageLocations.map(loc => <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor={`useby-${item.id}`}>Use by:</Label>
+                            <Select value={item.useByTimeline} onValueChange={(value) => handleItemChange(index, 'useByTimeline', value)}>
+                                <SelectTrigger id={`useby-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select timeline..." /></SelectTrigger>
+                                <SelectContent>
+                                    {useByTimelines.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor={`source-${item.id}`}>From:</Label>
+                            <Select value={item.purchaseSource} onValueChange={(value) => handleItemChange(index, 'purchaseSource', value)}>
+                                <SelectTrigger id={`source-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select source..." /></SelectTrigger>
+                                <SelectContent>
+                                    {purchaseSources.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
+                            <Input
+                                id={`price-${item.id}`}
+                                type="number"
+                                value={item.estimatedCost ?? ''}
+                                onChange={(e) => handleItemChange(index, 'estimatedCost', e.target.valueAsNumber || undefined)}
+                                placeholder="e.g. 150.00"
+                                className="h-11 bg-background"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
+    )
+}
+
 export function ReviewPantryItems() {
   const router = useRouter();
   const { toast } = useToast();
@@ -74,7 +195,9 @@ export function ReviewPantryItems() {
       id: crypto.randomUUID(),
       name: '',
       estimatedAmount: '',
-      shelfLifeDays: 7, // Default shelf life
+      estimatedExpirationDate: addDays(new Date(), 7).toISOString(),
+      shelfLifeByStorage: { counter: 7, pantry: 14, refrigerator: 21, freezer: 365 },
+      storageLocation: 'counter', // Default
       carbonFootprint: 0,
       estimatedCost: 0,
     };
@@ -89,14 +212,14 @@ export function ReviewPantryItems() {
     setIsSaving(true);
     try {
       const itemsToSave = items.map(item => {
-        const expirationDate = addDays(new Date(), item.shelfLifeDays || 7);
+        const shelfLife = item.shelfLifeByStorage[item.storageLocation as keyof typeof item.shelfLifeByStorage || 'counter'] || 7;
+        const expirationDate = addDays(new Date(), shelfLife);
         return {
             ...item,
             estimatedExpirationDate: expirationDate.toISOString(),
         }
       });
       
-      // Optimistically add items to the UI right away
       const optimisticPantryItems = itemsToSave.map(logItem => ({
         ...logItem,
         id: logItem.id,
@@ -149,97 +272,15 @@ export function ReviewPantryItems() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {items.map((item: PantryLogItem, index: number) => {
-            const calculatedExpiryDate = addDays(new Date(), item.shelfLifeDays || 0);
-            return (
-              <Collapsible key={item.id} className="space-y-3 rounded-lg border p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 grid gap-3">
-                      <Input
-                          value={item.name}
-                          onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                          className="text-lg font-semibold h-11"
-                          placeholder="Item Name"
-                      />
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            <Input
-                              value={item.estimatedAmount}
-                              onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
-                              placeholder="Amount (e.g. 1kg)"
-                              className="h-11"
-                          />
-                          <DatePicker
-                              date={calculatedExpiryDate}
-                              onDateChange={(date) => {
-                                  const today = new Date();
-                                  const newDate = date || today;
-                                  const shelfLife = Math.ceil((newDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                                  handleItemChange(index, 'shelfLifeDays', shelfLife);
-                              }}
-                              className="h-11"
-                          />
-                      </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => handleRemoveItem(index)}>
-                      <Trash2 className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                <CollapsibleTrigger asChild>
-                    <Button variant="outline" className="w-full border-dashed data-[state=open]:border-solid">
-                        <ChevronDown className="h-4 w-4 mr-2 transition-transform duration-300 data-[state=open]:rotate-180" />
-                        <span className="data-[state=open]:hidden">Add details (optional)</span>
-                        <span className="data-[state=closed]:hidden">Hide details</span>
-                    </Button>
-                </CollapsibleTrigger>
-                
-                <CollapsibleContent>
-                    <div className="space-y-4 rounded-md border-dashed border bg-secondary/50 p-4 mt-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="grid gap-1.5">
-                                <Label htmlFor={`storage-${item.id}`}>Store in:</Label>
-                                <Select value={item.storageLocation} onValueChange={(value) => handleItemChange(index, 'storageLocation', value)}>
-                                    <SelectTrigger id={`storage-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select location..." /></SelectTrigger>
-                                    <SelectContent>
-                                        {storageLocations.map(loc => <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-1.5">
-                                <Label htmlFor={`useby-${item.id}`}>Use by:</Label>
-                                <Select value={item.useByTimeline} onValueChange={(value) => handleItemChange(index, 'useByTimeline', value)}>
-                                    <SelectTrigger id={`useby-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select timeline..." /></SelectTrigger>
-                                    <SelectContent>
-                                        {useByTimelines.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-1.5">
-                                <Label htmlFor={`source-${item.id}`}>From:</Label>
-                                <Select value={item.purchaseSource} onValueChange={(value) => handleItemChange(index, 'purchaseSource', value)}>
-                                    <SelectTrigger id={`source-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select source..." /></SelectTrigger>
-                                    <SelectContent>
-                                        {purchaseSources.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid gap-1.5">
-                                <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
-                                <Input
-                                    id={`price-${item.id}`}
-                                    type="number"
-                                    value={item.estimatedCost ?? ''}
-                                    onChange={(e) => handleItemChange(index, 'estimatedCost', e.target.valueAsNumber || undefined)}
-                                    placeholder="e.g. 150.00"
-                                    className="h-11 bg-background"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          })}
+          {items.map((item, index) => (
+             <ItemCard 
+                key={item.id}
+                item={item} 
+                index={index} 
+                handleItemChange={handleItemChange} 
+                handleRemoveItem={handleRemoveItem} 
+            />
+          ))}
         </CardContent>
       </Card>
       <div className="flex justify-end gap-2">

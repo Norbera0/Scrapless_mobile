@@ -7,6 +7,12 @@ export interface PantryLogItem {
   name: string;
   estimatedAmount: string;
   estimatedExpirationDate: string;
+  shelfLifeByStorage: {
+      counter: number;
+      pantry: number;
+      refrigerator: number;
+      freezer: number;
+  };
   carbonFootprint?: number;
   estimatedCost?: number;
   // Optional details
