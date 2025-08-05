@@ -78,7 +78,17 @@ export const initializeUserCache = (userId: string) => {
         console.error("Error with pantry listener:", error);
         usePantryLogStore.getState().setPantryInitialized(true);
     });
-    listenerManager.pantry.push(pantryUnsub);
+    
+    // Listener for Archived Pantry Items
+    const archivedPantryQuery = query(collection(db, `users/${userId}/archivedPantryItems`), orderBy('addedDate', 'desc'), limit(100)); // Limit to last 100 for performance
+    const archivedPantryUnsub = onSnapshot(archivedPantryQuery, (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
+        usePantryLogStore.getState().setArchivedItems(items);
+    }, (error) => {
+        console.error("Error with archivedPantry listener:", error);
+    });
+
+    listenerManager.pantry.push(pantryUnsub, archivedPantryUnsub);
     
     // Listener for Insights
     const insightsQuery = query(collection(db, `users/${userId}/insights`), orderBy('date', 'desc'));
