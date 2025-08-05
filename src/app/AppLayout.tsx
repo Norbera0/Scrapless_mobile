@@ -72,10 +72,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
-              <div className="flex-1">
-                   {/* Can add other header items here in the future */}
+              <div className="flex items-center gap-2 md:gap-4">
+                {pathname === '/dashboard' && (
+                  <div className="flex flex-col items-end text-right">
+                    <div className="text-xs md:text-sm font-medium">
+                      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <div className="hidden sm:flex flex-col items-end text-right">
+                    <div className="text-sm font-medium">{user?.name || 'User'}</div>
+                    <div className="text-xs text-muted-foreground">{user?.email}</div>
+                  </div>
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium text-primary-foreground">
+                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                </div>
               </div>
-              {/* Add other header items like avatar here if needed */}
           </header>
           <div className="bg-background w-full max-w-full overflow-x-hidden">
             {children}

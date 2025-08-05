@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Home, Camera, LogOut, BarChart, Warehouse, Bookmark, Bot, Lightbulb, ShoppingCart, Utensils, PanelLeft, PackagePlus } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -47,12 +47,12 @@ export function SidebarNav({ user }: { user: User }) {
   };
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: Home },
-    { href: '/pantry', label: 'Pantry', icon: Warehouse },
-    { href: '/my-waste', label: 'My Waste', icon: BarChart },
-    { href: '/insights', label: 'Insights', icon: Lightbulb },
-    { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
-    { href: '/saves', label: 'My Saves', icon: Bookmark },
+    { href: '/dashboard', label: 'Dashboard', iconSrc: '/icons/Dashboard icon.png', inactiveIconSrc: '/icons/Dashboard icon - inactive.png' },
+    { href: '/pantry', label: 'Pantry', iconSrc: '/icons/Pantry Icon.png', inactiveIconSrc: '/icons/Pantry Icon - inactive.png' },
+    { href: '/my-waste', label: 'My Waste', iconSrc: '/icons/Waste icon.png', inactiveIconSrc: '/icons/Waste icon - inactive.png' },
+    { href: '/insights', label: 'Insights', iconSrc: '/icons/Insights icon.png', inactiveIconSrc: '/icons/Insights icon - inactive.png' },
+    { href: '/shopping', label: 'Shopping Hubs', iconSrc: '/icons/My shopping hub icon.png', inactiveIconSrc: '/icons/My shopping hub icon - inactive.png' },
+    { href: '/saves', label: 'My Saves', iconSrc: '/icons/My saves icon.png', inactiveIconSrc: '/icons/My saves icon - inactiver.png' },
   ];
   
   const getInitials = (name?: string | null) => {
@@ -95,7 +95,13 @@ export function SidebarNav({ user }: { user: User }) {
                 className="w-full justify-start text-base h-12"
                 tooltip={item.label}
               >
-                <item.icon className="h-5 w-5" />
+                <Image 
+                  src={isActive(item.href) ? item.iconSrc : item.inactiveIconSrc} 
+                  alt={item.label}
+                  width={20}
+                  height={20}
+                  className="h-5 w-5"
+                />
                 <span>{item.label}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -114,8 +120,14 @@ export function SidebarNav({ user }: { user: User }) {
           </div>
         </div>
         <Button variant="ghost" className="w-full justify-start gap-2 group-data-[[data-collapsible=icon]]/sidebar-wrapper:justify-center" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
-          <span className='group-data-[[data-collapsible=icon]]/sidebar-wrapper:hidden'>Logout</span>
+          <Image 
+            src="/icons/Logout icon.png"
+            alt="Logout"
+            width={16}
+            height={16}
+            className="h-4 w-4"
+          />
+          <span className='group-data-[[data-collapsible=icon]]/sidebar-wrapper:hidden'>Log Out</span>
         </Button>
       </SidebarFooter>
     </>
