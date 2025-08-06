@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useSavingsStore } from '@/stores/savings-store';
 import { isWithinInterval, add } from 'date-fns';
 import { 
   Sparkles, 
@@ -24,7 +25,8 @@ import {
   Target,
   Leaf,
   DollarSign,
-  Zap
+  Zap,
+  Trash
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -33,6 +35,7 @@ export default function DashboardPage() {
   const { logs } = useWasteLogStore();
   const { insights } = useInsightStore();
   const { liveItems } = usePantryLogStore();
+  const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
 
@@ -44,7 +47,7 @@ export default function DashboardPage() {
   }, []);
 
   // Calculate weekly stats
-  const weeklyStats = logs
+  const weeklyWasteStats = logs
     .filter(log => isWithinInterval(new Date(log.date), { 
       start: new Date(new Date().setDate(new Date().getDate() - 7)), 
       end: new Date() 
@@ -54,6 +57,16 @@ export default function DashboardPage() {
       acc.totalCarbonFootprint += log.totalCarbonFootprint;
       return acc;
     }, { totalPesoValue: 0, totalCarbonFootprint: 0 });
+
+  const weeklySavingsStats = savingsEvents
+    .filter(event => isWithinInterval(new Date(event.date), {
+        start: new Date(new Date().setDate(new Date().getDate() - 7)),
+        end: new Date()
+    }))
+    .reduce((acc, event) => {
+        acc.totalSavings += event.amount;
+        return acc;
+    }, { totalSavings: 0 });
 
   // Calculate pantry health stats
   const freshItems = liveItems.filter(item => {
@@ -159,7 +172,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-green-700 mb-6">Your waste tracking results</p>
+            <p className="text-sm text-green-700 mb-6">Your progress this week</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-6 border border-green-300">
                 <div className="flex items-center gap-4">
@@ -167,7 +180,7 @@ export default function DashboardPage() {
                     <DollarSign className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-green-800">₱{weeklyStats.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-green-800">₱{weeklySavingsStats.totalSavings.toFixed(2)}</p>
                     <p className="text-sm text-green-600 font-medium">Virtual Savings</p>
                   </div>
                 </div>
@@ -176,11 +189,11 @@ export default function DashboardPage() {
               <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 border border-red-300">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
-                    <Leaf className="w-6 h-6 text-red-600" />
+                    <Trash className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-red-800">{weeklyStats.totalCarbonFootprint.toFixed(2)} kg</p>
-                    <p className="text-sm text-red-600 font-medium">Carbon Footprint</p>
+                    <p className="text-3xl font-bold text-red-800">₱{weeklyWasteStats.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-sm text-red-600 font-medium">Food Waste</p>
                   </div>
                 </div>
               </div>
@@ -327,3 +340,4 @@ export default function DashboardPage() {
   );
 }
 
+    
