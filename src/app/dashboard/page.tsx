@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -150,24 +151,24 @@ export default function DashboardPage() {
         </div>
 
         {/* This Week's Impact */}
-        <Card className="mb-8 bg-gradient-to-br from-red-50 to-pink-50 border-red-200 shadow-sm">
+        <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-800">
-              <BarChart3 className="w-6 h-6 text-red-600" />
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <BarChart3 className="w-6 h-6 text-green-600" />
               This Week's Impact
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-red-700 mb-6">Your waste tracking results</p>
+            <p className="text-sm text-green-700 mb-6">Your waste tracking results</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 border border-red-300">
+              <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-6 border border-green-300">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-red-600" />
+                  <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-3xl font-bold text-red-800">₱{weeklyStats.totalPesoValue.toFixed(2)}</p>
-                    <p className="text-sm text-red-600 font-medium">Financial Leakage</p>
+                    <p className="text-3xl font-bold text-green-800">₱{weeklyStats.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-sm text-green-600 font-medium">Virtual Savings</p>
                   </div>
                 </div>
               </div>
