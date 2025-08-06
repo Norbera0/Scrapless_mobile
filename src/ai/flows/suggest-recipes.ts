@@ -29,28 +29,19 @@ async function generateRecipeImage(recipeName: string): Promise<string | undefin
         });
         
         console.log('🖼️ Full result:', result);
-        console.log('🖼️ Result keys:', Object.keys(result));
         console.log('🖼️ Media:', result.media);
+        console.log('🖼️ Media URL:', result.media?.url);
         
-        // Try different possible structures
-        const possibleUrls = [
-            result.media?.url,
-            result.media?.[0]?.uri,
-            result.media?.[0]?.url,
-            result.output?.media?.url,
-            result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
-        ];
-        
-        console.log('🖼️ Possible URLs:', possibleUrls);
-        
-        // Return the first non-undefined URL
-        return possibleUrls.find(url => url !== undefined);
+        // The TypeScript errors show that media is an object with { url: string, contentType?: string }
+        // So we can directly access .url
+        return result.media?.url;
         
     } catch (error) {
         console.error(`❌ Failed to generate image for ${recipeName}:`, error);
         return undefined;
     }
 }
+
 
 export async function suggestRecipes(input: SuggestRecipesInput): Promise<SuggestRecipesOutput> {
   return suggestRecipesFlow(input);
