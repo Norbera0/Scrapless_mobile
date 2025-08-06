@@ -71,19 +71,22 @@ const suggestRecipesFlow = ai.defineFlow(
     outputSchema: SuggestRecipesOutputSchema,
   },
   async (input) => {
+    // 1. Generate the recipe TEXT (name, ingredients, etc.)
     const { output } = await prompt(input);
     if (!output || !output.recipes) {
+      console.log("AI did not return any recipes from the text prompt.");
       return { recipes: [] };
     }
 
-    // Generate images for each recipe in parallel
+    // 2. Generate an image for each recipe in parallel
     const recipesWithImages = await Promise.all(
         output.recipes.map(async (recipe) => {
             const photoDataUri = await generateRecipeImage(recipe.name);
             return { ...recipe, photoDataUri };
         })
     );
-
+    
+    // 3. Return the combined text and image data
     return { recipes: recipesWithImages };
   }
 );

@@ -31,7 +31,7 @@ import { deletePantryItem, getSavedRecipes, saveRecipe, unsaveRecipe, updatePant
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
-import { suggestRecipes } from '@/ai/flows/suggest-recipes';
+import { getRecipeSuggestions } from '@/app/actions';
 import { PantryOverview } from '@/components/pantry/PantryOverview';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
@@ -181,7 +181,8 @@ export default function PantryPage() {
     setIsLoadingRecipes(true);
     try {
       const pantryItemNames = liveItems.map((item) => item.name);
-      const result = await suggestRecipes({
+      // Call the Server Action instead of the AI flow directly
+      const result = await getRecipeSuggestions({
         pantryItems: pantryItemNames,
         preferences: {
             quickMeals: recipeFilters.quickMeals,
