@@ -61,7 +61,6 @@ export default function PantryPage() {
   const [recipeFilters, setRecipeFilters] = useState({
     quickMeals: false,
     filipinoDishes: true,
-    difficulty: 'Easy' as const,
   });
 
   useEffect(() => {
@@ -187,7 +186,6 @@ export default function PantryPage() {
         preferences: {
             quickMeals: recipeFilters.quickMeals,
             filipinoDishes: recipeFilters.filipinoDishes,
-            difficulty: recipeFilters.difficulty as any,
         },
         history: currentRecipes.map(r => r.name),
       });
