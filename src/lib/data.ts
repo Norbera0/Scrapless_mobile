@@ -18,13 +18,15 @@ import {
     limit,
     updateDoc,
     runTransaction,
-    collectionGroup
+    collectionGroup,
+    where
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useInsightStore } from '@/stores/insight-store';
 import type { PantryLogItem } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
+import { FOOD_DATA_MAP } from './food-data';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -138,6 +140,80 @@ export const deleteWasteLog = async (userId: string, logId: string) => {
 };
 
 // --- Pantry Functions ---
+
+export const getExpiredPantryItems = async (userId: string): Promise<PantryItem[]> => {
+    const todayISO = new Date().toISOString();
+    const q = query(
+        collection(db, `users/${userId}/pantry`), 
+        where('estimatedExpirationDate', '<', todayISO)
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
+};
+
+export const moveExpiredItemsToWaste = async (userId: string, expiredItems: PantryItem[]) => {
+    if (expiredItems.length === 0) return;
+
+    const batch = writeBatch(db);
+
+    const getImpact = (itemName: string): { peso: number; co2e: number } => {
+        const lowerCaseItem = itemName.toLowerCase();
+        for (const key in FOOD_DATA_MAP) {
+            if (lowerCaseItem.includes(key)) {
+                return { peso: FOOD_DATA_MAP[key].peso, co2e: FOOD_DATA_MAP[key].co2e };
+            }
+        }
+        return { peso: 5, co2e: 0.1 }; // Default
+    };
+
+    let totalPesoValue = 0;
+    let totalCarbonFootprint = 0;
+
+    const foodItemsForLog = expiredItems.map(item => {
+        const { peso, co2e } = getImpact(item.name);
+        totalPesoValue += peso;
+        totalCarbonFootprint += co2e;
+        return {
+            id: item.id,
+            name: item.name,
+            estimatedAmount: item.estimatedAmount,
+            pesoValue: peso,
+            carbonFootprint: co2e,
+            wasteReason: 'Past expiry date',
+        };
+    });
+    
+    // 1. Create a new single waste log for all expired items
+    const wasteLogRef = doc(collection(db, `users/${userId}/wasteLogs`));
+    const newWasteLog: Omit<WasteLog, 'id'> = {
+        date: new Date().toISOString(),
+        userId,
+        items: foodItemsForLog,
+        totalPesoValue,
+        totalCarbonFootprint,
+        sessionWasteReason: 'Past expiry date',
+    };
+    batch.set(wasteLogRef, newWasteLog);
+
+    // 2. Move items from pantry to archivedPantryItems
+    for (const item of expiredItems) {
+        const pantryRef = doc(db, `users/${userId}/pantry`, item.id);
+        const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, item.id);
+        const archivedData: PantryItem = { 
+            ...item, 
+            status: 'wasted', 
+            usedDate: new Date().toISOString() 
+        };
+
+        batch.set(archiveRef, archivedData);
+        batch.delete(pantryRef);
+    }
+    
+    await batch.commit();
+    console.log(`Successfully moved ${expiredItems.length} expired items to waste log.`);
+};
+
+
 export const getPantryItemsForUser = async (userId: string): Promise<PantryItem[]> => {
     const q = query(collection(db, `users/${userId}/pantry`), orderBy('estimatedExpirationDate', 'asc'));
     const querySnapshot = await getDocs(q);

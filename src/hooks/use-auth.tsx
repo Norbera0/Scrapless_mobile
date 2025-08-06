@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import type { Insight, PantryItem, User, WasteLog } from '@/types';
-import { getLatestInsight, saveInsight } from '@/lib/data';
+import { getLatestInsight, saveInsight, getExpiredPantryItems, moveExpiredItemsToWaste } from '@/lib/data';
 import { analyzeConsumptionPatterns } from '@/ai/flows/analyze-consumption-patterns';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 
 const twentyFourHours = 24 * 60 * 60 * 1000;
+const oneHour = 60 * 60 * 1000;
 
 const fetchAndSaveNewInsight = async (user: User, wasteLogs: WasteLog[], pantryItems: PantryItem[]) => {
   if (wasteLogs.length === 0 && pantryItems.length === 0) {
@@ -67,15 +68,26 @@ export function useAuth() {
 
   useEffect(() => {
     if (user && logsInitialized && pantryInitialized) {
-      const checkAndGenerateInsight = async () => {
-        const latestInsight = await getLatestInsight(user.uid);
-        const now = new Date().getTime();
+      const lastInsightCheck = localStorage.getItem(`lastInsightCheck_${user.uid}`);
+      const now = new Date().getTime();
 
-        if (!latestInsight || now - new Date(latestInsight.date).getTime() > twentyFourHours) {
-          await fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
-        }
-      };
-      checkAndGenerateInsight();
+      if (!lastInsightCheck || now - parseInt(lastInsightCheck, 10) > twentyFourHours) {
+        console.log("Checking for new insights...");
+        fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
+        localStorage.setItem(`lastInsightCheck_${user.uid}`, now.toString());
+      }
+      
+      const lastExpiredCheck = localStorage.getItem(`lastExpiredCheck_${user.uid}`);
+      if (!lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour) {
+         console.log("Checking for expired items...");
+         getExpiredPantryItems(user.uid).then(expiredItems => {
+            if (expiredItems.length > 0) {
+                console.log(`Found ${expiredItems.length} expired items. Moving to waste...`);
+                moveExpiredItemsToWaste(user.uid, expiredItems);
+            }
+         });
+         localStorage.setItem(`lastExpiredCheck_${user.uid}`, now.toString());
+      }
     }
   }, [user, logsInitialized, pantryInitialized, wasteLogs, pantryItems]);
 
