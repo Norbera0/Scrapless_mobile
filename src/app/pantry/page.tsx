@@ -21,7 +21,8 @@ import {
   AlertTriangle,
   Filter,
   Grid3X3,
-  List
+  List,
+  Loader2
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
