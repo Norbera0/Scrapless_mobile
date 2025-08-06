@@ -138,9 +138,12 @@ export function ReviewItems() {
       toast({
           title: 'Success!',
           description: 'Your waste log has been saved.',
+          duration: 3000,
       });
       
-      await safelyResetThenNavigate(reset, router, "/dashboard");
+      setTimeout(() => {
+        safelyResetThenNavigate(reset, router, "/dashboard");
+      }, 2500);
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);

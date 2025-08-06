@@ -240,9 +240,12 @@ export function ReviewPantryItems() {
       toast({
         title: 'Success!',
         description: 'Your pantry has been updated.',
+        duration: 3000,
       });
 
-      await safelyResetThenNavigate(reset, router, "/pantry");
+      setTimeout(() => {
+        safelyResetThenNavigate(reset, router, "/pantry");
+      }, 2500);
       
     } catch (error) {
       console.error('Failed to save pantry items:', error);
