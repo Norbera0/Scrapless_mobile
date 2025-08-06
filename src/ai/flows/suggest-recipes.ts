@@ -27,7 +27,15 @@ async function generateRecipeImage(recipeName: string): Promise<string | undefin
         });
         
         // For new API shape ─ grab the first image URI
-        return result.output?.media?.[0]?.uri;
+        const imageUrl = result.output?.media?.[0]?.uri;
+
+        if (imageUrl) {
+            console.log(`✅ Successfully generated image for ${recipeName}.`);
+        } else {
+            console.warn(`⚠️ Image generation for ${recipeName} returned no URL.`);
+        }
+        
+        return imageUrl;
         
     } catch (error) {
         console.error(`❌ Failed to generate image for ${recipeName}:`, error);
