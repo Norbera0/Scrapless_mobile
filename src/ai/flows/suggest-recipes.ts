@@ -19,21 +19,14 @@ import {
 
 async function generateRecipeImage(recipeName: string): Promise<string | undefined> {
   try {
-    console.log(`🖼️ Generating image for: ${recipeName}`);
-    const result = await ai.generate({
+    const { media } = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
       prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
-      output: { format: 'uri' }
+      config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+      },
     });
-
-    const uri = result.output?.media?.[0]?.uri;
-    if (uri) {
-        console.log(`✅ Successfully generated image for ${recipeName}.`);
-    } else {
-        console.error(`❌ Failed to get URI from response for ${recipeName}:`, JSON.stringify(result, null, 2));
-    }
-    return uri;
-
+    return media?.url;
   } catch (err) {
     console.error(`❌ Hard failure to generate image for ${recipeName}:`, err);
     return undefined;
