@@ -1,19 +1,30 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { isWithinInterval, add } from 'date-fns';
-import { useSavingsStore } from '@/stores/savings-store';
+import { 
+  Sparkles, 
+  TrendingUp, 
+  Package, 
+  Clock, 
+  AlertTriangle,
+  CheckCircle,
+  ArrowRight,
+  BarChart3,
+  Target,
+  Leaf,
+  DollarSign,
+  Zap
+} from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -21,7 +32,6 @@ export default function DashboardPage() {
   const { logs } = useWasteLogStore();
   const { insights } = useInsightStore();
   const { liveItems } = usePantryLogStore();
-  const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
 
@@ -39,16 +49,10 @@ export default function DashboardPage() {
       end: new Date() 
     }))
     .reduce((acc, log) => {
+      acc.totalPesoValue += log.totalPesoValue;
       acc.totalCarbonFootprint += log.totalCarbonFootprint;
       return acc;
-    }, { totalCarbonFootprint: 0 });
-
-  const weeklySavings = savingsEvents
-    .filter(event => isWithinInterval(new Date(event.date), {
-        start: new Date(new Date().setDate(new Date().getDate() - 7)),
-        end: new Date()
-    }))
-    .reduce((acc, event) => acc + event.amount, 0);
+    }, { totalPesoValue: 0, totalCarbonFootprint: 0 });
 
   // Calculate pantry health stats
   const freshItems = liveItems.filter(item => {
@@ -72,230 +76,251 @@ export default function DashboardPage() {
     ? Math.round((freshItems.length / liveItems.length) * 100) 
     : 0;
 
-  // Sample watchlist items - you can replace with actual data
-  const watchlistItems = [
-    { name: "🍌 Bangus", daysLeft: 0, status: "Today" },
-    { name: "🥬 Galunggong", daysLeft: 4, status: "4 days" },
-    { name: "🍖 Pork Chop", daysLeft: 2, status: "2 days" },
-    { name: "🥬 Liempo", daysLeft: 2, status: "2 days" },
-    { name: "🍗 Chicken Breast", daysLeft: 4, status: "4 days" },
-    { name: "🍞 Bread", daysLeft: 1, status: "1 day" },
-    { name: "🍉 Watermelon", daysLeft: 2, status: "2 days" }
-  ];
+  const latestInsight = insights.length > 0 ? insights[0] : null;
 
   return (
-    <div className="p-4 md:p-6 space-y-4 md:space-y-6 bg-gray-50 min-h-screen">
-      {/* Greeting Header */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
-          {greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!
-        </h1>
-        <p className="text-gray-600">Let's reduce waste together</p>
-      </div>
-
-      {/* This Week's Impact */}
-      <Card className="bg-pink-50 border-pink-200">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-pink-200 rounded flex items-center justify-center">
-              📊
-            </div>
-            <h2 className="text-lg font-semibold text-gray-900">This Week's Impact</h2>
+    <div className="min-h-screen bg-[#F7F7F7] p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <h1 className="text-4xl font-semibold text-[#063627]">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
+            <Sparkles className="w-8 h-8 text-[#FFDD00]" />
           </div>
-          <p className="text-sm text-gray-600 mb-4">Your waste tracking results</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                  💸
-                </div>
+          <p className="text-[#7C7C7C] text-lg">Let's reduce waste together</p>
+        </div>
+
+        {/* Key Metrics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-green-600">
-                    ₱{weeklySavings.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-green-500">Virtual Savings</div>
+                  <p className="text-sm font-medium text-pink-700">Total Items</p>
+                  <p className="text-3xl font-semibold text-pink-900">{liveItems.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                  <Package className="w-6 h-6 text-pink-600" />
                 </div>
               </div>
-            </div>
-            
-            <div className="text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  🌍
-                </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl md:text-3xl font-bold text-red-600">
-                    {weeklyStats.totalCarbonFootprint.toFixed(2)} kg
-                  </div>
-                  <div className="text-sm text-red-500">Carbon Footprint</div>
+                  <p className="text-sm font-medium text-green-700">Health Score</p>
+                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
                 </div>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
 
-      {/* Action Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Button
-          className="h-12 md:h-16 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 border border-yellow-300"
-          variant="outline"
-          onClick={() => router.push('/add-to-pantry')}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 md:w-8 md:h-8 bg-yellow-200 rounded flex items-center justify-center">
-              🛒
-            </div>
-            <span className="font-medium text-sm md:text-base">Add Groceries</span>
-          </div>
-        </Button>
-        
-        <Button
-          className="h-12 md:h-16 bg-green-100 hover:bg-green-200 text-green-800 border border-green-300"
-          variant="outline"
-          onClick={() => router.push('/log-waste')}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 md:w-8 md:h-8 bg-green-200 rounded flex items-center justify-center">
-              📸
-            </div>
-            <span className="font-medium text-sm md:text-base">Log Food Waste</span>
-          </div>
-        </Button>
-      </div>
+          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
+                  <p className="text-3xl font-semibold text-yellow-900">{expiringSoonItems.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Bottom Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* AI Insights */}
-        <Card className="bg-green-600 text-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">✨ Your frequently waste portions</h3>
-                <p className="text-sm text-green-100">Fresh AI Insight</p>
-                <Badge className="mt-2 bg-green-500 hover:bg-green-500">AI Powered</Badge>
+          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-700">This Week's Logs</p>
+                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => isWithinInterval(new Date(log.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() })).length}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
-              <Button size="icon" variant="ghost" className="text-white hover:bg-green-500">
-                →
-              </Button>
-            </div>
-            
-            <div className="bg-green-500 rounded-lg p-4">
-              <p className="text-sm">
-                "Try reducing the amount you cook in a single batch, starting with smaller portions and adjust based on what you actually consume to minimize leftovers."
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Progress Card */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-semibold">🎉 Great Progress!</h3>
-                <p className="text-sm text-gray-600">This week's update</p>
-                <Badge className="mt-2 bg-green-100 text-green-800 hover:bg-green-100">On track</Badge>
-              </div>
-              <Button size="icon" variant="ghost">
-                →
-              </Button>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium">Waste Budget</span>
-                <span className="text-2xl font-bold">65%</span>
-              </div>
-              <Progress value={65} className="h-3" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom Grid - Second Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Pantry Health Score */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-6 h-6 text-blue-600">📊</div>
-              <div>
-                <h3 className="text-lg font-semibold">Pantry Health Score</h3>
-                <p className="text-sm text-gray-600">Current inventory status</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-center mb-6">
-              <div className="relative w-32 h-32">
-                <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">{healthPercentage}%</div>
-                    <div className="text-sm text-gray-600">Inventory Health</div>
+        {/* This Week's Impact */}
+        <Card className="mb-8 bg-gradient-to-br from-red-50 to-pink-50 border-red-200 shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-800">
+              <BarChart3 className="w-6 h-6 text-red-600" />
+              This Week's Impact
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-red-700 mb-6">Your waste tracking results</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 border border-red-300">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-red-800">₱{weeklyStats.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-sm text-red-600 font-medium">Financial Leakage</p>
                   </div>
                 </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">{freshItems.length} items - Fresh</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <span className="text-sm">{expiringSoonItems.length} items - Expiring Soon</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-sm">{expiredItems.length} items - Expired</span>
-                </div>
-              </div>
-            </div>
-            
-            <Button variant="link" className="w-full mt-4 text-center">
-              View Pantry →
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Pantry Watchlist */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-6 h-6 text-yellow-600">⚠️</div>
-              <div>
-                <h3 className="text-lg font-semibold">Pantry Watchlist</h3>
-                <p className="text-sm text-gray-600">Items needing attention</p>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-4 text-sm font-medium text-gray-600 mb-3">
-                <span>Items</span>
-                <span className="text-right">Days Expiring</span>
               </div>
               
-              {watchlistItems.map((item, index) => (
-                <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                  <span className="text-sm">{item.name}</span>
-                  <span className={`text-sm font-medium ${
-                    item.daysLeft === 0 ? 'text-red-600' : 
-                    item.daysLeft <= 2 ? 'text-yellow-600' : 'text-gray-600'
-                  }`}>
-                    {item.status}
-                  </span>
+              <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 border border-red-300">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
+                    <Leaf className="w-6 h-6 text-red-600" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-red-800">{weeklyStats.totalCarbonFootprint.toFixed(2)} kg</p>
+                    <p className="text-sm text-red-600 font-medium">Carbon Footprint</p>
+                  </div>
                 </div>
-              ))}
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card 
+            className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md border-2 border-yellow-200 hover:border-yellow-300 bg-gradient-to-br from-yellow-50 to-amber-50"
+            onClick={() => router.push('/add-to-pantry')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Package className="w-6 h-6 text-white" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-400" />
+              </div>
+              <h3 className="font-semibold text-[#063627] text-lg mb-1">Add Groceries</h3>
+              <p className="text-[#7C7C7C] text-sm">Stock your pantry with new items</p>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md border-2 border-green-200 hover:border-green-300 bg-gradient-to-br from-green-50 to-emerald-50"
+            onClick={() => router.push('/log-waste?method=camera')}
+          >
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <BarChart3 className="w-6 h-6 text-white" />
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-400" />
+              </div>
+              <h3 className="font-semibold text-[#063627] text-lg mb-1">Log Food Waste</h3>
+              <p className="text-[#7C7C7C] text-sm">Track and learn from waste</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* AI Insights Card */}
+          {latestInsight && (
+            <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#FFDD00]" />
+                  ✨ Your frequently waste portions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-white/80 mb-2">Fresh AI Insight</p>
+                <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
+                <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
+                  <p className="text-white/90 text-sm leading-relaxed">
+                    "Try reducing the amount you cook in a single batch, starting with smaller portions and adjust based on what you actually consume to minimize leftovers."
+                  </p>
+                </div>
+                <Button 
+                  variant="link" 
+                  className="text-white hover:text-white/80 p-0 h-auto font-semibold"
+                  onClick={() => router.push(`/insights/${latestInsight.id}`)}
+                >
+                  View Full Analysis →
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Progress Card */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-[#063627]">
+                <Target className="w-5 h-5 text-[#227D53]" />
+                🎉 Great Progress!
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-[#7C7C7C] mb-2">This week's update</p>
+              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">On track</Badge>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-800">Waste Budget</span>
+                    <span className="text-2xl font-bold text-green-800">65%</span>
+                  </div>
+                  <Progress value={65} className="h-3" />
+                </div>
+              </div>
+              <Button 
+                variant="link" 
+                className="text-[#227D53] hover:text-[#227D53]/80 p-0 h-auto font-semibold"
+                onClick={() => router.push('/my-waste')}
+              >
+                View Your Trends →
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Pantry Watchlist */}
+        {expiringSoonItems.length > 0 && (
+          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-yellow-800">
+                <AlertTriangle className="w-6 h-6 text-yellow-600" />
+                Pantry Watchlist
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-yellow-700 mb-4">Items needing attention</p>
+              
+              <div className="space-y-3">
+                {expiringSoonItems.slice(0, 5).map((item, index) => (
+                  <div key={item.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-100 to-yellow-200 border border-yellow-300 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-yellow-300 rounded-lg flex items-center justify-center">
+                        <span className="text-sm">🥬</span>
+                      </div>
+                      <span className="font-medium text-yellow-800">{item.name}</span>
+                    </div>
+                    <Badge variant="outline" className="border-yellow-400 text-yellow-700 font-medium">
+                      {Math.max(0, Math.ceil((new Date(item.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              
+              <Button 
+                variant="link" 
+                className="w-full mt-4 text-yellow-700 hover:text-yellow-800 font-semibold"
+                onClick={() => router.push('/pantry')}
+              >
+                Go to Pantry →
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

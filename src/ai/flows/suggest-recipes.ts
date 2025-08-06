@@ -19,30 +19,19 @@ import {
 
 async function generateRecipeImage(recipeName: string): Promise<string | undefined> {
     try {
-        console.log(`🖼️ Generating image for: ${recipeName}`);
-        const result = await ai.generate({
+        const { media } = await ai.generate({
             model: 'googleai/gemini-2.0-flash-preview-image-generation',
             prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
-            output: { format: 'uri' }
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
         });
-        
-        // For new API shape ─ grab the first image URI
-        const imageUrl = result.output?.media?.[0]?.uri;
-
-        if (imageUrl) {
-            console.log(`✅ Successfully generated image for ${recipeName}.`);
-        } else {
-            console.warn(`⚠️ Image generation for ${recipeName} returned no URL.`);
-        }
-        
-        return imageUrl;
-        
+        return media?.url;
     } catch (error) {
-        console.error(`❌ Failed to generate image for ${recipeName}:`, error);
+        console.error(`Failed to generate image for ${recipeName}:`, error);
         return undefined;
     }
 }
-
 
 export async function suggestRecipes(input: SuggestRecipesInput): Promise<SuggestRecipesOutput> {
   return suggestRecipesFlow(input);
