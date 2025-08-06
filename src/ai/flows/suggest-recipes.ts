@@ -19,16 +19,35 @@ import {
 
 async function generateRecipeImage(recipeName: string): Promise<string | undefined> {
     try {
-        const { media } = await ai.generate({
+        console.log(`🖼️ Generating image for: ${recipeName}`);
+        const result = await ai.generate({
             model: 'googleai/gemini-2.0-flash-preview-image-generation',
             prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
             config: {
                 responseModalities: ['TEXT', 'IMAGE'],
             },
         });
-        return media?.url;
+        
+        console.log('🖼️ Full result:', result);
+        console.log('🖼️ Result keys:', Object.keys(result));
+        console.log('🖼️ Media:', result.media);
+        
+        // Try different possible structures
+        const possibleUrls = [
+            result.media?.url,
+            result.media?.[0]?.uri,
+            result.media?.[0]?.url,
+            result.output?.media?.url,
+            result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data
+        ];
+        
+        console.log('🖼️ Possible URLs:', possibleUrls);
+        
+        // Return the first non-undefined URL
+        return possibleUrls.find(url => url !== undefined);
+        
     } catch (error) {
-        console.error(`Failed to generate image for ${recipeName}:`, error);
+        console.error(`❌ Failed to generate image for ${recipeName}:`, error);
         return undefined;
     }
 }
