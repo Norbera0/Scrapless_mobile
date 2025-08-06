@@ -5,7 +5,7 @@ import { PantryItem, ItemInsights } from '@/types';
 import { format, formatDistanceToNowStrict, parseISO } from 'date-fns';
 import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot, Check, MinusCircle, Package, DivideCircle, PackageCheck } from 'lucide-react';
 import Image from 'next/image';
-import { updatePantryItemStatus } from '@/lib/data';
+import { updatePantryItemStatus, savePantryItems } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { calculateAndSaveAvoidedExpiry } from '@/lib/savings';
@@ -33,35 +33,97 @@ interface PantryItemDetailsProps {
     insights: ItemInsights | null;
 }
 
+function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: boolean, onOpenChange: (open: boolean) => void, onSave: (cost: number) => void, isUpdating: boolean }) {
+    const [cost, setCost] = useState<number | undefined>();
+
+    return (
+         <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Enter Item Cost</DialogTitle>
+                    <DialogDescription>
+                        To calculate your savings, please provide an estimated cost for this item.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="cost" className="text-right">
+                            Cost (₱)
+                        </Label>
+                        <Input
+                            id="cost"
+                            type="number"
+                            value={cost ?? ''}
+                            onChange={(e) => setCost(e.target.valueAsNumber)}
+                            className="col-span-3"
+                            placeholder="e.g. 150.00"
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button onClick={() => cost && onSave(cost)} disabled={!cost || isUpdating}>
+                        {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save and Continue
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+
 export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsights, isFetchingInsights, insights }: PantryItemDetailsProps) {
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUpdating, setIsUpdating] = useState(false);
+    const [showCostPrompt, setShowCostPrompt] = useState(false);
 
     if (!isOpen || !item) return null;
 
     const addedDate = parseISO(item.addedDate);
     const addedAgo = formatDistanceToNowStrict(addedDate, { addSuffix: true });
-
-    const handleMarkAsUsed = async () => {
-        if (!user || !item) return;
+    
+    const executeMarkAsUsed = async (itemWithCost: PantryItem) => {
+        if (!user) return;
         setIsUpdating(true);
         try {
             // Assumes 100% usage (usageEfficiency = 1.0)
-            calculateAndSaveAvoidedExpiry(user, item, 1.0).catch(console.error);
+            calculateAndSaveAvoidedExpiry(user, itemWithCost, 1.0).catch(console.error);
 
             // Update item status in DB (fire-and-forget)
-            updatePantryItemStatus(user.uid, item.id, 'used').catch(console.error);
+            updatePantryItemStatus(user.uid, itemWithCost.id, 'used').catch(console.error);
             
-            toast({ title: "Item usage logged!", description: `You've used "${item.name}".`});
+            toast({ title: "Item usage logged!", description: `You've used "${itemWithCost.name}".`});
             onClose();
         } catch (error) {
             console.error(`Failed to mark item as used`, error);
             toast({ variant: 'destructive', title: 'Update Failed', description: 'Could not update the item status.' });
         } finally {
             setIsUpdating(false);
+            setShowCostPrompt(false);
+        }
+    }
+
+    const handleMarkAsUsed = async () => {
+        if (!item.estimatedCost || item.estimatedCost === 0) {
+            setShowCostPrompt(true);
+        } else {
+            await executeMarkAsUsed(item);
         }
     };
+    
+    const handleSaveCostAndContinue = async (cost: number) => {
+        if (!user || !item) return;
+        const updatedItem = { ...item, estimatedCost: cost };
+        
+        // Optimistically update, but don't wait for the save to complete before calculating savings
+        savePantryItems(user.uid, [{
+            ...updatedItem,
+            estimatedExpirationDate: updatedItem.estimatedExpirationDate,
+        }]).catch(err => console.error("Failed to persist updated cost", err));
+
+        await executeMarkAsUsed(updatedItem);
+    }
     
     const handleWasteConfirm = async () => {
         if (!user || !item) return;
@@ -82,6 +144,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
 
 
     return (
+        <>
         <div className="fixed inset-0 z-50">
             <div className="modal-overlay absolute inset-0" onClick={onClose}></div>
             <div className={`modal absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto ${isOpen ? 'show' : ''}`}>
@@ -191,5 +254,12 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                 </div>
             </div>
         </div>
+        <CostPromptDialog 
+            open={showCostPrompt} 
+            onOpenChange={setShowCostPrompt} 
+            onSave={handleSaveCostAndContinue}
+            isUpdating={isUpdating}
+        />
+        </>
     );
 }
