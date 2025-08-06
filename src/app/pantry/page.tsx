@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -25,7 +26,7 @@ import {
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
 import { PantryItemDetails } from '@/components/pantry/PantryItemDetails';
-import { deletePantryItem, getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
+import { deletePantryItem, getSavedRecipes, saveRecipe, unsaveRecipe, updatePantryItemStatus } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
@@ -173,7 +174,6 @@ export default function PantryPage() {
 
   const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
     if (liveItems.length === 0) {
-      toast({ title: 'Pantry is empty', description: 'Add items to your pantry to get recipe suggestions.' });
       setRecipes([]);
       return;
     }
@@ -183,7 +183,11 @@ export default function PantryPage() {
       const pantryItemNames = liveItems.map((item) => item.name);
       const result = await suggestRecipes({
         pantryItems: pantryItemNames,
-        preferences: recipeFilters,
+        preferences: {
+            quickMeals: recipeFilters.quickMeals,
+            filipinoDishes: recipeFilters.filipinoDishes,
+            difficulty: recipeFilters.difficulty as any,
+        },
         history: currentRecipes.map(r => r.name),
       });
       const recipesWithIds = result.recipes.map(r => ({ ...r, id: r.id || crypto.randomUUID() }));
@@ -200,11 +204,12 @@ export default function PantryPage() {
     }
   }, [liveItems, recipeFilters, toast]);
 
+
   useEffect(() => {
     if (pantryInitialized && recipes.length === 0) {
       fetchRecipes([]);
     }
-  }, [pantryInitialized, fetchRecipes]);
+  }, [pantryInitialized, recipes.length, fetchRecipes]);
 
   useEffect(() => {
     const loadSaved = async () => {
@@ -451,36 +456,58 @@ export default function PantryPage() {
         </div>
 
         {/* Recipe Suggestions */}
-        {recipes.length > 0 && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-semibold text-[#063627]">Recipe Suggestions</h2>
-                <Sparkles className="w-6 h-6 text-[#FFDD00]" />
-              </div>
-              <Button
-                onClick={() => fetchRecipes(recipes)}
-                disabled={isLoadingRecipes}
-                variant="outline"
-                className="border-[#227D53] text-[#227D53] hover:bg-[#227D53]/10"
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingRecipes ? 'animate-spin' : ''}`} />
-                Refresh Recipes
-              </Button>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-semibold text-[#063627]">Recipe Suggestions</h2>
+              <Sparkles className="w-6 h-6 text-[#FFDD00]" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  isSaved={savedRecipeIds.has(recipe.id)}
-                  onToggleSave={handleToggleSave}
-                />
-              ))}
-            </div>
+            <Button
+              onClick={() => fetchRecipes(recipes)}
+              disabled={isLoadingRecipes}
+              variant="outline"
+              className="border-[#227D53] text-[#227D53] hover:bg-[#227D53]/10"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingRecipes ? 'animate-spin' : ''}`} />
+              Refresh Recipes
+            </Button>
           </div>
-        )}
+          {recipes.length > 0 ? (
+            <Carousel opts={{ align: "start", loop: true }} className="w-full">
+              <CarouselContent>
+                {recipes.map((recipe) => (
+                  <CarouselItem key={recipe.id} className="md:basis-1/2 lg:basis-1/3">
+                    <RecipeCard
+                      recipe={recipe}
+                      isSaved={savedRecipeIds.has(recipe.id)}
+                      onToggleSave={handleToggleSave}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          ) : isLoadingRecipes ? (
+             <div className="text-center py-10">
+                <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
+                <p className="mt-2 text-muted-foreground">Finding delicious recipes...</p>
+            </div>
+          ) : (
+             <Card className="border-2 border-dashed border-[#A3A9A7]/30">
+                <CardContent className="p-12 text-center">
+                    <BookOpen className="w-16 h-16 text-[#A3A9A7] mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-[#063627] mb-2">No Recipes Found</h3>
+                    <p className="text-[#7C7C7C] mb-4">
+                        We couldn't find any recipes. Try adding more items to your pantry or refreshing.
+                    </p>
+                    <Button onClick={() => fetchRecipes([])}>
+                        <RefreshCw className="w-4 h-4 mr-2" />
+                        Try Again
+                    </Button>
+                </CardContent>
+            </Card>
+          )}
+        </div>
+
 
         {/* Item Details Modal */}
         {selectedItem && (
