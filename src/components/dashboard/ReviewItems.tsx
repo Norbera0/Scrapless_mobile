@@ -126,7 +126,14 @@ export function ReviewItems() {
         logData.photoDataUri = photoDataUri;
       }
       
-      await saveWasteLog(logData);
+      try {
+        await Promise.race([
+          saveWasteLog(logData),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+        ]);
+      } catch (err) {
+        console.error('Firestore ACK timeout – proceeding optimistically', err);
+      }
 
       toast({
           title: 'Success!',

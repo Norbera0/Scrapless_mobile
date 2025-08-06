@@ -228,7 +228,14 @@ export function ReviewPantryItems() {
       }));
       usePantryLogStore.getState().addOptimisticItems(optimisticPantryItems);
 
-      await savePantryItems(user.uid, itemsToSave);
+      try {
+        await Promise.race([
+          savePantryItems(user.uid, itemsToSave),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
+        ]);
+      } catch(err) {
+        console.error('Firestore ACK timeout – proceeding optimistically', err);
+      }
       
       toast({
         title: 'Success!',
