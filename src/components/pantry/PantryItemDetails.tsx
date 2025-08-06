@@ -48,10 +48,10 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         setIsUpdating(true);
         try {
             // Assumes 100% usage (usageEfficiency = 1.0)
-            await calculateAndSaveAvoidedExpiry(user, item, 1.0);
+            calculateAndSaveAvoidedExpiry(user, item, 1.0).catch(console.error);
 
-            // Update item status in DB
-            await updatePantryItemStatus(user.uid, item.id, 'used');
+            // Update item status in DB (fire-and-forget)
+            updatePantryItemStatus(user.uid, item.id, 'used').catch(console.error);
             
             toast({ title: "Item usage logged!", description: `You've used "${item.name}".`});
             onClose();
@@ -67,8 +67,8 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user || !item) return;
         setIsUpdating(true);
         try {
-            // Update item status to 'wasted'
-            await updatePantryItemStatus(user.uid, item.id, 'wasted');
+            // Update item status to 'wasted' (fire-and-forget)
+            updatePantryItemStatus(user.uid, item.id, 'wasted').catch(console.error);
             
             toast({ title: `Item marked as wasted`, description: `"${item.name}" has been moved to your waste log.`});
             onClose();
