@@ -244,6 +244,7 @@ export function ReviewPantryItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
+    } finally {
       setIsSaving(false);
     }
   };
