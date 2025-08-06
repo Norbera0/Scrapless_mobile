@@ -3,17 +3,18 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight } from 'lucide-react';
+import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight, Archive } from 'lucide-react';
 import { getSavedRecipes } from '@/lib/data';
-import type { Recipe, User, Insight } from '@/types';
+import type { Recipe, User, Insight, PantryItem } from '@/types';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { useToast } from '@/hooks/use-toast';
 import { unsaveRecipe } from '@/lib/data';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { useAuth } from '@/hooks/use-auth';
 import { useInsightStore } from '@/stores/insight-store';
+import { usePantryLogStore } from '@/stores/pantry-store';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 
 
@@ -22,14 +23,15 @@ export default function SavedItemsPage() {
   const router = useRouter();
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
   const { insights, insightsInitialized } = useInsightStore();
+  const { archivedItems, pantryInitialized } = usePantryLogStore();
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isAuthLoading && insightsInitialized) {
+    if (!isAuthLoading && insightsInitialized && pantryInitialized) {
       setIsLoading(false);
     }
-  }, [isAuthLoading, insightsInitialized]);
+  }, [isAuthLoading, insightsInitialized, pantryInitialized]);
 
   useEffect(() => {
     if (user) {
@@ -64,6 +66,7 @@ export default function SavedItemsPage() {
   };
   
   const solutionsImTrying = insights.filter(i => i.status === 'acted_on');
+  const usedItems = archivedItems.filter(i => i.status === 'used');
 
   if (isLoading) {
     return (
@@ -82,7 +85,7 @@ export default function SavedItemsPage() {
         </p>
       </div>
       
-       <Accordion type="multiple" defaultValue={['recipes']} className="w-full space-y-4">
+       <Accordion type="multiple" defaultValue={['recipes', 'used-items']} className="w-full space-y-4">
         {/* Saved Recipes Section */}
         <AccordionItem value="recipes" className="border-none">
           <Card>
@@ -161,6 +164,49 @@ export default function SavedItemsPage() {
                     </CardContent>
                 </AccordionContent>
              </Card>
+        </AccordionItem>
+        
+        {/* Used Food History */}
+        <AccordionItem value="used-items" className="border-none">
+          <Card>
+              <AccordionTrigger className="p-6 border-b hover:no-underline">
+              <CardHeader className="p-0 text-left">
+                  <CardTitle className="flex items-center gap-2"><Archive /> Recently Used Items ({usedItems.length})</CardTitle>
+                  <CardDescription>A log of food you successfully used.</CardDescription>
+              </CardHeader>
+              </AccordionTrigger>
+              <AccordionContent>
+                  <CardContent className="pt-6">
+                      {usedItems.length > 0 ? (
+                          <div className="space-y-3">
+                              {usedItems.map(item => (
+                                  <Card key={item.id}>
+                                      <CardContent className="p-4 flex items-center justify-between">
+                                          <div>
+                                              <p className="font-semibold">{item.name}</p>
+                                              <p className="text-sm text-muted-foreground">
+                                                  Used on {item.usedDate ? format(parseISO(item.usedDate), 'MMMM d, yyyy') : 'N/A'}
+                                              </p>
+                                          </div>
+                                          {item.estimatedCost && (
+                                              <div className="text-right">
+                                                  <p className="font-semibold text-green-600">₱{item.estimatedCost.toFixed(2)}</p>
+                                                  <p className="text-xs text-muted-foreground">Value</p>
+                                              </div>
+                                          )}
+                                      </CardContent>
+                                  </Card>
+                              ))}
+                          </div>
+                      ) : (
+                          <div className="text-center text-muted-foreground py-10">
+                              <p>You haven't marked any items as used yet.</p>
+                              <p className="text-sm">Mark items as used from your Pantry to see them here.</p>
+                          </div>
+                      )}
+                  </CardContent>
+              </AccordionContent>
+          </Card>
         </AccordionItem>
 
         {/* Placeholder for Shopping Tips */}
