@@ -23,18 +23,11 @@ async function generateRecipeImage(recipeName: string): Promise<string | undefin
         const result = await ai.generate({
             model: 'googleai/gemini-2.0-flash-preview-image-generation',
             prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
+            output: { format: 'uri' }
         });
         
-        console.log('🖼️ Full result:', result);
-        console.log('🖼️ Media:', result.media);
-        console.log('🖼️ Media URL:', result.media?.url);
-        
-        // The TypeScript errors show that media is an object with { url: string, contentType?: string }
-        // So we can directly access .url
-        return result.media?.url;
+        // For new API shape ─ grab the first image URI
+        return result.output?.media?.[0]?.uri;
         
     } catch (error) {
         console.error(`❌ Failed to generate image for ${recipeName}:`, error);
