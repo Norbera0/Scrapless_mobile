@@ -322,14 +322,14 @@ export default function PantryPage() {
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
             <Card
-                className="p-5 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                className="p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
                 onClick={() => setFilter('all')}
             >
                 <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
                     <Package className="w-6 h-6 text-blue-600" />
                 </div>
                 <p className="text-3xl font-bold text-blue-800">{stats.total}</p>
-                <p className="text-sm font-medium text-gray-500">Total Items</p>
+                <p className="text-sm font-medium text-blue-600">Total Items</p>
             </Card>
             <Card
                 className="p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
