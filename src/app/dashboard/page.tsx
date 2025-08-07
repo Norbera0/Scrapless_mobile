@@ -367,7 +367,7 @@ export default function DashboardPage() {
               <Button 
                 variant="outline"
                 className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
-                onClick={() => router.push('/my-waste')}
+                onClick={() => {router.push('/my-waste')}}
               >
                 View Your Trends →
               </Button>
@@ -423,8 +423,8 @@ export default function DashboardPage() {
                 </Table>
               </div>
               <Button 
-                variant="link" 
-                className="w-full mt-4 text-yellow-700 hover:text-yellow-800 font-semibold"
+                variant="outline" 
+                className="w-full mt-4 bg-transparent text-yellow-700 border-yellow-700 hover:bg-yellow-700 hover:text-white rounded-full font-semibold transition-colors duration-300"
                 onClick={() => router.push('/pantry')}
               >
                 Go to Pantry →
@@ -438,6 +438,8 @@ export default function DashboardPage() {
 }
 
     
+    
+
     
 
     
