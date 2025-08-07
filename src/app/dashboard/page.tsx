@@ -377,10 +377,10 @@ export default function DashboardPage() {
 
         {/* Pantry Watchlist */}
         {expiringSoonItems.length > 0 && (
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
+          <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-800">
-                <AlertTriangle className="w-6 h-6 text-green-600" />
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <AlertTriangle className="w-6 h-6 text-primary" />
                 Pantry Watchlist
               </CardTitle>
             </CardHeader>
@@ -424,7 +424,7 @@ export default function DashboardPage() {
               </div>
               <Button 
                 variant="outline" 
-                className="w-full mt-4 bg-transparent text-green-700 border-green-700 hover:bg-green-700 hover:text-white rounded-full font-semibold transition-colors duration-300"
+                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-white rounded-full font-semibold transition-colors duration-300"
                 onClick={() => router.push('/pantry')}
               >
                 Go to Pantry →
@@ -436,10 +436,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-    
-
-    
-
-    
