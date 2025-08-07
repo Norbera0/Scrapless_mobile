@@ -405,7 +405,7 @@ export default function DashboardPage() {
                   <TableBody>
                     {sortedWatchlistItems.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell className="font-medium">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                        <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             {getStatusIndicator(item.daysUntilExpiration)}
@@ -413,9 +413,6 @@ export default function DashboardPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
-                            <Edit className="w-4 h-4 mr-2" /> Edit
-                          </Button>
                            <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
                             <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
                           </Button>
