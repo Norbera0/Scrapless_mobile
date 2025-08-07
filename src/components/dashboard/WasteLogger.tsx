@@ -289,40 +289,64 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     );
   }
 
-  return (
-    <Card>
-      {method === 'voice' && (
-        <>
-           <CardHeader>
-                <CardTitle>Log with Voice</CardTitle>
-                <CardDescription>Press record and list your wasted items.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center items-center h-[250px] flex-col gap-4">
-             <Button 
-                type="button" 
-                variant={isRecording ? 'destructive' : 'outline'} 
-                className="h-24 w-24 rounded-full text-lg" 
-                onClick={isRecording ? stopRecording : startRecording} 
-                disabled={isLoading}>
-                {isRecording ? <Square className="h-10 w-10" /> : <Mic className="h-10 w-10" />}
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              {isLoading ? 'Processing...' : isRecording ? 'Recording...' : 'Tap to record'}
-            </p>
-            {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
+  if (method === 'voice') {
+      return (
+          <Card>
+              <CardHeader className='text-center'>
+                  <CardTitle className='text-2xl font-bold text-gray-800'>Log with Voice</CardTitle>
+                  <CardDescription>Press record and list your wasted items.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 text-center flex flex-col items-center justify-center p-8 min-h-[350px]">
+                   <div className={`relative w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
+                      isRecording 
+                      ? 'bg-destructive animate-pulse' 
+                      : 'bg-primary'
+                  }`}>
+                      <Mic className="w-16 h-16 text-white" />
+                  </div>
+                   <div className='h-16'>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                          {isLoading ? 'Processing...' : isRecording ? 'Listening...' : 'Ready to record'}
+                      </h3>
+                      <p className="text-muted-foreground">
+                          {isLoading ? 'Analyzing your speech...' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
+                      </p>
+                   </div>
+                   <Button 
+                      size="lg" 
+                      variant={isRecording ? 'destructive' : 'default'}
+                      className="w-full h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
+                      onClick={isRecording ? stopRecording : startRecording}
+                      disabled={isLoading}
+                  >
+                      {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : 
+                      isRecording ? <Square className="w-6 h-6 mr-2" /> : <Mic className="w-6 h-6 mr-2" />}
+                      {isLoading ? "Analyzing..." : isRecording ? 'Stop Recording' : 'Start Recording'}
+                  </Button>
+                  {hasAudioPermission === false && (
+                    <Alert variant="destructive" className="mt-4">
+                      <AlertTitle>Microphone Access Required</AlertTitle>
+                      <AlertDescription>Please allow microphone access.</AlertDescription>
+                    </Alert>
+                  )}
+              </CardContent>
+               <div className="p-6 pt-0">
+                  <div className="bg-secondary/50 rounded-xl p-4 border">
+                      <h4 className="font-semibold text-foreground flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Recording Tips</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside text-left">
+                          <li>Speak clearly, for example: "I wasted one cup of rice".</li>
+                          <li>Say both the item and quantity for best results.</li>
+                          <li>You can list multiple items, like "two slices of pizza and three bananas".</li>
+                      </ul>
+                  </div>
+              </div>
+          </Card>
+      )
+  }
 
-            {hasAudioPermission === false && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertTitle>Microphone Access Required</AlertTitle>
-                <AlertDescription>Please allow microphone access.</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-        </>
-      )}
-
-      {method === 'text' && (
-        <>
+  if (method === 'text') {
+      return (
+        <Card>
           <CardHeader>
             <CardTitle>Log with Text</CardTitle>
             <CardDescription>Type out the items you wasted, one per line.</CardDescription>
@@ -332,7 +356,7 @@ export function WasteLogger({ method }: WasteLoggerProps) {
               placeholder="e.g.&#10;1 cup of rice&#10;2 slices of bread&#10;Half an apple"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              className="min-h-[150px]"
+              className="min-h-[200px] text-base"
             />
           </CardContent>
           <CardFooter>
@@ -341,8 +365,9 @@ export function WasteLogger({ method }: WasteLoggerProps) {
               Next: Review Items
             </Button>
           </CardFooter>
-        </>
-      )}
-    </Card>
-  );
+        </Card>
+      )
+  }
+
+  return null;
 }
