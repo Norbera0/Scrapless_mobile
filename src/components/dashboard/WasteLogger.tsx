@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type, Lightbulb, Upload } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -21,6 +21,8 @@ import { Textarea } from '../ui/textarea';
 interface WasteLoggerProps {
     method: 'camera' | 'voice' | 'text';
 }
+
+const NUM_WAVEFORM_BARS = 30;
 
 export function WasteLogger({ method }: WasteLoggerProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,12 +36,23 @@ export function WasteLogger({ method }: WasteLoggerProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  
+  // For waveform visualization
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const [waveform, setWaveform] = useState<number[]>(Array(NUM_WAVEFORM_BARS).fill(0));
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   const { toast } = useToast();
   const router = useRouter();
@@ -78,6 +91,31 @@ export function WasteLogger({ method }: WasteLoggerProps) {
         }
     }
   }, [method, toast, isMobile]);
+  
+  // Audio Permission Check Effect
+  useEffect(() => {
+    if (method !== 'voice') return;
+    const checkAudioPermission = async () => {
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            setHasAudioPermission(true);
+        } catch {
+            setHasAudioPermission(false);
+        }
+    };
+    checkAudioPermission();
+  }, [method]);
+
+  // Waveform Cleanup
+  useEffect(() => {
+    return () => {
+        if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            audioContextRef.current.close();
+        }
+    }
+  }, []);
 
   const stopCameraStream = () => {
     if (videoRef.current && videoRef.current.srcObject) {
@@ -160,66 +198,126 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       setIsLoading(false);
     }
   };
+  
+  const visualize = useCallback(() => {
+    if (!analyserRef.current || !dataArrayRef.current) return;
+    
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+
+    const newWaveform = Array(NUM_WAVEFORM_BARS).fill(0);
+    const barWidth = Math.floor(dataArrayRef.current.length / NUM_WAVEFORM_BARS);
+
+    for (let i = 0; i < NUM_WAVEFORM_BARS; i++) {
+        let sum = 0;
+        for (let j = 0; j < barWidth; j++) {
+            sum += dataArrayRef.current[i * barWidth + j];
+        }
+        let average = sum / barWidth;
+        newWaveform[i] = (average / 255);
+    }
+    setWaveform(newWaveform);
+
+    animationFrameRef.current = requestAnimationFrame(visualize);
+  }, []);
+  
+  const handleVoiceAnalysis = async (audioDataUri: string) => {
+    setIsLoading(true);
+    try {
+      const result = await logFoodWasteFromAudio({ audioDataUri });
+      if (result && result.items && result.items.length > 0) {
+        const newItems = result.items.map((item) => ({ ...item, id: crypto.randomUUID() }));
+        setItems(newItems);
+        toast({ title: 'Analysis complete!', description: 'Please review the detected items.' });
+        router.push('/review-items');
+      } else {
+        toast({ title: 'No items detected', description: 'Could not identify items. Please review and add them manually.' });
+        setItems([]);
+        router.push('/review-items');
+      }
+    } catch (error) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Voice analysis failed', description: 'Could not process the audio.' });
+    } finally {
+      setIsLoading(false);
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      }
+    }
+  };
+
 
   const startRecording = async () => {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setHasAudioPermission(false);
+    if (hasAudioPermission === false) {
+        toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
         return;
-      }
+    }
+    try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setHasAudioPermission(true);
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      mediaRecorderRef.current.ondataavailable = (event) => audioChunksRef.current.push(event.data);
-      mediaRecorderRef.current.onstop = handleStopRecording;
+      
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-      mediaRecorderRef.current.start();
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        if(animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        if(recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+        setWaveform(Array(NUM_WAVEFORM_BARS).fill(0));
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Audio = reader.result as string;
+          handleVoiceAnalysis(base64Audio);
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+      
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+      sourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      sourceRef.current.connect(analyserRef.current);
+
+      mediaRecorder.start();
       setIsRecording(true);
-      toast({ title: "Recording started...", description: "Speak the food items you've wasted." });
-    } catch (err) {
-      console.error("Error accessing microphone:", err);
-      setHasAudioPermission(false);
-      toast({ variant: 'destructive', title: 'Microphone Access Denied', description: 'Please enable microphone permissions.' });
+      setRecordingTime(0);
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+
+      visualize();
+
+    } catch (error) {
+      console.error('Microphone access denied:', error);
+      toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
-      toast({ title: "Recording stopped", description: "Processing your voice log..."});
     }
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if(recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
   };
-
-  const handleStopRecording = async () => {
-    setIsLoading(true);
-    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-    const reader = new FileReader();
-    reader.readAsDataURL(audioBlob);
-    reader.onloadend = async () => {
-      const base64Audio = reader.result as string;
-      try {
-        const result = await logFoodWasteFromAudio({ audioDataUri: base64Audio });
-        if (result && result.items && result.items.length > 0) {
-            const newItems = result.items.map((item) => ({ ...item, id: crypto.randomUUID() }));
-            setItems(newItems);
-            toast({ title: 'Analysis complete!', description: 'Please review the detected items.' });
-            router.push('/review-items');
-        } else {
-            toast({ title: 'No items detected', description: 'Could not identify items. Please review and add them manually.' });
-            setItems([]);
-            router.push('/review-items');
-        }
-      } catch (error) {
-        console.error(error);
-        toast({ variant: 'destructive', title: 'Voice analysis failed', description: 'Could not process the audio.' });
-      } finally {
-        setIsLoading(false);
-        if(mediaRecorderRef.current) {
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-        }
-      }
-    };
+  
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (method === 'camera') {
@@ -297,19 +395,28 @@ export function WasteLogger({ method }: WasteLoggerProps) {
                   <CardDescription>Press record and list your wasted items.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 text-center flex flex-col items-center justify-center p-8 min-h-[350px]">
-                   <div className={`relative w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
-                      isRecording 
-                      ? 'bg-destructive animate-pulse' 
-                      : 'bg-primary'
-                  }`}>
-                      <Mic className="w-16 h-16 text-white" />
+                  <div className="h-20 w-full flex items-center justify-center gap-1">
+                      {waveform.map((height, i) => (
+                          <div
+                              key={i}
+                              className="w-1 rounded-full bg-primary/80"
+                              style={{
+                                  height: `${Math.max(4, height * 100)}%`,
+                                  transition: 'height 0.1s ease-out'
+                              }}
+                          />
+                      ))}
                   </div>
                    <div className='h-16'>
                       <h3 className="text-xl font-semibold text-gray-800">
                           {isLoading ? 'Processing...' : isRecording ? 'Listening...' : 'Ready to record'}
                       </h3>
                       <p className="text-muted-foreground">
-                          {isLoading ? 'Analyzing your speech...' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
+                           {isLoading
+                              ? 'Analyzing your speech...'
+                              : isRecording
+                              ? formatTime(recordingTime)
+                              : 'Tap the button to start recording.'}
                       </p>
                    </div>
                    <Button 
@@ -371,3 +478,5 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   return null;
 }
+
+    
