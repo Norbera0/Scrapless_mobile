@@ -216,7 +216,7 @@ export default function AddToPantryPage() {
                     Back to methods
                 </Button>
                 {selectedMethod === 'camera' && (
-                    <div className="rounded-2xl bg-gradient-to-br from-slate-100 to-gray-200 p-6 md:p-8 shadow-sm border border-slate-200">
+                    <div className="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-slate-200">
                         <div className="text-center mb-6">
                             <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Capture Your Groceries</h2>
                             <p className="text-slate-500 mt-1">Point your camera at your items, or upload a photo of your receipt.</p>
@@ -281,23 +281,26 @@ export default function AddToPantryPage() {
                 )}
                  {selectedMethod === 'voice' && (
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Voice Entry</CardTitle>
+                        <CardHeader className='text-center'>
+                            <CardTitle className='text-2xl font-bold text-gray-800'>Voice Entry</CardTitle>
+                            <p className='text-muted-foreground'>Add items to your pantry using voice commands</p>
                         </CardHeader>
-                        <CardContent className="space-y-6 text-center">
-                             <div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
+                        <CardContent className="space-y-6 text-center flex flex-col items-center justify-center p-8 min-h-[350px]">
+                             <div className={`relative w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
                                 isRecording 
-                                ? 'bg-gradient-to-br from-destructive to-red-600 animate-pulse' 
-                                : 'bg-gradient-to-br from-primary to-green-600'
+                                ? 'bg-destructive animate-pulse' 
+                                : 'bg-primary'
                             }`}>
                                 <Mic className="w-16 h-16 text-white" />
                             </div>
-                             <h3 className="text-xl font-semibold text-gray-800">
-                                {isLoading ? 'Processing...' : isRecording ? 'Recording...' : 'Ready to record'}
-                            </h3>
-                            <p className="text-muted-foreground">
-                                {isLoading ? 'Please wait a moment.' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
-                            </p>
+                             <div className='h-16'>
+                                <h3 className="text-xl font-semibold text-gray-800">
+                                    {isLoading ? 'Processing...' : isRecording ? 'Listening...' : 'Ready to record'}
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    {isLoading ? 'Converting speech to text...' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
+                                </p>
+                             </div>
                              <Button 
                                 size="lg" 
                                 variant={isRecording ? 'destructive' : 'default'}
