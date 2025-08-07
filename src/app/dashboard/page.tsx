@@ -168,10 +168,16 @@ export default function DashboardPage() {
   };
 
   const getStatusIndicator = (days: number) => {
-    if (days <= 1) return <div className="w-3 h-3 rounded-full bg-red-500" title="Urgent"></div>;
-    if (days <= 3) return <div className="w-3 h-3 rounded-full bg-yellow-500" title="Expiring Soon"></div>;
+    if (days <= 1) return <div className="w-3 h-3 rounded-full bg-red-500 ring-2 ring-red-500/30" title="Urgent"></div>;
+    if (days <= 3) return <div className="w-3 h-3 rounded-full bg-yellow-500 ring-2 ring-yellow-500/30" title="Expiring Soon"></div>;
     return <div className="w-3 h-3 rounded-full bg-green-500" title="Fresh"></div>;
   };
+  
+  const getTableRowClass = (days: number) => {
+      if(days <= 1) return "bg-red-500/10 hover:bg-red-500/20";
+      if(days <= 3) return "bg-amber-500/10 hover:bg-amber-500/20";
+      return "bg-white";
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] p-8">
@@ -181,6 +187,64 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
             <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
         </div>
+
+        {/* Pantry Watchlist */}
+        {expiringSoonItems.length > 0 && (
+          <Card className="shadow-sm bg-white mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <AlertTriangle className="w-6 h-6 text-primary" />
+                Pantry Watchlist
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
+                          Item {getSortIcon('name')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">
+                        <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
+                          Expires In {getSortIcon('daysUntilExpiration')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedWatchlistItems.map((item) => (
+                      <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
+                        <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {getStatusIndicator(item.daysUntilExpiration)}
+                            <span className="font-semibold">{item.daysUntilExpiration} days</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
+                            <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
+                onClick={() => router.push('/pantry')}
+              >
+                Go to Pantry →
+              </Button>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -361,74 +425,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Pantry Watchlist */}
-        {expiringSoonItems.length > 0 && (
-          <Card className="shadow-sm bg-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <AlertTriangle className="w-6 h-6 text-primary" />
-                Pantry Watchlist
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
-                          Item {getSortIcon('name')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-right">
-                        <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
-                          Expires In {getSortIcon('daysUntilExpiration')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedWatchlistItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {getStatusIndicator(item.daysUntilExpiration)}
-                            <span>{item.daysUntilExpiration} days</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
-                            <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
-                onClick={() => router.push('/pantry')}
-              >
-                Go to Pantry →
-              </Button>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
 
     
-
-    
-
-
-
-
-
-

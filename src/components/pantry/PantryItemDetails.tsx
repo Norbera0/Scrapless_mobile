@@ -231,17 +231,17 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                         onClick={handleMarkAsUsed}
                         disabled={isUpdating}
                     >
-                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                        Used
+                        {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+                        Mark as Used
                     </Button>
                      <AlertDialog>
                         <AlertDialogTrigger asChild>
                              <Button
-                                className="bg-amber-500 hover:bg-amber-600"
+                                variant="outline"
                                 disabled={isUpdating}
                             >
-                                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <MinusCircle className="w-4 h-4" />}
-                                Wasted
+                                {isUpdating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <MinusCircle className="w-4 h-4 mr-2" />}
+                                Mark as Wasted
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -292,3 +292,4 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
     );
 }
 
+    

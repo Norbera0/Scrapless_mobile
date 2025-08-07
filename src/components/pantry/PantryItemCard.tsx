@@ -49,7 +49,7 @@ const getFreshness = (expirationDate: string) => {
     const daysLeft = differenceInDays(expiry, today);
     
     if (daysLeft < 0) return { label: 'EXPIRED', color: 'red', days: daysLeft };
-    if (daysLeft <= 1) return { label: 'USE NOW', color: 'red', days: daysLeft };
+    if (daysLeft <= 1) return { label: 'URGENT', color: 'red', days: daysLeft };
     if (daysLeft <= 5) return { label: 'USE SOON', color: 'amber', days: daysLeft };
     return { label: 'FRESH', color: 'green', days: daysLeft };
 };
@@ -111,7 +111,7 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
 
             <div className="flex items-center justify-between">
                 {freshness.color === 'red' ? (
-                     <Button size="sm" className="h-8 text-xs bg-primary hover:bg-primary/90" onClick={handleUseNow}>
+                     <Button size="sm" className="h-8 text-xs bg-red-600 hover:bg-red-700" onClick={handleUseNow}>
                         Use Now
                     </Button>
                 ) : (
@@ -148,3 +148,5 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
         </div>
     )
 }
+
+    
