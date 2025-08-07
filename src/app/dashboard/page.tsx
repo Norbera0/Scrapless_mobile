@@ -179,7 +179,7 @@ export default function DashboardPage() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <h1 className="text-4xl font-semibold text-[#063627]">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
-            <Sparkles className="w-8 h-8 text-[#FFDD00]" />
+            
           </div>
           <p className="text-[#7C7C7C] text-lg">Let's reduce waste together</p>
         </div>
@@ -389,7 +389,6 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[40px]">Status</TableHead>
                       <TableHead>
                         <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
                           Item {getSortIcon('name')}
@@ -406,9 +405,13 @@ export default function DashboardPage() {
                   <TableBody>
                     {sortedWatchlistItems.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell>{getStatusIndicator(item.daysUntilExpiration)}</TableCell>
                         <TableCell className="font-medium">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
-                        <TableCell className="text-right">{item.daysUntilExpiration} days</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {getStatusIndicator(item.daysUntilExpiration)}
+                            <span>{item.daysUntilExpiration} days</span>
+                          </div>
+                        </TableCell>
                         <TableCell className="text-right">
                            <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
                             <Edit className="w-4 h-4 mr-2" /> Edit
