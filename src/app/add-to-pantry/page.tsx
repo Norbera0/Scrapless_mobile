@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useAuth } from '@/hooks/use-auth';
@@ -32,6 +32,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
 
+const NUM_WAVEFORM_BARS = 30;
+
 export default function AddToPantryPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -51,12 +53,23 @@ export default function AddToPantryPage() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  
+  const [recordingTime, setRecordingTime] = useState(0);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  
+  // For waveform visualization
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const [waveform, setWaveform] = useState<number[]>(Array(NUM_WAVEFORM_BARS).fill(0));
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
 
   useEffect(() => {
     resetStore();
@@ -102,6 +115,17 @@ export default function AddToPantryPage() {
 
     checkAudioPermission();
   }, [selectedMethod]);
+
+  // Waveform Cleanup
+  useEffect(() => {
+    return () => {
+        if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            audioContextRef.current.close();
+        }
+    }
+  }, []);
 
 
   const handleAnalyze = async (source: 'camera' | 'voice' | 'text', data: string) => {
@@ -161,6 +185,27 @@ export default function AddToPantryPage() {
     }
   };
 
+  const visualize = useCallback(() => {
+    if (!analyserRef.current || !dataArrayRef.current) return;
+    
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+
+    const newWaveform = Array(NUM_WAVEFORM_BARS).fill(0);
+    const barWidth = Math.floor(dataArrayRef.current.length / NUM_WAVEFORM_BARS);
+
+    for (let i = 0; i < NUM_WAVEFORM_BARS; i++) {
+        let sum = 0;
+        for (let j = 0; j < barWidth; j++) {
+            sum += dataArrayRef.current[i * barWidth + j];
+        }
+        let average = sum / barWidth;
+        newWaveform[i] = (average / 255);
+    }
+    setWaveform(newWaveform);
+
+    animationFrameRef.current = requestAnimationFrame(visualize);
+  }, []);
+
   const startRecording = async () => {
     if (hasAudioPermission === false) {
         toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
@@ -168,6 +213,8 @@ export default function AddToPantryPage() {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Setup MediaRecorder
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -177,6 +224,10 @@ export default function AddToPantryPage() {
       };
 
       mediaRecorder.onstop = () => {
+        if(animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        if(recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
+        setWaveform(Array(NUM_WAVEFORM_BARS).fill(0));
+
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -186,8 +237,29 @@ export default function AddToPantryPage() {
         reader.readAsDataURL(audioBlob);
       };
 
+      // Setup Web Audio API for visualization
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+      
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+      sourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      sourceRef.current.connect(analyserRef.current);
+
       mediaRecorder.start();
       setIsRecording(true);
+      setRecordingTime(0);
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+
+      visualize();
+
     } catch (error) {
       console.error('Microphone access denied:', error);
       toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
@@ -197,14 +269,23 @@ export default function AddToPantryPage() {
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
     }
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if(recordingIntervalRef.current) clearInterval(recordingIntervalRef.current);
   };
 
   const handleTextSubmit = () => {
     if (textInput.trim()) {
       handleAnalyze('text', textInput);
     }
+  };
+  
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (selectedMethod) {
@@ -286,19 +367,30 @@ export default function AddToPantryPage() {
                             <p className='text-muted-foreground'>Add items to your pantry using voice commands</p>
                         </CardHeader>
                         <CardContent className="space-y-6 text-center flex flex-col items-center justify-center p-8 min-h-[350px]">
-                             <div className={`relative w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
-                                isRecording 
-                                ? 'bg-destructive animate-pulse' 
-                                : 'bg-primary'
-                            }`}>
-                                <Mic className="w-16 h-16 text-white" />
+                            {/* Waveform Visualization */}
+                            <div className="h-20 w-full flex items-center justify-center gap-1">
+                                {waveform.map((height, i) => (
+                                    <div
+                                        key={i}
+                                        className="w-1 rounded-full bg-primary/80"
+                                        style={{
+                                            height: `${Math.max(4, height * 100)}%`,
+                                            transition: 'height 0.1s ease-out'
+                                        }}
+                                    />
+                                ))}
                             </div>
+
                              <div className='h-16'>
                                 <h3 className="text-xl font-semibold text-gray-800">
                                     {isLoading ? 'Processing...' : isRecording ? 'Listening...' : 'Ready to record'}
                                 </h3>
                                 <p className="text-muted-foreground">
-                                    {isLoading ? 'Converting speech to text...' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
+                                     {isLoading
+                                        ? 'Converting speech to text...'
+                                        : isRecording
+                                        ? formatTime(recordingTime)
+                                        : 'Tap the button to start recording.'}
                                 </p>
                              </div>
                              <Button 
@@ -497,3 +589,4 @@ export default function AddToPantryPage() {
     </div>
   );
 }
+
