@@ -323,7 +323,7 @@ export default function DashboardPage() {
             <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                   Your frequently waste portions
+                   ✨ Your frequently waste portions
                 </CardTitle>
               </CardHeader>
               <CardContent>
