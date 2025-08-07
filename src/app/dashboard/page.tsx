@@ -242,42 +242,28 @@ export default function DashboardPage() {
         </div>
 
          {/* This Week's Impact */}
-        <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <BarChart3 className="w-6 h-6 text-green-600" />
-              This Week's Impact
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-green-700 mb-6">Your progress this week</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-6 border border-green-300">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-green-800">₱{weeklySavingsStats.totalSavings.toFixed(2)}</p>
-                    <p className="text-sm text-green-600 font-medium">Virtual Savings</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-6 border border-red-300">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-red-200 rounded-xl flex items-center justify-center">
-                    <Trash className="w-6 h-6 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-red-800">₱{weeklyWasteStats.totalPesoValue.toFixed(2)}</p>
-                    <p className="text-sm text-red-600 font-medium">Food Waste</p>
-                  </div>
-                </div>
-              </div>
+        <div className="mb-8 rounded-2xl p-6 bg-gradient-to-br from-slate-50 to-slate-100 border relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500" />
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <BarChart3 className="w-6 h-6 text-green-700" />
+                    This Week's Impact
+                </h2>
+                <Badge variant="outline">This Week</Badge>
             </div>
-          </CardContent>
-        </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                    <p className="text-sm font-medium text-green-700">Virtual Savings</p>
+                    <p className="text-3xl font-bold text-green-800">₱{weeklySavingsStats.totalSavings.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">From using items before expiry</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                     <p className="text-sm font-medium text-red-700">Food Waste</p>
+                    <p className="text-3xl font-bold text-red-800">₱{weeklyWasteStats.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500">Value of items logged as waste</p>
+                </div>
+            </div>
+        </div>
 
         {/* Quick Actions Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -442,5 +428,6 @@ export default function DashboardPage() {
     
 
     
+
 
 
