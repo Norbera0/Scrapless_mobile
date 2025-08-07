@@ -256,7 +256,7 @@ export default function AddToPantryPage() {
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Button size="lg" className="h-14 text-lg bg-primary hover:bg-primary/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
+                                    <Button size="lg" className="h-14 text-lg bg-blue-500 hover:bg-blue-600 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
                                         <Camera className="w-6 h-6 mr-2" />
                                         Capture Photo
                                     </Button>
@@ -287,8 +287,8 @@ export default function AddToPantryPage() {
                         <CardContent className="space-y-6 text-center">
                              <div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
                                 isRecording 
-                                ? 'bg-gradient-to-br from-red-500 to-red-600 animate-pulse' 
-                                : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                                ? 'bg-gradient-to-br from-destructive to-red-600 animate-pulse' 
+                                : 'bg-gradient-to-br from-primary to-green-600'
                             }`}>
                                 <Mic className="w-16 h-16 text-white" />
                             </div>
@@ -300,11 +300,8 @@ export default function AddToPantryPage() {
                             </p>
                              <Button 
                                 size="lg" 
-                                className={`w-full h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] ${
-                                isRecording 
-                                    ? 'bg-red-500 hover:bg-red-600' 
-                                    : 'bg-purple-600 hover:bg-purple-700'
-                                }`}
+                                variant={isRecording ? 'destructive' : 'default'}
+                                className="w-full h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
                                 onClick={isRecording ? stopRecording : startRecording}
                                 disabled={isLoading}
                             >
