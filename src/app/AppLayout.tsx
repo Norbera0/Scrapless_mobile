@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import { Sidebar, SidebarInset, SidebarRail, SidebarTrigger } from '@/components/ui/sidebar';
@@ -12,6 +12,7 @@ import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssist
 import { Button } from '@/components/ui/button';
 import { PanelLeft, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 
 const getPageTitle = (pathname: string) => {
@@ -33,6 +34,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+        setCurrentDate(new Date());
+    }, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !user && pathname !== '/login') {
@@ -72,7 +81,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
-              <div className="flex items-center gap-2 md:gap-4">
+              <div className="flex items-center gap-4 md:gap-6 ml-auto">
+                 <div className="hidden md:flex flex-col items-end">
+                    <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
+                    <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
+                 </div>
                  <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
