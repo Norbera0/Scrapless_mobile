@@ -81,7 +81,7 @@ export default function DashboardPage() {
   const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
-  const [sortConfig, setSortConfig = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -436,3 +436,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
