@@ -273,7 +273,7 @@ export default function PantryPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className='flex items-center gap-3'>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 Your Pantry</h1>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 My Pantry</h1>
               <div>
                 <p className="text-gray-500 text-sm md:text-base hidden">Manage your inventory and discover new recipes</p>
               </div>
