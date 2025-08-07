@@ -21,7 +21,8 @@ import {
   Loader2,
   ListFilter,
   PackageCheck,
-  Soup
+  Soup,
+  Leaf
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
@@ -319,44 +320,49 @@ export default function PantryPage() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <Card className="border-gray-200">
-            <CardContent className="p-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
-                  <Package className="w-5 h-5 text-blue-600" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
+            <Card
+                className="p-5 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                onClick={() => setFilter('all')}
+            >
+                <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
+                    <Package className="w-6 h-6 text-blue-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+                <p className="text-3xl font-bold text-gray-800">{stats.total}</p>
                 <p className="text-sm font-medium text-gray-500">Total Items</p>
-            </CardContent>
-          </Card>
-          <Card className="border-green-200">
-            <CardContent className="p-4">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-2">
-                  <PackageCheck className="w-5 h-5 text-green-600" />
+            </Card>
+            <Card
+                className="p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                onClick={() => setFilter('fresh')}
+            >
+                <div className="w-11 h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
+                    <Leaf className="w-6 h-6 text-green-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-800">{stats.fresh}</p>
-                <p className="text-sm font-medium text-gray-500">Fresh Items</p>
-            </CardContent>
-          </Card>
-          <Card className="border-amber-200">
-            <CardContent className="p-4">
-                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-2">
-                  <Clock className="w-5 h-5 text-amber-600" />
+                <p className="text-3xl font-bold text-green-800">{stats.fresh}</p>
+                <p className="text-sm font-medium text-green-600">Fresh Items</p>
+            </Card>
+            <Card
+                className="p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                onClick={() => setFilter('expiring')}
+            >
+                <div className="w-11 h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
+                    <Clock className="w-6 h-6 text-amber-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-800">{stats.expiring}</p>
-                <p className="text-sm font-medium text-gray-500">Expiring Soon</p>
-            </CardContent>
-          </Card>
-          <Card className="border-red-200">
-            <CardContent className="p-4">
-                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-2">
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
+                <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
+            </Card>
+            <Card
+                className="p-5 rounded-2xl shadow-sm border border-red-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                onClick={() => setFilter('expired')}
+            >
+                <div className="w-11 h-11 bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center mb-2">
+                    <AlertTriangle className="w-6 h-6 text-red-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-800">{stats.expired}</p>
-                <p className="text-sm font-medium text-gray-500">Expired</p>
-            </CardContent>
-          </Card>
+                <p className="text-3xl font-bold text-red-800">{stats.expired}</p>
+                <p className="text-sm font-medium text-red-600">Expired</p>
+            </Card>
         </div>
+
 
         {/* Pantry Health Score */}
         <Card className="mb-8 rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md">
