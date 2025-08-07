@@ -81,35 +81,35 @@ export default function LogWastePage() {
         <div className="mb-8">
             <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">How would you like to log your waste?</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col bg-gradient-to-br from-blue-50 to-blue-100">
+                <Card className="border border-gray-200 transform hover:scale-[1.02] transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
                   <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-                      <Camera className="w-8 h-8 text-blue-600" />
+                    <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
+                        <span className="text-4xl">📷</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Log with Camera</h3>
-                    <p className="text-gray-500 mb-6 text-sm">Snap a picture of your food waste. The AI will identify the items for you.</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Log with Camera</h3>
+                    <p className="text-gray-500 mb-6 text-sm">Snap a picture of your food waste.</p>
                     <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('camera')}>Use Camera</Button>
                   </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col bg-gradient-to-br from-purple-50 to-purple-100">
+                <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
                   <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-                      <Mic className="w-8 h-8 text-purple-600" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl flex items-center justify-center mb-4">
+                      <span className="text-3xl">🎤</span>
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Log with Voice</h3>
-                    <p className="text-gray-500 mb-6 text-sm">Simply say what you've wasted, and the AI will transcribe it into a list.</p>
+                    <p className="text-gray-500 mb-6 text-sm">Simply say what you've wasted.</p>
                      <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('voice')}>Use Voice</Button>
                   </CardContent>
                 </Card>
 
-                 <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col bg-gradient-to-br from-orange-50 to-orange-100">
+                 <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
                   <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                    <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm">
-                      <Type className="w-8 h-8 text-orange-600" />
+                     <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4">
+                      <span className="text-3xl">⌨️</span>
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Manual Entry</h3>
-                    <p className="text-gray-500 mb-6 text-sm">Type out the items you've wasted for a quick and simple log.</p>
+                    <p className="text-gray-500 mb-6 text-sm">Type out the items you've wasted.</p>
                      <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('text')}>Use Text</Button>
                   </CardContent>
                 </Card>
