@@ -397,7 +397,7 @@ export default function AddToPantryPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
             {/* Camera Card - Primary */}
-            <Card className="border border-gray-200 shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col">
+            <Card className="border border-gray-200 transform hover:scale-105 transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
               <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
                   <span className="text-4xl">📷</span>
