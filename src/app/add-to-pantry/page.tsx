@@ -313,6 +313,17 @@ export default function AddToPantryPage() {
                                 {isLoading ? "Analyzing..." : isRecording ? 'Stop Recording' : 'Start Recording'}
                             </Button>
                         </CardContent>
+                        <div className="p-6 pt-0">
+                            <div className="bg-secondary/50 rounded-xl p-4 border">
+                                <h4 className="font-semibold text-foreground flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Recording Tips</h4>
+                                <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside text-left">
+                                    <li>Speak clearly and at a natural pace.</li>
+                                    <li>Say both the item and quantity (e.g., "2 kilos of rice").</li>
+                                    <li>List items one after another (e.g., "1 dozen eggs and 5 bananas").</li>
+                                    <li>No need to rush, you can pause between items.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </Card>
                 )}
                  {selectedMethod === 'text' && (
