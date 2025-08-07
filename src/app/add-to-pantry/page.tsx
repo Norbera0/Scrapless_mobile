@@ -455,7 +455,7 @@ export default function AddToPantryPage() {
           <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#FFDD00]" />
+                
                 AI Insights
               </CardTitle>
             </CardHeader>
