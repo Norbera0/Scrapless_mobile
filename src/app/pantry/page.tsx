@@ -328,7 +328,7 @@ export default function PantryPage() {
                 <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
                     <Package className="w-6 h-6 text-blue-600" />
                 </div>
-                <p className="text-3xl font-bold text-gray-800">{stats.total}</p>
+                <p className="text-3xl font-bold text-blue-800">{stats.total}</p>
                 <p className="text-sm font-medium text-gray-500">Total Items</p>
             </Card>
             <Card
