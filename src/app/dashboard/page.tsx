@@ -289,14 +289,17 @@ export default function DashboardPage() {
             onClick={() => router.push('/add-to-pantry')}
           >
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
-                <ShoppingBasket className="h-6 w-6 text-amber-700" />
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                  <ShoppingBasket className="h-6 w-6 text-amber-700" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                  <p className="text-sm text-gray-500">Stock your pantry</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
-                <p className="text-sm text-gray-500">Stock your pantry with new items</p>
-              </div>
+              <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
             </div>
           </div>
           <div
@@ -304,14 +307,17 @@ export default function DashboardPage() {
             onClick={() => router.push('/log-waste?method=camera')}
           >
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
-                <BarChart3 className="h-6 w-6 text-green-700" />
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                  <BarChart3 className="h-6 w-6 text-green-700" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                  <p className="text-sm text-gray-500">Track your impact</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
-                <p className="text-sm text-gray-500">Track and learn from waste patterns</p>
-              </div>
+              <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
             </div>
           </div>
         </div>
@@ -439,3 +445,4 @@ export default function DashboardPage() {
     
 
     
+
