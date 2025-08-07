@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Progress, type ProgressSegment } from '@/components/ui/progress';
 import { 
   Plus, 
   Search, 
@@ -36,6 +36,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday } from 'date-fns';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const filterOptions = [
     { value: 'all', label: 'All Items' },
@@ -113,13 +114,21 @@ export default function PantryPage() {
           ((fresh.length * 100) + (expiring.length * 50) + (expired.length * 0)) / liveItems.length
         )
       : 100;
+    
+    const total = liveItems.length;
+    const segments: ProgressSegment[] = total > 0 ? [
+        { value: fresh.length, color: '#10B981', label: 'Fresh' },
+        { value: expiring.length, color: '#F59E0B', label: 'Expiring Soon' },
+        { value: expired.length, color: '#EF4444', label: 'Expired' },
+    ] : [];
 
     return {
       total: liveItems.length,
       fresh: fresh.length,
       expiring: expiring.length,
       expired: expired.length,
-      healthScore
+      healthScore,
+      segments
     };
   }, [liveItems, getStatus]);
 
@@ -251,6 +260,11 @@ export default function PantryPage() {
         return 'text-red-600';
     };
 
+    const pieChartData = [
+        { name: 'Health', value: stats.healthScore, color: '#059669' },
+        { name: 'Remainder', value: 100 - stats.healthScore, color: '#F3F4F6' },
+    ];
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -346,66 +360,70 @@ export default function PantryPage() {
         </div>
 
         {/* Pantry Health Score */}
-         <Card className="mb-8 border-gray-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-800">
-              <TrendingUp className="w-5 h-5" />
-              Pantry Health Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
-               <div className="relative h-32 w-32">
-                  <svg className="w-full h-full" viewBox="0 0 36 36">
-                    <path
-                      className="text-gray-200"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                    />
-                    <path
-                      className={getScoreColor(stats.healthScore)}
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeDasharray={`${stats.healthScore}, 100`}
-                    />
-                  </svg>
-                  <div className={`absolute inset-0 flex items-center justify-center text-3xl font-bold ${getScoreColor(stats.healthScore)}`}>
-                    {stats.healthScore}%
-                  </div>
+        <Card className="mb-8 rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md">
+            <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                📊 Pantry Health Score
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col md:flex-row items-center gap-8 p-6">
+                <div className="relative w-32 h-32 md:w-36 md:h-36">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={pieChartData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius="70%"
+                                outerRadius="100%"
+                                startAngle={90}
+                                endAngle={450}
+                                dataKey="value"
+                                stroke="none"
+                            >
+                                {pieChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                     <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className={`text-3xl font-bold ${getScoreColor(stats.healthScore)}`}>
+                            {stats.healthScore}%
+                        </span>
+                        <span className="text-xs text-gray-500">Health Score</span>
+                    </div>
                 </div>
-              <div className="flex-1 w-full">
-                <Progress value={stats.healthScore} className="h-3 mb-4" />
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
-                    <div>
-                        <p className="font-semibold text-gray-700">{stats.fresh}</p>
-                        <p className="text-gray-500">Fresh</p>
+
+                <div className="flex-1 w-full">
+                    <Progress value={stats.healthScore} segments={stats.segments} className="h-3 mb-4 rounded-full" />
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-[#10B981] rounded-full"></div>
+                            <div>
+                                <p className="font-bold text-lg text-gray-800">{stats.fresh}</p>
+                                <p className="text-gray-500">Fresh</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 bg-[#F59E0B] rounded-full"></div>
+                             <div>
+                                <p className="font-bold text-lg text-gray-800">{stats.expiring}</p>
+                                <p className="text-gray-500">Expiring</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <div className="w-3 h-3 bg-[#EF4444] rounded-full"></div>
+                             <div>
+                                <p className="font-bold text-lg text-gray-800">{stats.expired}</p>
+                                <p className="text-gray-500">Expired</p>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-amber-500 rounded-full"></div>
-                    <div>
-                        <p className="font-semibold text-gray-700">{stats.expiring}</p>
-                        <p className="text-gray-500">Expiring</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-                    <div>
-                        <p className="font-semibold text-gray-700">{stats.expired}</p>
-                        <p className="text-gray-500">Expired</p>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            </div>
-          </CardContent>
+            </CardContent>
         </Card>
+
 
         {/* Pantry Items */}
         <div className="mb-8">
