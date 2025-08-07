@@ -78,7 +78,7 @@ export default function SavedItemsPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2"><Bookmark className="h-8 w-8"/> My Saves</h1>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">🔖 My Saves</h1>
         <p className="text-muted-foreground">
           Your personal collection of recipes, insights, and tips.
         </p>
@@ -88,7 +88,7 @@ export default function SavedItemsPage() {
         {/* Saved Recipes Section */}
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Utensils /> Saved Recipes ({savedRecipes.length})</CardTitle>
+                <CardTitle className="flex items-center gap-2">🍴 Saved Recipes ({savedRecipes.length})</CardTitle>
                 <CardDescription>Recipes you've bookmarked to try.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -115,7 +115,7 @@ export default function SavedItemsPage() {
         {/* Solutions I'm Trying */}
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Lightbulb /> Solutions I'm Trying ({solutionsImTrying.length})</CardTitle>
+                <CardTitle className="flex items-center gap-2">💡 Solutions I'm Trying ({solutionsImTrying.length})</CardTitle>
                 <CardDescription>Solutions you've committed to from your insights.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -124,7 +124,7 @@ export default function SavedItemsPage() {
                         {solutionsImTrying.map(insight => (
                             <Card 
                                 key={insight.id} 
-                                className="hover:bg-muted/50 transition-colors"
+                                className="hover:bg-muted/50 transition-colors bg-green-50 border-green-200"
                             >
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div>
@@ -152,7 +152,7 @@ export default function SavedItemsPage() {
         {/* Used Food History */}
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Archive /> Recently Used Items ({usedItems.length})</CardTitle>
+                <CardTitle className="flex items-center gap-2">✅ Recently Used Items ({usedItems.length})</CardTitle>
                 <CardDescription>A log of food you successfully used.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -190,7 +190,7 @@ export default function SavedItemsPage() {
         <Card>
             <CardHeader className="flex-row items-center justify-between">
                 <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2 text-muted-foreground"><ShoppingCart /> Shopping Tips I'm Trying</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-muted-foreground">🛒 Shopping Tips I'm Trying</CardTitle>
                     <CardDescription>Shopping recommendations you are actively implementing.</CardDescription>
                 </div>
                  <Button variant="outline" disabled>Coming Soon</Button>
@@ -201,7 +201,7 @@ export default function SavedItemsPage() {
         <Card>
             <CardHeader className="flex-row items-center justify-between">
                 <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2"><History /> My Full Insights History</CardTitle>
+                    <CardTitle className="flex items-center gap-2">📜 My Full Insights History</CardTitle>
                     <CardDescription>Review your log of all past AI-powered insights.</CardDescription>
                 </div>
                 <Button variant="outline" onClick={() => router.push('/insights/history')}>
