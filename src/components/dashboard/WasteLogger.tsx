@@ -222,15 +222,8 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       {method === 'camera' && (
         <>
           <CardHeader>
-             <div className="flex items-center justify-between">
-                <div>
-                    <CardTitle>1. Capture with Camera</CardTitle>
-                    <CardDescription>Take a live photo or upload one.</CardDescription>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => router.push('/log-waste?method=voice')}>
-                    <Mic className="mr-2 h-4 w-4" /> Use Voice
-                </Button>
-            </div>
+            <CardTitle>Log with Camera</CardTitle>
+            <CardDescription>Take a live photo or upload one of your food waste.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
@@ -278,15 +271,8 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       {method === 'voice' && (
         <>
            <CardHeader>
-             <div className="flex items-center justify-between">
-                <div>
-                    <CardTitle>1. Record with Voice</CardTitle>
-                    <CardDescription>Press record and list your wasted items.</CardDescription>
-                </div>
-                <Button variant="outline" size="sm" onClick={() => router.push('/log-waste?method=camera')}>
-                    <Camera className="mr-2 h-4 w-4" /> Use Camera
-                </Button>
-            </div>
+                <CardTitle>Log with Voice</CardTitle>
+                <CardDescription>Press record and list your wasted items.</CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center items-center h-[250px] flex-col gap-4">
              <Button 
@@ -297,6 +283,9 @@ export function WasteLogger({ method }: WasteLoggerProps) {
                 disabled={isLoading}>
                 {isRecording ? <Square className="h-10 w-10" /> : <Mic className="h-10 w-10" />}
             </Button>
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? 'Processing...' : isRecording ? 'Recording...' : 'Tap to record'}
+            </p>
             {isLoading && <Loader2 className="h-8 w-8 animate-spin text-primary" />}
 
             {hasAudioPermission === false && (
