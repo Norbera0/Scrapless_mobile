@@ -242,28 +242,26 @@ export default function DashboardPage() {
         </div>
 
          {/* This Week's Impact */}
-        <div className="mb-8 rounded-2xl p-6 bg-gradient-to-br from-slate-50 to-slate-100 border relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-emerald-500" />
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <BarChart3 className="w-6 h-6 text-green-700" />
+        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 text-white">
+                <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
                     This Week's Impact
-                </h2>
-                <Badge variant="outline">This Week</Badge>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                     <p className="text-sm font-medium text-green-700">Virtual Savings</p>
                     <p className="text-3xl font-bold text-green-800">₱{weeklySavingsStats.totalSavings.toFixed(2)}</p>
                     <p className="text-xs text-gray-500">From using items before expiry</p>
                 </div>
-                <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <div>
                      <p className="text-sm font-medium text-red-700">Food Waste</p>
                     <p className="text-3xl font-bold text-red-800">₱{weeklyWasteStats.totalPesoValue.toFixed(2)}</p>
                     <p className="text-xs text-gray-500">Value of items logged as waste</p>
                 </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
 
         {/* Quick Actions Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -428,6 +426,8 @@ export default function DashboardPage() {
     
 
     
+
+
 
 
 
