@@ -36,6 +36,42 @@ import type { PantryItem } from '@/types';
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
 
+const emojiMap: { [key: string]: string } = {
+    'pork': '🐷',
+    'chicken': '🐔',
+    'beef': '🐄',
+    'fish': '🐟',
+    'salmon': '🐟',
+    'tuna': '🐟',
+    'cabbage': '🥬',
+    'garlic': '🧄',
+    'tomato': '🍅',
+    'onion': '🧅',
+    'carrot': '🥕',
+    'potato': '🥔',
+    'milk': '🥛',
+    'cheese': '🧀',
+    'butter': '🧈',
+    'apple': '🍎',
+    'banana': '🍌',
+    'orange': '🍊',
+    'rice': '🍚',
+    'bread': '🍞',
+    'pasta': '🍝',
+    'lettuce': '🥬',
+    'egg': '🥚',
+};
+
+const getItemEmoji = (itemName: string) => {
+    const lowerItem = itemName.toLowerCase();
+    for (const key in emojiMap) {
+        if (lowerItem.includes(key)) {
+            return emojiMap[key];
+        }
+    }
+    return '🍽️'; // Default emoji
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -371,7 +407,7 @@ export default function DashboardPage() {
                     {sortedWatchlistItems.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{getStatusIndicator(item.daysUntilExpiration)}</TableCell>
-                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell className="font-medium">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
                         <TableCell className="text-right">{item.daysUntilExpiration} days</TableCell>
                         <TableCell className="text-right">
                            <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
