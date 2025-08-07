@@ -8,7 +8,8 @@ import {
     Trash2,
     Lightbulb,
     ShoppingCart,
-    Bookmark
+    Bookmark,
+    PackagePlus
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -56,8 +57,8 @@ export function SidebarNav({ user }: { user: User }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/pantry', label: 'Pantry', icon: CookingPot },
-    { href: '/my-waste', label: 'My Waste', icon: Trash2 },
+    { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
+    { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items'] },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/shopping', label: 'Shopping Hubs', icon: ShoppingCart },
     { href: '/saves', label: 'My Saves', icon: Bookmark },
@@ -72,13 +73,14 @@ export function SidebarNav({ user }: { user: User }) {
     return name.charAt(0).toUpperCase();
   }
 
-  const isActive = (itemHref: string) => {
+  const isActive = (itemHref: string, relatedPaths: string[] = []) => {
     const itemBase = itemHref.split('?')[0];
+    if (pathname === itemBase || pathname.startsWith(`${itemBase}/`)) return true;
     
-    if (pathname === itemBase) return true;
-
-    // Broader match for nested routes
-    if (pathname.startsWith(`${itemBase}/`)) return true;
+    // Check if the current path is one of the related paths
+    for (const path of relatedPaths) {
+      if (pathname.startsWith(path)) return true;
+    }
     
     return false;
   }
@@ -101,7 +103,7 @@ export function SidebarNav({ user }: { user: User }) {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   onClick={() => handleNavigation(item.href)}
-                  isActive={isActive(item.href)}
+                  isActive={isActive(item.href, item.relatedPaths)}
                   className="w-full justify-start text-base h-12"
                   tooltip={item.label}
                 >
