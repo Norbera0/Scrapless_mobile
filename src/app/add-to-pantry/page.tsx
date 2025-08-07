@@ -25,7 +25,9 @@ import {
   ArrowLeft,
   Loader2,
   Square,
-  BarChart3
+  BarChart3,
+  Lightbulb,
+  Receipt
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
@@ -207,71 +209,75 @@ export default function AddToPantryPage() {
 
   if (selectedMethod) {
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-            <div className="max-w-3xl mx-auto">
-                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-4">
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+            <div className="max-w-4xl mx-auto">
+                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-4 text-muted-foreground hover:text-foreground">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to methods
                 </Button>
                 {selectedMethod === 'camera' && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Scan with Camera</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center bg-muted overflow-hidden">
+                    <div className="rounded-2xl bg-gradient-to-br from-slate-100 to-gray-200 p-6 md:p-8 shadow-sm border border-slate-200">
+                        <div className="text-center mb-6">
+                            <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Capture Your Groceries</h2>
+                            <p className="text-slate-500 mt-1">Point your camera at your items, or upload a photo of your receipt.</p>
+                        </div>
+
+                        <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
                             {photoPreview ? (
-                                <Image src={photoPreview} alt="Captured" width={400} height={300} className="mx-auto rounded-xl shadow-lg object-contain h-full w-full" />
+                                <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" className="shadow-lg" />
                             ) : hasCameraPermission === false ? (
-                                <div className="text-center p-4">
-                                    <Camera className="w-12 h-12 text-destructive mx-auto mb-2" />
-                                    <h3 className="text-xl font-semibold text-destructive mb-2">Camera Access Required</h3>
-                                    <p className="text-muted-foreground">Please allow camera access in your browser settings to use this feature.</p>
+                                <div className="text-center p-4 text-white">
+                                    <Camera className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-white mb-2">Camera Access Required</h3>
+                                    <p className="text-red-300">Please allow camera access in your browser settings to use this feature.</p>
                                 </div>
                             ) : (
                                 <video 
                                     ref={videoRef} 
-                                    className="mx-auto rounded-xl shadow-lg max-w-full h-auto"
+                                    className="w-full h-full object-cover"
                                     autoPlay
                                     playsInline
                                     muted
                                 />
                             )}
                             <canvas ref={canvasRef} className="hidden" />
-                            </div>
-                            <div className="flex gap-4">
-                                {photoPreview ? (
-                                     <>
-                                        <Button className="flex-1" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
-                                            {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
-                                            Analyze Photo
-                                        </Button>
-                                        <Button variant="outline" className="flex-1" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
-                                            Retake
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Button className="flex-1" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
-                                            <Camera className="w-5 h-5 mr-2" />
-                                            Capture Photo
-                                        </Button>
-                                        <Button variant="outline" className="flex-1" onClick={() => fileInputRef.current?.click()}>
-                                            <Upload className="w-5 h-5 mr-2" />
-                                            Upload
-                                        </Button>
-                                         <input
-                                            type="file"
-                                            ref={fileInputRef}
-                                            onChange={handleFileUpload}
-                                            accept="image/*"
-                                            className="hidden"
-                                        />
-                                    </>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        
+                        <div className="mt-6">
+                            {photoPreview ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Button size="lg" className="h-14 text-lg" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
+                                        {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : <ArrowRight className="w-6 h-6 mr-2" />}
+                                        Analyze Photo
+                                    </Button>
+                                    <Button size="lg" variant="outline" className="h-14 text-lg bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
+                                        Retake
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <Button size="lg" className="h-14 text-lg bg-primary hover:bg-primary/90" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
+                                        <Camera className="w-6 h-6 mr-2" />
+                                        Capture Photo
+                                    </Button>
+                                    <Button size="lg" variant="secondary" className="h-14 text-lg" onClick={() => fileInputRef.current?.click()}>
+                                        <Upload className="w-6 h-6 mr-2" />
+                                        Upload
+                                    </Button>
+                                    <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-8 bg-white/60 rounded-xl p-4 border border-slate-200">
+                             <h4 className="font-semibold text-slate-700 flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Scanning Tips</h4>
+                             <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                                 <li>For best results, place items on a plain background.</li>
+                                 <li>Ensure good lighting to avoid shadows and reflections.</li>
+                                 <li>You can also scan a clear, well-lit grocery receipt.</li>
+                             </ul>
+                        </div>
+                    </div>
                 )}
                  {selectedMethod === 'voice' && (
                     <Card>
@@ -397,7 +403,7 @@ export default function AddToPantryPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
             
             {/* Camera Card - Primary */}
-            <Card className="border border-gray-200 transform hover:scale-105 transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
+            <Card className="border border-gray-200 transform hover:scale-[1.02] transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
               <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
                   <span className="text-4xl">📷</span>
@@ -436,7 +442,7 @@ export default function AddToPantryPage() {
 
         {/* Bottom Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <Card className="bg-gradient-to-br from-green-900 to-green-800 text-white shadow-lg">
+          <Card className="bg-primary text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="text-yellow-300" />
@@ -480,5 +486,3 @@ export default function AddToPantryPage() {
     </div>
   );
 }
-
-    
