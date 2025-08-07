@@ -269,7 +269,6 @@ export default function DashboardPage() {
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-[#063627]">
-                <Target className="w-5 h-5 text-[#227D53]" />
                 🎉 Great Progress!
               </CardTitle>
             </CardHeader>
