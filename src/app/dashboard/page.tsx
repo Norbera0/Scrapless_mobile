@@ -81,7 +81,7 @@ export default function DashboardPage() {
   const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
-  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
+  const [sortConfig, setSortConfig = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                 </div>
                 <Button 
                   variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white/10 rounded-full"
+                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300"
                   onClick={() => router.push(`/insights/${latestInsight.id}`)}
                 >
                   View Full Analysis →
