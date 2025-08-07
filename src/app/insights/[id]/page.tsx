@@ -14,7 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolution, onSelect: () => void, disabled: boolean }) {
+function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
         <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader>
@@ -33,9 +33,15 @@ function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolut
                         <Progress value={solution.successRate * 100} className="h-2" />
                     </div>
                 </div>
-                 <Button size="sm" className="w-full mt-4" onClick={onSelect} disabled={disabled}>
-                    <Check className="mr-2 h-4 w-4" /> 
-                    {disabled ? "Working on it!" : `I'll try this`}
+                 <Button 
+                    size="sm" 
+                    className="w-full mt-4" 
+                    onClick={onSelect} 
+                    disabled={isUpdating}
+                    variant={isSelected ? 'default' : 'outline'}
+                 >
+                    {isSelected ? <Check className="mr-2 h-4 w-4" /> : null}
+                    {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isSelected ? "Working on it!" : `I'll try this`)}
                  </Button>
             </CardContent>
         </Card>
@@ -50,29 +56,57 @@ export default function InsightDetailPage() {
     const { insights, insightsInitialized } = useInsightStore();
     const [insight, setInsight] = useState<Insight | null>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+    const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (insightsInitialized) {
             const foundInsight = insights.find(i => i.id === params.id);
-            setInsight(foundInsight || null);
+            if (foundInsight) {
+                setInsight(foundInsight);
+                if (foundInsight.status === 'acted_on' && foundInsight.solutions) {
+                    // Pre-populate selections if the insight was already acted on.
+                    // Assuming all solutions were selected previously for simplicity.
+                    // A more advanced implementation might store selected solution IDs.
+                    const solutionNames = new Set(foundInsight.solutions.map(s => s.solution));
+                    setSelectedSolutions(solutionNames);
+                }
+            } else {
+                setInsight(null);
+            }
         }
     }, [params.id, insights, insightsInitialized]);
 
-    const handleMarkAsActedOn = async () => {
+    const handleSelectSolution = async (solutionToSelect: InsightSolution) => {
         if (!user || !insight) return;
         setIsUpdatingStatus(true);
         try {
-            await updateInsightStatus(user.uid, insight.id, 'acted_on');
-            toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
-            setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
+            // Update the local state for immediate feedback
+            const newSelectedSolutions = new Set(selectedSolutions);
+            if (newSelectedSolutions.has(solutionToSelect.solution)) {
+                // For now, we only allow adding, not toggling off, to keep it simple.
+                // A toggle could be added here if desired.
+            } else {
+                newSelectedSolutions.add(solutionToSelect.solution);
+            }
+            setSelectedSolutions(newSelectedSolutions);
+
+            // If this is the first solution selected, update the insight's overall status
+            if (insight.status !== 'acted_on') {
+                await updateInsightStatus(user.uid, insight.id, 'acted_on');
+                setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
+                toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
+            }
+            
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not update insight status.' });
+            // Revert optimistic update on failure
+            const revertedSolutions = new Set(selectedSolutions);
+            revertedSolutions.delete(solutionToSelect.solution);
+            setSelectedSolutions(revertedSolutions);
         } finally {
             setIsUpdatingStatus(false);
         }
     }
-    
-    const isActedOn = insight?.status === 'acted_on';
 
     if (!insightsInitialized) {
         return (
@@ -153,7 +187,13 @@ export default function InsightDetailPage() {
                 <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {insight.solutions.map((solution, index) => (
-                        <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} disabled={isActedOn || isUpdatingStatus} />
+                        <SolutionCard 
+                            key={index} 
+                            solution={solution} 
+                            onSelect={() => handleSelectSolution(solution)} 
+                            isSelected={selectedSolutions.has(solution.solution)}
+                            isUpdating={isUpdatingStatus}
+                        />
                     ))}
                 </div>
             </div>
@@ -170,5 +210,3 @@ export default function InsightDetailPage() {
         </div>
     )
 }
-
-    
