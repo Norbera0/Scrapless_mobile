@@ -177,14 +177,11 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#F7F7F7] p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-4xl font-semibold text-[#063627]">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
-            
-          </div>
-          <p className="text-[#7C7C7C] text-lg">Let's reduce waste together</p>
+        <div className="mb-8 p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
+            <h1 className="text-3xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
+            <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
         </div>
-
+        
         {/* Key Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
@@ -244,7 +241,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* This Week's Impact */}
+         {/* This Week's Impact */}
         <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-800">
@@ -281,45 +278,45 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Quick Actions Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
-            onClick={() => router.push('/add-to-pantry')}
-          >
-            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
-                  <ShoppingBasket className="h-6 w-6 text-amber-700" />
+            <div
+                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
+                onClick={() => router.push('/add-to-pantry')}
+            >
+                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                            <ShoppingBasket className="h-6 w-6 text-amber-700" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                            <p className="text-sm text-gray-500">Stock your pantry</p>
+                        </div>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
-                  <p className="text-sm text-gray-500">Stock your pantry</p>
-                </div>
-              </div>
-              <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
             </div>
-          </div>
-          <div
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
-            onClick={() => router.push('/log-waste?method=camera')}
-          >
-            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
-                  <BarChart3 className="h-6 w-6 text-green-700" />
+            <div
+                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
+                onClick={() => router.push('/log-waste?method=camera')}
+            >
+                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+                <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                            <BarChart3 className="h-6 w-6 text-green-700" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                            <p className="text-sm text-gray-500">Track your impact</p>
+                        </div>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
-                  <p className="text-sm text-gray-500">Track your impact</p>
-                </div>
-              </div>
-              <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
             </div>
-          </div>
         </div>
 
         {/* Bottom Grid */}
@@ -445,4 +442,5 @@ export default function DashboardPage() {
     
 
     
+
 

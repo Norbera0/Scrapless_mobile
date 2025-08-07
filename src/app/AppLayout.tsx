@@ -73,16 +73,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-2 md:gap-4">
-                {pathname === '/dashboard' && (
-                  <div className="flex flex-col items-end text-right">
-                    <div className="text-xs md:text-sm font-medium">
-                      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-                    </div>
-                  </div>
-                )}
                  <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
