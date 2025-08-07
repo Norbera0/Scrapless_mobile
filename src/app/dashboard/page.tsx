@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { isWithinInterval, add } from 'date-fns';
+import { isWithinInterval, add, differenceInDays, startOfToday } from 'date-fns';
 import { 
   Sparkles, 
   TrendingUp, 
@@ -22,12 +22,19 @@ import {
   CheckCircle,
   ArrowRight,
   BarChart3,
-  Target,
   Leaf,
   DollarSign,
   Zap,
-  Trash
+  Trash,
+  ChevronDown,
+  ChevronUp,
+  Edit
 } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import type { PantryItem } from '@/types';
+
+type SortKey = 'name' | 'daysUntilExpiration';
+type SortDirection = 'asc' | 'desc';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -38,6 +45,7 @@ export default function DashboardPage() {
   const { savingsEvents } = useSavingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -91,6 +99,42 @@ export default function DashboardPage() {
     : 0;
 
   const latestInsight = insights.length > 0 ? insights[0] : null;
+
+  const sortedWatchlistItems = useMemo(() => {
+    const itemsWithDays = expiringSoonItems.map(item => ({
+      ...item,
+      daysUntilExpiration: differenceInDays(new Date(item.estimatedExpirationDate), startOfToday())
+    }));
+
+    return [...itemsWithDays].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [expiringSoonItems, sortConfig]);
+
+  const requestSort = (key: SortKey) => {
+    let direction: SortDirection = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  const getSortIcon = (key: SortKey) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
+  };
+
+  const getStatusIndicator = (days: number) => {
+    if (days <= 1) return <div className="w-3 h-3 rounded-full bg-red-500" title="Urgent"></div>;
+    if (days <= 3) return <div className="w-3 h-3 rounded-full bg-yellow-500" title="Expiring Soon"></div>;
+    return <div className="w-3 h-3 rounded-full bg-green-500" title="Fresh"></div>;
+  };
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] p-8">
@@ -243,7 +287,7 @@ export default function DashboardPage() {
             <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  ✨ Your frequently waste portions
+                   Your frequently waste portions
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -269,7 +313,7 @@ export default function DashboardPage() {
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-[#063627]">
-                🎉 Great Progress!
+                 🎉 Great Progress!
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -305,24 +349,43 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-yellow-700 mb-4">Items needing attention</p>
-              
-              <div className="space-y-3">
-                {expiringSoonItems.slice(0, 5).map((item, index) => (
-                  <div key={item.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-100 to-yellow-200 border border-yellow-300 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-yellow-300 rounded-lg flex items-center justify-center">
-                        <span className="text-sm">🥬</span>
-                      </div>
-                      <span className="font-medium text-yellow-800">{item.name}</span>
-                    </div>
-                    <Badge variant="outline" className="border-yellow-400 text-yellow-700 font-medium">
-                      {Math.max(0, Math.ceil((new Date(item.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days
-                    </Badge>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[40px]">Status</TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
+                          Item {getSortIcon('name')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">
+                        <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
+                          Expires In {getSortIcon('daysUntilExpiration')}
+                        </Button>
+                      </TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedWatchlistItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{getStatusIndicator(item.daysUntilExpiration)}</TableCell>
+                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell className="text-right">{item.daysUntilExpiration} days</TableCell>
+                        <TableCell className="text-right">
+                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
+                            <Edit className="w-4 h-4 mr-2" /> Edit
+                          </Button>
+                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
+                            <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
-              
               <Button 
                 variant="link" 
                 className="w-full mt-4 text-yellow-700 hover:text-yellow-800 font-semibold"
@@ -337,5 +400,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
