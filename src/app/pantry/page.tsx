@@ -272,17 +272,16 @@ export default function PantryPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className='flex items-center gap-3'>
-              <Soup className="w-8 h-8 text-primary" />
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 Your Pantry</h1>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Your Pantry</h1>
-                <p className="text-gray-500 text-sm md:text-base">Manage your inventory and discover new recipes</p>
+                <p className="text-gray-500 text-sm md:text-base hidden">Manage your inventory and discover new recipes</p>
               </div>
             </div>
             <Button 
               onClick={() => router.push('/add-to-pantry')}
               className="bg-primary hover:bg-primary/90 h-10 px-4 md:h-12 md:px-6 rounded-lg"
             >
-              <Plus className="w-5 h-5 mr-2" />
+              <Plus className="w-5 h-5 md:mr-2" />
               <span className='hidden md:inline'>Add Items</span>
             </Button>
           </div>
