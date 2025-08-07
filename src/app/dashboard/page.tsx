@@ -366,7 +366,7 @@ export default function DashboardPage() {
               </div>
               <Button 
                 variant="outline"
-                className="text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
+                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
                 onClick={() => router.push('/my-waste')}
               >
                 View Your Trends →
