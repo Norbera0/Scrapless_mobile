@@ -335,8 +335,8 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <Button 
-                  variant="link" 
-                  className="text-white hover:text-white/80 p-0 h-auto font-semibold"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10 rounded-full"
                   onClick={() => router.push(`/insights/${latestInsight.id}`)}
                 >
                   View Full Analysis →
