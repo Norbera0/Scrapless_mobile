@@ -8,7 +8,7 @@ import type { LogFoodWasteOutput } from '@/ai/schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type } from 'lucide-react';
+import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type, Lightbulb, Upload } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -222,57 +222,75 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     };
   };
 
+  if (method === 'camera') {
+    return (
+        <div className="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-slate-200">
+            <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Capture Your Waste</h2>
+                <p className="text-slate-500 mt-1">Point your camera at the food you've wasted.</p>
+            </div>
+
+            <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
+                {photoPreview ? (
+                    <Image src={photoPreview} alt="Captured waste" layout="fill" objectFit="contain" className="shadow-lg" />
+                ) : hasCameraPermission === false ? (
+                    <div className="text-center p-4 text-white">
+                        <Camera className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-white mb-2">Camera Access Required</h3>
+                        <p className="text-red-300">Please allow camera access in your browser settings to use this feature.</p>
+                    </div>
+                ) : (
+                    <video 
+                        ref={videoRef} 
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        playsInline
+                        muted
+                    />
+                )}
+                <canvas ref={canvasRef} className="hidden" />
+            </div>
+            
+            <div className="mt-6">
+                {photoPreview ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Button size="lg" className="h-14 text-lg" onClick={handleAnalyze} disabled={isLoading}>
+                            {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : <ArrowRight className="w-6 h-6 mr-2" />}
+                            Next: Review Items
+                        </Button>
+                        <Button size="lg" variant="outline" className="h-14 text-lg bg-white" onClick={resetCapture}>
+                            Retake
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Button size="lg" className="h-14 text-lg bg-primary hover:bg-primary/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={handleCaptureClick} disabled={!hasCameraPermission || isLoading}>
+                            <Camera className="w-6 h-6 mr-2" />
+                            Capture Photo
+                        </Button>
+                        <Button size="lg" variant="secondary" className="h-14 text-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg hover:bg-gray-300" onClick={() => fileInputRef.current?.click()}>
+                            <Upload className="w-6 h-6 mr-2" />
+                            Upload
+                        </Button>
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-8 bg-white/60 rounded-xl p-4 border border-slate-200">
+                 <h4 className="font-semibold text-slate-700 flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Scanning Tips</h4>
+                 <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                     <li>For best results, place items on a plain background.</li>
+                     <li>Ensure good lighting to avoid shadows and reflections.</li>
+                     <li>Try to capture all wasted items in a single photo.</li>
+                 </ul>
+            </div>
+        </div>
+    );
+  }
+
   return (
     <Card>
-      {method === 'camera' && (
-        <>
-          <CardHeader>
-            <CardTitle>Log with Camera</CardTitle>
-            <CardDescription>Take a live photo or upload one of your food waste.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-            <div className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center bg-muted overflow-hidden">
-              {photoPreview ? (
-                <Image src={photoPreview} alt="Food waste preview" width={400} height={225} className="object-cover w-full h-full" />
-              ) : (
-                <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-              )}
-              <canvas ref={canvasRef} className="hidden"></canvas>
-            </div>
-            {hasCameraPermission === false && (
-              <Alert variant="destructive">
-                <VideoOff className="h-4 w-4" />
-                <AlertTitle>Camera Access Required</AlertTitle>
-                <AlertDescription>Please allow camera access to use this feature.</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-          <CardFooter className="grid grid-cols-2 gap-4">
-            {photoPreview ? (
-              <>
-                <Button type="button" onClick={handleAnalyze} disabled={isLoading}>
-                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
-                  Next: Review Items
-                </Button>
-                <Button type="button" variant="outline" onClick={resetCapture}>
-                  <Trash2 className="mr-2 h-4 w-4" /> Retake
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button type="button" onClick={handleCaptureClick} disabled={!hasCameraPermission}>
-                  <Camera className="mr-2 h-4 w-4" /> Capture Photo
-                </Button>
-                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                  <ImageIcon className="mr-2 h-4 w-4" /> Upload
-                </Button>
-              </>
-            )}
-          </CardFooter>
-        </>
-      )}
-
       {method === 'voice' && (
         <>
            <CardHeader>
