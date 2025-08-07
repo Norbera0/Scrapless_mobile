@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 interface PantryItemDetailsProps {
     item: PantryItem | null;
@@ -77,6 +78,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
     const { toast } = useToast();
     const [isUpdating, setIsUpdating] = useState(false);
     const [showCostPrompt, setShowCostPrompt] = useState(false);
+    const archiveItem = usePantryLogStore((state) => state.archiveItem);
 
     if (!isOpen || !item) return null;
 
@@ -90,7 +92,8 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
             // Assumes 100% usage (usageEfficiency = 1.0)
             calculateAndSaveAvoidedExpiry(user, itemWithCost, 1.0).catch(console.error);
 
-            // Update item status in DB (fire-and-forget)
+            // Update item status in DB and optimistically update the UI
+            archiveItem(itemWithCost.id, 'used');
             updatePantryItemStatus(user.uid, itemWithCost.id, 'used').catch(console.error);
             
             toast({ title: "Item usage logged!", description: `You've used "${itemWithCost.name}".`});
@@ -129,7 +132,8 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user || !item) return;
         setIsUpdating(true);
         try {
-            // Update item status to 'wasted' (fire-and-forget)
+            // Update item status to 'wasted' and optimistically update the UI
+            archiveItem(item.id, 'wasted');
             updatePantryItemStatus(user.uid, item.id, 'wasted').catch(console.error);
             
             toast({ title: `Item marked as wasted`, description: `"${item.name}" has been moved to your waste log.`});

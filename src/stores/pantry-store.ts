@@ -34,6 +34,7 @@ interface PantryLogState {
   setItems: (items: PantryLogItem[]) => void;
   setLiveItems: (items: PantryItem[]) => void;
   setArchivedItems: (items: PantryItem[]) => void;
+  archiveItem: (itemId: string, status: 'used' | 'wasted') => void;
   addOptimisticItems: (items: PantryItem[]) => void;
   clearOptimisticItems: () => void;
   setPantryInitialized: (initialized: boolean) => void;
@@ -50,13 +51,23 @@ const initialState = {
     pantryInitialized: false,
 };
 
-export const usePantryLogStore = create<PantryLogState>()((set) => ({
+export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   ...initialState,
   setPhotoDataUri: (uri) => set({ photoDataUri: uri }),
   setTextInput: (text) => set({ textInput: text }),
   setItems: (items) => set({ items }),
   setLiveItems: (items) => set({ liveItems: items }),
   setArchivedItems: (items) => set({ archivedItems: items }),
+  archiveItem: (itemId, status) => {
+    const itemToArchive = get().liveItems.find(item => item.id === itemId);
+    if (itemToArchive) {
+        const updatedItem = { ...itemToArchive, status, usedDate: new Date().toISOString() };
+        set(state => ({
+            liveItems: state.liveItems.filter(item => item.id !== itemId),
+            archivedItems: [updatedItem, ...state.archivedItems],
+        }));
+    }
+  },
   addOptimisticItems: (items) => set((state) => ({ optimisticItems: [...state.optimisticItems, ...items] })),
   clearOptimisticItems: () => set({ optimisticItems: [] }),
   setPantryInitialized: (initialized) => set({ pantryInitialized: initialized }),

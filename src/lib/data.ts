@@ -246,20 +246,28 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
 export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted') => {
     const itemRef = doc(db, `users/${userId}/pantry`, itemId);
     
-    await runTransaction(db, async (transaction) => {
-        const itemSnap = await transaction.get(itemRef);
-        if (!itemSnap.exists()) {
-            throw new Error("Pantry item not found!");
-        }
-
-        const itemData = itemSnap.data() as Omit<PantryItem, 'id'>;
-        
-        // Move to archived
-        const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
-        const archivedData = { ...itemData, status: status, usedDate: new Date().toISOString() };
-        transaction.set(archiveRef, archivedData);
-        transaction.delete(itemRef);
-    });
+    try {
+        await runTransaction(db, async (transaction) => {
+            const itemSnap = await transaction.get(itemRef);
+            if (!itemSnap.exists()) {
+                // Item might already have been moved by an optimistic update, which is fine.
+                console.log(`Pantry item ${itemId} not found, likely already archived.`);
+                return;
+            }
+    
+            const itemData = itemSnap.data() as Omit<PantryItem, 'id'>;
+            
+            // Move to archived
+            const archiveRef = doc(db, `users/${userId}/archivedPantryItems`, itemId);
+            const archivedData = { ...itemData, status: status, usedDate: new Date().toISOString() };
+            transaction.set(archiveRef, archivedData);
+            transaction.delete(itemRef);
+        });
+    } catch (error) {
+        console.error("Transaction to archive pantry item failed:", error);
+        // Don't re-throw, as the optimistic update might have handled the UI.
+        // In a production app, you might add retry logic or state reconciliation here.
+    }
 };
 
 export const deletePantryItem = async (userId: string, itemId: string) => {
