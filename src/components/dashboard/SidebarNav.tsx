@@ -1,7 +1,15 @@
 
 'use client';
 
-import { LogOut } from 'lucide-react';
+import { 
+    LogOut,
+    LayoutDashboard,
+    CookingPot,
+    Trash2,
+    Lightbulb,
+    ShoppingCart,
+    Bookmark
+} from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -47,12 +55,12 @@ export function SidebarNav({ user }: { user: User }) {
   };
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', iconSrc: '/icons/Dashboard icon.png', inactiveIconSrc: '/icons/Dashboard icon - inactive.png' },
-    { href: '/pantry', label: 'Pantry', iconSrc: '/icons/Pantry Icon.png', inactiveIconSrc: '/icons/Pantry Icon - inactive.png' },
-    { href: '/my-waste', label: 'My Waste', iconSrc: '/icons/Waste icon.png', inactiveIconSrc: '/icons/Waste icon - inactive.png' },
-    { href: '/insights', label: 'Insights', iconSrc: '/icons/Insights icon.png', inactiveIconSrc: '/icons/Insights icon - inactive.png' },
-    { href: '/shopping', label: 'Shopping Hubs', iconSrc: '/icons/My shopping hub icon.png', inactiveIconSrc: '/icons/My shopping hub icon - inactive.png' },
-    { href: '/saves', label: 'My Saves', iconSrc: '/icons/My saves icon.png', inactiveIconSrc: '/icons/My saves icon - inactiver.png' },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/pantry', label: 'Pantry', icon: CookingPot },
+    { href: '/my-waste', label: 'My Waste', icon: Trash2 },
+    { href: '/insights', label: 'Insights', icon: Lightbulb },
+    { href: '/shopping', label: 'Shopping Hubs', icon: ShoppingCart },
+    { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
   
   const getInitials = (name?: string | null) => {
@@ -87,25 +95,22 @@ export function SidebarNav({ user }: { user: User }) {
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                onClick={() => handleNavigation(item.href)}
-                isActive={isActive(item.href)}
-                className="w-full justify-start text-base h-12"
-                tooltip={item.label}
-              >
-                <Image 
-                  src={isActive(item.href) ? item.iconSrc : item.inactiveIconSrc} 
-                  alt={item.label}
-                  width={20}
-                  height={20}
-                  className="h-5 w-5"
-                />
-                <span>{item.label}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  onClick={() => handleNavigation(item.href)}
+                  isActive={isActive(item.href)}
+                  className="w-full justify-start text-base h-12"
+                  tooltip={item.label}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2">
@@ -120,13 +125,7 @@ export function SidebarNav({ user }: { user: User }) {
           </div>
         </div>
         <Button variant="ghost" className="w-full justify-start gap-2 group-data-[[data-collapsible=icon]]/sidebar-wrapper:justify-center" onClick={handleLogout}>
-          <Image 
-            src="/icons/Logout icon.png"
-            alt="Logout"
-            width={16}
-            height={16}
-            className="h-4 w-4"
-          />
+          <LogOut className="h-4 w-4" />
           <span className='group-data-[[data-collapsible=icon]]/sidebar-wrapper:hidden'>Log Out</span>
         </Button>
       </SidebarFooter>
