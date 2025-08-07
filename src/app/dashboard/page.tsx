@@ -28,7 +28,8 @@ import {
   Trash,
   ChevronDown,
   ChevronUp,
-  Edit
+  Edit,
+  ShoppingBasket
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { PantryItem } from '@/types';
@@ -243,6 +244,40 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Quick Actions Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card 
+                className="group cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-lg rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
+                onClick={() => router.push('/add-to-pantry')}
+                style={{boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'}}
+            >
+                <CardContent className="p-6 flex items-center gap-6">
+                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                        <ShoppingBasket className="w-8 h-8"/>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-xl">Add Groceries</h3>
+                        <p className="text-white/80 text-sm">Stock your pantry</p>
+                    </div>
+                </CardContent>
+            </Card>
+            <Card 
+                className="group cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-lg rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 text-white"
+                onClick={() => router.push('/log-waste?method=camera')}
+                style={{boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'}}
+            >
+                <CardContent className="p-6 flex items-center gap-6">
+                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                        <BarChart3 className="w-8 h-8"/>
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-xl">Log Food Waste</h3>
+                        <p className="text-white/80 text-sm">Track and reduce waste</p>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
         {/* This Week's Impact */}
         <Card className="mb-8 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
           <CardHeader>
@@ -280,41 +315,6 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card 
-            className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md border-2 border-yellow-200 hover:border-yellow-300 bg-gradient-to-br from-yellow-50 to-amber-50"
-            onClick={() => router.push('/add-to-pantry')}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Package className="w-6 h-6 text-white" />
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-400" />
-              </div>
-              <h3 className="font-semibold text-[#063627] text-lg mb-1">Add Groceries</h3>
-              <p className="text-[#7C7C7C] text-sm">Stock your pantry with new items</p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md border-2 border-green-200 hover:border-green-300 bg-gradient-to-br from-green-50 to-emerald-50"
-            onClick={() => router.push('/log-waste?method=camera')}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <BarChart3 className="w-6 h-6 text-white" />
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-400" />
-              </div>
-              <h3 className="font-semibold text-[#063627] text-lg mb-1">Log Food Waste</h3>
-              <p className="text-[#7C7C7C] text-sm">Track and learn from waste</p>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -377,7 +377,7 @@ export default function DashboardPage() {
 
         {/* Pantry Watchlist */}
         {expiringSoonItems.length > 0 && (
-          <Card className="shadow-sm">
+          <Card className="shadow-sm bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <AlertTriangle className="w-6 h-6 text-primary" />
@@ -424,7 +424,7 @@ export default function DashboardPage() {
               </div>
               <Button 
                 variant="outline" 
-                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-white rounded-full font-semibold transition-colors duration-300"
+                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
                 onClick={() => router.push('/pantry')}
               >
                 Go to Pantry →
@@ -435,4 +435,5 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-}
+
+    
