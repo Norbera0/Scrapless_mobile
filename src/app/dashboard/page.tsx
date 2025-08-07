@@ -246,36 +246,36 @@ export default function DashboardPage() {
 
         {/* Quick Actions Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card 
-                className="group cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-lg rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white"
-                onClick={() => router.push('/add-to-pantry')}
-                style={{boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'}}
-            >
-                <CardContent className="p-6 flex items-center gap-6">
-                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                        <ShoppingBasket className="w-8 h-8"/>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-xl">Add Groceries</h3>
-                        <p className="text-white/80 text-sm">Stock your pantry</p>
-                    </div>
-                </CardContent>
-            </Card>
-            <Card 
-                className="group cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl shadow-lg rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 text-white"
-                onClick={() => router.push('/log-waste?method=camera')}
-                style={{boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'}}
-            >
-                <CardContent className="p-6 flex items-center gap-6">
-                    <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                        <BarChart3 className="w-8 h-8"/>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-xl">Log Food Waste</h3>
-                        <p className="text-white/80 text-sm">Track and reduce waste</p>
-                    </div>
-                </CardContent>
-            </Card>
+          <div
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
+            onClick={() => router.push('/add-to-pantry')}
+          >
+            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                <ShoppingBasket className="h-6 w-6 text-amber-700" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                <p className="text-sm text-gray-500">Stock your pantry with new items</p>
+              </div>
+            </div>
+          </div>
+          <div
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
+            onClick={() => router.push('/log-waste?method=camera')}
+          >
+            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                <BarChart3 className="h-6 w-6 text-green-700" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                <p className="text-sm text-gray-500">Track and learn from waste patterns</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* This Week's Impact */}
@@ -435,5 +435,7 @@ export default function DashboardPage() {
       </div>
     </div>
   );
+
+    
 
     
