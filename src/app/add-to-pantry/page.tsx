@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -21,8 +22,10 @@ import {
   Clock,
   CheckCircle,
   ArrowRight,
+  ArrowLeft,
   Loader2,
-  Square
+  Square,
+  BarChart3
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
@@ -59,27 +62,45 @@ export default function AddToPantryPage() {
 
   // Camera Permission Effect
   useEffect(() => {
+    if (selectedMethod !== 'camera') return;
+
     const checkCameraPermission = async () => {
       try {
-        const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
-        setHasCameraPermission(result.state === 'granted');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setHasCameraPermission(true);
       } catch {
         setHasCameraPermission(false);
       }
     };
 
+    checkCameraPermission();
+
+    return () => {
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+  }, [selectedMethod]);
+
+   useEffect(() => {
+     if (selectedMethod !== 'voice') return;
+
     const checkAudioPermission = async () => {
       try {
-        const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        setHasAudioPermission(result.state === 'granted');
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        setHasAudioPermission(true);
       } catch {
         setHasAudioPermission(false);
       }
     };
 
-    checkCameraPermission();
     checkAudioPermission();
-  }, []);
+  }, [selectedMethod]);
+
 
   const handleAnalyze = async (source: 'camera' | 'voice' | 'text', data: string) => {
     setIsLoading(true);
@@ -104,21 +125,6 @@ export default function AddToPantryPage() {
     }
   };
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-        setHasCameraPermission(true);
-      }
-    } catch (error) {
-      console.error('Camera access denied:', error);
-      setHasCameraPermission(false);
-      toast({ variant: 'destructive', title: 'Camera access denied', description: 'Please allow camera access to use this feature.' });
-    }
-  };
-
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
       const canvas = canvasRef.current;
@@ -132,7 +138,6 @@ export default function AddToPantryPage() {
         setPhotoDataUri(dataUri);
         setPhotoPreview(dataUri);
         
-        // Stop camera stream
         const stream = video.srcObject as MediaStream;
         if (stream) {
           stream.getTracks().forEach(track => track.stop());
@@ -155,6 +160,10 @@ export default function AddToPantryPage() {
   };
 
   const startRecording = async () => {
+    if (hasAudioPermission === false) {
+        toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
+        return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -177,10 +186,8 @@ export default function AddToPantryPage() {
 
       mediaRecorder.start();
       setIsRecording(true);
-      setHasAudioPermission(true);
     } catch (error) {
       console.error('Microphone access denied:', error);
-      setHasAudioPermission(false);
       toast({ variant: 'destructive', title: 'Microphone access denied', description: 'Please allow microphone access to use this feature.' });
     }
   };
@@ -198,310 +205,277 @@ export default function AddToPantryPage() {
     }
   };
 
+  if (selectedMethod) {
+    return (
+        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+            <div className="max-w-3xl mx-auto">
+                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-4">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to methods
+                </Button>
+                {selectedMethod === 'camera' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Scan with Camera</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="w-full aspect-video border-2 border-dashed rounded-lg flex items-center justify-center bg-muted overflow-hidden">
+                            {photoPreview ? (
+                                <Image src={photoPreview} alt="Captured" width={400} height={300} className="mx-auto rounded-xl shadow-lg object-contain h-full w-full" />
+                            ) : hasCameraPermission === false ? (
+                                <div className="text-center p-4">
+                                    <Camera className="w-12 h-12 text-destructive mx-auto mb-2" />
+                                    <h3 className="text-xl font-semibold text-destructive mb-2">Camera Access Required</h3>
+                                    <p className="text-muted-foreground">Please allow camera access in your browser settings to use this feature.</p>
+                                </div>
+                            ) : (
+                                <video 
+                                    ref={videoRef} 
+                                    className="mx-auto rounded-xl shadow-lg max-w-full h-auto"
+                                    autoPlay
+                                    playsInline
+                                    muted
+                                />
+                            )}
+                            <canvas ref={canvasRef} className="hidden" />
+                            </div>
+                            <div className="flex gap-4">
+                                {photoPreview ? (
+                                     <>
+                                        <Button className="flex-1" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
+                                            {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
+                                            Analyze Photo
+                                        </Button>
+                                        <Button variant="outline" className="flex-1" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
+                                            Retake
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button className="flex-1" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
+                                            <Camera className="w-5 h-5 mr-2" />
+                                            Capture Photo
+                                        </Button>
+                                        <Button variant="outline" className="flex-1" onClick={() => fileInputRef.current?.click()}>
+                                            <Upload className="w-5 h-5 mr-2" />
+                                            Upload
+                                        </Button>
+                                         <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileUpload}
+                                            accept="image/*"
+                                            className="hidden"
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+                 {selectedMethod === 'voice' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Voice Entry</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6 text-center">
+                             <div className={`w-32 h-32 mx-auto rounded-full flex items-center justify-center shadow-lg transition-all ${
+                                isRecording 
+                                ? 'bg-gradient-to-br from-red-500 to-red-600 animate-pulse' 
+                                : 'bg-gradient-to-br from-purple-500 to-pink-500'
+                            }`}>
+                                <Mic className="w-16 h-16 text-white" />
+                            </div>
+                             <h3 className="text-xl font-semibold text-gray-800">
+                                {isLoading ? 'Processing...' : isRecording ? 'Recording...' : 'Ready to record'}
+                            </h3>
+                            <p className="text-muted-foreground">
+                                {isLoading ? 'Please wait a moment.' : isRecording ? 'Tap the button to stop.' : 'Tap the button and say your items.'}
+                            </p>
+                             <Button 
+                                size="lg" 
+                                className={`w-full h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] ${
+                                isRecording 
+                                    ? 'bg-red-500 hover:bg-red-600' 
+                                    : 'bg-purple-600 hover:bg-purple-700'
+                                }`}
+                                onClick={isRecording ? stopRecording : startRecording}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : 
+                                isRecording ? <Square className="w-6 h-6 mr-2" /> : <Mic className="w-6 h-6 mr-2" />}
+                                {isLoading ? "Analyzing..." : isRecording ? 'Stop Recording' : 'Start Recording'}
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
+                 {selectedMethod === 'text' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Manual Entry</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Textarea
+                                placeholder="Type your groceries here... e.g.,&#10;2 kg rice&#10;1 dozen eggs&#10;500g chicken breast"
+                                value={textInput}
+                                onChange={(e) => setTextInput(e.target.value)}
+                                className="min-h-[200px] text-base"
+                            />
+                            <Button 
+                                size="lg" 
+                                className="w-full"
+                                onClick={handleTextSubmit}
+                                disabled={isLoading || !textInput.trim()}
+                            >
+                                {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
+                                Analyze Text
+                            </Button>
+                        </CardContent>
+                    </Card>
+                )}
+            </div>
+        </div>
+    );
+  }
+
+
   return (
-    <div className="min-h-screen bg-[#F7F7F7] p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <h1 className="text-4xl font-semibold text-[#063627]">Add to Pantry</h1>
-            <Sparkles className="w-8 h-8 text-[#FFDD00]" />
-          </div>
-          <p className="text-[#7C7C7C] text-lg">Log your new groceries using your camera, voice, or by typing.</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Add to Pantry ✨</h1>
+          <p className="text-lg text-gray-500">Choose your preferred way to add groceries</p>
         </div>
 
-        {/* Key Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-pink-700">Items Added Today</p>
-                  <p className="text-3xl font-semibold text-pink-900">12</p>
-                </div>
+        {/* Quick Stats Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <Card className="bg-gradient-to-br from-rose-50 to-pink-50 border-pink-200">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
                   <Package className="w-6 h-6 text-pink-600" />
                 </div>
+                <div>
+                  <p className="text-2xl font-bold text-pink-900">12</p>
+                  <p className="text-sm font-medium text-pink-700">Added Today</p>
+                </div>
               </div>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Waste Reduced</p>
-                  <p className="text-3xl font-semibold text-green-900">85%</p>
-                </div>
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+                  <BarChart3 className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-green-900">85%</p>
+                  <p className="text-sm font-medium text-green-700">Waste Reduced</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                  <p className="text-3xl font-semibold text-yellow-900">3</p>
-                </div>
+          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                   <Clock className="w-6 h-6 text-yellow-600" />
                 </div>
+                <div>
+                  <p className="text-2xl font-bold text-yellow-900">3</p>
+                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Method Selection Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {[
-            { 
-              icon: Camera, 
-              label: "Camera", 
-              method: "camera", 
-              description: "Scan items instantly",
-              bgColor: "bg-gradient-to-br from-blue-50 to-cyan-50",
-              iconBg: "bg-gradient-to-br from-blue-500 to-cyan-500"
-            },
-            { 
-              icon: Mic, 
-              label: "Voice", 
-              method: "voice", 
-              description: "Speak your groceries",
-              bgColor: "bg-gradient-to-br from-purple-50 to-pink-50",
-              iconBg: "bg-gradient-to-br from-purple-500 to-pink-500"
-            },
-            { 
-              icon: Type, 
-              label: "Text", 
-              method: "text", 
-              description: "Type manually",
-              bgColor: "bg-gradient-to-br from-orange-50 to-red-50",
-              iconBg: "bg-gradient-to-br from-orange-500 to-red-500"
-            }
-          ].map((item) => (
-            <Card 
-              key={item.method}
-              className={`cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md border-2 ${
-                selectedMethod === item.method 
-                  ? "border-[#227D53] shadow-lg shadow-[#227D53]/25" 
-                  : "border-gray-200 hover:border-gray-300"
-              } ${item.bgColor}`}
-              onClick={() => setSelectedMethod(item.method)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 ${item.iconBg} rounded-xl flex items-center justify-center shadow-lg`}>
-                    <item.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400" />
+        {/* Input Method Cards */}
+        <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">How would you like to add items?</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            
+            {/* Camera Card - Primary */}
+            <Card className="border-2 border-blue-500 shadow-lg transform hover:scale-105 transition-transform duration-300 flex flex-col">
+              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="text-4xl">📷</span>
                 </div>
-                <h3 className="font-semibold text-[#063627] text-lg mb-1">{item.label}</h3>
-                <p className="text-[#7C7C7C] text-sm">{item.description}</p>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Scan with Camera</h3>
+                <p className="text-gray-500 mb-6">Point at items for instant recognition.</p>
+                <Button className="w-full mt-auto bg-blue-500 hover:bg-blue-600" onClick={() => setSelectedMethod('camera')}>Start Scanning</Button>
               </CardContent>
             </Card>
-          ))}
+
+            {/* Voice Card - Secondary */}
+            <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
+              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="text-3xl">🎤</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Voice Entry</h3>
+                <p className="text-gray-500 mb-6 text-sm">Say item names naturally.</p>
+                <Button className="w-full mt-auto bg-purple-500 hover:bg-purple-600" onClick={() => setSelectedMethod('voice')}>Start Recording</Button>
+              </CardContent>
+            </Card>
+
+            {/* Text Card - Tertiary */}
+            <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
+              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4">
+                  <span className="text-3xl">⌨️</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Type Manually</h3>
+                <p className="text-gray-500 mb-6 text-sm">Add items by typing.</p>
+                <Button className="w-full mt-auto bg-orange-500 hover:bg-orange-600" onClick={() => setSelectedMethod('text')}>Start Typing</Button>
+              </CardContent>
+            </Card>
+            </div>
         </div>
-
-        {/* Content Area Based on Selected Method */}
-        {selectedMethod === 'camera' && (
-          <div className="space-y-6">
-            {/* Camera Preview */}
-            <Card className="border-2 border-dashed border-[#A3A9A7]/30 shadow-sm">
-              <CardContent className="p-12">
-                {photoPreview ? (
-                  <div className="text-center">
-                    <Image src={photoPreview} alt="Captured" width={400} height={300} className="mx-auto rounded-xl shadow-lg" />
-                    <Button 
-                      onClick={() => {
-                        setPhotoPreview(null);
-                        setPhotoDataUri('');
-                      }}
-                      variant="outline"
-                      className="mt-4"
-                    >
-                      Retake Photo
-                    </Button>
-                  </div>
-                ) : hasCameraPermission === false ? (
-                  <div className="text-center">
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center shadow-lg">
-                      <Camera className="w-12 h-12 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-[#063627] mb-2">Camera Access Required</h3>
-                    <p className="text-[#A3A9A7] mb-4">Please allow camera access to use this feature</p>
-                    <Button onClick={startCamera} className="bg-gradient-to-r from-[#063627] to-[#227D53]">
-                      Enable Camera
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <video 
-                      ref={videoRef} 
-                      className="mx-auto rounded-xl shadow-lg max-w-full h-auto"
-                      style={{ maxHeight: '400px' }}
-                    />
-                    <canvas ref={canvasRef} className="hidden" />
-                    {hasCameraPermission && (
-                      <Button 
-                        onClick={capturePhoto}
-                        className="mt-4 bg-gradient-to-r from-[#063627] to-[#227D53]"
-                      >
-                        <Camera className="w-5 h-5 mr-2" />
-                        Capture Photo
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4">
-              <Button 
-                size="lg" 
-                className="flex-1 bg-gradient-to-r from-[#063627] to-[#227D53] hover:from-[#063627]/90 hover:to-[#227D53]/90 shadow-lg shadow-[#227D53]/25 h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
-                onClick={() => photoPreview ? handleAnalyze('camera', photoDataUri) : startCamera()}
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Camera className="w-5 h-5 mr-2" />}
-                {photoPreview ? 'Analyze Photo' : 'Start Camera'}
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="flex-1 border-2 border-[#A3A9A7] hover:border-[#227D53] hover:bg-[#227D53]/10 h-14 text-lg font-semibold rounded-lg transition-all duration-200"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload className="w-5 h-5 mr-2" />
-                Upload
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {selectedMethod === 'voice' && (
-          <div className="space-y-6">
-            <Card className="border-2 border-dashed border-[#A3A9A7]/30 shadow-sm">
-              <CardContent className="p-12">
-                <div className="text-center">
-                  <div className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg ${
-                    isRecording 
-                      ? 'bg-gradient-to-br from-red-500 to-red-600 animate-pulse' 
-                      : 'bg-gradient-to-br from-purple-500 to-pink-500'
-                  }`}>
-                    <Mic className="w-12 h-12 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-[#063627] mb-2">
-                    {isRecording ? 'Recording...' : 'Voice Recording'}
-                  </h3>
-                  <p className="text-[#A3A9A7]">
-                    {isRecording ? 'Speak clearly about your groceries' : 'Click record to start voice input'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex gap-4">
-              <Button 
-                size="lg" 
-                className={`flex-1 h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02] ${
-                  isRecording 
-                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' 
-                    : 'bg-gradient-to-r from-[#063627] to-[#227D53] hover:from-[#063627]/90 hover:to-[#227D53]/90'
-                } shadow-lg shadow-[#227D53]/25`}
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={isLoading || hasAudioPermission === false}
-              >
-                {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : 
-                 isRecording ? <Square className="w-5 h-5 mr-2" /> : <Mic className="w-5 h-5 mr-2" />}
-                {isRecording ? 'Stop Recording' : 'Start Recording'}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {selectedMethod === 'text' && (
-          <div className="space-y-6">
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <Textarea
-                  placeholder="Type your groceries here... (e.g., 2 kg rice, 1 dozen eggs, 500g chicken breast)"
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  className="min-h-[200px] text-lg border-2 border-[#A3A9A7]/30 focus:border-[#227D53] rounded-xl"
-                />
-              </CardContent>
-            </Card>
-
-            <Button 
-              size="lg" 
-              className="w-full bg-gradient-to-r from-[#063627] to-[#227D53] hover:from-[#063627]/90 hover:to-[#227D53]/90 shadow-lg shadow-[#227D53]/25 h-14 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
-              onClick={handleTextSubmit}
-              disabled={isLoading || !textInput.trim()}
-            >
-              {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
-              Analyze Text
-            </Button>
-          </div>
-        )}
 
         {/* Bottom Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          {/* AI Insights Card */}
-          <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
+          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                
+                <Sparkles className="text-yellow-300" />
                 AI Insights
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-white/90 mb-4">Based on your patterns, you typically add fresh produce on weekends. Consider bulk buying to reduce packaging waste.</p>
+              <p className="text-gray-300 mb-4">Based on your patterns, you typically add fresh produce on weekends. Consider bulk buying to reduce packaging waste.</p>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[#FFDD00]" />
-                <span className="text-sm text-white/80">Sustainability tip applied</span>
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-sm text-gray-400">Sustainability tip applied</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Progress Tracking */}
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle className="text-[#063627]">Monthly Progress</CardTitle>
+              <CardTitle className="text-gray-800">This Month's Progress</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-[#7C7C7C]">Items Added</span>
-                    <span className="font-semibold text-[#063627]">156/200</span>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Items Added</span>
+                    <span className="font-semibold text-gray-800">156/200</span>
                   </div>
-                  <Progress value={78} className="h-2" />
+                  <Progress value={78} className="h-2 [&>div]:bg-blue-500" />
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-[#7C7C7C]">Waste Reduction</span>
-                    <span className="font-semibold text-[#063627]">85%</span>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Waste Reduction</span>
+                    <span className="font-semibold text-green-600">85%</span>
                   </div>
-                  <Progress value={85} className="h-2" />
+                  <Progress value={85} className="h-2 [&>div]:bg-green-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Hidden file input */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          accept="image/*"
-          className="hidden"
-        />
       </div>
     </div>
   );
