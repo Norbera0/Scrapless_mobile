@@ -234,7 +234,7 @@ export default function MyWastePage() {
                                       verticalAlign="middle"
                                       align="right"
                                       iconSize={10}
-                                      wrapperStyle={{ paddingLeft: '20px' }}
+                                      wrapperStyle={{ paddingLeft: '20px', fontSize: '14px' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
