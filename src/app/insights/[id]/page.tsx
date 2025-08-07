@@ -40,8 +40,11 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                     disabled={isUpdating}
                     variant={isSelected ? 'default' : 'outline'}
                  >
-                    {isSelected ? <Check className="mr-2 h-4 w-4" /> : null}
-                    {isUpdating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isSelected ? "Working on it!" : `I'll try this`)}
+                    {isUpdating ? 
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
+                        (isSelected ? <Check className="mr-2 h-4 w-4" /> : null)
+                    }
+                    {isSelected ? "Working on it!" : `I'll try this`}
                  </Button>
             </CardContent>
         </Card>
