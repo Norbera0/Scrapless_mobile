@@ -436,7 +436,7 @@ export default function AddToPantryPage() {
 
         {/* Bottom Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <Card className="bg-gradient-to-br from-gray-800 to-gray-900 text-white shadow-lg">
+          <Card className="bg-gradient-to-br from-green-900 to-green-800 text-white shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="text-yellow-300" />
@@ -444,10 +444,10 @@ export default function AddToPantryPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-300 mb-4">Based on your patterns, you typically add fresh produce on weekends. Consider bulk buying to reduce packaging waste.</p>
+              <p className="text-gray-200 mb-4">Based on your patterns, you typically add fresh produce on weekends. Consider bulk buying to reduce packaging waste.</p>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-gray-400">Sustainability tip applied</span>
+                <span className="text-sm text-gray-300">Sustainability tip applied</span>
               </div>
             </CardContent>
           </Card>
