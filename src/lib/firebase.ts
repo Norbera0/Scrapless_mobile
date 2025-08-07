@@ -6,12 +6,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence, terminate } from 'firebase/firestore';
 
 const firebaseConfig: FirebaseOptions = {
-  projectId: 'scrapless-66nyt',
-  appId: '1:607204493465:web:01fc85b8c8ab4b7e99d008',
-  storageBucket: 'scrapless-66nyt.firebasestorage.app',
-  apiKey: 'AIzaSyDg5fap5Ezu1XX6vcCBzOFpEXF8fE0xDF8',
-  authDomain: 'scrapless-66nyt.firebaseapp.com',
-  measurementId: '',
+  projectId: 'scrapless-bzy61',
+  appId: '1:866902679735:web:09651336c25cad07412d32',
+  storageBucket: 'scrapless-bzy61.firebasestorage.app',
+  apiKey: 'AIzaSyADKNT7geO88EM0tytBrFH8DcATT_lpP9E',
+  authDomain: 'scrapless-bzy61.firebasestorage.app',
+  measurementId: '866902679735',
   messagingSenderId: '607204493465',
 };
 
