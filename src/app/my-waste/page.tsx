@@ -139,12 +139,12 @@ export default function MyWastePage() {
     <div className="flex flex-col gap-6 p-4 md:p-6">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">My Waste</h1>
+                <h1 className="text-3xl font-bold tracking-tight">My Waste Impact</h1>
                 <p className="text-muted-foreground">
-                    Track patterns, view insights, and reduce your waste.
+                    Track patterns, reduce waste, save money & the planet.
                 </p>
             </div>
-            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap">
+            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90">
                 <Trash className="w-5 h-5 md:mr-2" />
                 <span className='hidden md:inline'>Log Waste</span>
             </Button>
@@ -341,5 +341,3 @@ export default function MyWastePage() {
       )}
     </div>
   );
-
-    
