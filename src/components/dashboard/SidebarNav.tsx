@@ -9,7 +9,8 @@ import {
     Lightbulb,
     ShoppingCart,
     Bookmark,
-    PackagePlus
+    PackagePlus,
+    PiggyBank
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -60,6 +61,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items'] },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
+    { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
     { href: '/shopping', label: 'Shopping Hubs', icon: ShoppingCart },
     { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
