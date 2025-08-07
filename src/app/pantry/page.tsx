@@ -4,6 +4,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useRecipeStore } from '@/stores/recipe-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress, type ProgressSegment } from '@/components/ui/progress';
@@ -51,6 +52,7 @@ export default function PantryPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { liveItems, pantryInitialized } = usePantryLogStore();
+  const { recipes, setRecipes } = useRecipeStore();
   
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,7 +64,6 @@ export default function PantryPage() {
   const [itemInsights, setItemInsights] = useState<Map<string, ItemInsights>>(new Map());
   const [isFetchingInsights, setIsFetchingInsights] = useState<Set<string>>(new Set());
 
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const [recipeFilters, setRecipeFilters] = useState({
@@ -206,10 +207,11 @@ export default function PantryPage() {
     } finally {
       setIsLoadingRecipes(false);
     }
-  }, [liveItems, recipeFilters, toast]);
+  }, [liveItems, recipeFilters, toast, setRecipes]);
 
 
   useEffect(() => {
+    // Fetch recipes only on initial load if the recipe store is empty
     if (pantryInitialized && recipes.length === 0) {
       fetchRecipes([]);
     }
