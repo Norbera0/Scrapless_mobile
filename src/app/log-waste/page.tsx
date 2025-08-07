@@ -6,11 +6,11 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { WasteLogger } from '@/components/dashboard/WasteLogger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Mic, ArrowLeft } from 'lucide-react';
+import { Camera, Mic, ArrowLeft, Type } from 'lucide-react';
 
 export default function LogWastePage() {
   const resetStore = useWasteLogStore((state) => state.reset);
-  const [selectedMethod, setSelectedMethod] = useState<'camera' | 'voice' | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<'camera' | 'voice' | 'text' | null>(null);
 
   useEffect(() => {
     // Reset the store whenever the user lands on this page
@@ -38,7 +38,7 @@ export default function LogWastePage() {
                 Choose how you'd like to log your waste.
             </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto w-full">
             <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Camera /> Log with Camera</CardTitle>
@@ -55,6 +55,15 @@ export default function LogWastePage() {
                 </CardHeader>
                 <CardContent>
                      <Button className="w-full" onClick={() => setSelectedMethod('voice')}>Use Voice</Button>
+                </CardContent>
+            </Card>
+             <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Type /> Manual Entry</CardTitle>
+                    <CardDescription>Type out the items you've wasted for a quick and simple log.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Button className="w-full" onClick={() => setSelectedMethod('text')}>Use Text</Button>
                 </CardContent>
             </Card>
         </div>

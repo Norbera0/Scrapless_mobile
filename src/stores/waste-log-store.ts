@@ -12,6 +12,7 @@ export interface WasteLogItem {
 interface WasteLogState {
   photoDataUri: string | null;
   photoPreview: string | null;
+  textInput: string;
   items: WasteLogItem[];
   logs: WasteLog[];
   logsInitialized: boolean;
@@ -19,6 +20,7 @@ interface WasteLogState {
   otherWasteReasonText: string;
   setPhotoDataUri: (uri: string | null) => void;
   setPhotoPreview: (uri: string | null) => void;
+  setTextInput: (text: string) => void;
   setItems: (items: WasteLogItem[]) => void;
   setLogs: (logs: WasteLog[]) => void;
   setLogsInitialized: (initialized: boolean) => void;
@@ -30,6 +32,7 @@ interface WasteLogState {
 const initialState = {
     photoDataUri: null,
     photoPreview: null,
+    textInput: '',
     items: [],
     logs: [],
     logsInitialized: false,
@@ -41,6 +44,7 @@ export const useWasteLogStore = create<WasteLogState>()((set) => ({
   ...initialState,
   setPhotoDataUri: (uri) => set({ photoDataUri: uri }),
   setPhotoPreview: (uri) => set({ photoPreview: uri }),
+  setTextInput: (text) => set({ textInput: text }),
   setItems: (items) => set({ items: items }),
   setLogs: (logs) => set({ logs }),
   setLogsInitialized: (initialized) => set({ logsInitialized: initialized }),

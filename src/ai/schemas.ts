@@ -23,6 +23,10 @@ export const LogFoodWasteFromAudioInputSchema = z.object({
   });
 export type LogFoodWasteFromAudioInput = z.infer<typeof LogFoodWasteFromAudioInputSchema>;
 
+export const LogFoodWasteFromTextInputSchema = z.object({
+  text: z.string().describe('A text list of wasted food items.'),
+});
+export type LogFoodWasteFromTextInput = z.infer<typeof LogFoodWasteFromTextInputSchema>;
 
 export const LogFoodWasteOutputSchema = z.object({
   items: z.array(

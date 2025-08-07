@@ -3,21 +3,23 @@
 
 import { logFoodWaste } from '@/ai/flows/log-food-waste';
 import { logFoodWasteFromAudio } from '@/ai/flows/log-food-waste-from-audio';
+import { logFoodWasteFromText } from '@/ai/flows/log-food-waste-from-text';
 import type { LogFoodWasteOutput } from '@/ai/schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight } from 'lucide-react';
+import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Textarea } from '../ui/textarea';
 
 
 interface WasteLoggerProps {
-    method: 'camera' | 'voice';
+    method: 'camera' | 'voice' | 'text';
 }
 
 export function WasteLogger({ method }: WasteLoggerProps) {
@@ -25,6 +27,7 @@ export function WasteLogger({ method }: WasteLoggerProps) {
   const {
       photoPreview, setPhotoPreview,
       photoDataUri, setPhotoDataUri,
+      textInput, setTextInput,
       setItems
   } = useWasteLogStore();
 
@@ -136,6 +139,8 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       let result: LogFoodWasteOutput | null = null;
       if (method === 'camera' && photoDataUri) {
         result = await logFoodWaste({ photoDataUri });
+      } else if (method === 'text' && textInput) {
+        result = await logFoodWasteFromText({ text: textInput });
       }
       
       if (result && result.items && result.items.length > 0) {
@@ -295,6 +300,29 @@ export function WasteLogger({ method }: WasteLoggerProps) {
               </Alert>
             )}
           </CardContent>
+        </>
+      )}
+
+      {method === 'text' && (
+        <>
+          <CardHeader>
+            <CardTitle>Log with Text</CardTitle>
+            <CardDescription>Type out the items you wasted, one per line.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea 
+              placeholder="e.g.&#10;1 cup of rice&#10;2 slices of bread&#10;Half an apple"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              className="min-h-[150px]"
+            />
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleAnalyze} disabled={isLoading || !textInput.trim()} className="w-full">
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
+              Next: Review Items
+            </Button>
+          </CardFooter>
         </>
       )}
     </Card>
