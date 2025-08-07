@@ -1,9 +1,9 @@
 
 'use client';
 import type { PantryItem } from '@/types';
-import { differenceInDays, format, startOfToday } from 'date-fns';
+import { differenceInDays, startOfToday } from 'date-fns';
 import { Button } from '../ui/button';
-import { Utensils, Trash2, Edit, Loader2 } from 'lucide-react';
+import { Utensils, Trash2, Edit, Loader2, Clock, Package } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +15,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { cn } from '@/lib/utils';
+import { usePantryLogStore } from '@/stores/pantry-store';
+import { useAuth } from '@/hooks/use-auth';
+import { updatePantryItemStatus } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 interface PantryItemCardProps {
     item: PantryItem;
@@ -23,73 +28,121 @@ interface PantryItemCardProps {
     isDeleting: boolean;
 }
 
+const emojiMap: { [key: string]: string } = {
+    'pork': '🐷', 'chicken': '🐔', 'beef': '🐄', 'fish': '🐟', 'salmon': '🐟', 'tuna': '🐟', 'cabbage': '🥬',
+    'garlic': '🧄', 'tomato': '🍅', 'onion': '🧅', 'carrot': '🥕', 'potato': '🥔', 'milk': '🥛',
+    'cheese': '🧀', 'butter': '🧈', 'apple': '🍎', 'banana': '🍌', 'orange': '🍊', 'rice': '🍚',
+    'bread': '🍞', 'pasta': '🍝', 'lettuce': '🥬', 'egg': '🥚', 'default': '🍽️'
+};
+
+const getItemEmoji = (itemName: string) => {
+    const lowerItem = itemName.toLowerCase();
+    for (const key in emojiMap) {
+        if (key !== 'default' && lowerItem.includes(key)) return emojiMap[key];
+    }
+    return emojiMap.default;
+};
+
 const getFreshness = (expirationDate: string) => {
     const today = startOfToday();
     const expiry = new Date(expirationDate);
-    expiry.setHours(0, 0, 0, 0);
-
-    const daysLeft = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const daysLeft = differenceInDays(expiry, today);
     
-    if (daysLeft <= 0) return { label: `Expired`, color: 'bg-red-500', textColor: 'text-white' };
-    if (daysLeft === 1) return { label: `1 day left`, color: 'bg-amber-500', textColor: 'text-white' };
-    if (daysLeft <= 3) return { label: `${daysLeft} days left`, color: 'bg-amber-500', textColor: 'text-white' };
-    return { label: 'Fresh', color: 'bg-green-500', textColor: 'text-white' };
+    if (daysLeft < 0) return { label: 'EXPIRED', color: 'red', days: daysLeft };
+    if (daysLeft <= 1) return { label: 'USE NOW', color: 'red', days: daysLeft };
+    if (daysLeft <= 5) return { label: 'USE SOON', color: 'amber', days: daysLeft };
+    return { label: 'FRESH', color: 'green', days: daysLeft };
 };
 
 export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryItemCardProps) {
     const freshness = getFreshness(item.estimatedExpirationDate);
+    const archiveItem = usePantryLogStore((state) => state.archiveItem);
+    const { user } = useAuth();
+    const { toast } = useToast();
+
+    const handleUseNow = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if(!user) return;
+        archiveItem(item.id, 'used');
+        await updatePantryItemStatus(user.uid, item.id, 'used').catch(err => {
+            console.error("Failed to mark item as used on server", err);
+        });
+        toast({ title: "Item used!", description: `You've used "${item.name}".`});
+    }
+
+    const borderColorClass = {
+        red: 'border-l-red-500',
+        amber: 'border-l-amber-500',
+        green: 'border-l-green-500'
+    }[freshness.color];
+    
+    const badgeColorClass = {
+        red: 'bg-red-100 text-red-700',
+        amber: 'bg-amber-100 text-amber-700',
+        green: 'bg-green-100 text-green-700'
+    }[freshness.color];
+
 
     return (
-        <div className="pantry-item bg-card rounded-2xl p-4 cursor-pointer shadow-md" onClick={() => onSelect(item)}>
+        <div 
+            className={cn("pantry-item bg-white rounded-lg p-4 cursor-pointer shadow-sm border border-l-4 transition-all hover:shadow-md hover:-translate-y-1", borderColorClass)} 
+            onClick={() => onSelect(item)}
+        >
+            <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-3">
+                    <span className="text-2xl">{getItemEmoji(item.name)}</span>
+                    <h3 className="font-bold text-gray-800 text-base pr-2 leading-tight">{item.name}</h3>
+                </div>
+                <div className={cn("px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap", badgeColorClass)}>
+                    {freshness.label}
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                <Package className="w-4 h-4" />
+                <span>{item.estimatedAmount}</span>
+                {item.estimatedCost && (
+                    <>
+                        <span className="text-gray-300">•</span>
+                        <span>₱{item.estimatedCost.toFixed(2)}</span>
+                    </>
+                )}
+            </div>
+
             <div className="flex items-center justify-between">
-                <div className="flex-1">
-                    <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-foreground text-base pr-2">{item.name}</h3>
-                        <span className={`${freshness.color} ${freshness.textColor} px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap`}>
-                            {freshness.label.toUpperCase()}
-                        </span>
+                {freshness.color === 'red' ? (
+                     <Button size="sm" className="h-8 text-xs bg-primary hover:bg-primary/90" onClick={handleUseNow}>
+                        Use Now
+                    </Button>
+                ) : (
+                    <div className='flex items-center gap-1 text-sm text-gray-500'>
+                        <Clock className="w-4 h-4" />
+                        <span>{freshness.days} days left</span>
                     </div>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between">
-                        <div className="flex items-center flex-wrap space-x-3 text-sm text-muted-foreground">
-                             <span className="flex items-center whitespace-nowrap">
-                                <strong>Qty:</strong> {item.estimatedAmount}
-                            </span>
-                           {item.storageLocation && (
-                             <span className="flex items-center whitespace-nowrap capitalize">
-                                <strong>In:</strong> {item.storageLocation}
-                            </span>
-                           )}
-                           {item.estimatedCost && (
-                             <span className="flex items-center text-green-600 font-medium whitespace-nowrap">
-                                <strong>Value:</strong> ₱{item.estimatedCost.toFixed(2)}
-                            </span>
-                           )}
-                        </div>
-                        <div className="flex space-x-1 mt-2 md:mt-0">
-                            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-8 w-8 text-muted-foreground hover:bg-secondary">
-                                <Edit className="w-4 h-4" />
+                )}
+                <div className="flex space-x-1">
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                        <Edit className="w-4 h-4" />
+                    </Button>
+                     <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-8 w-8 text-red-400 hover:bg-red-50 hover:text-red-600">
+                                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                             </Button>
-                             <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-8 w-8 text-destructive hover:bg-red-50">
-                                        {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                                    <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete "{item.name}" from your pantry.
-                                    </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => onDelete(item.id)}>Delete</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </div>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete "{item.name}" from your pantry.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => onDelete(item.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </div>
         </div>

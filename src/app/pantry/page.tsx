@@ -7,7 +7,6 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
   Search, 
@@ -19,10 +18,10 @@ import {
   Sparkles,
   CheckCircle,
   AlertTriangle,
-  Filter,
-  Grid3X3,
-  List,
-  Loader2
+  Loader2,
+  ListFilter,
+  PackageCheck,
+  Soup
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
@@ -32,11 +31,18 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { getRecipeSuggestions } from '@/app/actions';
-import { PantryOverview } from '@/components/pantry/PantryOverview';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { differenceInDays, startOfToday } from 'date-fns';
+
+const filterOptions = [
+    { value: 'all', label: 'All Items' },
+    { value: 'expiring', label: 'Expiring Soon' },
+    { value: 'fresh', label: 'Fresh' },
+    { value: 'expired', label: 'Expired' },
+];
 
 export default function PantryPage() {
   const { user } = useAuth();
@@ -46,7 +52,6 @@ export default function PantryPage() {
   
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -67,6 +72,17 @@ export default function PantryPage() {
     setIsClient(true);
   }, []);
 
+  const getStatus = useCallback((expirationDate: string) => {
+    const today = startOfToday();
+    const expiry = new Date(expirationDate);
+    const daysLeft = differenceInDays(expiry, today);
+
+    if (daysLeft < 0) return 'expired';
+    if (daysLeft <= 3) return 'expiring';
+    return 'fresh';
+  }, []);
+
+
   // Filter and search items
   const filteredItems = useMemo(() => {
     let items = liveItems;
@@ -80,53 +96,32 @@ export default function PantryPage() {
     
     // Apply category filter
     if (filter !== 'all') {
-      const now = new Date();
-      items = items.filter(item => {
-        const expirationDate = new Date(item.estimatedExpirationDate);
-        const daysUntilExpiration = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        
-        switch (filter) {
-          case 'fresh':
-            return daysUntilExpiration > 3;
-          case 'expiring':
-            return daysUntilExpiration >= 0 && daysUntilExpiration <= 3;
-          case 'expired':
-            return daysUntilExpiration < 0;
-          default:
-            return true;
-        }
-      });
+      items = items.filter(item => getStatus(item.estimatedExpirationDate) === filter);
     }
     
-    return items;
-  }, [liveItems, filter, searchQuery]);
+    return items.sort((a,b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
+  }, [liveItems, filter, searchQuery, getStatus]);
 
   // Calculate statistics
   const stats = useMemo(() => {
-    const now = new Date();
-    const fresh = liveItems.filter(item => {
-      const daysUntilExpiration = Math.ceil((new Date(item.estimatedExpirationDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return daysUntilExpiration > 3;
-    });
-    
-    const expiring = liveItems.filter(item => {
-      const daysUntilExpiration = Math.ceil((new Date(item.estimatedExpirationDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return daysUntilExpiration >= 0 && daysUntilExpiration <= 3;
-    });
-    
-    const expired = liveItems.filter(item => {
-      const daysUntilExpiration = Math.ceil((new Date(item.estimatedExpirationDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      return daysUntilExpiration < 0;
-    });
+    const fresh = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'fresh');
+    const expiring = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'expiring');
+    const expired = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'expired');
+
+    const healthScore = liveItems.length > 0 
+      ? Math.round(
+          ((fresh.length * 100) + (expiring.length * 50) + (expired.length * 0)) / liveItems.length
+        )
+      : 100;
 
     return {
       total: liveItems.length,
       fresh: fresh.length,
       expiring: expiring.length,
       expired: expired.length,
-      healthPercentage: liveItems.length > 0 ? Math.round((fresh.length / liveItems.length) * 100) : 0
+      healthScore
     };
-  }, [liveItems]);
+  }, [liveItems, getStatus]);
 
   const handleDelete = async (itemId: string) => {
     if (!user) return;
@@ -181,7 +176,6 @@ export default function PantryPage() {
     setIsLoadingRecipes(true);
     try {
       const pantryItemNames = liveItems.map((item) => item.name);
-      // Call the Server Action instead of the AI flow directly
       const result = await getRecipeSuggestions({
         pantryItems: pantryItemNames,
         preferences: {
@@ -250,159 +244,162 @@ export default function PantryPage() {
   if (!isClient) {
     return null;
   }
+  
+    const getScoreColor = (score: number) => {
+        if (score >= 80) return 'text-green-600';
+        if (score >= 60) return 'text-amber-600';
+        return 'text-red-600';
+    };
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] p-8">
+    <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-4xl font-semibold text-[#063627]">Your Pantry</h1>
-                <Package className="w-8 h-8 text-[#227D53]" />
+          <div className="flex items-center justify-between mb-4">
+            <div className='flex items-center gap-3'>
+              <Soup className="w-8 h-8 text-primary" />
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Your Pantry</h1>
+                <p className="text-gray-500 text-sm md:text-base">Manage your inventory and discover new recipes</p>
               </div>
-              <p className="text-[#7C7C7C] text-lg">Manage your inventory and discover new recipes</p>
             </div>
             <Button 
               onClick={() => router.push('/add-to-pantry')}
-              className="bg-gradient-to-r from-[#063627] to-[#227D53] hover:from-[#063627]/90 hover:to-[#227D53]/90 shadow-lg shadow-[#227D53]/25 h-12 px-6 text-lg font-semibold rounded-lg transition-all duration-200 hover:scale-[1.02]"
+              className="bg-primary hover:bg-primary/90 h-10 px-4 md:h-12 md:px-6 rounded-lg"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Add Items
+              <span className='hidden md:inline'>Add Items</span>
             </Button>
           </div>
 
           {/* Search and Filter Bar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7C7C7C] w-5 h-5" />
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 placeholder="Search your pantry..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 bg-white border-2 border-[#A3A9A7]/30 focus:border-[#227D53] rounded-lg text-lg"
+                className="pl-11 h-12 text-base bg-white border-gray-200 focus:border-primary focus:ring-primary/20"
               />
             </div>
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-full md:w-48 h-12 bg-white border-2 border-[#A3A9A7]/30 focus:border-[#227D53] rounded-lg">
-                <SelectValue placeholder="Filter items" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Items</SelectItem>
-                <SelectItem value="fresh">Fresh Items</SelectItem>
-                <SelectItem value="expiring">Expiring Soon</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('grid')}
-                className="h-12 w-12"
-              >
-                <Grid3X3 className="w-5 h-5" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('list')}
-                className="h-12 w-12"
-              >
-                <List className="w-5 h-5" />
-              </Button>
+             <div className="flex gap-2 items-center overflow-x-auto pb-2 scrollbar-hide">
+                {filterOptions.map(opt => (
+                    <Button 
+                        key={opt.value}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setFilter(opt.value)}
+                        className={cn(
+                            "rounded-full border-gray-300 transition-all duration-200 whitespace-nowrap",
+                            filter === opt.value 
+                                ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90" 
+                                : "bg-white hover:border-primary hover:text-primary"
+                        )}
+                    >
+                        {opt.label}
+                    </Button>
+                ))}
             </div>
           </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-700">Total Items</p>
-                  <p className="text-3xl font-semibold text-blue-900">{stats.total}</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
+                  <Package className="w-5 h-5 text-blue-600" />
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
+                <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+                <p className="text-sm font-medium text-gray-500">Total Items</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Fresh Items</p>
-                  <p className="text-3xl font-semibold text-green-900">{stats.fresh}</p>
+          <Card className="border-green-200">
+            <CardContent className="p-4">
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-2">
+                  <PackageCheck className="w-5 h-5 text-green-600" />
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
+                <p className="text-2xl font-bold text-gray-800">{stats.fresh}</p>
+                <p className="text-sm font-medium text-gray-500">Fresh Items</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                  <p className="text-3xl font-semibold text-yellow-900">{stats.expiring}</p>
+          <Card className="border-amber-200">
+            <CardContent className="p-4">
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-2">
+                  <Clock className="w-5 h-5 text-amber-600" />
                 </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-yellow-600" />
-                </div>
-              </div>
+                <p className="text-2xl font-bold text-gray-800">{stats.expiring}</p>
+                <p className="text-sm font-medium text-gray-500">Expiring Soon</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-red-700">Expired</p>
-                  <p className="text-3xl font-semibold text-red-900">{stats.expired}</p>
+          <Card className="border-red-200">
+            <CardContent className="p-4">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-2">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
                 </div>
-                <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-              </div>
+                <p className="text-2xl font-bold text-gray-800">{stats.expired}</p>
+                <p className="text-sm font-medium text-gray-500">Expired</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Pantry Health Score */}
-        <Card className="mb-8 shadow-sm">
+         <Card className="mb-8 border-gray-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-[#063627]">
-              <TrendingUp className="w-6 h-6 text-[#227D53]" />
+            <CardTitle className="flex items-center gap-2 text-gray-800">
+              <TrendingUp className="w-5 h-5" />
               Pantry Health Score
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center gap-6">
-              <div className="flex-1">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-[#7C7C7C]">Overall Health</span>
-                  <span className="font-semibold text-[#063627]">{stats.healthPercentage}%</span>
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+               <div className="relative h-32 w-32">
+                  <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <path
+                      className="text-gray-200"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    />
+                    <path
+                      className={getScoreColor(stats.healthScore)}
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeDasharray={`${stats.healthScore}, 100`}
+                    />
+                  </svg>
+                  <div className={`absolute inset-0 flex items-center justify-center text-3xl font-bold ${getScoreColor(stats.healthScore)}`}>
+                    {stats.healthScore}%
+                  </div>
                 </div>
-                <Progress value={stats.healthPercentage} className="h-3 mb-4" />
+              <div className="flex-1 w-full">
+                <Progress value={stats.healthScore} className="h-3 mb-4" />
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-[#7C7C7C]">{stats.fresh} Fresh</span>
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
+                    <div>
+                        <p className="font-semibold text-gray-700">{stats.fresh}</p>
+                        <p className="text-gray-500">Fresh</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                    <span className="text-[#7C7C7C]">{stats.expiring} Expiring</span>
+                    <div className="w-2.5 h-2.5 bg-amber-500 rounded-full"></div>
+                    <div>
+                        <p className="font-semibold text-gray-700">{stats.expiring}</p>
+                        <p className="text-gray-500">Expiring</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-[#7C7C7C]">{stats.expired} Expired</span>
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                    <div>
+                        <p className="font-semibold text-gray-700">{stats.expired}</p>
+                        <p className="text-gray-500">Expired</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -413,35 +410,33 @@ export default function PantryPage() {
         {/* Pantry Items */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold text-[#063627]">Your Items</h2>
-            <span className="text-[#7C7C7C]">{filteredItems.length} items</span>
+            <h2 className="text-xl font-bold text-gray-800">Your Items</h2>
+            <span className="text-sm text-gray-500">{filteredItems.length} items found</span>
           </div>
 
-          {filteredItems.length === 0 ? (
-            <Card className="border-2 border-dashed border-[#A3A9A7]/30">
-              <CardContent className="p-12 text-center">
-                <Package className="w-16 h-16 text-[#A3A9A7] mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#063627] mb-2">No items found</h3>
-                <p className="text-[#7C7C7C] mb-4">
+          {!pantryInitialized ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
+                ))}
+             </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
+                <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No items found</h3>
+                <p className="text-gray-500 mb-4">
                   {liveItems.length === 0 
-                    ? "Your pantry is empty. Start by adding some items!"
-                    : "No items match your current filters."
+                    ? "Your pantry is empty. Let's add some groceries!"
+                    : "Clear your search or filters to see all items."
                   }
                 </p>
-                <Button 
-                  onClick={() => router.push('/add-to-pantry')}
-                  className="bg-gradient-to-r from-[#063627] to-[#227D53]"
-                >
+                <Button onClick={() => router.push('/add-to-pantry')}>
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Items
+                  Add Groceries
                 </Button>
-              </CardContent>
-            </Card>
+            </div>
           ) : (
-            <div className={viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
-              : "space-y-4"
-            }>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredItems.map((item) => (
                 <PantryItemCard
                   key={item.id}
@@ -457,26 +452,31 @@ export default function PantryPage() {
 
         {/* Recipe Suggestions */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-semibold text-[#063627]">Recipe Suggestions</h2>
-              <Sparkles className="w-6 h-6 text-[#FFDD00]" />
+              <h2 className="text-xl font-bold text-gray-800">Recipe Suggestions</h2>
+              <Sparkles className="w-5 h-5 text-amber-400" />
             </div>
             <Button
               onClick={() => fetchRecipes(recipes)}
               disabled={isLoadingRecipes}
               variant="outline"
-              className="border-[#227D53] text-[#227D53] hover:bg-[#227D53]/10"
+              size="sm"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingRecipes ? 'animate-spin' : ''}`} />
-              Refresh Recipes
+              <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
+              New Ideas
             </Button>
           </div>
-          {recipes.length > 0 ? (
-            <Carousel opts={{ align: "start", loop: true }} className="w-full">
-              <CarouselContent>
+          {isLoadingRecipes ? (
+             <div className="text-center py-10">
+                <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
+                <p className="mt-2 text-gray-500">Finding delicious recipes...</p>
+            </div>
+          ) : recipes.length > 0 ? (
+            <Carousel opts={{ align: "start" }} className="w-full">
+              <CarouselContent className="-ml-4">
                 {recipes.map((recipe) => (
-                  <CarouselItem key={recipe.id} className="md:basis-1/2 lg:basis-1/3">
+                  <CarouselItem key={recipe.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
                     <RecipeCard
                       recipe={recipe}
                       isSaved={savedRecipeIds.has(recipe.id)}
@@ -486,28 +486,20 @@ export default function PantryPage() {
                 ))}
               </CarouselContent>
             </Carousel>
-          ) : isLoadingRecipes ? (
-             <div className="text-center py-10">
-                <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
-                <p className="mt-2 text-muted-foreground">Finding delicious recipes...</p>
-            </div>
           ) : (
-             <Card className="border-2 border-dashed border-[#A3A9A7]/30">
-                <CardContent className="p-12 text-center">
-                    <BookOpen className="w-16 h-16 text-[#A3A9A7] mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-[#063627] mb-2">No Recipes Found</h3>
-                    <p className="text-[#7C7C7C] mb-4">
-                        We couldn't find any recipes. Try adding more items to your pantry or refreshing.
-                    </p>
-                    <Button onClick={() => fetchRecipes([])}>
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Try Again
-                    </Button>
-                </CardContent>
-            </Card>
+            <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
+                <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No Recipes Found</h3>
+                <p className="text-gray-500 mb-4">
+                    We couldn't find any recipes. Try adding more items to your pantry or refreshing.
+                </p>
+                <Button onClick={() => fetchRecipes([])}>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Try Again
+                </Button>
+            </div>
           )}
         </div>
-
 
         {/* Item Details Modal */}
         {selectedItem && (

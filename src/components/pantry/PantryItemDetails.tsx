@@ -17,12 +17,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog"
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface PantryItemDetailsProps {
     item: PantryItem | null;
@@ -89,10 +98,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user) return;
         setIsUpdating(true);
         try {
-            // Assumes 100% usage (usageEfficiency = 1.0)
             calculateAndSaveAvoidedExpiry(user, itemWithCost, 1.0).catch(console.error);
-
-            // Update item status in DB and optimistically update the UI
             archiveItem(itemWithCost.id, 'used');
             updatePantryItemStatus(user.uid, itemWithCost.id, 'used').catch(console.error);
             
@@ -119,7 +125,6 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user || !item) return;
         const updatedItem = { ...item, estimatedCost: cost };
         
-        // Optimistically update, but don't wait for the save to complete before calculating savings
         savePantryItems(user.uid, [{
             ...updatedItem,
             estimatedExpirationDate: updatedItem.estimatedExpirationDate,
@@ -132,7 +137,6 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user || !item) return;
         setIsUpdating(true);
         try {
-            // Update item status to 'wasted' and optimistically update the UI
             archiveItem(item.id, 'wasted');
             updatePantryItemStatus(user.uid, item.id, 'wasted').catch(console.error);
             
@@ -149,81 +153,69 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
 
     return (
         <>
-        <div className="fixed inset-0 z-50">
-            <div className="modal-overlay absolute inset-0" onClick={onClose}></div>
-            <div className={`modal absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto ${isOpen ? 'show' : ''}`}>
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">{item.name}</h2>
-                        <Button variant="ghost" size="icon" onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                            <X className="w-6 h-6 text-gray-400" />
-                        </Button>
-                    </div>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-h-[90vh] overflow-y-auto">
+                 <DialogHeader>
+                    <DialogTitle className="text-2xl">{item.name}</DialogTitle>
+                     <DialogDescription>
+                        Added {addedAgo}
+                    </DialogDescription>
+                </DialogHeader>
 
-                    <div className="glass-card rounded-2xl p-5 mb-6">
-                         <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="text-sm text-gray-500 uppercase tracking-wide">Quantity</label>
-                                <p className="text-lg font-semibold text-gray-900">{item.estimatedAmount}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm text-gray-500 uppercase tracking-wide">Expires</label>
-                                <p className="text-lg font-semibold text-gray-900">{format(new Date(item.estimatedExpirationDate), 'MMM d, yyyy')}</p>
-                            </div>
-                           {item.storageLocation && (
-                             <div>
-                                <label className="text-sm text-gray-500 uppercase tracking-wide">Location</label>
-                                <p className="text-lg font-semibold text-gray-900 capitalize">{item.storageLocation}</p>
-                            </div>
-                           )}
-                           {item.estimatedCost && (
-                             <div>
-                                <label className="text-sm text-gray-500 uppercase tracking-wide">Value</label>
-                                <p className="text-lg font-semibold text-green-600">₱{item.estimatedCost.toFixed(2)}</p>
-                            </div>
-                           )}
+                <div className="space-y-4 my-4">
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="rounded-lg bg-secondary/50 p-3">
+                            <label className="text-xs text-muted-foreground">Quantity</label>
+                            <p className="font-semibold">{item.estimatedAmount}</p>
                         </div>
-                        <div className="text-sm text-gray-500 text-right">
-                           Added {addedAgo}
+                        <div className="rounded-lg bg-secondary/50 p-3">
+                            <label className="text-xs text-muted-foreground">Expires</label>
+                            <p className="font-semibold">{format(new Date(item.estimatedExpirationDate), 'MMM d, yyyy')}</p>
                         </div>
+                       {item.storageLocation && (
+                         <div className="rounded-lg bg-secondary/50 p-3">
+                            <label className="text-xs text-muted-foreground">Location</label>
+                            <p className="font-semibold capitalize">{item.storageLocation}</p>
+                        </div>
+                       )}
+                       {item.estimatedCost && (
+                         <div className="rounded-lg bg-secondary/50 p-3">
+                            <label className="text-xs text-muted-foreground">Value</label>
+                            <p className="font-semibold text-green-600">₱{item.estimatedCost.toFixed(2)}</p>
+                        </div>
+                       )}
                     </div>
-                    
-                    <div className="mb-6">
-                        {!insights && (
-                            <Button onClick={() => onGetInsights(item)} className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-4 px-6 rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center" disabled={isFetchingInsights}>
-                                {isFetchingInsights ? <Loader2 className="w-6 h-6 mr-3 animate-spin" /> : <Bot className="w-6 h-6 mr-3" />}
-                                {isFetchingInsights ? 'Getting Insights...' : 'Get AI-Powered Insights'}
-                            </Button>
-                        )}
-                    </div>
-                    
-                     {insights && (
-                         <div className="space-y-4">
-                            <div className="ai-insight-card rounded-2xl p-5">
-                                <h4 className="font-semibold text-purple-900 mb-2 flex items-center">
-                                    <Info className="text-lg mr-2" /> Storage Tip
-                                </h4>
-                                <p className="text-sm text-purple-800">{insights.storageTip}</p>
+                </div>
+                
+                <div className="space-y-4">
+                    {!insights && (
+                        <Button onClick={() => onGetInsights(item)} className="w-full" disabled={isFetchingInsights}>
+                            {isFetchingInsights ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Bot className="w-5 h-5 mr-2" />}
+                            {isFetchingInsights ? 'Getting Insights...' : 'Get AI-Powered Insights'}
+                        </Button>
+                    )}
+                
+                    {insights && (
+                        <div className="space-y-3">
+                            <div>
+                                <h4 className="font-semibold mb-1 flex items-center gap-2 text-sm text-muted-foreground"><Info size={16}/>Storage Tip</h4>
+                                <p className="text-sm">{insights.storageTip}</p>
                             </div>
-                            <div className="tip-card rounded-2xl p-5">
-                                <h4 className="font-semibold text-green-900 mb-2 flex items-center">
-                                    <Info className="text-lg mr-2" /> Waste Prevention
-                                </h4>
-                                <p className="text-sm text-green-800">{insights.wastePreventionTip}</p>
+                            <div>
+                                <h4 className="font-semibold mb-1 flex items-center gap-2 text-sm text-muted-foreground"><Info size={16}/>Waste Prevention</h4>
+                                <p className="text-sm">{insights.wastePreventionTip}</p>
                             </div>
                             {insights.recipes && insights.recipes.length > 0 && (
-                                <div className="recipe-card rounded-2xl p-5">
-                                    <h4 className="font-semibold text-yellow-900 mb-3 flex items-center">
-                                        <CookingPot className="text-lg mr-2" /> Recipe Ideas
-                                    </h4>
+                                <div>
+                                    <h4 className="font-semibold mb-2 flex items-center gap-2 text-sm text-muted-foreground"><CookingPot size={16}/>Recipe Ideas</h4>
                                     <div className="space-y-2">
                                         {insights.recipes.map(recipe => (
-                                            <div key={recipe.id} className="flex items-center justify-between bg-white bg-opacity-50 rounded-lg p-3">
-                                                <div className='flex items-center gap-3'>
-                                                    {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} width={40} height={40} className='rounded-md object-cover'/>}
+                                            <div key={recipe.id} className="flex items-center justify-between bg-secondary/50 rounded-md p-2">
+                                                <div className='flex items-center gap-2'>
+                                                    {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} width={32} height={32} className='rounded-sm object-cover'/>}
                                                     <span className="font-medium text-sm">{recipe.name}</span>
                                                 </div>
-                                                <span className="text-xs text-yellow-700">{recipe.cookingTime}</span>
+                                                <span className="text-xs text-muted-foreground">{recipe.cookingTime}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -231,33 +223,65 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                             )}
                         </div>
                     )}
-
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                        <Button 
-                            className="bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-                            onClick={handleMarkAsUsed}
-                            disabled={isUpdating}
-                        >
-                            {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5 inline mr-2" />}
-                            Mark as Used
-                        </Button>
-                         <Button
-                            className="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
-                            onClick={handleWasteConfirm}
-                            disabled={isUpdating}
-                        >
-                             {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : <MinusCircle className="w-5 h-5 inline mr-2" />}
-                            Mark as Wasted
-                        </Button>
-                    </div>
-                    
-                    <Button onClick={() => onDelete(item.id)} className="w-full mt-3 border-2 border-gray-300 text-gray-600 hover:bg-gray-100 py-3 rounded-xl font-medium transition-colors">
-                        <Trash2 className="w-5 h-5 inline mr-2" />
-                        Delete Item Permanently
-                    </Button>
                 </div>
-            </div>
-        </div>
+
+                <DialogFooter className="grid grid-cols-2 gap-2 pt-4">
+                     <Button 
+                        className="bg-primary hover:bg-primary/90"
+                        onClick={handleMarkAsUsed}
+                        disabled={isUpdating}
+                    >
+                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                        Used
+                    </Button>
+                     <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                             <Button
+                                className="bg-amber-500 hover:bg-amber-600"
+                                disabled={isUpdating}
+                            >
+                                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <MinusCircle className="w-4 h-4" />}
+                                Wasted
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                             <AlertDialogHeader>
+                                <AlertDialogTitle>Mark as Wasted?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will move the item out of your active pantry. You can see it later in your waste history.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleWasteConfirm}>Confirm</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                    
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" className="col-span-2">
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Item Permanently
+                            </Button>
+                        </AlertDialogTrigger>
+                         <AlertDialogContent>
+                             <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete "{item.name}" from your pantry and all associated data.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => onDelete(item.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
         <CostPromptDialog 
             open={showCostPrompt} 
             onOpenChange={setShowCostPrompt} 
@@ -267,3 +291,4 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         </>
     );
 }
+
