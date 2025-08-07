@@ -188,6 +188,65 @@ export default function DashboardPage() {
             <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
         </div>
         
+        {/* Key Metrics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-pink-700">Total Items</p>
+                  <p className="text-3xl font-semibold text-pink-900">{liveItems.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                  <Package className="w-6 h-6 text-pink-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-700">Health Score</p>
+                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
+                  <p className="text-3xl font-semibold text-yellow-900">{expiringSoonItems.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-blue-700">This Week's Logs</p>
+                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => isWithinInterval(new Date(log.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() })).length}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* This Week's Impact */}
         <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200">
             <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 text-white">
@@ -250,66 +309,6 @@ export default function DashboardPage() {
             </div>
         </div>
         
-        {/* Key Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-pink-700">Total Items</p>
-                  <p className="text-3xl font-semibold text-pink-900">{liveItems.length}</p>
-                </div>
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-6 h-6 text-pink-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Health Score</p>
-                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                  <p className="text-3xl font-semibold text-yellow-900">{expiringSoonItems.length}</p>
-                </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-yellow-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-700">This Week's Logs</p>
-                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => isWithinInterval(new Date(log.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() })).length}</p>
-                </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-
         {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* AI Insights Card */}
@@ -431,3 +430,4 @@ export default function DashboardPage() {
   );
 
     
+
