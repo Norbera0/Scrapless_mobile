@@ -3,12 +3,11 @@
 
 import { useInsightStore } from '@/stores/insight-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Lightbulb, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Loader2, Lightbulb, CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
 
 const statusConfig = {
     new: { icon: Lightbulb, color: 'default', label: 'New' },
@@ -82,3 +81,5 @@ export default function InsightHistoryPage() {
         </div>
     )
 }
+
+    

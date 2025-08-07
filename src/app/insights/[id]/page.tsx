@@ -7,23 +7,24 @@ import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles } from 'lucide-react';
+import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles, AlertTriangle, HelpCircle, TrendingUp } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolution, onSelect: () => void, disabled: boolean }) {
     return (
-        <Card className="bg-secondary/50 flex flex-col">
-            <CardContent className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                    <p className="font-semibold">{solution.solution}</p>
-                    {solution.estimatedSavings && (
-                         <p className="text-sm font-bold text-green-600 my-2">💰 Estimated savings: ₱{solution.estimatedSavings}</p>
-                    )}
-                </div>
+        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader>
+                <CardTitle className='text-base'>{solution.solution}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-0 space-y-3 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
+                    {solution.estimatedSavings && (
+                         <p className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}/mo</p>
+                    )}
                     <div className="space-y-1">
                         <div className="flex justify-between items-center text-xs text-muted-foreground">
                             <span>Success Rate</span>
@@ -31,11 +32,11 @@ function SolutionCard({ solution, onSelect, disabled }: { solution: InsightSolut
                         </div>
                         <Progress value={solution.successRate * 100} className="h-2" />
                     </div>
-                     <Button size="sm" className="w-full" onClick={onSelect} disabled={disabled}>
-                        <Check className="mr-2 h-4 w-4" /> 
-                        {disabled ? "Working on it!" : `I'll try this${solution.estimatedSavings ? ` - Save ₱${solution.estimatedSavings}` : ''}`}
-                     </Button>
                 </div>
+                 <Button size="sm" className="w-full mt-4" onClick={onSelect} disabled={disabled}>
+                    <Check className="mr-2 h-4 w-4" /> 
+                    {disabled ? "Working on it!" : `I'll try this`}
+                 </Button>
             </CardContent>
         </Card>
     )
@@ -63,7 +64,6 @@ export default function InsightDetailPage() {
         try {
             await updateInsightStatus(user.uid, insight.id, 'acted_on');
             toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
-            // Optimistically update the local state to reflect the change immediately
             setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not update insight status.' });
@@ -91,48 +91,66 @@ export default function InsightDetailPage() {
             </div>
         )
     }
+    
+    const financialValue = insight.financialImpact.match(/₱(\d+)/)?.[1];
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6">
+        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" onClick={() => router.back()}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-bold tracking-tight">{insight.patternAlert}</h1>
-                    <p className="text-muted-foreground">A deep dive into this pattern from {new Date(insight.date).toLocaleDateString()}</p>
+                    <h1 className="text-xl font-bold tracking-tight">{insight.patternAlert}</h1>
+                    <p className="text-sm text-muted-foreground">Insight from {new Date(insight.date).toLocaleDateString()}</p>
                 </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="lg:col-span-2">
+            <div className="grid gap-6">
+                <div className="grid md:grid-cols-2 gap-4">
+                     <Card className="bg-red-50 border-red-200">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-red-800">Financial Impact</CardTitle>
+                            <Wallet className="h-4 w-4 text-red-700" />
+                        </CardHeader>
+                        <CardContent>
+                             <div className="text-2xl font-bold text-red-800">{financialValue ? `₱${financialValue}` : insight.financialImpact.split(' ')[0]}</div>
+                             <p className="text-xs text-red-600">
+                                {financialValue ? `in wasted vegetables over 4 weekends` : `est. monthly loss`}
+                            </p>
+                        </CardContent>
+                    </Card>
+                     <Card className="bg-green-50 border-green-200">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-sm font-medium text-green-800">Top Tip</CardTitle>
+                            <Sparkles className="h-4 w-4 text-green-700" />
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-green-900 font-semibold">{insight.smartTip}</p>
+                        </CardContent>
+                    </Card>
+                </div>
+                
+                <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Target className="text-primary" /> What's Really Happening</CardTitle>
+                        <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">{insight.whatsReallyHappening}</p>
+                        <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
                     </CardContent>
                 </Card>
                  <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Wallet className="text-primary" /> Financial Impact</CardTitle>
+                        <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">{insight.financialImpact}</p>
-                    </CardContent>
-                </Card>
-                 <Card className="lg:col-span-3">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary" /> Why This Pattern Exists</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">{insight.whyThisPatternExists}</p>
+                        <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
                     </CardContent>
                 </Card>
             </div>
             
              <div>
-                <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Solutions</h2>
+                <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {insight.solutions.map((solution, index) => (
                         <SolutionCard key={index} solution={solution} onSelect={handleMarkAsActedOn} disabled={isActedOn || isUpdatingStatus} />
@@ -142,13 +160,15 @@ export default function InsightDetailPage() {
 
             <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Users className="text-primary" /> Similar User Story</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-base"><Users className="text-primary" /> You're Not Alone</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-muted-foreground italic">"{insight.similarUserStory}"</p>
+                    <p className="text-sm text-muted-foreground italic">"{insight.similarUserStory}"</p>
                 </CardContent>
             </Card>
 
         </div>
     )
 }
+
+    
