@@ -260,7 +260,7 @@ export default function AddToPantryPage() {
                                         <Camera className="w-6 h-6 mr-2" />
                                         Capture Photo
                                     </Button>
-                                    <Button size="lg" variant="secondary" className="h-14 text-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={() => fileInputRef.current?.click()}>
+                                    <Button size="lg" variant="secondary" className="h-14 text-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg hover:bg-gray-300" onClick={() => fileInputRef.current?.click()}>
                                         <Upload className="w-6 h-6 mr-2" />
                                         Upload
                                     </Button>
