@@ -230,22 +230,8 @@ export function ReviewPantryItems() {
         }
       });
       
-      const optimisticPantryItems = itemsToSave.map(logItem => ({
-        ...logItem,
-        id: logItem.id,
-        addedDate: new Date().toISOString(),
-        status: 'live' as const,
-      }));
-      usePantryLogStore.getState().addOptimisticItems(optimisticPantryItems);
-
-      try {
-        await Promise.race([
-          savePantryItems(user.uid, itemsToSave),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
-        ]);
-      } catch(err) {
-        console.error('Firestore ACK timeout – proceeding optimistically', err);
-      }
+      const savedItems = await savePantryItems(user.uid, itemsToSave);
+      usePantryLogStore.getState().addLiveItems(savedItems);
       
       toast({
         title: 'Success!',
@@ -264,7 +250,6 @@ export function ReviewPantryItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
-    } finally {
       setIsSaving(false);
     }
   };

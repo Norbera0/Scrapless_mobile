@@ -28,17 +28,15 @@ interface PantryLogState {
   items: PantryLogItem[];
   liveItems: PantryItem[];
   archivedItems: PantryItem[];
-  optimisticItems: PantryItem[];
   pantryInitialized: boolean;
   setPhotoDataUri: (uri: string | null) => void;
   setTextInput: (text: string) => void;
   setItems: (items: PantryLogItem[]) => void;
   setLiveItems: (items: PantryItem[]) => void;
   setArchivedItems: (items: PantryItem[]) => void;
+  addLiveItems: (items: PantryItem[]) => void;
   archiveItem: (itemId: string, status: 'used' | 'wasted') => void;
   updatePantryItemQuantity: (itemId: string, newQuantity: number) => void;
-  addOptimisticItems: (items: PantryItem[]) => void;
-  clearOptimisticItems: () => void;
   setPantryInitialized: (initialized: boolean) => void;
   reset: () => void;
 }
@@ -49,7 +47,6 @@ const initialState = {
     items: [],
     liveItems: [],
     archivedItems: [],
-    optimisticItems: [],
     pantryInitialized: false,
 };
 
@@ -60,6 +57,9 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   setItems: (items) => set({ items }),
   setLiveItems: (items) => set({ liveItems: items }),
   setArchivedItems: (items) => set({ archivedItems: items }),
+  addLiveItems: (itemsToAdd) => set(state => ({
+    liveItems: [...state.liveItems, ...itemsToAdd].sort((a, b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime())
+  })),
   archiveItem: (itemId, status) => {
     const itemToArchive = get().liveItems.find(item => item.id === itemId);
     if (itemToArchive) {
@@ -77,13 +77,10 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
       ),
     }));
   },
-  addOptimisticItems: (items) => set((state) => ({ optimisticItems: [...state.optimisticItems, ...items] })),
-  clearOptimisticItems: () => set({ optimisticItems: [] }),
   setPantryInitialized: (initialized) => set({ pantryInitialized: initialized }),
   reset: () => set({ 
     photoDataUri: null,
     textInput: '',
     items: [],
-    // Do not reset liveItems, optimisticItems, or initialized status
   }),
 }));
