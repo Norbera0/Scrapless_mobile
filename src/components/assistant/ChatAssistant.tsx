@@ -107,7 +107,7 @@ export function ChatAssistant() {
       const pantryData = pantryItems.map(item => ({
           name: item.name,
           estimatedExpirationDate: format(parseISO(item.estimatedExpirationDate), 'MMM d, yyyy'),
-          estimatedAmount: item.estimatedAmount,
+          estimatedAmount: `${item.quantity} ${item.unit}`,
       }));
   
       const wasteAnalysis = calculateWasteAnalysis(wasteLogs);
