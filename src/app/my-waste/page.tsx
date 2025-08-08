@@ -7,9 +7,9 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WasteLog } from '@/types';
-import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO } from 'date-fns';
+import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay } from 'date-fns';
 import Image from 'next/image';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
@@ -40,6 +40,148 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
     "Bought too much": Users, 
     "Plans changed": Users,
     "Other reason": Lightbulb,
+};
+
+// --- New Components for Redesigned Waste History ---
+
+const getAvatarProps = (itemName: string): { initial: string; bgColor: string; textColor: string; } => {
+  const colors = [
+    { bg: '#FEF3C7', text: '#92400E' }, // Yellow
+    { bg: '#DBEAFE', text: '#1E40AF' }, // Blue  
+    { bg: '#D1FAE5', text: '#065F46' }, // Green
+    { bg: '#FCE7F3', text: '#BE185D' }, // Pink
+    { bg: '#E0E7FF', text: '#3730A3' }, // Indigo
+  ];
+  const charCode = itemName.charCodeAt(0) || 0;
+  const color = colors[charCode % colors.length];
+  
+  return {
+    initial: itemName.charAt(0).toUpperCase(),
+    bgColor: color.bg,
+    textColor: color.text,
+  };
+};
+
+const WasteEntryCard = ({ entry }: { entry: WasteLog }) => {
+    const { initial, bgColor, textColor } = getAvatarProps(entry.items[0]?.name || 'F');
+
+    return (
+        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-3 transition-all hover:shadow-lg hover:border-primary">
+            <div className="flex items-start gap-3">
+                <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-lg flex-shrink-0"
+                    style={{ backgroundColor: bgColor, color: textColor }}
+                >
+                    {initial}
+                </div>
+                <div className="flex-1">
+                    <p className="font-medium text-gray-800 leading-snug mb-1.5">{entry.items.map(i => i.name).join(', ')}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{format(parseISO(entry.date), 'h:mm a')}</div>
+                        <div className="flex items-center gap-1.5"><Bug className="w-3.5 h-3.5" />{entry.sessionWasteReason}</div>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <p className="font-semibold text-orange-600 text-base">₱{entry.totalPesoValue.toFixed(2)}</p>
+                    <p className="text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full mt-1">{entry.totalCarbonFootprint.toFixed(2)}kg CO₂e</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
+    const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
+    const [dateRange, setDateRange] = useState<Date[]>([]);
+    
+    useEffect(() => {
+        const today = startOfDay(new Date());
+        const range = Array.from({ length: 7 }, (_, i) => startOfDay(subDays(today, 3 - i)));
+        setDateRange(range);
+    }, []);
+
+    const organizedWaste = useMemo(() => {
+        const filteredLogs = logs.filter(log => isSameDay(parseISO(log.date), selectedDate));
+        
+        return filteredLogs.reduce((acc, entry) => {
+            const hour = parseISO(entry.date).getHours();
+            const timeOfDay = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+            acc[timeOfDay].push(entry);
+            return acc;
+        }, { morning: [] as WasteLog[], afternoon: [] as WasteLog[], evening: [] as WasteLog[] });
+    }, [logs, selectedDate]);
+
+    const handleDateChange = (offset: number) => {
+        setDateRange(prevRange => prevRange.map(d => addDays(d, offset)));
+    };
+
+    const hasWasteForSelectedDate = Object.values(organizedWaste).some(arr => arr.length > 0);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Recent Waste History</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(-7)}>
+                        <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <div className="flex-1 overflow-x-auto scrollbar-hide">
+                        <div className="flex gap-2 pb-1">
+                            {dateRange.map(date => (
+                                <button
+                                    key={date.toISOString()}
+                                    className={cn(
+                                        "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-colors border",
+                                        isSameDay(date, selectedDate)
+                                            ? 'bg-primary text-white border-primary'
+                                            : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
+                                    )}
+                                    onClick={() => setSelectedDate(date)}
+                                >
+                                    <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
+                                    <p className={cn("text-xl font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(7)}>
+                        <ChevronRight className="h-5 w-5" />
+                    </Button>
+                </div>
+
+                <div className="mt-4">
+                    {!hasWasteForSelectedDate ? (
+                        <div className="text-center py-10 bg-gray-50 rounded-lg">
+                            <p className="text-gray-500">No waste logged for this day.</p>
+                        </div>
+                    ) : (
+                        <>
+                            {organizedWaste.morning.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Morning</h3>
+                                    {organizedWaste.morning.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                </div>
+                            )}
+                             {organizedWaste.afternoon.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Afternoon</h3>
+                                    {organizedWaste.afternoon.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                </div>
+                            )}
+                             {organizedWaste.evening.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Evening</h3>
+                                    {organizedWaste.evening.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
 };
 
 
@@ -145,7 +287,7 @@ export default function MyWastePage() {
   const latestInsight = insights.length > 0 ? insights[0] : null;
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6">
+    <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Waste Impact</h1>
@@ -312,41 +454,10 @@ export default function MyWastePage() {
               </CardContent>
             </Card>
 
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Recent Waste History</h2>
-              <div className="space-y-3">
-                {logs.length > 0 ? (
-                  logs.slice(0, 5).map(log => (
-                    <Card key={log.id} className="overflow-hidden">
-                      <div className="flex items-center p-4">
-                          {log.photoDataUri ? (
-                               <Image src={log.photoDataUri} alt="Wasted food" width={48} height={48} className="rounded-lg mr-4 object-cover" data-ai-hint="food waste" />
-                          ) : (
-                              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xl mr-4">
-                                  <span>{log.items[0]?.name.charAt(0) || '📝'}</span>
-                              </div>
-                          )}
-                          <div className="flex-1 overflow-hidden">
-                              <p className="font-semibold truncate">{log.items.map(i => i.name).join(', ')}</p>
-                              <p className="text-sm text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a')} • {log.sessionWasteReason}</p>
-                          </div>
-                          <div className='text-right ml-4'>
-                              <p className="font-bold text-destructive">₱{log.totalPesoValue.toFixed(2)}</p>
-                              <p className="text-xs text-muted-foreground">{log.totalCarbonFootprint.toFixed(2)}kg CO₂e</p>
-                          </div>
-                      </div>
-                    </Card>
-                  ))
-                ) : (
-                  <Card>
-                    <CardContent className="pt-6">
-                      <p className="text-center text-muted-foreground py-8">No waste logs yet. Go to the "Log Waste" page to add your first entry.</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </div>
+            <RecentWasteHistory logs={logs} />
           </div>
       )}
     </div>
   );
+}
+
