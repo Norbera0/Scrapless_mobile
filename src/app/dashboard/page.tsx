@@ -30,11 +30,14 @@ import {
   ChevronUp,
   Edit,
   ShoppingBasket,
-  Lightbulb
+  Lightbulb,
+  Loader2
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
 import type { PantryItem } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import { updatePantryItemStatus } from '@/lib/data';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -80,11 +83,13 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { logs } = useWasteLogStore();
   const { insights } = useInsightStore();
-  const { liveItems } = usePantryLogStore();
+  const { liveItems, archiveItem } = usePantryLogStore();
   const { savingsEvents } = useSavingsStore();
+  const { toast } = useToast();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
+  const [isUpdatingItemId, setIsUpdatingItemId] = useState<string | null>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -192,6 +197,28 @@ export default function DashboardPage() {
       if(days <= 3) return "bg-amber-500/10 hover:bg-amber-500/20";
       return "bg-white";
   }
+
+  const handleMarkAsUsed = async (item: PantryItem) => {
+    if (!user) return;
+    setIsUpdatingItemId(item.id);
+    try {
+      // Optimistic UI update
+      archiveItem(item.id, 'used');
+      
+      // Server update (fire and forget for better UX)
+      updatePantryItemStatus(user.uid, item.id, 'used').catch(err => {
+        console.error("Failed to mark item as used on server", err);
+        // Here you might add logic to revert the optimistic update if needed
+      });
+
+      toast({ title: "Item used!", description: `You've used "${item.name}".`});
+    } catch (error) {
+      console.error("Error marking item as used:", error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not mark item as used.' });
+    } finally {
+      setIsUpdatingItemId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] p-4 sm:p-6 md:p-8">
@@ -444,8 +471,13 @@ export default function DashboardPage() {
                               </div>
                             </TableCell>
                             <TableCell className="text-right">
-                               <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
-                                <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
+                               <Button variant="ghost" size="sm" onClick={() => handleMarkAsUsed(item)} disabled={isUpdatingItemId === item.id}>
+                                {isUpdatingItemId === item.id ? (
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                )}
+                                Mark Used
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -476,3 +508,6 @@ export default function DashboardPage() {
 
     
 
+
+
+    
