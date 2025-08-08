@@ -353,19 +353,11 @@ export default function PantryPage() {
                 <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
             </Card>
             <Card className="p-5 rounded-2xl shadow-sm border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
-                <div className="relative w-full h-full flex flex-col items-center justify-center">
-                    <ResponsiveContainer width="60%" height="60%">
-                        <PieChart>
-                            <Pie data={pieChartData} cx="50%" cy="50%" innerRadius="70%" outerRadius="100%" startAngle={90} endAngle={450} dataKey="value" stroke="none">
-                                {pieChartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                            </Pie>
-                        </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-2xl font-bold" style={{ color: getScoreColor(stats.healthScore) }}>{stats.healthScore}%</span>
-                    </div>
-                     <p className="text-sm font-medium text-gray-600 mt-1">Health Score</p>
+                <div className="w-11 h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
+                    <TrendingUp className="w-6 h-6 text-teal-600" />
                 </div>
+                <p className="text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
+                <p className="text-sm font-medium text-teal-600">Health Score</p>
             </Card>
         </div>
 
