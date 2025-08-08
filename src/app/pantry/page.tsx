@@ -44,7 +44,6 @@ const filterOptions = [
     { value: 'all', label: 'All Items' },
     { value: 'expiring', label: 'Expiring Soon' },
     { value: 'fresh', label: 'Fresh' },
-    { value: 'expired', label: 'Expired' },
 ];
 
 export default function PantryPage() {
@@ -258,13 +257,13 @@ export default function PantryPage() {
   }
   
     const getScoreColor = (score: number) => {
-        if (score >= 80) return 'text-green-600';
-        if (score >= 60) return 'text-amber-600';
-        return 'text-red-600';
+        if (score >= 80) return '#059669'; // text-green-600
+        if (score >= 60) return '#D97706'; // text-amber-600
+        return '#DC2626'; // text-red-600
     };
 
     const pieChartData = [
-        { name: 'Health', value: stats.healthScore, color: '#059669' },
+        { name: 'Health', value: stats.healthScore, color: getScoreColor(stats.healthScore) },
         { name: 'Remainder', value: 100 - stats.healthScore, color: '#F3F4F6' },
     ];
 
@@ -353,84 +352,22 @@ export default function PantryPage() {
                 <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
                 <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
             </Card>
-            <Card
-                className="p-5 rounded-2xl shadow-sm border border-red-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                onClick={() => setFilter('expired')}
-            >
-                <div className="w-11 h-11 bg-gradient-to-br from-red-100 to-red-200 rounded-lg flex items-center justify-center mb-2">
-                    <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-                <p className="text-3xl font-bold text-red-800">{stats.expired}</p>
-                <p className="text-sm font-medium text-red-600">Expired</p>
-            </Card>
-        </div>
-
-
-        {/* Pantry Health Score */}
-        <Card className="mb-8 rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md">
-            <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                📊 Pantry Health Score
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col md:flex-row items-center gap-8 p-6">
-                <div className="relative w-32 h-32 md:w-36 md:h-36">
-                    <ResponsiveContainer width="100%" height="100%">
+            <Card className="p-5 rounded-2xl shadow-sm border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+                <div className="relative w-full h-full flex flex-col items-center justify-center">
+                    <ResponsiveContainer width="60%" height="60%">
                         <PieChart>
-                            <Pie
-                                data={pieChartData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius="70%"
-                                outerRadius="100%"
-                                startAngle={90}
-                                endAngle={450}
-                                dataKey="value"
-                                stroke="none"
-                            >
-                                {pieChartData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
+                            <Pie data={pieChartData} cx="50%" cy="50%" innerRadius="70%" outerRadius="100%" startAngle={90} endAngle={450} dataKey="value" stroke="none">
+                                {pieChartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
                             </Pie>
                         </PieChart>
                     </ResponsiveContainer>
-                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className={`text-3xl font-bold ${getScoreColor(stats.healthScore)}`}>
-                            {stats.healthScore}%
-                        </span>
-                        <span className="text-xs text-gray-500">Health Score</span>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-bold" style={{ color: getScoreColor(stats.healthScore) }}>{stats.healthScore}%</span>
                     </div>
+                     <p className="text-sm font-medium text-gray-600 mt-1">Health Score</p>
                 </div>
-
-                <div className="flex-1 w-full">
-                    <Progress value={stats.healthScore} segments={stats.segments} className="h-3 mb-4 rounded-full" />
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-[#10B981] rounded-full"></div>
-                            <div>
-                                <p className="font-bold text-lg text-gray-800">{stats.fresh}</p>
-                                <p className="text-gray-500">Fresh</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 bg-[#F59E0B] rounded-full"></div>
-                             <div>
-                                <p className="font-bold text-lg text-gray-800">{stats.expiring}</p>
-                                <p className="text-gray-500">Expiring</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           <div className="w-3 h-3 bg-[#EF4444] rounded-full"></div>
-                             <div>
-                                <p className="font-bold text-lg text-gray-800">{stats.expired}</p>
-                                <p className="text-gray-500">Expired</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-
+            </Card>
+        </div>
 
         {/* Pantry Items */}
         <div className="mb-8">

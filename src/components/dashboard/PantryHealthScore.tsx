@@ -78,7 +78,7 @@ export function PantryHealthScore() {
         });
         
         const totalItems = liveItems.length;
-        const score = Math.round(((fresh * 100) + (expiring * 50)) / totalItems);
+        const score = totalItems > 0 ? Math.round(((fresh * 100) + (expiring * 50)) / totalItems) : 100;
 
         const segments: ProgressSegment[] = totalItems > 0 ? [
             { value: fresh, color: '#10B981', label: 'Fresh' },
