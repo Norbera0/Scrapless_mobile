@@ -65,7 +65,6 @@ export default function InsightDetailPage() {
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
     const { logs } = useWasteLogStore();
     const [showMore, setShowMore] = useState<{ what: boolean; why: boolean }>({ what: false, why: false });
-    const touchStartX = useRef<number | null>(null);
 
     useEffect(() => {
         if (insightsInitialized && id) {
@@ -117,30 +116,6 @@ export default function InsightDetailPage() {
         }
     }
 
-    const navigateToAdjacentInsight = (direction: 'prev' | 'next') => {
-        if (!insight) return;
-        const currentIndex = insights.findIndex(i => i.id === insight.id);
-        if (currentIndex === -1) return;
-        const targetIndex = direction === 'prev' ? currentIndex + 1 : currentIndex - 1; // insights sorted desc
-        if (targetIndex >= 0 && targetIndex < insights.length) {
-            const target = insights[targetIndex];
-            router.replace(`/insights/${target.id}`);
-        }
-    }
-
-    // Swipe navigation for mobile
-    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
-    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-        if (touchStartX.current === null) return;
-        const dx = e.changedTouches[0].clientX - touchStartX.current;
-        const threshold = 60; // px
-        if (dx > threshold) navigateToAdjacentInsight('prev');
-        if (dx < -threshold) navigateToAdjacentInsight('next');
-        touchStartX.current = null;
-    };
-
     // Milestones & challenge data
     const milestone = useMemo(() => {
         let days = -1;
@@ -176,7 +151,7 @@ export default function InsightDetailPage() {
     const financialValue = insight.financialImpact.match(/₱(\d+)/)?.[1];
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
             <div className="flex items-center gap-2 md:gap-4">
                 <Button variant="outline" size="icon" onClick={() => router.back()}>
                     <ArrowLeft className="h-4 w-4" />
@@ -184,10 +159,6 @@ export default function InsightDetailPage() {
                 <div className="space-y-1">
                     <h1 className="text-xl font-bold tracking-tight">{insight.patternAlert}</h1>
                     <p className="text-sm text-muted-foreground">Insight from {new Date(insight.date).toLocaleDateString()}</p>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => navigateToAdjacentInsight('next')} disabled={insights.length <= 1}>Next</Button>
-                    <Button variant="outline" size="sm" onClick={() => navigateToAdjacentInsight('prev')} disabled={insights.length <= 1}>Previous</Button>
                 </div>
             </div>
 
@@ -283,5 +254,3 @@ export default function InsightDetailPage() {
         </div>
     )
 }
-
-    
