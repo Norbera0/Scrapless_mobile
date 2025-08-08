@@ -55,11 +55,11 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
     const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
 
     return (
-        <div className="flex flex-col h-full max-h-[70vh]">
+        <div className="flex flex-col h-full">
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className="flex-1">
+            <ScrollArea className="flex-1 h-[400px]">
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
                         orderedCategories.map(category => 
