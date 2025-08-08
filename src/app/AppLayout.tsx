@@ -39,6 +39,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [currentDate, setCurrentDate] = useState(new Date());
   const { notifications, totalNew, priorityColor } = useNotifications();
+  const [hasOpenedNotifications, setHasOpenedNotifications] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -99,11 +100,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
                     <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
                  </div>
-                 <Popover>
+                 <Popover onOpenChange={(open) => {
+                    if(open) {
+                        setHasOpenedNotifications(true);
+                    }
+                 }}>
                     <PopoverTrigger asChild>
                         <Button variant="ghost" size="icon" className="relative">
                           <Bell className="h-5 w-5" />
-                          {totalNew > 0 && (
+                          {totalNew > 0 && !hasOpenedNotifications && (
                             <span className={cn("absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white", badgeColorClass)}>
                                 {totalNew > 9 ? '9+' : totalNew}
                             </span>
