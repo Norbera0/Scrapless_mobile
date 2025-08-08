@@ -265,6 +265,47 @@ export default function PantryPage() {
               <span className='hidden md:inline'>Add Items</span>
             </Button>
           </div>
+          
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
+              <Card
+                  className="p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  onClick={() => setFilter('all')}
+              >
+                  <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
+                      <Package className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <p className="text-3xl font-bold text-blue-800">{stats.total}</p>
+                  <p className="text-sm font-medium text-blue-600">Total Items</p>
+              </Card>
+              <Card
+                  className="p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  onClick={() => setFilter('fresh')}
+              >
+                  <div className="w-11 h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
+                      <Leaf className="w-6 h-6 text-green-600" />
+                  </div>
+                  <p className="text-3xl font-bold text-green-800">{stats.fresh}</p>
+                  <p className="text-sm font-medium text-green-600">Fresh Items</p>
+              </Card>
+              <Card
+                  className="p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  onClick={() => setFilter('expiring')}
+              >
+                  <div className="w-11 h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
+                      <Clock className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
+                  <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
+              </Card>
+              <Card className="p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+                  <div className="w-11 h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
+                      <TrendingUp className="w-6 h-6 text-teal-600" />
+                  </div>
+                  <p className="text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
+                  <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
+              </Card>
+          </div>
 
           {/* Search and Filter Bar */}
           <div className="space-y-4">
@@ -296,47 +337,6 @@ export default function PantryPage() {
                 ))}
             </div>
           </div>
-        </div>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
-            <Card
-                className="p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                onClick={() => setFilter('all')}
-            >
-                <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
-                    <Package className="w-6 h-6 text-blue-600" />
-                </div>
-                <p className="text-3xl font-bold text-blue-800">{stats.total}</p>
-                <p className="text-sm font-medium text-blue-600">Total Items</p>
-            </Card>
-            <Card
-                className="p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                onClick={() => setFilter('fresh')}
-            >
-                <div className="w-11 h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
-                    <Leaf className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-3xl font-bold text-green-800">{stats.fresh}</p>
-                <p className="text-sm font-medium text-green-600">Fresh Items</p>
-            </Card>
-            <Card
-                className="p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                onClick={() => setFilter('expiring')}
-            >
-                <div className="w-11 h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
-                    <Clock className="w-6 h-6 text-amber-600" />
-                </div>
-                <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
-                <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
-            </Card>
-            <Card className="p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
-                <div className="w-11 h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
-                    <TrendingUp className="w-6 h-6 text-teal-600" />
-                </div>
-                <p className="text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
-                <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
-            </Card>
         </div>
 
         {/* Pantry Items */}
