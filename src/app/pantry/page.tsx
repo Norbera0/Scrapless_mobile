@@ -7,7 +7,6 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { useRecipeStore } from '@/stores/recipe-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress, type ProgressSegment } from '@/components/ui/progress';
 import { 
   Plus, 
   Search, 
@@ -38,7 +37,6 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday } from 'date-fns';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const filterOptions = [
     { value: 'all', label: 'All Items' },
@@ -115,21 +113,12 @@ export default function PantryPage() {
           ((fresh.length * 100) + (expiring.length * 50) + (expired.length * 0)) / liveItems.length
         )
       : 100;
-    
-    const total = liveItems.length;
-    const segments: ProgressSegment[] = total > 0 ? [
-        { value: fresh.length, color: '#10B981', label: 'Fresh' },
-        { value: expiring.length, color: '#F59E0B', label: 'Expiring Soon' },
-        { value: expired.length, color: '#EF4444', label: 'Expired' },
-    ] : [];
 
     return {
       total: liveItems.length,
       fresh: fresh.length,
       expiring: expiring.length,
-      expired: expired.length,
       healthScore,
-      segments
     };
   }, [liveItems, getStatus]);
 
@@ -255,17 +244,6 @@ export default function PantryPage() {
   if (!isClient) {
     return null;
   }
-  
-    const getScoreColor = (score: number) => {
-        if (score >= 80) return '#059669'; // text-green-600
-        if (score >= 60) return '#D97706'; // text-amber-600
-        return '#DC2626'; // text-red-600
-    };
-
-    const pieChartData = [
-        { name: 'Health', value: stats.healthScore, color: getScoreColor(stats.healthScore) },
-        { name: 'Remainder', value: 100 - stats.healthScore, color: '#F3F4F6' },
-    ];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
@@ -352,7 +330,7 @@ export default function PantryPage() {
                 <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
                 <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
             </Card>
-            <Card className="p-5 rounded-2xl shadow-sm border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+            <Card className="p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
                 <div className="w-11 h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
                     <TrendingUp className="w-6 h-6 text-teal-600" />
                 </div>
