@@ -12,7 +12,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { isWithinInterval, add, differenceInDays, startOfToday } from 'date-fns';
+import { isWithinInterval, add, differenceInDays, startOfToday, startOfMonth } from 'date-fns';
 import { 
   Sparkles, 
   TrendingUp, 
@@ -32,6 +32,7 @@ import {
   ShoppingBasket
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
 import type { PantryItem } from '@/types';
 
 type SortKey = 'name' | 'daysUntilExpiration';
@@ -113,6 +114,10 @@ export default function DashboardPage() {
         return acc;
     }, { totalSavings: 0 });
 
+  // Storytelling equivalents for savings
+  const weeklyRiceKg = estimateRiceKgFromPesos(weeklySavingsStats.totalSavings);
+  const weeklyWaterSavedL = estimateWaterSavedLitersFromSavings(weeklySavingsStats.totalSavings);
+
   // Calculate pantry health stats
   const freshItems = liveItems.filter(item => {
     const expirationDate = new Date(item.estimatedExpirationDate);
@@ -136,6 +141,14 @@ export default function DashboardPage() {
     : 0;
 
   const latestInsight = insights.length > 0 ? insights[0] : null;
+
+  // Monthly savings goal progress (hackathon placeholder goal)
+  const savingsGoal = 5000;
+  const monthStart = startOfMonth(new Date());
+  const monthSavings = savingsEvents
+    .filter(e => new Date(e.date) >= monthStart)
+    .reduce((acc, e) => acc + e.amount, 0);
+  const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
 
   const sortedWatchlistItems = useMemo(() => {
     const itemsWithDays = expiringSoonItems.map(item => ({
@@ -247,7 +260,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* This Week's Impact */}
+        {/* This Week's Impact (prioritize savings and impact equivalences) */}
         <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200">
             <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 text-white">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -255,21 +268,26 @@ export default function DashboardPage() {
                     This Week's Impact
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <p className="text-sm font-medium text-green-700">Virtual Savings</p>
-                    <p className="text-3xl font-bold text-green-800">₱{weeklySavingsStats.totalSavings.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">From using items before expiry</p>
+                    <p className="text-3xl font-bold text-green-800">{formatPeso(weeklySavingsStats.totalSavings)}</p>
+                    <p className="text-xs text-white/80">From using items before expiry</p>
                 </div>
                 <div>
-                     <p className="text-sm font-medium text-red-700">Food Waste</p>
-                    <p className="text-3xl font-bold text-red-800">₱{weeklyWasteStats.totalPesoValue.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">Value of items logged as waste</p>
+                    <p className="text-sm font-medium text-emerald-100">Impact Equivalents</p>
+                    <p className="text-sm text-white/90">≈ {weeklyRiceKg.toFixed(1)} kg rice or ~{weeklyWaterSavedL.toFixed(0)} L water saved</p>
+                    <p className="text-xs text-white/60">Story-based comparison</p>
+                </div>
+                <div>
+                     <p className="text-sm font-medium text-red-100">Food Waste Logged</p>
+                    <p className="text-3xl font-bold text-white">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
+                    <p className="text-xs text-white/80">Track and reduce weekly losses</p>
                 </div>
             </CardContent>
         </Card>
 
-        {/* Quick Actions Section */}
+        {/* Quick Actions Section (tap-friendly, mobile-first) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div
                 className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
@@ -316,7 +334,7 @@ export default function DashboardPage() {
             <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                   ✨ Your frequently waste portions
+                   ✨ {latestInsight.keyObservation || 'Fresh AI Insight'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -324,7 +342,7 @@ export default function DashboardPage() {
                 <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
                 <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
                   <p className="text-white/90 text-sm leading-relaxed">
-                    "Try reducing the amount you cook in a single batch, starting with smaller portions and adjust based on what you actually consume to minimize leftovers."
+                    {latestInsight.smartTip}
                   </p>
                 </div>
                 <Button 
@@ -346,15 +364,15 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-[#7C7C7C] mb-2">This week's update</p>
-              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">On track</Badge>
+              <p className="text-sm text-[#7C7C7C] mb-2">Savings goal progress</p>
+              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
               <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-green-800">Waste Budget</span>
-                    <span className="text-2xl font-bold text-green-800">65%</span>
+                    <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
+                    <span className="text-2xl font-bold text-green-800">{goalProgress}%</span>
                   </div>
-                  <Progress value={65} className="h-3" />
+                  <Progress value={goalProgress} className="h-3" />
                 </div>
               </div>
               <Button 
@@ -368,7 +386,7 @@ export default function DashboardPage() {
           </Card>
         </div>
         
-        {/* Pantry Watchlist */}
+        {/* Pantry Watchlist with suggested next actions */}
         {expiringSoonItems.length > 0 && (
           <Card className="shadow-sm bg-white mb-8">
             <CardHeader>
@@ -378,6 +396,16 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+                {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
+                  <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                    <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
+                    <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
+                      {latestInsight.solutions.slice(0,2).map((s, idx) => (
+                        <li key={idx}>{s.solution}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>

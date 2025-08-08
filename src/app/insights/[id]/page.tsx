@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
@@ -13,6 +13,8 @@ import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useWasteLogStore } from '@/stores/waste-log-store';
+import { differenceInDays, isWithinInterval, startOfToday } from 'date-fns';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
@@ -60,6 +62,9 @@ export default function InsightDetailPage() {
     const [insight, setInsight] = useState<Insight | null>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
+    const { logs } = useWasteLogStore();
+    const [showMore, setShowMore] = useState<{ what: boolean; why: boolean }>({ what: false, why: false });
+    const touchStartX = useRef<number | null>(null);
 
     useEffect(() => {
         if (insightsInitialized) {
@@ -111,6 +116,44 @@ export default function InsightDetailPage() {
         }
     }
 
+    const navigateToAdjacentInsight = (direction: 'prev' | 'next') => {
+        if (!insight) return;
+        const currentIndex = insights.findIndex(i => i.id === insight.id);
+        if (currentIndex === -1) return;
+        const targetIndex = direction === 'prev' ? currentIndex + 1 : currentIndex - 1; // insights sorted desc
+        if (targetIndex >= 0 && targetIndex < insights.length) {
+            const target = insights[targetIndex];
+            router.replace(`/insights/${target.id}`);
+        }
+    }
+
+    // Swipe navigation for mobile
+    const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+    const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        if (touchStartX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX.current;
+        const threshold = 60; // px
+        if (dx > threshold) navigateToAdjacentInsight('prev');
+        if (dx < -threshold) navigateToAdjacentInsight('next');
+        touchStartX.current = null;
+    };
+
+    // Milestones & challenge data
+    const milestone = useMemo(() => {
+        let days = -1;
+        if (logs.length > 0) {
+            const lastLogDate = new Date(logs[0].date);
+            days = differenceInDays(startOfToday(), lastLogDate);
+        }
+        const weekWaste = logs
+            .filter(l => isWithinInterval(new Date(l.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() }))
+            .reduce((acc, l) => acc + l.totalPesoValue, 0);
+        const target = Math.max(0, weekWaste * 0.85);
+        return { daysSinceLastWaste: days, weeklyWaste: weekWaste, weeklyTarget: target };
+    }, [logs]);
+
     if (!insightsInitialized) {
         return (
             <div className="flex h-full w-full items-center justify-center p-4">
@@ -132,14 +175,18 @@ export default function InsightDetailPage() {
     const financialValue = insight.financialImpact.match(/₱(\d+)/)?.[1];
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-            <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+            <div className="flex items-center gap-2 md:gap-4">
                 <Button variant="outline" size="icon" onClick={() => router.back()}>
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div className="space-y-1">
                     <h1 className="text-xl font-bold tracking-tight">{insight.patternAlert}</h1>
                     <p className="text-sm text-muted-foreground">Insight from {new Date(insight.date).toLocaleDateString()}</p>
+                </div>
+                <div className="ml-auto flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => navigateToAdjacentInsight('next')} disabled={insights.length <= 1}>Next</Button>
+                    <Button variant="outline" size="sm" onClick={() => navigateToAdjacentInsight('prev')} disabled={insights.length <= 1}>Previous</Button>
                 </div>
             </div>
 
@@ -174,6 +221,9 @@ export default function InsightDetailPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
+                        <div className="mt-2">
+                            <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, what: !s.what }))}>{showMore.what ? 'Show less' : 'Learn more'}</Button>
+                        </div>
                     </CardContent>
                 </Card>
                  <Card>
@@ -182,9 +232,28 @@ export default function InsightDetailPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
+                        <div className="mt-2">
+                            <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, why: !s.why }))}>{showMore.why ? 'Show less' : 'Learn more'}</Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base"><TrendingUp className="text-primary" /> Milestones & Weekly Challenge</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-md bg-green-50 border border-green-200 p-3">
+                            <p className="text-sm text-green-900"><strong>Milestone:</strong> {milestone.daysSinceLastWaste >= 0 ? `${milestone.daysSinceLastWaste} day(s) since last waste log` : 'Start logging to unlock milestones'}</p>
+                        </div>
+                        <div className="rounded-md bg-amber-50 border border-amber-200 p-3">
+                            <p className="text-sm text-amber-900"><strong>Challenge:</strong> Cut this week’s waste to ₱{milestone.weeklyTarget.toFixed(0)} or less.</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
             
              <div>
                 <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
