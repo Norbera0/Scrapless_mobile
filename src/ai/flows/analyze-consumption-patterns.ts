@@ -65,6 +65,23 @@ Keep the tone encouraging, positive, and helpful. Focus on the single most impor
 `,
 });
 
+const generateDefaultInsight = (): AnalyzeConsumptionPatternsOutput => {
+    const errorMessage = "Start logging to unlock powerful insights about your food habits.";
+    return {
+        keyObservation: errorMessage,
+        patternAlert: "We need a bit more data to identify your unique patterns.",
+        smartTip: "Log your next grocery trip or any food waste to begin your analysis.",
+        smartShoppingPlan: "Add items to your virtual pantry to get shopping recommendations.",
+        whatsReallyHappening: "I'm standing by to analyze your data as soon as it comes in.",
+        whyThisPatternExists: "Your food habits hold the key to reducing waste.",
+        financialImpact: "Let's find out how much you can save together.",
+        solutions: [
+            { solution: "Add items to your virtual pantry.", successRate: 0.9 },
+            { solution: "Use the camera or voice log to record waste.", successRate: 0.9 }
+        ],
+        similarUserStory: "The first step to reducing waste is knowing what you waste. You're on the right track!",
+    };
+};
 
 const analyzeConsumptionPatternsFlow = ai.defineFlow(
   {
@@ -73,29 +90,20 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
     outputSchema: AnalyzeConsumptionPatternsOutputSchema,
   },
   async (input) => {
-    // If there's no data, return a default message - THIS LOGIC IS FLAWED AND PREVENTS INSIGHTS
-    // We will let the AI handle the empty state directly based on the prompt.
+    try {
+        const { output } = await prompt(input);
+        
+        if (!output) {
+            console.log("AI did not return an output. Returning default insight.");
+            return generateDefaultInsight();
+        }
+        
+        return output;
 
-    const { output } = await prompt(input);
-    
-    if (!output) {
-        const errorMessage = "Start logging to unlock powerful insights about your food habits.";
-        return {
-            keyObservation: errorMessage,
-            patternAlert: "We need a bit more data to identify your unique patterns.",
-            smartTip: "Log your next grocery trip or any food waste to begin your analysis.",
-            smartShoppingPlan: "Add items to your pantry to get shopping recommendations.",
-            whatsReallyHappening: "I'm standing by to analyze your data as soon as it comes in.",
-            whyThisPatternExists: "Your food habits hold the key to reducing waste.",
-            financialImpact: "Let's find out how much you can save together.",
-            solutions: [
-                { solution: "Add items to your virtual pantry.", successRate: 0.9 },
-                { solution: "Use the camera or voice log to record waste.", successRate: 0.9 }
-            ],
-            similarUserStory: "The first step to reducing waste is knowing what you waste. You're on the right track!",
-        };
+    } catch (error) {
+        console.error("Error in analyzeConsumptionPatternsFlow:", error);
+        // If any error occurs during the AI call, return the default insight.
+        return generateDefaultInsight();
     }
-    
-    return output;
   }
 );
