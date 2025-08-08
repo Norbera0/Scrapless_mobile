@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -53,10 +53,9 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
     )
 }
 
-export default function InsightDetailPage() {
+export default function InsightDetailPage({ params }: { params: { id: string } }) {
     const { user } = useAuth();
     const router = useRouter();
-    const params = useParams();
     const { toast } = useToast();
     const { insights, insightsInitialized } = useInsightStore();
     const [insight, setInsight] = useState<Insight | null>(null);
