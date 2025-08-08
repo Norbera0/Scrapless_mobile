@@ -18,8 +18,8 @@ export default function LogWastePage() {
 
   if (selectedMethod) {
     return (
-      <div className="flex flex-col gap-6 p-4 md:p-6 max-w-2xl mx-auto">
-         <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="self-start text-muted-foreground hover:text-foreground">
+      <div className="flex flex-col gap-4 p-4 md:p-6 max-w-2xl mx-auto">
+         <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="self-start text-muted-foreground hover:text-foreground -ml-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to methods
         </Button>
@@ -32,11 +32,11 @@ export default function LogWastePage() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Log Food Waste 🗑️</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Log Food Waste 🗑️</h1>
           <p className="text-lg text-teal-600">Track your waste to reduce it and save money</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <Card className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200">
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
@@ -79,8 +79,8 @@ export default function LogWastePage() {
         </div>
 
         <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">How would you like to log your waste?</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">How would you like to log?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                 <Card className="border border-gray-200 transform hover:scale-[1.02] transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
                   <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
                     <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
@@ -88,7 +88,7 @@ export default function LogWastePage() {
                     </div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">Log with Camera</h3>
                     <p className="text-gray-500 mb-6 text-sm">Snap a picture of your food waste.</p>
-                    <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('camera')}>Use Camera</Button>
+                    <Button className="w-full mt-auto bg-primary hover:bg-primary/90 h-11 text-base" onClick={() => setSelectedMethod('camera')}>Use Camera</Button>
                   </CardContent>
                 </Card>
 
@@ -99,7 +99,7 @@ export default function LogWastePage() {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Log with Voice</h3>
                     <p className="text-gray-500 mb-6 text-sm">Simply say what you've wasted.</p>
-                     <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('voice')}>Use Voice</Button>
+                     <Button className="w-full mt-auto bg-primary hover:bg-primary/90 h-11 text-base" onClick={() => setSelectedMethod('voice')}>Use Voice</Button>
                   </CardContent>
                 </Card>
 
@@ -110,7 +110,7 @@ export default function LogWastePage() {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Manual Entry</h3>
                     <p className="text-gray-500 mb-6 text-sm">Type out the items you've wasted.</p>
-                     <Button className="w-full mt-auto bg-primary hover:bg-primary/90" onClick={() => setSelectedMethod('text')}>Use Text</Button>
+                     <Button className="w-full mt-auto bg-primary hover:bg-primary/90 h-11 text-base" onClick={() => setSelectedMethod('text')}>Use Text</Button>
                   </CardContent>
                 </Card>
             </div>
@@ -119,3 +119,5 @@ export default function LogWastePage() {
     </div>
   );
 }
+
+    

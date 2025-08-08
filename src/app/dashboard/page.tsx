@@ -193,67 +193,67 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] p-8">
+    <div className="min-h-screen bg-[#F7F7F7] p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8 p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
-            <h1 className="text-3xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
+        <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
+            <h1 className="text-3xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
             <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
         </div>
         
         {/* Key Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-pink-700">Total Items</p>
                   <p className="text-3xl font-semibold text-pink-900">{liveItems.length}</p>
                 </div>
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-6 h-6 text-pink-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                  <Package className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-700">Health Score</p>
                   <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
                 </div>
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
                   <p className="text-3xl font-semibold text-yellow-900">{expiringSoonItems.length}</p>
                 </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-yellow-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-700">This Week's Logs</p>
                   <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => isWithinInterval(new Date(log.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() })).length}</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -268,18 +268,18 @@ export default function DashboardPage() {
                     This Week's Impact
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+                <div className="space-y-1">
                     <p className="text-sm font-medium text-green-200">Virtual Savings</p>
                     <p className="text-3xl font-bold">{formatPeso(weeklySavingsStats.totalSavings)}</p>
                     <p className="text-xs text-white/80">From using items before expiry</p>
                 </div>
-                <div>
+                <div className="space-y-1">
                     <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
                     <p className="text-sm text-white/90">≈ {weeklyRiceKg.toFixed(1)} kg rice or ~{weeklyWaterSavedL.toFixed(0)} L water saved</p>
                     <p className="text-xs text-white/60">Story-based comparison</p>
                 </div>
-                <div>
+                <div className="space-y-1">
                      <p className="text-sm font-medium text-red-200">Food Waste Logged</p>
                     <p className="text-3xl font-bold">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
                     <p className="text-xs text-white/80">Track and reduce weekly losses</p>
@@ -341,13 +341,13 @@ export default function DashboardPage() {
                 <p className="text-sm text-white/80 mb-2">Fresh AI Insight</p>
                 <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
                 <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
-                  <p className="text-white/90 text-sm leading-relaxed">
+                  <p className="text-white/90 text-base leading-relaxed">
                     {latestInsight.smartTip}
                   </p>
                 </div>
                 <Button 
                   variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300"
+                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300 h-11"
                   onClick={() => router.push(`/insights/${latestInsight.id}`)}
                 >
                   View Full Analysis →
@@ -364,7 +364,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-[#7C7C7C] mb-2">Savings goal progress</p>
+              <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
               <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
               <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
                 <div className="space-y-3">
@@ -377,7 +377,7 @@ export default function DashboardPage() {
               </div>
               <Button 
                 variant="outline"
-                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
+                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
                 onClick={() => {router.push('/my-waste')}}
               >
                 View Your Trends →
@@ -445,7 +445,7 @@ export default function DashboardPage() {
               </div>
               <Button 
                 variant="outline" 
-                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300"
+                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
                 onClick={() => router.push('/pantry')}
               >
                 Go to Pantry →
@@ -456,3 +456,5 @@ export default function DashboardPage() {
       </div>
     </div>
   );
+
+    

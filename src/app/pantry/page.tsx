@@ -251,15 +251,10 @@ export default function PantryPage() {
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className='flex items-center gap-3'>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 My Pantry</h1>
-              <div>
-                <p className="text-gray-500 text-sm md:text-base hidden">Manage your inventory and discover new recipes</p>
-              </div>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 My Pantry</h1>
             <Button 
               onClick={() => router.push('/add-to-pantry')}
-              className="bg-primary hover:bg-primary/90 h-10 px-4 md:h-12 md:px-6 rounded-lg"
+              className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-base"
             >
               <Plus className="w-5 h-5 md:mr-2" />
               <span className='hidden md:inline'>Add Items</span>
@@ -269,41 +264,41 @@ export default function PantryPage() {
           {/* Statistics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
               <Card
-                  className="p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
                   onClick={() => setFilter('all')}
               >
-                  <div className="w-11 h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
-                      <Package className="w-6 h-6 text-blue-600" />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
+                      <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                   </div>
-                  <p className="text-3xl font-bold text-blue-800">{stats.total}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-blue-800">{stats.total}</p>
                   <p className="text-sm font-medium text-blue-600">Total Items</p>
               </Card>
               <Card
-                  className="p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
                   onClick={() => setFilter('fresh')}
               >
-                  <div className="w-11 h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
-                      <Leaf className="w-6 h-6 text-green-600" />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
+                      <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                   </div>
-                  <p className="text-3xl font-bold text-green-800">{stats.fresh}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-green-800">{stats.fresh}</p>
                   <p className="text-sm font-medium text-green-600">Fresh Items</p>
               </Card>
               <Card
-                  className="p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
+                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
                   onClick={() => setFilter('expiring')}
               >
-                  <div className="w-11 h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
-                      <Clock className="w-6 h-6 text-amber-600" />
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
+                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                   </div>
-                  <p className="text-3xl font-bold text-amber-800">{stats.expiring}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-amber-800">{stats.expiring}</p>
                   <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
               </Card>
-              <Card className="p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
-                  <div className="w-11 h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
-                      <TrendingUp className="w-6 h-6 text-teal-600" />
-                  </div>
-                  <p className="text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
-                  <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
+              <Card className="p-4 sm:p-5 rounded-2xl shadow-sm border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
+                    <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
+                </div>
+                <p className="text-2xl sm:text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
+                <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
               </Card>
           </div>
 
@@ -326,7 +321,7 @@ export default function PantryPage() {
                         size="sm"
                         onClick={() => setFilter(opt.value)}
                         className={cn(
-                            "rounded-full border-gray-300 transition-all duration-200 whitespace-nowrap",
+                            "rounded-full border-gray-300 transition-all duration-200 whitespace-nowrap h-9",
                             filter === opt.value 
                                 ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90" 
                                 : "bg-white hover:border-primary hover:text-primary"
@@ -347,7 +342,7 @@ export default function PantryPage() {
           </div>
 
           {!pantryInitialized ? (
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                     <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
                 ))}
@@ -356,19 +351,19 @@ export default function PantryPage() {
             <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">No items found</h3>
-                <p className="text-gray-500 mb-4">
+                <p className="text-gray-500 mb-4 px-4">
                   {liveItems.length === 0 
                     ? "Your pantry is empty. Let's add some groceries!"
                     : "Clear your search or filters to see all items."
                   }
                 </p>
-                <Button onClick={() => router.push('/add-to-pantry')}>
+                <Button onClick={() => router.push('/add-to-pantry')} className="h-11 text-base">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Groceries
                 </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
               {filteredItems.map((item) => (
                 <PantryItemCard
                   key={item.id}
@@ -394,6 +389,7 @@ export default function PantryPage() {
               disabled={isLoadingRecipes}
               variant="outline"
               size="sm"
+              className="h-9"
             >
               <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
               New Ideas
@@ -408,7 +404,7 @@ export default function PantryPage() {
             <Carousel opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-4">
                 {recipes.map((recipe) => (
-                  <CarouselItem key={recipe.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
+                  <CarouselItem key={recipe.id} className="sm:basis-1/2 lg:basis-1/3 pl-4">
                     <RecipeCard
                       recipe={recipe}
                       isSaved={savedRecipeIds.has(recipe.id)}
@@ -422,10 +418,10 @@ export default function PantryPage() {
             <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
                 <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-700 mb-2">No Recipes Found</h3>
-                <p className="text-gray-500 mb-4">
+                <p className="text-gray-500 mb-4 px-4">
                     We couldn't find any recipes. Try adding more items to your pantry or refreshing.
                 </p>
-                <Button onClick={() => fetchRecipes([])}>
+                <Button onClick={() => fetchRecipes([])} className="h-11 text-base">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Try Again
                 </Button>
@@ -449,3 +445,5 @@ export default function PantryPage() {
     </div>
   );
 }
+
+    
