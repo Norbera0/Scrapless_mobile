@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash, Clock, ChevronLeft, ChevronRight, MessageCircleQuestion, Plus, ShoppingCart, Utensils, Droplets, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, Droplets, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -33,7 +34,7 @@ const getCategory = (itemName: string): string => {
 };
 
 const reasonIconMap: { [key: string]: React.ElementType } = {
-  "Got spoiled/rotten": Bug,
+  "Got spoiled/rotten": Droplets,
   "Past expiry date": CalendarClock,
   "Forgot about it": Brain,
   "Cooked too much": Soup,
@@ -75,7 +76,7 @@ const WasteReasonIndicator = ({ reason }: { reason: string }) => {
         'Past expiry date': { icon: Clock, color: 'bg-red-500', tooltip: 'Expired' },
         'Forgot about it': { icon: Brain, color: 'bg-yellow-500', tooltip: 'Forgot' },
         'Cooked too much': { icon: Plus, color: 'bg-blue-500', tooltip: 'Excess' },
-        'Got spoiled/rotten': { icon: Bug, color: 'bg-green-600', tooltip: 'Spoiled' },
+        'Got spoiled/rotten': { icon: Droplets, color: 'bg-green-600', tooltip: 'Spoiled' },
         'Bought too much': { icon: ShoppingCart, color: 'bg-purple-500', tooltip: 'Bought too much'},
     };
 
@@ -125,7 +126,14 @@ const WasteEntryCard = ({ entry }: { entry: WasteLog }) => {
     const ReasonIcon = reasonIconMap[entry.sessionWasteReason || ''] || Lightbulb;
     
     return (
-        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-3 transition-all hover:shadow-md hover:border-green-500 group">
+        <motion.div 
+            className="bg-white border border-gray-200 rounded-xl p-4 mb-3 transition-all hover:shadow-md hover:border-green-500 group"
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+        >
             <div className="flex items-start gap-3">
                 <WasteIcon entry={entry} />
                 <div className="flex-1">
@@ -140,17 +148,26 @@ const WasteEntryCard = ({ entry }: { entry: WasteLog }) => {
                     <p className="text-xs text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full mt-1">{entry.totalCarbonFootprint.toFixed(2)}kg CO₂e</p>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
 const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
     const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
     const [dateRange, setDateRange] = useState<Date[]>([]);
-    
+    const containerRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         const today = startOfDay(new Date());
-        const range = Array.from({ length: 7 }, (_, i) => startOfDay(subDays(today, 3 - i)));
+        let numDays = 7;
+        if (containerRef.current) {
+            const containerWidth = containerRef.current.offsetWidth;
+            const buttonWidth = 92; // Approx width of a date button including gap
+            numDays = Math.max(1, Math.floor(containerWidth / buttonWidth));
+        }
+
+        const half = Math.floor(numDays / 2);
+        const range = Array.from({ length: numDays }, (_, i) => startOfDay(subDays(today, half - i)));
         setDateRange(range);
     }, []);
 
@@ -178,60 +195,77 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
             </CardHeader>
             <CardContent>
                 <div className="flex items-center gap-2 mb-4">
-                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(-7)}>
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(-dateRange.length)}>
                         <ChevronLeft className="h-5 w-5" />
                     </Button>
-                    <div className="flex-1 overflow-x-auto scrollbar-hide">
+                    <div className="flex-1 overflow-x-auto scrollbar-hide" ref={containerRef}>
                         <div className="flex gap-2 pb-1">
                             {dateRange.map(date => (
-                                <button
+                                <motion.button
                                     key={date.toISOString()}
                                     className={cn(
                                         "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-colors border",
                                         isSameDay(date, selectedDate)
-                                            ? 'bg-primary text-white border-primary'
+                                            ? 'bg-primary text-white border-primary shadow-md'
                                             : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
                                     )}
                                     onClick={() => setSelectedDate(date)}
+                                    whileTap={{ scale: 0.95 }}
                                 >
                                     <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
                                     <p className={cn("text-xl font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
                     </div>
-                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(7)}>
+                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(dateRange.length)}>
                         <ChevronRight className="h-5 w-5" />
                     </Button>
                 </div>
 
-                <div className="mt-4">
-                    {!hasWasteForSelectedDate ? (
-                        <div className="text-center py-10 bg-gray-50 rounded-lg">
-                            <p className="text-gray-500">No waste logged for this day.</p>
-                        </div>
-                    ) : (
-                        <>
-                            {organizedWaste.morning.length > 0 && (
-                                <div className="mb-6">
-                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Morning</h3>
-                                    {organizedWaste.morning.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                <div className="mt-4 min-h-[150px]">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={selectedDate.toISOString()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {!hasWasteForSelectedDate ? (
+                                <div className="text-center py-10 bg-gray-50 rounded-lg">
+                                    <p className="text-gray-500">No waste logged for this day.</p>
                                 </div>
+                            ) : (
+                                <>
+                                    {organizedWaste.morning.length > 0 && (
+                                        <div className="mb-6">
+                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Morning</h3>
+                                            <AnimatePresence>
+                                                {organizedWaste.morning.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
+                                    {organizedWaste.afternoon.length > 0 && (
+                                        <div className="mb-6">
+                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Afternoon</h3>
+                                             <AnimatePresence>
+                                                {organizedWaste.afternoon.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
+                                    {organizedWaste.evening.length > 0 && (
+                                        <div className="mb-6">
+                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Evening</h3>
+                                             <AnimatePresence>
+                                                {organizedWaste.evening.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                            </AnimatePresence>
+                                        </div>
+                                    )}
+                                </>
                             )}
-                             {organizedWaste.afternoon.length > 0 && (
-                                <div className="mb-6">
-                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Afternoon</h3>
-                                    {organizedWaste.afternoon.map(log => <WasteEntryCard key={log.id} entry={log} />)}
-                                </div>
-                            )}
-                             {organizedWaste.evening.length > 0 && (
-                                <div className="mb-6">
-                                    <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Evening</h3>
-                                    {organizedWaste.evening.map(log => <WasteEntryCard key={log.id} entry={log} />)}
-                                </div>
-                            )}
-                        </>
-                    )}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </CardContent>
         </Card>
@@ -514,4 +548,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
