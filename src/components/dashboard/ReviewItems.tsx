@@ -142,7 +142,7 @@ export function ReviewItems() {
       });
       
       setTimeout(() => {
-        safelyResetThenNavigate(reset, router, "/dashboard");
+        safelyResetThenNavigate(reset, router, "/my-waste");
       }, 2500);
       
     } catch (error) {
