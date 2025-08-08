@@ -220,7 +220,7 @@ export default function MyWastePage() {
             </Card>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="flex flex-col min-h-[400px]">
+                <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart2 className="h-5 w-5" />
@@ -243,7 +243,7 @@ export default function MyWastePage() {
                                       verticalAlign={isMobile ? 'bottom' : 'middle'}
                                       align={isMobile ? 'center' : 'right'}
                                       iconSize={10}
-                                      wrapperStyle={isMobile ? { fontSize: '12px' } : { paddingLeft: '20px', fontSize: '14px', overflowY: 'auto', maxHeight: 200 }}
+                                      wrapperStyle={isMobile ? { fontSize: '12px' } : { paddingLeft: '20px', fontSize: '14px' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -251,7 +251,7 @@ export default function MyWastePage() {
                     </CardContent>
                 </Card>
 
-                  <Card className="flex flex-col min-h-[400px]">
+                  <Card className="flex flex-col">
                       <CardHeader>
                           <CardTitle>Why Food Gets Wasted</CardTitle>
                           <CardDescription>Root cause breakdown</CardDescription>
@@ -350,5 +350,3 @@ export default function MyWastePage() {
       )}
     </div>
   );
-
-    
