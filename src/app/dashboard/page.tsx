@@ -245,20 +245,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Pantry Health Score</p>
-                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
@@ -268,6 +254,20 @@ export default function DashboardPage() {
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-green-700">Pantry Health Score</p>
+                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
+                </div>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -509,5 +509,7 @@ export default function DashboardPage() {
     
 
 
+
+    
 
     
