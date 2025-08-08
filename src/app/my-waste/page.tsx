@@ -7,7 +7,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, Droplets, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -34,7 +34,7 @@ const getCategory = (itemName: string): string => {
 };
 
 const reasonIconMap: { [key: string]: React.ElementType } = {
-  "Got spoiled/rotten": Droplets,
+  "Got spoiled/rotten": ThumbsDown,
   "Past expiry date": CalendarClock,
   "Forgot about it": Brain,
   "Cooked too much": Soup,
@@ -76,7 +76,7 @@ const WasteReasonIndicator = ({ reason }: { reason: string }) => {
         'Past expiry date': { icon: Clock, color: 'bg-red-500', tooltip: 'Expired' },
         'Forgot about it': { icon: Brain, color: 'bg-yellow-500', tooltip: 'Forgot' },
         'Cooked too much': { icon: Plus, color: 'bg-blue-500', tooltip: 'Excess' },
-        'Got spoiled/rotten': { icon: Droplets, color: 'bg-green-600', tooltip: 'Spoiled' },
+        'Got spoiled/rotten': { icon: ThumbsDown, color: 'bg-green-600', tooltip: 'Spoiled' },
         'Bought too much': { icon: ShoppingCart, color: 'bg-purple-500', tooltip: 'Bought too much'},
     };
 
@@ -204,7 +204,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                                 <motion.button
                                     key={date.toISOString()}
                                     className={cn(
-                                        "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-colors border",
+                                        "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-all border",
                                         isSameDay(date, selectedDate)
                                             ? 'bg-primary text-white border-primary shadow-md'
                                             : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
