@@ -76,6 +76,7 @@ const WasteReasonIndicator = ({ reason }: { reason: string }) => {
         'Forgot about it': { icon: Brain, color: 'bg-yellow-500', tooltip: 'Forgot' },
         'Cooked too much': { icon: Plus, color: 'bg-blue-500', tooltip: 'Excess' },
         'Got spoiled/rotten': { icon: Bug, color: 'bg-green-600', tooltip: 'Spoiled' },
+        'Bought too much': { icon: ShoppingCart, color: 'bg-purple-500', tooltip: 'Bought too much'},
     };
 
     const indicator = Object.keys(indicatorMap).find(key => reason.toLowerCase().includes(key.toLowerCase()));
@@ -414,7 +415,7 @@ export default function MyWastePage() {
               </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
