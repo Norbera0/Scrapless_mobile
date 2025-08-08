@@ -10,7 +10,6 @@ import { analyzeConsumptionPatterns } from '@/ai/flows/analyze-consumption-patte
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 
-const twentyFourHours = 24 * 60 * 60 * 1000;
 const oneHour = 60 * 60 * 1000;
 
 const fetchAndSaveNewInsight = async (user: User, wasteLogs: WasteLog[], pantryItems: PantryItem[]) => {
@@ -68,15 +67,12 @@ export function useAuth() {
 
   useEffect(() => {
     if (user && logsInitialized && pantryInitialized) {
-      const lastInsightCheck = localStorage.getItem(`lastInsightCheck_${user.uid}`);
-      const now = new Date().getTime();
-
-      if (!lastInsightCheck || now - parseInt(lastInsightCheck, 10) > twentyFourHours) {
-        console.log("Checking for new insights...");
-        fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
-        localStorage.setItem(`lastInsightCheck_${user.uid}`, now.toString());
-      }
+      // Always check for insights when data changes.
+      // The backend can decide if an insight is recent enough.
+      fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
       
+      // Hourly check for expired items
+      const now = new Date().getTime();
       const lastExpiredCheck = localStorage.getItem(`lastExpiredCheck_${user.uid}`);
       if (!lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour) {
          console.log("Checking for expired items...");
