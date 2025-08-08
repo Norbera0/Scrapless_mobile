@@ -199,11 +199,11 @@ export default function PantryPage() {
 
 
   useEffect(() => {
-    // Fetch recipes only on initial load if the recipe store is empty
-    if (pantryInitialized && recipes.length === 0) {
+    // Fetch recipes only on initial load if the recipe store is empty and pantry is not
+    if (pantryInitialized && recipes.length === 0 && liveItems.length > 0) {
       fetchRecipes([]);
     }
-  }, [pantryInitialized, recipes.length, fetchRecipes]);
+  }, [pantryInitialized, liveItems.length]);
 
   useEffect(() => {
     const loadSaved = async () => {
@@ -261,7 +261,7 @@ export default function PantryPage() {
             </Button>
           </div>
           
-          {/* Statistics Cards */}
+           {/* Statistics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
               <Card
                   className="p-4 sm:p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
@@ -301,7 +301,7 @@ export default function PantryPage() {
                 <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
               </Card>
           </div>
-
+          
           {/* Search and Filter Bar */}
           <div className="space-y-4">
             <div className="relative">
@@ -395,7 +395,7 @@ export default function PantryPage() {
               New Ideas
             </Button>
           </div>
-          {isLoadingRecipes ? (
+          {isLoadingRecipes && recipes.length === 0 ? (
              <div className="text-center py-10">
                 <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
                 <p className="mt-2 text-gray-500">Finding delicious recipes...</p>
@@ -445,5 +445,3 @@ export default function PantryPage() {
     </div>
   );
 }
-
-    
