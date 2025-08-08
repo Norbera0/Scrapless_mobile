@@ -56,48 +56,54 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
     const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
     const notificationsToShow = isExpanded ? notifications : notifications.slice(0, 3);
 
+    const renderNotifications = (notificationsToRender: Notification[]) => {
+        const groupedToRender = notificationsToRender.reduce((acc, notif) => {
+            const category = notif.category;
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(notif);
+            return acc;
+        }, {} as Record<Notification['category'], Notification[]>);
+
+        return orderedCategories.map(category => {
+            const categoryNotifications = groupedToRender[category];
+            if (!categoryNotifications || categoryNotifications.length === 0) return null;
+
+            return (
+                <div key={category} className="p-4 border-b last:border-none">
+                    <h4 className="text-sm font-semibold mb-2">{categoryConfig[category].title}</h4>
+                    <div className="space-y-3">
+                    {categoryNotifications.map(notif => {
+                        const Icon = categoryConfig[notif.category].icon;
+                        return (
+                            <div key={notif.id} className={cn("flex items-start gap-3 p-3 rounded-lg border", categoryConfig[notif.category].color)}>
+                                <Icon className="h-5 w-5 mt-1 flex-shrink-0" />
+                                <div className="flex-1">
+                                    <p className="font-semibold text-sm">{notif.title}</p>
+                                    <p className="text-xs">{notif.message}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {formatDistanceToNow(new Date(notif.date), { addSuffix: true })}
+                                    </p>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    </div>
+                </div>
+            )
+        })
+    }
+
     return (
         <div className="flex flex-col h-full">
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className={cn("flex-1", isExpanded ? "h-[400px]" : "h-auto")}>
+            <ScrollArea className="h-80">
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
-                        orderedCategories.map(category => {
-                            const categoryNotifications = groupedNotifications[category];
-                            if (!categoryNotifications || categoryNotifications.length === 0) return null;
-
-                            let notificationsToDisplay = categoryNotifications;
-                            if (!isExpanded) {
-                                const visibleIds = new Set(notificationsToShow.map(n => n.id));
-                                notificationsToDisplay = categoryNotifications.filter(n => visibleIds.has(n.id));
-                            }
-                            if (notificationsToDisplay.length === 0) return null;
-
-                            return (
-                                <div key={category} className="p-4 border-b last:border-none">
-                                    <h4 className="text-sm font-semibold mb-2">{categoryConfig[category].title}</h4>
-                                    <div className="space-y-3">
-                                    {notificationsToDisplay.map(notif => {
-                                        const Icon = categoryConfig[notif.category].icon;
-                                        return (
-                                            <div key={notif.id} className={cn("flex items-start gap-3 p-3 rounded-lg border", categoryConfig[notif.category].color)}>
-                                                <Icon className="h-5 w-5 mt-1 flex-shrink-0" />
-                                                <div className="flex-1">
-                                                    <p className="font-semibold text-sm">{notif.title}</p>
-                                                    <p className="text-xs">{notif.message}</p>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {formatDistanceToNow(new Date(notif.date), { addSuffix: true })}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                                    </div>
-                                </div>
-                            )
-                        })
+                        renderNotifications(notificationsToShow)
                     ) : (
                         <div className="text-center p-10 text-muted-foreground">
                             <BellOff className="mx-auto h-10 w-10 mb-4" />
@@ -107,7 +113,7 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
                     )}
                 </CardContent>
             </ScrollArea>
-             {notifications.length > 3 && !isExpanded && (
+            {notifications.length > 3 && !isExpanded && (
                 <CardFooter className="p-2 border-t">
                     <Button variant="ghost" className="w-full" onClick={() => setIsExpanded(true)}>View All</Button>
                 </CardFooter>
