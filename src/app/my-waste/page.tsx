@@ -15,6 +15,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -48,6 +49,7 @@ export default function MyWastePage() {
   const { insights, insightsInitialized } = useInsightStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
+  const isMobile = useIsMobile();
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
@@ -86,10 +88,17 @@ export default function MyWastePage() {
   }, [logs, timeframe]);
   
   const tickFormatter = (value: string, index: number) => {
-    if (chartData.length <= 7) return value; // For 7d view, show all dates
+    const dataLength = chartData.length;
+    if (dataLength <= 7) return value;
+    if (isMobile && dataLength > 14) {
+       if (index === 0 || index === dataLength - 1 || index % 7 === 0) {
+           return value;
+       }
+       return "";
+    }
     const date = parseISO(chartData[index].fullDate.toISOString());
     // Show full date for first, last, and roughly weekly intervals
-    if (index === 0 || index === chartData.length - 1 || (index + 1) % Math.floor(chartData.length / 4) === 0) {
+    if (index === 0 || index === dataLength - 1 || (index + 1) % Math.floor(dataLength / 4) === 0) {
         return format(date, 'MMM d');
     }
     return ""; // Hide other labels to prevent crowding
@@ -139,14 +148,14 @@ export default function MyWastePage() {
     <div className="flex flex-col gap-6 p-4 md:p-6">
        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">My Waste Impact</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Waste Impact</h1>
+                <p className="text-muted-foreground text-sm md:text-base">
                     Track patterns, reduce waste, save money & the planet.
                 </p>
             </div>
-            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90">
-                <Trash className="w-5 h-5 md:mr-2" />
-                <span className='hidden md:inline'>Log Waste</span>
+            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base w-full md:w-auto">
+                <Trash className="w-5 h-5 mr-2" />
+                <span>Log Waste</span>
             </Button>
         </div>
 
@@ -224,7 +233,7 @@ export default function MyWastePage() {
                             <ResponsiveContainer width="100%" height={250}>
                                 <PieChart>
                                     <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-                                    <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label={false} labelLine={false}>
+                                    <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={isMobile ? 60 : 80} fill="#8884d8" label={false} labelLine={false}>
                                         {categoryData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                         ))}
@@ -234,7 +243,7 @@ export default function MyWastePage() {
                                       verticalAlign="middle"
                                       align="right"
                                       iconSize={10}
-                                      wrapperStyle={{ paddingLeft: '20px', fontSize: '14px' }}
+                                      wrapperStyle={{ paddingLeft: '20px', fontSize: isMobile ? '12px' : '14px', overflowY: 'auto', maxHeight: 200 }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -317,7 +326,7 @@ export default function MyWastePage() {
                                   <span>{log.items[0]?.name.charAt(0) || '📝'}</span>
                               </div>
                           )}
-                          <div className="flex-1">
+                          <div className="flex-1 overflow-hidden">
                               <p className="font-semibold truncate">{log.items.map(i => i.name).join(', ')}</p>
                               <p className="text-sm text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a')} • {log.sessionWasteReason}</p>
                           </div>
