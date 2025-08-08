@@ -509,7 +509,10 @@ export default function MyWastePage() {
 
                   <Card className="flex flex-col min-h-[400px]">
                       <CardHeader>
-                          <CardTitle>Why Food Gets Wasted</CardTitle>
+                          <CardTitle className="flex items-center gap-2">
+                            <Brain className="h-5 w-5" />
+                            Why Food Gets Wasted
+                          </CardTitle>
                           <CardDescription>Root cause breakdown</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-2 flex-1">
