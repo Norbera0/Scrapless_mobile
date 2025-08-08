@@ -156,19 +156,34 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
     const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
     const [dateRange, setDateRange] = useState<Date[]>([]);
     const containerRef = useRef<HTMLDivElement>(null);
+    const today = startOfDay(new Date());
 
     useEffect(() => {
-        const today = startOfDay(new Date());
-        let numDays = 7;
-        if (containerRef.current) {
-            const containerWidth = containerRef.current.offsetWidth;
-            const buttonWidth = 92; // Approx width of a date button including gap
-            numDays = Math.max(1, Math.floor(containerWidth / buttonWidth));
-        }
+        const calculateVisibleDays = () => {
+            let numDays = 7;
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.offsetWidth;
+                const buttonWidth = 92; // Approx width of a date button including gap
+                numDays = Math.max(1, Math.floor(containerWidth / buttonWidth));
+            }
+            return numDays;
+        };
 
-        const half = Math.floor(numDays / 2);
-        const range = Array.from({ length: numDays }, (_, i) => startOfDay(subDays(today, half - i)));
+        const numDays = calculateVisibleDays();
+        const initialEndDate = selectedDate > today ? today : selectedDate;
+        const range = Array.from({ length: numDays }, (_, i) => startOfDay(subDays(initialEndDate, i))).reverse();
         setDateRange(range);
+
+        const handleResize = () => {
+            const newNumDays = calculateVisibleDays();
+            const currentEndDate = dateRange[dateRange.length - 1] || today;
+            const newRange = Array.from({ length: newNumDays }, (_, i) => startOfDay(subDays(currentEndDate, i))).reverse();
+            setDateRange(newRange);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+        
     }, []);
 
     const organizedWaste = useMemo(() => {
@@ -181,12 +196,23 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
             return acc;
         }, { morning: [] as WasteLog[], afternoon: [] as WasteLog[], evening: [] as WasteLog[] });
     }, [logs, selectedDate]);
-
+    
     const handleDateChange = (offset: number) => {
-        setDateRange(prevRange => prevRange.map(d => addDays(d, offset)));
+        if (dateRange.length === 0) return;
+        const currentEndDate = dateRange[dateRange.length - 1];
+        let newEndDate = addDays(currentEndDate, offset);
+
+        if (isAfter(newEndDate, today)) {
+            newEndDate = today;
+        }
+
+        const newRange = Array.from({ length: dateRange.length }, (_, i) => startOfDay(subDays(newEndDate, i))).reverse();
+        setDateRange(newRange);
     };
 
     const hasWasteForSelectedDate = Object.values(organizedWaste).some(arr => arr.length > 0);
+
+    const isFutureDate = (date: Date) => isAfter(date, today);
 
     return (
         <Card>
@@ -218,7 +244,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                             ))}
                         </div>
                     </div>
-                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(dateRange.length)}>
+                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(dateRange.length)} disabled={dateRange.length > 0 && isSameDay(dateRange[dateRange.length-1], today)}>
                         <ChevronRight className="h-5 w-5" />
                     </Button>
                 </div>
