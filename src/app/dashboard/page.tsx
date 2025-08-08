@@ -29,7 +29,8 @@ import {
   ChevronDown,
   ChevronUp,
   Edit,
-  ShoppingBasket
+  ShoppingBasket,
+  Lightbulb
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -271,7 +272,7 @@ export default function DashboardPage() {
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-green-200">Virtual Savings</p>
-                    <p className="text-3xl font-bold">{formatPeso(weeklySavingsStats.totalSavings)}</p>
+                    <p className="text-3xl font-bold text-white">{formatPeso(weeklySavingsStats.totalSavings)}</p>
                     <p className="text-xs text-white/80">From using items before expiry</p>
                 </div>
                 <div className="space-y-1">
@@ -281,7 +282,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="space-y-1">
                      <p className="text-sm font-medium text-red-200">Food Waste Logged</p>
-                    <p className="text-3xl font-bold">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
+                    <p className="text-3xl font-bold text-white">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
                     <p className="text-xs text-white/80">Track and reduce weekly losses</p>
                 </div>
             </CardContent>
@@ -330,31 +331,39 @@ export default function DashboardPage() {
         {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* AI Insights Card */}
-          {latestInsight && (
-            <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                   ✨ {latestInsight.keyObservation || 'Fresh AI Insight'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-white/80 mb-2">Fresh AI Insight</p>
-                <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
-                <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
-                  <p className="text-white/90 text-base leading-relaxed">
-                    {latestInsight.smartTip}
-                  </p>
+          <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                 ✨ {latestInsight ? latestInsight.keyObservation : 'Fresh AI Insight'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {latestInsight ? (
+                <>
+                  <p className="text-sm text-white/80 mb-2">Fresh AI Insight</p>
+                  <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
+                  <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
+                    <p className="text-white/90 text-base leading-relaxed">
+                      {latestInsight.smartTip}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300 h-11"
+                    onClick={() => router.push(`/insights/${latestInsight.id}`)}
+                  >
+                    View Full Analysis →
+                  </Button>
+                </>
+              ) : (
+                <div className="text-center text-white/70 py-6">
+                  <Lightbulb className="w-10 h-10 mx-auto mb-3" />
+                  <p className="font-semibold">No insights generated yet</p>
+                  <p className="text-sm text-white/60">Keep logging your waste and pantry items to see AI-powered tips!</p>
                 </div>
-                <Button 
-                  variant="outline"
-                  className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300 h-11"
-                  onClick={() => router.push(`/insights/${latestInsight.id}`)}
-                >
-                  View Full Analysis →
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
 
           {/* Progress Card */}
           <Card className="shadow-sm">
@@ -387,8 +396,7 @@ export default function DashboardPage() {
         </div>
         
         {/* Pantry Watchlist with suggested next actions */}
-        {expiringSoonItems.length > 0 && (
-          <Card className="shadow-sm bg-white mb-8">
+        <Card className="shadow-sm bg-white mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <AlertTriangle className="w-6 h-6 text-primary" />
@@ -396,63 +404,72 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-                {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
-                  <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                    <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
-                    <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
-                      {latestInsight.solutions.slice(0,2).map((s, idx) => (
-                        <li key={idx}>{s.solution}</li>
-                      ))}
-                    </ul>
+              {expiringSoonItems.length > 0 ? (
+                <>
+                  {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
+                    <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                      <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
+                      <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
+                        {latestInsight.solutions.slice(0,2).map((s, idx) => (
+                          <li key={idx}>{s.solution}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>
+                            <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
+                              Item {getSortIcon('name')}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right">
+                            <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
+                              Expires In {getSortIcon('daysUntilExpiration')}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {sortedWatchlistItems.map((item) => (
+                          <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
+                            <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {getStatusIndicator(item.daysUntilExpiration)}
+                                <span className="font-semibold">{item.daysUntilExpiration} days</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                               <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
+                                <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                )}
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>
-                        <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
-                          Item {getSortIcon('name')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-right">
-                        <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
-                          Expires In {getSortIcon('daysUntilExpiration')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedWatchlistItems.map((item) => (
-                      <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
-                        <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {getStatusIndicator(item.daysUntilExpiration)}
-                            <span className="font-semibold">{item.daysUntilExpiration} days</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                           <Button variant="ghost" size="sm" onClick={() => router.push('/pantry')}>
-                            <CheckCircle className="w-4 h-4 mr-2" /> Mark Used
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-                onClick={() => router.push('/pantry')}
-              >
-                Go to Pantry →
-              </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
+                    onClick={() => router.push('/pantry')}
+                  >
+                    Go to Pantry →
+                  </Button>
+                </>
+              ) : (
+                <div className="text-center text-muted-foreground py-10">
+                  <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
+                  <p className="font-semibold">Your pantry is looking fresh!</p>
+                  <p className="text-sm">Nothing is expiring in the next few days. Great job!</p>
+                </div>
+              )}
             </CardContent>
           </Card>
-        )}
       </div>
     </div>
   );
