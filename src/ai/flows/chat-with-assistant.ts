@@ -136,25 +136,28 @@ const chatWithAssistantFlow = ai.defineFlow(
         return { response: "I couldn't hear you clearly. Could you please try again?" };
     }
     
-    // Construct the input for the main chat prompt, but conditionally add context
+    // Base input for the chat prompt
     const chatPromptInput: ChatWithAssistantInput = {
-      ...input,
-      query: userQuery,
+        userName: input.userName,
+        history: input.history,
+        query: userQuery,
+        preferences: input.preferences
     };
     
     try {
         // First, check if full context is needed
         const { output: summary } = await summarizationPrompt({ query: userQuery, history: input.history });
 
-        if (!summary?.requiresPantry) {
-            delete chatPromptInput.pantryItems;
+        // Conditionally add context based on the summary
+        if (summary?.requiresPantry) {
+            chatPromptInput.pantryItems = input.pantryItems;
         }
-        if (!summary?.requiresWaste) {
-            delete chatPromptInput.wasteLogs;
-            delete chatPromptInput.totalPesoValueWasted;
-            delete chatPromptInput.totalCarbonFootprintWasted;
-            delete chatPromptInput.topWastedItem;
-            delete chatPromptInput.mostCommonWasteReason;
+        if (summary?.requiresWaste) {
+            chatPromptInput.wasteLogs = input.wasteLogs;
+            chatPromptInput.totalPesoValueWasted = input.totalPesoValueWasted;
+            chatPromptInput.totalCarbonFootprintWasted = input.totalCarbonFootprintWasted;
+            chatPromptInput.topWastedItem = input.topWastedItem;
+            chatPromptInput.mostCommonWasteReason = input.mostCommonWasteReason;
         }
 
         const { output } = await mainPrompt(chatPromptInput);
