@@ -222,7 +222,7 @@ export default function DashboardPage() {
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-700">Health Score</p>
+                  <p className="text-sm font-medium text-green-700">Pantry Health Score</p>
                   <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
@@ -475,3 +475,4 @@ export default function DashboardPage() {
   );
 
     
+
