@@ -73,24 +73,8 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
     outputSchema: AnalyzeConsumptionPatternsOutputSchema,
   },
   async (input) => {
-    // If there's no data, return a default message
-    if (input.wasteLogs.length === 0 && input.pantryItems.length === 0) {
-      const defaultMessage = "Welcome to Scrapless! Start logging your pantry and waste to get personalized insights.";
-      return {
-        keyObservation: defaultMessage,
-        patternAlert: "The more you log, the smarter your insights will be.",
-        smartTip: "Try logging your first item today to see how it works!",
-        smartShoppingPlan: "Unlock smart shopping tips by logging your groceries.",
-        whatsReallyHappening: "Once you start logging, I can show you exactly what's happening in your kitchen.",
-        whyThisPatternExists: "I'm ready to find the 'why' behind your food waste patterns.",
-        financialImpact: "Unlock insights into how much money you can save.",
-        solutions: [
-            { solution: "Log your first grocery trip.", successRate: 0.9 },
-            { solution: "Log any food you throw away this week.", successRate: 0.9 }
-        ],
-        similarUserStory: "Users who log consistently for two weeks are often surprised by what they discover!",
-      };
-    }
+    // If there's no data, return a default message - THIS LOGIC IS FLAWED AND PREVENTS INSIGHTS
+    // We will let the AI handle the empty state directly based on the prompt.
 
     const { output } = await prompt(input);
     
