@@ -145,7 +145,8 @@ export default function PantryPage() {
     try {
       const result = await getItemInsights({
         name: item.name,
-        estimatedAmount: item.estimatedAmount,
+        quantity: item.quantity,
+        unit: item.unit,
         estimatedExpirationDate: item.estimatedExpirationDate,
         estimatedCost: item.estimatedCost,
       });
@@ -293,7 +294,7 @@ export default function PantryPage() {
                   <p className="text-2xl sm:text-3xl font-bold text-amber-800">{stats.expiring}</p>
                   <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
               </Card>
-              <Card className="p-4 sm:p-5 rounded-2xl shadow-sm border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
+              <Card className="p-4 sm:p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
                 <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
                     <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
                 </div>

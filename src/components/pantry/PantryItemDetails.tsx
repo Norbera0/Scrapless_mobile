@@ -142,7 +142,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
             archiveItem(item.id, 'wasted');
             updatePantryItemStatus(user.uid, item.id, 'wasted').catch(console.error);
             
-            toast({ title: `Item marked as wasted`, description: `"${item.name}" has been moved to your waste log.`});
+            toast({ title: `Item marked as wasted`, description: `"${item.name}" has been moved to your waste history.`});
             onClose();
         } catch (error) {
             console.error(`Failed to mark item as wasted`, error);

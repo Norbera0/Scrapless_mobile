@@ -179,7 +179,8 @@ export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumption
 // Item-specific Insights Schemas
 export const GetItemInsightsInputSchema = z.object({
     name: z.string().describe('The name of the food item.'),
-    estimatedAmount: z.string().describe('The estimated amount of the food item.'),
+    quantity: z.number().describe('The quantity of the food item.'),
+    unit: z.string().describe('The unit for the quantity.'),
     estimatedExpirationDate: z.string().describe("The estimated expiration date in 'YYYY-MM-DD' format."),
     estimatedCost: z.number().optional().describe("The estimated cost of the item in PHP."),
   });
