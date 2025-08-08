@@ -1,11 +1,11 @@
 
 'use client';
 
+import { useState } from 'react';
 import type { Notification } from '@/types';
-import { CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Lightbulb, CheckCircle, BellRing, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -42,7 +42,8 @@ const categoryConfig = {
 };
 
 export function NotificationPanel({ notifications }: NotificationPanelProps) {
-    
+    const [isExpanded, setIsExpanded] = useState(false);
+
     const groupedNotifications = notifications.reduce((acc, notif) => {
         const category = notif.category;
         if (!acc[category]) {
@@ -53,13 +54,14 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
     }, {} as Record<Notification['category'], Notification[]>);
 
     const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
+    const visibleNotifications = isExpanded ? notifications : notifications.slice(0, 3);
 
     return (
         <div className="flex flex-col h-full">
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className="flex-1 h-[400px]">
+            <ScrollArea className={cn("flex-1", isExpanded ? "h-[450px]" : "h-auto")}>
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
                         orderedCategories.map(category => 
@@ -95,6 +97,11 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
                     )}
                 </CardContent>
             </ScrollArea>
+             {notifications.length > 3 && !isExpanded && (
+                <CardFooter className="p-2 border-t">
+                    <Button variant="ghost" className="w-full" onClick={() => setIsExpanded(true)}>View All</Button>
+                </CardFooter>
+            )}
         </div>
     );
 }
