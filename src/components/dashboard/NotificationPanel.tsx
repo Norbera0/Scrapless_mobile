@@ -44,17 +44,8 @@ const categoryConfig = {
 export function NotificationPanel({ notifications }: NotificationPanelProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const groupedNotifications = notifications.reduce((acc, notif) => {
-        const category = notif.category;
-        if (!acc[category]) {
-            acc[category] = [];
-        }
-        acc[category].push(notif);
-        return acc;
-    }, {} as Record<Notification['category'], Notification[]>);
-
-    const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
     const notificationsToShow = isExpanded ? notifications : notifications.slice(0, 3);
+    const hasMoreNotifications = notifications.length > 3;
 
     const renderNotifications = (notificationsToRender: Notification[]) => {
         const groupedToRender = notificationsToRender.reduce((acc, notif) => {
@@ -65,6 +56,8 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
             acc[category].push(notif);
             return acc;
         }, {} as Record<Notification['category'], Notification[]>);
+
+        const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
 
         return orderedCategories.map(category => {
             const categoryNotifications = groupedToRender[category];
@@ -100,7 +93,7 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className="h-80">
+            <ScrollArea className="h-96">
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
                         renderNotifications(notificationsToShow)
@@ -113,7 +106,7 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
                     )}
                 </CardContent>
             </ScrollArea>
-            {notifications.length > 3 && !isExpanded && (
+            {hasMoreNotifications && !isExpanded && (
                 <CardFooter className="p-2 border-t">
                     <Button variant="ghost" className="w-full" onClick={() => setIsExpanded(true)}>View All</Button>
                 </CardFooter>
