@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -46,7 +47,8 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 
 // --- Comprehensive Food Icon System ---
 const foodIconConfig: { [key: string]: { emoji: string; keywords: string[]; color: string; } } = {
-  vegetables: { emoji: '🥬', keywords: ['kangkong', 'spinach', 'lettuce', 'cabbage', 'bok choy', 'pechay', 'tomatoes', 'tomato', 'onion', 'sibuyas', 'carrots', 'karot', 'potatoes', 'patatas', 'sweet potato', 'kamote', 'bell pepper', 'chili', 'sili', 'eggplant', 'talong', 'cucumber', 'pipino', 'corn', 'mais', 'mushrooms', 'garlic', 'bawang', 'ginger', 'luya', 'gulay'], color: 'bg-green-100 text-green-800' },
+  vegetables: { emoji: '🥬', keywords: ['kangkong', 'spinach', 'lettuce', 'cabbage', 'bok choy', 'pechay', 'tomatoes', 'tomato', 'onion', 'sibuyas', 'carrots', 'karot', 'potatoes', 'patatas', 'sweet potato', 'kamote', 'bell pepper', 'chili', 'sili', 'cucumber', 'pipino', 'corn', 'mais', 'mushrooms', 'garlic', 'bawang', 'ginger', 'luya', 'gulay'], color: 'bg-green-100 text-green-800' },
+  eggplant: { emoji: '🍆', keywords: ['eggplant', 'talong'], color: 'bg-purple-100 text-purple-800' },
   fruits: { emoji: '🍎', keywords: ['apple', 'mansanas', 'banana', 'saging', 'orange', 'dalandan', 'mango', 'mangga', 'grapes', 'ubas', 'strawberry', 'watermelon', 'pakwan', 'pineapple', 'pinya', 'coconut', 'niyog', 'buko', 'papaya', 'avocado', 'lemon', 'kalamansi', 'calamansi', 'prutas'], color: 'bg-red-100 text-red-800' },
   meat: { emoji: '🥩', keywords: ['chicken', 'manok', 'pork', 'baboy', 'pork belly', 'pork chops', 'lechon', 'bacon', 'ham', 'beef', 'baka', 'ground beef', 'steak', 'sausage', 'hotdog', 'longganisa', 'karne'], color: 'bg-red-200 text-red-900' },
   seafood: { emoji: '🐟', keywords: ['fish', 'tilapia', 'bangus', 'milkfish', 'tuna', 'salmon', 'galunggong', 'shrimp', 'hipon', 'prawns', 'crab', 'alimango', 'squid', 'pusit', 'oysters', 'tahong', 'isda'], color: 'bg-blue-100 text-blue-800' },
