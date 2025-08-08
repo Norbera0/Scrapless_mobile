@@ -22,6 +22,31 @@ export async function chatWithAssistant(input: ChatWithAssistantInput): Promise<
   return chatWithAssistantFlow(input);
 }
 
+const summarizationPrompt = ai.definePrompt({
+    name: 'summarizeUserIntentPrompt',
+    input: { schema: z.object({
+        query: z.string(),
+        history: z.array(z.object({
+            role: z.enum(['user', 'model']),
+            text: z.string(),
+        })),
+    })},
+    output: { schema: z.object({
+        requiresPantry: z.boolean().describe("Does the query require knowing what's in the pantry?"),
+        requiresWaste: z.boolean().describe("Does the query require knowing the user's waste history?"),
+    })},
+    prompt: `Analyze the user's query and conversation history to determine if full context is needed.
+    
+    Conversation History:
+    {{#each history}}
+    - {{this.role}}: {{this.text}}
+    {{/each}}
+
+    User's new message:
+    "{{{query}}}"
+    `,
+});
+
 const mainPrompt = ai.definePrompt({
   name: 'chatWithAssistantPrompt',
   input: { schema: ChatWithAssistantInputSchema },
@@ -41,31 +66,25 @@ Here is the user's current context:
 - User Name: {{userName}}
 - Today's Date: ${new Date().toLocaleDateString()}
 
+{{#if pantryItems}}
 - Current Pantry Items (Name, Est. Expiry, Amount):
-{{#if pantryItems.length}}
-  {{#each pantryItems}}
+{{#each pantryItems}}
   - {{this.name}} (expires ~{{this.estimatedExpirationDate}}), {{this.estimatedAmount}}
-  {{/each}}
-{{else}}
-  - The pantry is empty.
+{{/each}}
 {{/if}}
 
+{{#if wasteLogs}}
 - Recent Waste Log Summary (Last 30 days):
-{{#if wasteLogs.length}}
   - Total Peso Value Wasted: ₱{{totalPesoValueWasted}}
   - Total Carbon Footprint: {{totalCarbonFootprintWasted}} kg CO₂e
   - Top Wasted Item: {{topWastedItem.name}} ({{topWastedItem.count}} times)
   - Most Common Waste Reason: "{{mostCommonWasteReason}}"
-{{else}}
-  - No waste has been logged recently.
 {{/if}}
 
-- User Preferences:
 {{#if preferences}}
+- User Preferences:
   - Dietary Restrictions: {{#if preferences.dietaryRestrictions}}{{#each preferences.dietaryRestrictions}}{{this}}, {{/each}}{{else}}None{{/if}}
   - Favorite Cuisines: {{#if preferences.favoriteCuisines}}{{#each preferences.favoriteCuisines}}{{this}}, {{/each}}{{else}}None{{/if}}
-{{else}}
-  - No preferences set.
 {{/if}}
 
 ---
@@ -109,7 +128,6 @@ const chatWithAssistantFlow = ai.defineFlow(
         transcribedQuery = userQuery;
       } catch (e) {
         console.error("Audio transcription failed:", e);
-        // Fallback if transcription fails
         return { response: "I'm sorry, I had trouble understanding your audio. Could you please try again or type your message?" };
       }
     }
@@ -118,13 +136,27 @@ const chatWithAssistantFlow = ai.defineFlow(
         return { response: "I couldn't hear you clearly. Could you please try again?" };
     }
     
-    // Construct the input for the main chat prompt
-    const chatPromptInput = {
+    // Construct the input for the main chat prompt, but conditionally add context
+    const chatPromptInput: ChatWithAssistantInput = {
       ...input,
       query: userQuery,
     };
     
     try {
+        // First, check if full context is needed
+        const { output: summary } = await summarizationPrompt({ query: userQuery, history: input.history });
+
+        if (!summary?.requiresPantry) {
+            delete chatPromptInput.pantryItems;
+        }
+        if (!summary?.requiresWaste) {
+            delete chatPromptInput.wasteLogs;
+            delete chatPromptInput.totalPesoValueWasted;
+            delete chatPromptInput.totalCarbonFootprintWasted;
+            delete chatPromptInput.topWastedItem;
+            delete chatPromptInput.mostCommonWasteReason;
+        }
+
         const { output } = await mainPrompt(chatPromptInput);
     
         if (!output?.response) {
