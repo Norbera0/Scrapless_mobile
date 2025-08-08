@@ -1,5 +1,6 @@
 
 
+
 export interface User {
   uid: string;
   name?: string | null;
@@ -128,6 +129,24 @@ export interface ItemInsights {
     wastePreventionTip: string;
     recipes: ItemRecipeSuggestion[];
 }
+
+// --- Notification Types ---
+
+export type NotificationCategory = 'critical' | 'important' | 'info' | 'success';
+
+export interface Notification {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  date: string; // ISO
+  isRead: boolean;
+  actions?: {
+    label: string;
+    action: () => void;
+  }[];
+}
+
 
 // --- New Savings-Related Data Structures ---
 

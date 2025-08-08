@@ -13,6 +13,9 @@ import { Button } from '@/components/ui/button';
 import { PanelLeft, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useNotifications } from '@/hooks/use-notifications';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { NotificationPanel } from '@/components/dashboard/NotificationPanel';
 
 
 const getPageTitle = (pathname: string) => {
@@ -35,6 +38,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const { notifications, totalNew, priorityColor } = useNotifications();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -69,6 +73,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
   if (!user) {
       return null;
   }
+  
+  const badgeColorClass = {
+      red: 'bg-red-500',
+      yellow: 'bg-yellow-500',
+      blue: 'bg-blue-500',
+      green: 'bg-green-500',
+      gray: 'bg-gray-400',
+  }[priorityColor];
+
 
   return (
     <SidebarProvider>
@@ -86,13 +99,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
                     <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
                  </div>
-                 <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                  </span>
-                </Button>
+                 <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="relative">
+                          <Bell className="h-5 w-5" />
+                          {totalNew > 0 && (
+                            <span className={cn("absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white", badgeColorClass)}>
+                                {totalNew > 9 ? '9+' : totalNew}
+                            </span>
+                          )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80 p-0" align="end">
+                        <NotificationPanel notifications={notifications} />
+                    </PopoverContent>
+                 </Popover>
                 <div className="flex items-center gap-2">
                   <div className="hidden sm:flex flex-col items-end text-right">
                     <div className="text-sm font-medium">{user?.name || 'User'}</div>
