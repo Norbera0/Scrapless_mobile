@@ -103,9 +103,15 @@ const chatWithAssistantFlow = ai.defineFlow(
 
     // If audio is provided, transcribe it first.
     if (input.audioDataUri) {
-      const { output: transcriptionOutput } = await transcriptionPrompt({ audioDataUri: input.audioDataUri });
-      userQuery = transcriptionOutput?.transcribedText ?? '';
-      transcribedQuery = userQuery;
+      try {
+        const { output: transcriptionOutput } = await transcriptionPrompt({ audioDataUri: input.audioDataUri });
+        userQuery = transcriptionOutput?.transcribedText;
+        transcribedQuery = userQuery;
+      } catch (e) {
+        console.error("Audio transcription failed:", e);
+        // Fallback if transcription fails
+        return { response: "I'm sorry, I had trouble understanding your audio. Could you please try again or type your message?" };
+      }
     }
 
     if (!userQuery) {
@@ -118,12 +124,17 @@ const chatWithAssistantFlow = ai.defineFlow(
       query: userQuery,
     };
     
-    const { output } = await mainPrompt(chatPromptInput);
+    try {
+        const { output } = await mainPrompt(chatPromptInput);
     
-    if (!output) {
-      return { response: "I'm not sure how to answer that. Can you try asking differently?" };
+        if (!output?.response) {
+            return { response: "I'm not sure how to answer that. Can you try asking differently?" };
+        }
+    
+        return { ...output, transcribedQuery };
+    } catch (error) {
+        console.error("Chat prompt failed:", error);
+        return { response: "I'm sorry, I'm having a little trouble right now. Please try again in a moment." };
     }
-
-    return { ...output, transcribedQuery };
   }
 );
