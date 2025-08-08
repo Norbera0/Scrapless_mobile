@@ -335,7 +335,7 @@ export default function PantryPage() {
                     <TrendingUp className="w-6 h-6 text-teal-600" />
                 </div>
                 <p className="text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
-                <p className="text-sm font-medium text-teal-600">Health Score</p>
+                <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
             </Card>
         </div>
 
