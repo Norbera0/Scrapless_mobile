@@ -10,7 +10,8 @@ import {
     ShoppingCart,
     Bookmark,
     PackagePlus,
-    PiggyBank
+    PiggyBank,
+    Landmark
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -62,6 +63,7 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items'] },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
+    { href: '/bpi', label: 'BPI Hub', icon: Landmark, relatedPaths: ['/bpi/login', '/bpi/dashboard', '/bpi/rewards', '/bpi/marketplace', '/bpi/goals', '/bpi/transfer'] },
     { href: '/shopping', label: 'Shopping Hubs', icon: ShoppingCart },
     { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
