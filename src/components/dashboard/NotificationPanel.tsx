@@ -54,32 +54,32 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
     }, {} as Record<Notification['category'], Notification[]>);
 
     const orderedCategories: Notification['category'][] = ['critical', 'important', 'success', 'info'];
-    const visibleNotifications = isExpanded ? notifications : notifications.slice(0, 3);
+    const notificationsToShow = isExpanded ? notifications : notifications.slice(0, 3);
 
     return (
         <div className="flex flex-col h-full">
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className="h-[300px] flex-1">
+            <ScrollArea className={cn("flex-1", isExpanded ? "h-[400px]" : "h-auto")}>
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
                         orderedCategories.map(category => {
                             const categoryNotifications = groupedNotifications[category];
                             if (!categoryNotifications || categoryNotifications.length === 0) return null;
 
-                            let notificationsToShow = categoryNotifications;
+                            let notificationsToDisplay = categoryNotifications;
                             if (!isExpanded) {
-                                const visibleIds = new Set(visibleNotifications.map(n => n.id));
-                                notificationsToShow = categoryNotifications.filter(n => visibleIds.has(n.id));
+                                const visibleIds = new Set(notificationsToShow.map(n => n.id));
+                                notificationsToDisplay = categoryNotifications.filter(n => visibleIds.has(n.id));
                             }
-                            if (notificationsToShow.length === 0) return null;
+                            if (notificationsToDisplay.length === 0) return null;
 
                             return (
                                 <div key={category} className="p-4 border-b last:border-none">
                                     <h4 className="text-sm font-semibold mb-2">{categoryConfig[category].title}</h4>
                                     <div className="space-y-3">
-                                    {notificationsToShow.map(notif => {
+                                    {notificationsToDisplay.map(notif => {
                                         const Icon = categoryConfig[notif.category].icon;
                                         return (
                                             <div key={notif.id} className={cn("flex items-start gap-3 p-3 rounded-lg border", categoryConfig[notif.category].color)}>
