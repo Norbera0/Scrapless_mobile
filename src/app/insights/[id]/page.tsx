@@ -54,6 +54,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
 }
 
 export default function InsightDetailPage({ params }: { params: { id: string } }) {
+    const { id } = params;
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
@@ -67,7 +68,7 @@ export default function InsightDetailPage({ params }: { params: { id: string } }
 
     useEffect(() => {
         if (insightsInitialized) {
-            const foundInsight = insights.find(i => i.id === params.id);
+            const foundInsight = insights.find(i => i.id === id);
             if (foundInsight) {
                 setInsight(foundInsight);
                 if (foundInsight.status === 'acted_on' && foundInsight.solutions) {
@@ -81,7 +82,7 @@ export default function InsightDetailPage({ params }: { params: { id: string } }
                 setInsight(null);
             }
         }
-    }, [params.id, insights, insightsInitialized]);
+    }, [id, insights, insightsInitialized]);
 
     const handleSelectSolution = async (solutionToSelect: InsightSolution) => {
         if (!user || !insight) return;
@@ -281,3 +282,5 @@ export default function InsightDetailPage({ params }: { params: { id: string } }
         </div>
     )
 }
+
+    
