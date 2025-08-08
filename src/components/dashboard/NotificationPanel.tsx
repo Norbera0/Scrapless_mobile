@@ -2,7 +2,7 @@
 'use client';
 
 import type { Notification } from '@/types';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
@@ -95,9 +95,6 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
                     )}
                 </CardContent>
             </ScrollArea>
-            <CardFooter className="border-t p-2">
-                <Button variant="ghost" className="w-full">View All</Button>
-            </CardFooter>
         </div>
     );
 }
