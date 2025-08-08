@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -53,7 +53,9 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
     )
 }
 
-export default function InsightDetailPage({ params: { id } }: { params: { id: string } }) {
+export default function InsightDetailPage() {
+    const params = useParams();
+    const id = params.id as string;
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
@@ -66,7 +68,7 @@ export default function InsightDetailPage({ params: { id } }: { params: { id: st
     const touchStartX = useRef<number | null>(null);
 
     useEffect(() => {
-        if (insightsInitialized) {
+        if (insightsInitialized && id) {
             const foundInsight = insights.find(i => i.id === id);
             if (foundInsight) {
                 setInsight(foundInsight);
