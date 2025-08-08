@@ -53,8 +53,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
     )
 }
 
-export default function InsightDetailPage({ params }: { params: { id: string } }) {
-    const { id } = params;
+export default function InsightDetailPage({ params: { id } }: { params: { id: string } }) {
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
