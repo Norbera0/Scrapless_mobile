@@ -7,9 +7,9 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, Bug, Trash, Clock, ChevronLeft, ChevronRight, MessageCircleQuestion, Plus, ShoppingCart, Utensils, Droplets, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package } from 'lucide-react';
 import type { WasteLog } from '@/types';
-import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay } from 'date-fns';
+import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
@@ -33,52 +33,105 @@ const getCategory = (itemName: string): string => {
 };
 
 const reasonIconMap: { [key: string]: React.ElementType } = {
-    "Got spoiled/rotten": Bug,
-    "Past expiry date": CalendarClock,
-    "Forgot about it": Brain,
-    "Cooked too much": Soup,
-    "Bought too much": Users, 
-    "Plans changed": Users,
-    "Other reason": Lightbulb,
+  "Got spoiled/rotten": Bug,
+  "Past expiry date": CalendarClock,
+  "Forgot about it": Brain,
+  "Cooked too much": Soup,
+  "Bought too much": ShoppingCart, 
+  "Plans changed": MessageCircleQuestion,
+  "Other reason": Lightbulb,
 };
 
-// --- New Components for Redesigned Waste History ---
 
-const getAvatarProps = (itemName: string): { initial: string; bgColor: string; textColor: string; } => {
-  const colors = [
-    { bg: '#FEF3C7', text: '#92400E' }, // Yellow
-    { bg: '#DBEAFE', text: '#1E40AF' }, // Blue  
-    { bg: '#D1FAE5', text: '#065F46' }, // Green
-    { bg: '#FCE7F3', text: '#BE185D' }, // Pink
-    { bg: '#E0E7FF', text: '#3730A3' }, // Indigo
-  ];
-  const charCode = itemName.charCodeAt(0) || 0;
-  const color = colors[charCode % colors.length];
-  
-  return {
-    initial: itemName.charAt(0).toUpperCase(),
-    bgColor: color.bg,
-    textColor: color.text,
-  };
+// --- Comprehensive Food Icon System ---
+const foodIconConfig: { [key: string]: { emoji: string; keywords: string[]; color: string; } } = {
+  vegetables: { emoji: '🥬', keywords: ['kangkong', 'spinach', 'lettuce', 'cabbage', 'bok choy', 'pechay', 'tomatoes', 'tomato', 'onion', 'sibuyas', 'carrots', 'karot', 'potatoes', 'patatas', 'sweet potato', 'kamote', 'bell pepper', 'chili', 'sili', 'eggplant', 'talong', 'cucumber', 'pipino', 'corn', 'mais', 'mushrooms', 'garlic', 'bawang', 'ginger', 'luya', 'gulay'], color: 'bg-green-100 text-green-800' },
+  fruits: { emoji: '🍎', keywords: ['apple', 'mansanas', 'banana', 'saging', 'orange', 'dalandan', 'mango', 'mangga', 'grapes', 'ubas', 'strawberry', 'watermelon', 'pakwan', 'pineapple', 'pinya', 'coconut', 'niyog', 'buko', 'papaya', 'avocado', 'lemon', 'kalamansi', 'calamansi', 'prutas'], color: 'bg-red-100 text-red-800' },
+  meat: { emoji: '🥩', keywords: ['chicken', 'manok', 'pork', 'baboy', 'pork belly', 'pork chops', 'lechon', 'bacon', 'ham', 'beef', 'baka', 'ground beef', 'steak', 'sausage', 'hotdog', 'longganisa', 'karne'], color: 'bg-red-200 text-red-900' },
+  seafood: { emoji: '🐟', keywords: ['fish', 'tilapia', 'bangus', 'milkfish', 'tuna', 'salmon', 'galunggong', 'shrimp', 'hipon', 'prawns', 'crab', 'alimango', 'squid', 'pusit', 'oysters', 'tahong', 'isda'], color: 'bg-blue-100 text-blue-800' },
+  dairy: { emoji: '🥛', keywords: ['milk', 'gatas', 'cheese', 'keso', 'cheddar', 'yogurt', 'butter', 'mantikilya'], color: 'bg-blue-200 text-blue-900' },
+  eggs: { emoji: '🥚', keywords: ['egg', 'itlog', 'duck egg'], color: 'bg-yellow-100 text-yellow-800' },
+  carbs: { emoji: '🍞', keywords: ['bread', 'tinapay', 'pandesal', 'rolls', 'rice', 'kanin', 'bigas', 'fried rice', 'sinangag', 'pasta', 'spaghetti', 'noodles', 'pancit', 'bihon'], color: 'bg-yellow-200 text-yellow-900' },
+  dishes: { emoji: '🍲', keywords: ['adobo', 'sinigang', 'tinola', 'kare kare', 'menudo', 'mechado', 'caldereta', 'afritada', 'lumpia', 'pinakbet', 'laing', 'bicol express', 'soup', 'sabaw', 'bulalo', 'pochero', 'curry', 'fried chicken', 'fried fish', 'inihaw', 'pizza', 'burger', 'sandwich', 'salad', 'ulam', 'leftovers', 'takeout'], color: 'bg-purple-100 text-purple-800' },
+  snacks: { emoji: '🥨', keywords: ['chips', 'crackers', 'biskwit', 'cookies', 'chicharon', 'nuts', 'mani', 'candy', 'chocolate', 'tsokolate', 'meryenda'], color: 'bg-orange-100 text-orange-800' },
+  desserts: { emoji: '🍰', keywords: ['cake', 'ice cream', 'sorbetes', 'halo halo', 'leche flan', 'ube', 'biko', 'bibingka', 'puto'], color: 'bg-pink-100 text-pink-800' },
+  beverages: { emoji: '🥤', keywords: ['juice', 'soda', 'coke', 'pepsi', 'sprite', 'coffee', 'kape', 'tea', 'tsaa', 'beer', 'wine', 'water', 'tubig'], color: 'bg-cyan-100 text-cyan-800' },
+  canned: { emoji: '🥫', keywords: ['canned', 'sardines', 'corned beef', 'spam', 'luncheon meat'], color: 'bg-gray-200 text-gray-800' },
+  other: { emoji: '🍽️', keywords: [], color: 'bg-gray-100 text-gray-700' },
 };
 
-const WasteEntryCard = ({ entry }: { entry: WasteLog }) => {
-    const { initial, bgColor, textColor } = getAvatarProps(entry.items[0]?.name || 'F');
+const getFoodIcon = (itemName: string) => {
+  const lowerItem = itemName.toLowerCase();
+  for (const category in foodIconConfig) {
+    if (foodIconConfig[category].keywords.some(keyword => lowerItem.includes(keyword))) {
+      return foodIconConfig[category];
+    }
+  }
+  return foodIconConfig.other;
+};
+
+const WasteReasonIndicator = ({ reason }: { reason: string }) => {
+    const indicatorMap: { [key: string]: { icon: React.ElementType, color: string, tooltip: string } } = {
+        'Past expiry date': { icon: Clock, color: 'bg-red-500', tooltip: 'Expired' },
+        'Forgot about it': { icon: Brain, color: 'bg-yellow-500', tooltip: 'Forgot' },
+        'Cooked too much': { icon: Plus, color: 'bg-blue-500', tooltip: 'Excess' },
+        'Got spoiled/rotten': { icon: Bug, color: 'bg-green-600', tooltip: 'Spoiled' },
+    };
+
+    const indicator = Object.keys(indicatorMap).find(key => reason.toLowerCase().includes(key.toLowerCase()));
+    if (!indicator) return null;
+
+    const { icon: Icon, color, tooltip } = indicatorMap[indicator];
+    
+    return (
+        <div title={tooltip} className={cn("absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-white shadow", color)}>
+            <Icon className="w-3 h-3" />
+        </div>
+    );
+};
+
+
+const WasteIcon = ({ entry }: { entry: WasteLog }) => {
+    const primaryItemName = entry.items[0]?.name || 'food';
+    const { emoji, color } = getFoodIcon(primaryItemName);
+    const cost = entry.totalPesoValue;
+
+    const costBorderColor = useMemo(() => {
+        if (cost >= 200) return 'border-red-500';
+        if (cost >= 100) return 'border-orange-500';
+        if (cost >= 50) return 'border-yellow-400';
+        return 'border-gray-200';
+    }, [cost]);
 
     return (
-        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-3 transition-all hover:shadow-lg hover:border-primary">
+        <div className="relative">
+             <div 
+                className={cn(
+                    "w-11 h-11 rounded-full flex items-center justify-center text-xl flex-shrink-0 border-2 transition-all duration-300 group-hover:scale-110", 
+                    color, 
+                    costBorderColor
+                )}
+            >
+                {cost >= 100 ? '💸' : emoji}
+            </div>
+            <WasteReasonIndicator reason={entry.sessionWasteReason || ''} />
+        </div>
+    );
+};
+
+
+const WasteEntryCard = ({ entry }: { entry: WasteLog }) => {
+    const ReasonIcon = reasonIconMap[entry.sessionWasteReason || ''] || Lightbulb;
+    
+    return (
+        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-3 transition-all hover:shadow-md hover:border-green-500 group">
             <div className="flex items-start gap-3">
-                <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-lg flex-shrink-0"
-                    style={{ backgroundColor: bgColor, color: textColor }}
-                >
-                    {initial}
-                </div>
+                <WasteIcon entry={entry} />
                 <div className="flex-1">
                     <p className="font-medium text-gray-800 leading-snug mb-1.5">{entry.items.map(i => i.name).join(', ')}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{format(parseISO(entry.date), 'h:mm a')}</div>
-                        <div className="flex items-center gap-1.5"><Bug className="w-3.5 h-3.5" />{entry.sessionWasteReason}</div>
+                        <div className="flex items-center gap-1.5"><ReasonIcon className="w-3.5 h-3.5" />{entry.sessionWasteReason}</div>
                     </div>
                 </div>
                 <div className="text-right">
@@ -340,7 +393,7 @@ export default function MyWastePage() {
                   <div className='flex gap-2'>
                        <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7d</Button>
                        <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30d</Button>
-                       <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>3m</Button>
+                       <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>90d</Button>
                   </div>
                   <ChartContainer config={chartConfig} className="h-[250px] w-full">
                       <LineChart accessibilityLayer data={chartData}>
@@ -361,7 +414,7 @@ export default function MyWastePage() {
               </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="flex flex-col">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -393,7 +446,7 @@ export default function MyWastePage() {
                     </CardContent>
                 </Card>
 
-                  <Card className="flex flex-col">
+                  <Card className="flex flex-col min-h-[400px]">
                       <CardHeader>
                           <CardTitle>Why Food Gets Wasted</CardTitle>
                           <CardDescription>Root cause breakdown</CardDescription>
