@@ -25,7 +25,7 @@ const fetchAndSaveNewInsight = async (user: User, wasteLogs: WasteLog[], pantryI
       pantryItems: pantryItems.map(item => ({
           name: item.name,
           estimatedExpirationDate: item.estimatedExpirationDate,
-          estimatedAmount: item.estimatedAmount
+          estimatedAmount: `${item.quantity} ${item.unit}`,
       })),
     });
 
