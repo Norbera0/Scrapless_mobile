@@ -67,12 +67,17 @@ export function useAuth() {
 
   useEffect(() => {
     if (user && logsInitialized && pantryInitialized) {
-      // Always check for insights when data changes.
-      // The backend can decide if an insight is recent enough.
-      fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
+      const now = new Date().getTime();
+      
+      // Hourly check for insights
+      const lastInsightCheck = localStorage.getItem(`lastInsightCheck_${user.uid}`);
+      if (!lastInsightCheck || now - parseInt(lastInsightCheck, 10) > oneHour) {
+        console.log("Checking for new insights...");
+        fetchAndSaveNewInsight(user, wasteLogs, pantryItems);
+        localStorage.setItem(`lastInsightCheck_${user.uid}`, now.toString());
+      }
       
       // Hourly check for expired items
-      const now = new Date().getTime();
       const lastExpiredCheck = localStorage.getItem(`lastExpiredCheck_${user.uid}`);
       if (!lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour) {
          console.log("Checking for expired items...");
