@@ -90,6 +90,8 @@ export const SuggestRecipesOutputSchema = z.object({
             ingredients: z.array(
                 z.object({
                     name: z.string().describe("The name of the ingredient."),
+                    quantity: z.number().describe("The numeric quantity of the ingredient needed (e.g., for '2 cloves of garlic', this is 2)."),
+                    unit: z.string().describe("The unit for the ingredient quantity (e.g., 'cloves', 'kg', 'cup')."),
                     status: z.enum(['Have', 'Basic', 'Need']).describe("The status of the ingredient: 'Have' (in pantry), 'Basic' (assumed available like oil/salt), or 'Need' (must be purchased)."),
                     estimatedCost: z.number().optional().describe("The estimated cost in PHP if the ingredient status is 'Need'."),
                 })

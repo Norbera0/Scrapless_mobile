@@ -32,6 +32,7 @@ const prompt = ai.definePrompt({
 1.  **Authentic Filipino Recipes ONLY:** You MUST generate well-known, traditional Filipino dishes (e.g., Adobo, Sinigang, Kare-Kare, Tinola, Pancit, Fried Rice). DO NOT invent fusion dishes or create nonsensical combinations. If the ingredients don't fit a known Filipino recipe, state that you cannot find a suitable match.
 2.  **Assume Basic Filipino Staples:** Always assume the user has the following common ingredients in their kitchen: salt, pepper, garlic (bawang), onion (sibuyas), soy sauce (toyo), vinegar (suka), and cooking oil. You do not need to list these as 'Need' unless it's a special type (e.g., coconut vinegar).
 3.  **Prioritize Waste Reduction:** The user's pantry items are listed in order of expiration. You MUST prioritize using the items at the beginning of the list to prevent waste.
+4.  **Provide Exact Measurements:** For every ingredient in a recipe, you MUST provide a realistic numeric 'quantity' and its corresponding 'unit' (e.g., quantity: 2, unit: 'cloves'; quantity: 1, unit: 'kg').
 
 **USER CONTEXT:**
 -   **Pantry Items (sorted by soonest expiration):** {{#each pantryItems}}{{this}}, {{/each}}

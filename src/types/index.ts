@@ -67,6 +67,8 @@ export interface PantryLog {
 // Recipe Types
 export interface RecipeIngredient {
   name: string;
+  quantity: number;
+  unit: string;
   status: 'Have' | 'Basic' | 'Need';
   estimatedCost?: number;
 }

@@ -30,7 +30,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
         await calculateAndSaveRecipeSavings(user, recipe);
         toast({
             title: "Nice one!",
-            description: `You've earned savings for cooking "${recipe.name}".`,
+            description: `You've earned savings for cooking "${recipe.name}". Your pantry has been updated.`,
         });
     };
 
@@ -101,7 +101,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         <ul className="list-disc list-inside space-y-1">
                             {recipe.ingredients.map((ing, i) => (
                                 <li key={i} className={cn(ing.status === 'Need' && 'text-muted-foreground')}>
-                                    {ing.name}
+                                    {ing.quantity} {ing.unit} {ing.name}
                                     {ing.status === 'Need' && <Badge variant="outline" className="ml-2">Need</Badge>}
                                 </li>
                             ))}

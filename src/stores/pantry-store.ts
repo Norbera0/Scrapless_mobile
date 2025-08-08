@@ -36,6 +36,7 @@ interface PantryLogState {
   setLiveItems: (items: PantryItem[]) => void;
   setArchivedItems: (items: PantryItem[]) => void;
   archiveItem: (itemId: string, status: 'used' | 'wasted') => void;
+  updatePantryItemQuantity: (itemId: string, newQuantity: number) => void;
   addOptimisticItems: (items: PantryItem[]) => void;
   clearOptimisticItems: () => void;
   setPantryInitialized: (initialized: boolean) => void;
@@ -68,6 +69,13 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
             archivedItems: [updatedItem, ...state.archivedItems],
         }));
     }
+  },
+  updatePantryItemQuantity: (itemId, newQuantity) => {
+    set(state => ({
+      liveItems: state.liveItems.map(item =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      ),
+    }));
   },
   addOptimisticItems: (items) => set((state) => ({ optimisticItems: [...state.optimisticItems, ...items] })),
   clearOptimisticItems: () => set({ optimisticItems: [] }),
