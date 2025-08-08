@@ -61,14 +61,13 @@ export function NotificationPanel({ notifications }: NotificationPanelProps) {
             <CardHeader className="border-b">
                 <CardTitle>Notifications</CardTitle>
             </CardHeader>
-            <ScrollArea className={cn("flex-1", isExpanded ? "h-[450px]" : "h-[300px]")}>
+            <ScrollArea className="h-[300px] flex-1">
                 <CardContent className="p-0">
                     {notifications.length > 0 ? (
                         orderedCategories.map(category => {
                             const categoryNotifications = groupedNotifications[category];
                             if (!categoryNotifications || categoryNotifications.length === 0) return null;
 
-                            // In collapsed view, we need to make sure we only show up to 3 total notifications
                             let notificationsToShow = categoryNotifications;
                             if (!isExpanded) {
                                 const visibleIds = new Set(visibleNotifications.map(n => n.id));
