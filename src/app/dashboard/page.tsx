@@ -261,8 +261,8 @@ export default function DashboardPage() {
         </div>
 
         {/* This Week's Impact (prioritize savings and impact equivalences) */}
-        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200">
-            <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-500 p-4 text-white">
+        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-r from-green-600 to-emerald-500 text-white">
+            <CardHeader className="bg-white/10 p-4">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <BarChart3 className="w-5 h-5" />
                     This Week's Impact
@@ -270,18 +270,18 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <p className="text-sm font-medium text-green-700">Virtual Savings</p>
-                    <p className="text-3xl font-bold text-green-800">{formatPeso(weeklySavingsStats.totalSavings)}</p>
+                    <p className="text-sm font-medium text-green-200">Virtual Savings</p>
+                    <p className="text-3xl font-bold">{formatPeso(weeklySavingsStats.totalSavings)}</p>
                     <p className="text-xs text-white/80">From using items before expiry</p>
                 </div>
                 <div>
-                    <p className="text-sm font-medium text-emerald-100">Impact Equivalents</p>
+                    <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
                     <p className="text-sm text-white/90">≈ {weeklyRiceKg.toFixed(1)} kg rice or ~{weeklyWaterSavedL.toFixed(0)} L water saved</p>
                     <p className="text-xs text-white/60">Story-based comparison</p>
                 </div>
                 <div>
-                     <p className="text-sm font-medium text-red-100">Food Waste Logged</p>
-                    <p className="text-3xl font-bold text-white">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
+                     <p className="text-sm font-medium text-red-200">Food Waste Logged</p>
+                    <p className="text-3xl font-bold">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
                     <p className="text-xs text-white/80">Track and reduce weekly losses</p>
                 </div>
             </CardContent>
