@@ -220,7 +220,7 @@ export default function MyWastePage() {
             </Card>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
+                <Card className="flex flex-col min-h-[400px]">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart2 className="h-5 w-5" />
@@ -228,9 +228,9 @@ export default function MyWastePage() {
                         </CardTitle>
                         <CardDescription>What you're wasting most</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex items-center justify-center">
                         <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
                                     <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={isMobile ? 60 : 80} fill="#8884d8" label={false} labelLine={false}>
@@ -239,11 +239,11 @@ export default function MyWastePage() {
                                         ))}
                                     </Pie>
                                     <Legend
-                                      layout="vertical"
-                                      verticalAlign="middle"
-                                      align="right"
+                                      layout={isMobile ? 'horizontal' : 'vertical'}
+                                      verticalAlign={isMobile ? 'bottom' : 'middle'}
+                                      align={isMobile ? 'center' : 'right'}
                                       iconSize={10}
-                                      wrapperStyle={{ paddingLeft: '20px', fontSize: isMobile ? '12px' : '14px', overflowY: 'auto', maxHeight: 200 }}
+                                      wrapperStyle={isMobile ? { fontSize: '12px' } : { paddingLeft: '20px', fontSize: '14px', overflowY: 'auto', maxHeight: 200 }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -251,12 +251,12 @@ export default function MyWastePage() {
                     </CardContent>
                 </Card>
 
-                  <Card>
+                  <Card className="flex flex-col min-h-[400px]">
                       <CardHeader>
                           <CardTitle>Why Food Gets Wasted</CardTitle>
                           <CardDescription>Root cause breakdown</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-2">
+                      <CardContent className="space-y-2 flex-1">
                           {reasonData.length > 0 ? reasonData.map(reason => {
                                const Icon = reasonIconMap[reason.name] || Lightbulb;
                                return (
@@ -350,3 +350,5 @@ export default function MyWastePage() {
       )}
     </div>
   );
+
+    
