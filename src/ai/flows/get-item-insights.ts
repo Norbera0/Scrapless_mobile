@@ -31,7 +31,7 @@ Your task is to provide a complete and practical insight package for a single fo
 
 **Food Item Details:**
 - Name: {{name}}
-- Amount: {{estimatedAmount}}
+- Amount: {{quantity}} {{unit}}
 - Estimated Expiration: {{estimatedExpirationDate}}
 - Estimated Cost: ₱{{#if estimatedCost}}{{estimatedCost}}{{else}}N/A{{/if}}
 

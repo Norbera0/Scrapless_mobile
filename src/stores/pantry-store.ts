@@ -5,7 +5,8 @@ import type { PantryItem } from '@/types';
 export interface PantryLogItem {
   id: string;
   name: string;
-  estimatedAmount: string;
+  quantity: number;
+  unit: string;
   estimatedExpirationDate: string;
   shelfLifeByStorage: {
       counter: number;

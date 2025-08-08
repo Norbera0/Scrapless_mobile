@@ -100,7 +100,7 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
 
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                 <Package className="w-4 h-4" />
-                <span>{item.estimatedAmount}</span>
+                <span>{item.quantity} {item.unit}</span>
                 {item.estimatedCost && (
                     <>
                         <span className="text-gray-300">•</span>
@@ -148,5 +148,3 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
         </div>
     )
 }
-
-    

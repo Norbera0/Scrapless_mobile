@@ -51,7 +51,8 @@ export const LogPantryItemOutputSchema = z.object({
     items: z.array(
       z.object({
         name: z.string().describe('The name of the food item.'),
-        estimatedAmount: z.string().describe('The estimated amount of the food item (e.g., 1 kg, 2 pcs, 1 box).'),
+        quantity: z.number().describe('The numeric quantity of the food item (e.g., for "2 apples", this is 2).'),
+        unit: z.string().describe('The unit of measurement for the quantity (e.g., for "2 apples", this is "apples"; for "1kg rice", this is "kg").'),
         shelfLifeByStorage: z.object({
             counter: z.number().describe("Shelf life in days if stored on the counter."),
             pantry: z.number().describe("Shelf life in days if stored in a pantry/cabinet."),
@@ -61,7 +62,7 @@ export const LogPantryItemOutputSchema = z.object({
         carbonFootprint: z.number().optional().describe("The estimated carbon footprint in kg CO2e."),
         estimatedCost: z.number().optional().describe("The estimated cost of the item in PHP."),
       })
-    ).describe('A list of detected food items, their amounts, and estimated shelf life.'),
+    ).describe('A list of detected food items, their quantities, units, and estimated shelf life.'),
 });
 export type LogPantryItemOutput = z.infer<typeof LogPantryItemOutputSchema>;
 

@@ -98,12 +98,21 @@ const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: P
                       placeholder="Item Name"
                   />
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <Input
-                          value={item.estimatedAmount}
-                          onChange={(e) => handleItemChange(index, 'estimatedAmount', e.target.value)}
-                          placeholder="Amount (e.g. 1kg)"
-                          className="h-11"
-                      />
+                        <div className="grid grid-cols-2 gap-2">
+                            <Input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => handleItemChange(index, 'quantity', e.target.valueAsNumber)}
+                                placeholder="Qty"
+                                className="h-11"
+                            />
+                            <Input
+                                value={item.unit}
+                                onChange={(e) => handleItemChange(index, 'unit', e.target.value)}
+                                placeholder="Unit (e.g. kg)"
+                                className="h-11"
+                            />
+                        </div>
                       <DatePicker
                           date={calculatedExpiryDate}
                           onDateChange={onDateChange}
@@ -194,7 +203,8 @@ export function ReviewPantryItems() {
     const newItem: PantryLogItem = {
       id: crypto.randomUUID(),
       name: '',
-      estimatedAmount: '',
+      quantity: 1,
+      unit: '',
       estimatedExpirationDate: addDays(new Date(), 7).toISOString(),
       shelfLifeByStorage: { counter: 7, pantry: 14, refrigerator: 21, freezer: 365 },
       storageLocation: 'counter', // Default

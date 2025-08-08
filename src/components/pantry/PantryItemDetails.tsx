@@ -125,7 +125,9 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         if (!user || !item) return;
         const updatedItem = { ...item, estimatedCost: cost };
         
+        // This is a fire-and-forget update to simplify the UX
         savePantryItems(user.uid, [{
+            id: updatedItem.id,
             ...updatedItem,
             estimatedExpirationDate: updatedItem.estimatedExpirationDate,
         }]).catch(err => console.error("Failed to persist updated cost", err));
@@ -166,7 +168,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                      <div className="grid grid-cols-2 gap-4">
                         <div className="rounded-lg bg-secondary/50 p-3">
                             <label className="text-xs text-muted-foreground">Quantity</label>
-                            <p className="font-semibold">{item.estimatedAmount}</p>
+                            <p className="font-semibold">{item.quantity} {item.unit}</p>
                         </div>
                         <div className="rounded-lg bg-secondary/50 p-3">
                             <label className="text-xs text-muted-foreground">Expires</label>
@@ -291,5 +293,3 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
         </>
     );
 }
-
-    

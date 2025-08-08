@@ -29,7 +29,8 @@ export interface WasteLog {
 export interface PantryItem {
     id: string;
     name: string;
-    estimatedAmount: string; // e.g., "1kg", "500g", "1 box"
+    quantity: number; 
+    unit: string; 
     estimatedExpirationDate: string; // ISO String
     addedDate: string; // ISO string for when the item was added
     status: 'live' | 'used' | 'wasted';
