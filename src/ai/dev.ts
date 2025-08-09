@@ -11,3 +11,4 @@ import '@/ai/flows/chat-with-assistant.ts';
 import '@/ai/flows/analyze-consumption-patterns.ts';
 import '@/ai/flows/get-item-insights.ts';
 import '@/ai/flows/food-image-generation.ts';
+import '@/ai/flows/generate-shopping-list.ts';

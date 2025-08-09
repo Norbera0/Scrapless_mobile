@@ -1,6 +1,5 @@
 
 
-
 export interface User {
   uid: string;
   name?: string | null;
@@ -200,4 +199,38 @@ export interface BaselineBehavior {
     spendingPerCategory: Record<string, number>;
     baselineDate: string; // ISO string
     isEstimated: boolean;
+}
+
+// --- Shopping List Data Structures ---
+
+export interface ShoppingListItem {
+  id: string;
+  name: string;
+  category: 'staple' | 'data_driven' | 'seasonal' | 'complementary' | 'low_stock';
+  quantity: string;
+  estimatedCost: number;
+  priority: 'essential' | 'recommended' | 'optional';
+  reasoning: string; // Human-readable explanation
+  isChecked: boolean; // Shopping completion status
+  isPurchased: boolean; // Final purchase confirmation
+  purchasedDate?: string;
+  wasPantryItem?: boolean; // If this replaces a depleted pantry item
+  relatedPantryItemId?: string;
+}
+
+export interface ShoppingList {
+  id: string;
+  userId: string;
+  generatedDate: string; // ISO 8601
+  lastModifiedDate: string; // ISO 8601
+  status: 'active' | 'completed' | 'archived';
+  items: ShoppingListItem[];
+  totalEstimatedCost: number;
+  generationMethod: string;
+  generationSource: {
+    pantryItemsConsidered: number;
+    wasteLogsAnalyzed: number;
+    daysOfDataUsed: number;
+    stapleItemsIncluded: number;
+  };
 }

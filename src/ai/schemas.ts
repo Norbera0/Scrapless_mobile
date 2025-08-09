@@ -202,4 +202,40 @@ export const GetItemInsightsOutputSchema = z.object({
   });
 export type GetItemInsightsOutput = z.infer<typeof GetItemInsightsOutputSchema>;
 
-    
+// Shopping List Schemas
+export const GenerateShoppingListInputSchema = z.object({
+  pantryItems: z.array(
+    z.object({
+      name: z.string(),
+      quantity: z.number(),
+      unit: z.string(),
+      estimatedExpirationDate: z.string(),
+    })
+  ).describe('A list of items currently in the user\'s pantry.'),
+  wasteLogs: z.array(z.any()).describe('A list of recent waste log objects (last 60 days).'),
+});
+export type GenerateShoppingListInput = z.infer<typeof GenerateShoppingListInputSchema>;
+
+export const GenerateShoppingListOutputSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string().describe('A unique ID for the shopping list item.'),
+      name: z.string().describe('The name of the item to buy.'),
+      category: z
+        .enum(['staple', 'data_driven', 'seasonal', 'complementary', 'low_stock'])
+        .describe('The category explaining why this item is suggested.'),
+      quantity: z.string().describe('The recommended quantity to buy (e.g., "500g", "1 liter", "3 pcs").'),
+      estimatedCost: z.number().describe('The estimated cost of the item in PHP.'),
+      priority: z.enum(['essential', 'recommended', 'optional']).describe('The priority of the item.'),
+      reasoning: z.string().describe('A human-readable explanation for the suggestion.'),
+    })
+  ),
+  totalEstimatedCost: z.number().describe('The total estimated cost of the shopping list in PHP.'),
+  generationSource: z.object({
+    pantryItemsConsidered: z.number(),
+    wasteLogsAnalyzed: z.number(),
+    daysOfDataUsed: z.number(),
+    stapleItemsIncluded: z.number(),
+  }),
+});
+export type GenerateShoppingListOutput = z.infer<typeof GenerateShoppingListOutputSchema>;

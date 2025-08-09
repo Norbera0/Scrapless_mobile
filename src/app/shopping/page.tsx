@@ -3,128 +3,154 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PackagePlus, Loader2, ShoppingCart, Leaf, Sparkles } from 'lucide-react';
+import { PackagePlus, Loader2, ShoppingCart, Leaf, Sparkles, BarChart, FileText, CheckCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { add, isBefore } from 'date-fns';
-import { formatPeso } from '@/lib/utils';
+import { generateShoppingList } from '@/ai/flows/generate-shopping-list';
+import type { GenerateShoppingListOutput } from '@/ai/schemas';
 
 export default function ShoppingHubPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { liveItems } = usePantryLogStore();
   const { logs } = useWasteLogStore();
+  const [generatedList, setGeneratedList] = useState<GenerateShoppingListOutput | null>(null);
 
-  const smartSuggestions = useMemo(() => {
-    // Identify items commonly wasted and items running low/expiring soon
-    const now = new Date();
-    const soon = add(now, { days: 3 });
-
-    const expiringSoon = liveItems.filter(i => {
-      const expiry = new Date(i.estimatedExpirationDate);
-      return isBefore(expiry, soon) && expiry >= now;
-    }).map(i => i.name.toLowerCase());
-
-    const frequentlyWasted: Record<string, { count: number; peso: number }> = {};
-    logs.forEach(l => {
-      l.items.forEach(it => {
-        const key = it.name.toLowerCase();
-        frequentlyWasted[key] = frequentlyWasted[key] || { count: 0, peso: 0 };
-        frequentlyWasted[key].count += 1;
-        frequentlyWasted[key].peso += (it as any).pesoValue || 0;
-      });
-    });
-
-    const topWasted = Object.entries(frequentlyWasted)
-      .sort((a, b) => b[1].count - a[1].count)
-      .slice(0, 3)
-      .map(([name, stats]) => ({ name, estimatedMonthlyLoss: stats.peso }));
-
-    return {
-      expiringSoon: Array.from(new Set(expiringSoon)).slice(0, 6),
-      topWasted,
-    };
-  }, [liveItems, logs]);
-
-  const handleGenerateList = () => {
+  const handleGenerateList = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+        const pantryData = liveItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            estimatedExpirationDate: item.estimatedExpirationDate,
+        }));
+
+        const result = await generateShoppingList({
+            pantryItems: pantryData,
+            wasteLogs: logs,
+        });
+
+        setGeneratedList(result);
+
       toast({
-        title: 'Smart suggestions ready',
-        description: 'Tailored to pantry gaps and your waste patterns.',
+        title: 'Smart suggestions ready!',
+        description: 'Your personalized shopping list has been created.',
       });
-    }, 900);
+    } catch(err) {
+        console.error("Shopping list generation failed", err);
+        toast({
+            variant: 'destructive',
+            title: 'Generation Failed',
+            description: 'Could not generate a shopping list at this time.'
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
+  
+  const getCategoryIcon = (category: string) => {
+    switch(category) {
+        case 'staple': return <Leaf className="h-4 w-4 text-green-600" />;
+        case 'data_driven': return <BarChart className="h-4 w-4 text-blue-600" />;
+        case 'low_stock': return <ShoppingCart className="h-4 w-4 text-yellow-600" />;
+        case 'complementary': return <PackagePlus className="h-4 w-4 text-purple-600" />;
+        default: return <Sparkles className="h-4 w-4 text-gray-600" />;
+    }
+  }
 
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
         <h1 className="text-3xl font-bold tracking-tight">Shopping Hub</h1>
-        <p className="text-muted-foreground">AI-powered suggestions tied to pantry gaps and waste patterns.</p>
+        <p className="text-muted-foreground">AI-powered suggestions to help you buy smarter.</p>
       </div>
       
-      <Card>
-        <CardHeader>
-            <CardTitle>Create This Week's List</CardTitle>
-            <CardDescription>Analyze pantry gaps and waste to buy just what you need.</CardDescription>
-        </CardHeader>
-        <CardContent>
-             <Button className="w-full" onClick={handleGenerateList} disabled={isLoading}>
-                {isLoading ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Generating...
-                    </>
-                ) : (
-                    <>
-                        <PackagePlus className="mr-2 h-4 w-4" />
-                        Generate Shopping Suggestions
-                    </>
-                )}
+      {!generatedList ? (
+        <Card>
+            <CardHeader>
+                <CardTitle>Create This Week's List</CardTitle>
+                <CardDescription>Analyze pantry gaps and waste to buy just what you need.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button className="w-full" onClick={handleGenerateList} disabled={isLoading}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Analyzing your habits...
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Generate Smart Shopping List
+                        </>
+                    )}
+                </Button>
+            </CardContent>
+        </Card>
+      ) : (
+        <>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Your Smart Shopping List</CardTitle>
+                    <CardDescription>
+                        Total Estimated Cost: <span className='font-bold text-primary'>₱{generatedList.totalEstimatedCost.toFixed(2)}</span>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {generatedList.items.map(item => (
+                        <Card key={item.id} className="p-3">
+                            <div className="flex items-center gap-4">
+                               <div className="flex-1">
+                                    <p className="font-semibold">{item.name} <span className="text-muted-foreground font-normal">({item.quantity})</span></p>
+                                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
+                                        {getCategoryIcon(item.category)}
+                                        {item.reasoning}
+                                    </p>
+                               </div>
+                               <div className="text-right">
+                                    <p className="font-semibold">₱{item.estimatedCost.toFixed(2)}</p>
+                                    <p className="text-xs capitalize text-muted-foreground">{item.priority}</p>
+                               </div>
+                            </div>
+                        </Card>
+                    ))}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><FileText className="h-4 w-4" /> Generation Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div className="p-2 bg-secondary rounded-md">
+                        <p className="text-2xl font-bold">{generatedList.generationSource.pantryItemsConsidered}</p>
+                        <p className="text-xs text-muted-foreground">Pantry Items</p>
+                    </div>
+                     <div className="p-2 bg-secondary rounded-md">
+                        <p className="text-2xl font-bold">{generatedList.generationSource.wasteLogsAnalyzed}</p>
+                        <p className="text-xs text-muted-foreground">Waste Logs</p>
+                    </div>
+                     <div className="p-2 bg-secondary rounded-md">
+                        <p className="text-2xl font-bold">{generatedList.generationSource.stapleItemsIncluded}</p>
+                        <p className="text-xs text-muted-foreground">Staples Added</p>
+                    </div>
+                     <div className="p-2 bg-secondary rounded-md">
+                        <p className="text-2xl font-bold">{generatedList.generationSource.daysOfDataUsed}</p>
+                        <p className="text-xs text-muted-foreground">Days Analyzed</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Button onClick={() => setGeneratedList(null)}>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Done Shopping
             </Button>
-        </CardContent>
-    </Card>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-4 w-4" /> Pantry Watchouts</CardTitle>
-            <CardDescription>Buy only what you’ll use before it expires.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {smartSuggestions.expiringSoon.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No items expiring in the next 3 days.</p>
-            ) : (
-              smartSuggestions.expiringSoon.map((name) => (
-                <div key={name} className="text-sm">• {name}</div>
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Leaf className="h-4 w-4" /> Green Alternatives</CardTitle>
-            <CardDescription>Lower-impact swaps and ways to save.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {smartSuggestions.topWasted.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No frequent waste patterns yet. Keep logging.</p>
-            ) : (
-              smartSuggestions.topWasted.map(item => (
-                <div key={item.name} className="text-sm">
-                  • Consider buying smaller portions of “{item.name}” or frozen variants. Est. loss last logs: {formatPeso(item.estimatedMonthlyLoss)}
-                </div>
-              ))
-            )}
-            <div className="text-xs text-muted-foreground">Partner offers and BPI perks can appear here.</div>
-          </CardContent>
-        </Card>
-      </div>
+        </>
+      )}
     </div>
   );
 }

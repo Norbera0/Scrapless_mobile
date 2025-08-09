@@ -61,10 +61,10 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items'] },
+    { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
     { href: '/bpi', label: 'BPI Hub', icon: Landmark, relatedPaths: ['/bpi/login', '/bpi/dashboard', '/bpi/rewards', '/bpi/marketplace', '/bpi/goals', '/bpi/transfer'] },
-    { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
   
