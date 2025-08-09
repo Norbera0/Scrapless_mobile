@@ -36,7 +36,7 @@ const prompt = ai.definePrompt({
 
 **USER CONTEXT:**
 -   **Pantry Items (sorted by soonest expiration):** {{#each pantryItems}}{{this}}, {{/each}}
--   **Avoid these past recipes:** {{#if history}}{{#each history}}{{this}}, {{/each}}{{else}}None{{/if}}
+-   **Avoid these past recipes:** {{#if history.length}}{{#each history}}{{this}}, {{/each}}{{else}}None{{/if}}
 -   **User Preferences:** {{#if preferences.filipinoDishes}}Filipino dishes preferred.{{/if}} {{#if preferences.quickMeals}}Quick meals (under 20 mins) preferred.{{/if}}
 
 **YOUR TASK:**
