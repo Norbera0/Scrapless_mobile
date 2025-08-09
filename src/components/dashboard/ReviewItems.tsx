@@ -29,6 +29,7 @@ const wasteReasons = [
   "Past expiry date",
   "Forgot about it",
   "Cooked too much",
+  "Portion too big / Couldn’t finish",
   "Bought too much",
   "Plans changed",
   "Other reason"
