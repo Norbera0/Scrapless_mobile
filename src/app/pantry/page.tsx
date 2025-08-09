@@ -49,7 +49,7 @@ export default function PantryPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { liveItems, pantryInitialized } = usePantryLogStore();
-  const { recipes, setRecipes } = useRecipeStore();
+  const { recipes, setRecipes, clearRecipes } = useRecipeStore();
   
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -167,10 +167,13 @@ export default function PantryPage() {
     }
   }, [itemInsights, toast]);
 
-  const fetchRecipes = useCallback(async (currentRecipes: Recipe[]) => {
+  const fetchRecipes = useCallback(async (isNewRequest: boolean) => {
     if (liveItems.length === 0) {
       setRecipes([]);
       return;
+    }
+    if(isNewRequest) {
+        clearRecipes();
     }
 
     setIsLoadingRecipes(true);
@@ -182,7 +185,7 @@ export default function PantryPage() {
             quickMeals: recipeFilters.quickMeals,
             filipinoDishes: recipeFilters.filipinoDishes,
         },
-        history: currentRecipes.map(r => r.name),
+        history: isNewRequest ? [] : recipes.map(r => r.name),
       });
       const recipesWithIds = result.recipes.map(r => ({ ...r, id: r.id || crypto.randomUUID() }));
       setRecipes(recipesWithIds);
@@ -196,15 +199,15 @@ export default function PantryPage() {
     } finally {
       setIsLoadingRecipes(false);
     }
-  }, [liveItems, recipeFilters, toast, setRecipes]);
+  }, [liveItems, recipeFilters, toast, setRecipes, recipes, clearRecipes]);
 
 
   useEffect(() => {
     // Fetch recipes only on initial load if the recipe store is empty and pantry is not
     if (pantryInitialized && recipes.length === 0 && liveItems.length > 0) {
-      fetchRecipes([]);
+      fetchRecipes(false);
     }
-  }, [pantryInitialized, liveItems.length]);
+  }, [pantryInitialized, liveItems.length, recipes.length, fetchRecipes]);
 
   useEffect(() => {
     const loadSaved = async () => {
@@ -386,7 +389,7 @@ export default function PantryPage() {
               <Sparkles className="w-5 h-5 text-amber-400" />
             </div>
             <Button
-              onClick={() => fetchRecipes(recipes)}
+              onClick={() => fetchRecipes(true)}
               disabled={isLoadingRecipes}
               variant="outline"
               size="sm"
@@ -422,7 +425,7 @@ export default function PantryPage() {
                 <p className="text-gray-500 mb-4 px-4">
                     We couldn't find any recipes. Try adding more items to your pantry or refreshing.
                 </p>
-                <Button onClick={() => fetchRecipes([])} className="h-11 text-base">
+                <Button onClick={() => fetchRecipes(true)} className="h-11 text-base">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Try Again
                 </Button>
