@@ -75,7 +75,6 @@ export const SuggestRecipesInputSchema = z.object({
         filipinoDishes: z.boolean().optional().describe("Filter for Filipino cuisine."),
         difficulty: z.string().optional().describe("The user's cooking skill level (e.g., 'Easy', 'Intermediate', 'Hard')."),
     }).optional(),
-    history: z.array(z.string()).optional().describe("A list of recipe names that have been suggested recently to avoid duplicates."),
 });
 export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 

@@ -188,7 +188,6 @@ export default function PantryPage() {
             quickMeals: recipeFilters.quickMeals,
             filipinoDishes: recipeFilters.filipinoDishes,
         },
-        history: isNewRequest ? [] : recipes.map(r => r.name),
       });
       const recipesWithIds = result.recipes.map(r => ({ ...r, id: r.id || crypto.randomUUID() }));
       setRecipes(recipesWithIds);
@@ -202,7 +201,7 @@ export default function PantryPage() {
     } finally {
       setIsLoadingRecipes(false);
     }
-  }, [liveItems, recipeFilters, toast, setRecipes, recipes, clearRecipes]);
+  }, [liveItems, recipeFilters, toast, setRecipes, clearRecipes]);
 
 
   useEffect(() => {
