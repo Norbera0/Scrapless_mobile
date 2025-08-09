@@ -70,6 +70,9 @@ export default function PantryPage() {
 
   useEffect(() => {
     setIsClient(true);
+    // Zustand's persist middleware handles hydration, but we can re-trigger
+    // recipe fetching if the pantry is initialized but recipes are empty.
+    useRecipeStore.persist.rehydrate();
   }, []);
 
   const getStatus = useCallback((expirationDate: string) => {
@@ -203,11 +206,11 @@ export default function PantryPage() {
 
 
   useEffect(() => {
-    // Fetch recipes only on initial load if the recipe store is empty and pantry is not
-    if (pantryInitialized && recipes.length === 0 && liveItems.length > 0) {
-      fetchRecipes(false);
+    if (pantryInitialized && isClient && useRecipeStore.getState().recipes.length === 0 && liveItems.length > 0) {
+        fetchRecipes(false);
     }
-  }, [pantryInitialized, liveItems.length, recipes.length, fetchRecipes]);
+  }, [pantryInitialized, liveItems.length, fetchRecipes, isClient]);
+
 
   useEffect(() => {
     const loadSaved = async () => {
