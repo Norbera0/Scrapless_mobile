@@ -187,28 +187,30 @@ export default function InsightDetailPage() {
                     </Card>
                 </div>
                 
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
-                        <div className="mt-2">
-                            <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, what: !s.what }))}>{showMore.what ? 'Show less' : 'Learn more'}</Button>
-                        </div>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
-                        <div className="mt-2">
-                            <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, why: !s.why }))}>{showMore.why ? 'Show less' : 'Learn more'}</Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <div className="grid md:grid-cols-2 gap-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
+                            <div className="mt-2">
+                                <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, what: !s.what }))}>{showMore.what ? 'Show less' : 'Learn more'}</Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
+                            <div className="mt-2">
+                                <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, why: !s.why }))}>{showMore.why ? 'Show less' : 'Learn more'}</Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
 
             <Card>
