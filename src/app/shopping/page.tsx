@@ -1,23 +1,27 @@
 
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PackagePlus, Loader2, ShoppingCart, Leaf, Sparkles, BarChart, FileText, CheckCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { PackagePlus, Loader2, ShoppingCart, Leaf, Sparkles, BarChart, FileText, CheckCircle, Trash2 } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { generateShoppingList } from '@/ai/flows/generate-shopping-list';
 import { useShoppingListStore } from '@/stores/shopping-list-store';
 import type { GenerateShoppingListOutput } from '@/ai/schemas';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 export default function ShoppingHubPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { liveItems } = usePantryLogStore();
   const { logs } = useWasteLogStore();
-  const { generatedList, setGeneratedList } = useShoppingListStore();
+  const { generatedList, setGeneratedList, toggleItemChecked } = useShoppingListStore();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -68,6 +72,13 @@ export default function ShoppingHubPage() {
     }
   }
 
+  const checkedItemsCost = useMemo(() => {
+    if (!generatedList) return 0;
+    return generatedList.items
+      .filter(item => item.isChecked)
+      .reduce((total, item) => total + item.estimatedCost, 0);
+  }, [generatedList]);
+
   if (!isClient) {
     return (
         <div className="flex justify-center items-center h-64">
@@ -111,58 +122,55 @@ export default function ShoppingHubPage() {
                 <CardHeader>
                     <CardTitle>Your Smart Shopping List</CardTitle>
                     <CardDescription>
-                        Total Estimated Cost: <span className='font-bold text-primary'>₱{generatedList.totalEstimatedCost.toFixed(2)}</span>
+                        Check off items as you shop.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                     {generatedList.items.map(item => (
-                        <Card key={item.id} className="p-3">
-                            <div className="flex items-center gap-4">
-                               <div className="flex-1">
-                                    <p className="font-semibold">{item.name} <span className="text-muted-foreground font-normal">({item.quantity})</span></p>
-                                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-1">
-                                        {getCategoryIcon(item.category)}
-                                        {item.reasoning}
-                                    </p>
-                               </div>
-                               <div className="text-right">
-                                    <p className="font-semibold">₱{item.estimatedCost.toFixed(2)}</p>
-                                    <p className="text-xs capitalize text-muted-foreground">{item.priority}</p>
-                               </div>
-                            </div>
-                        </Card>
+                        <div key={item.id} className={cn("flex items-start gap-4 p-4 rounded-lg transition-colors", item.isChecked && "bg-green-50")}>
+                            <Checkbox 
+                                id={`item-${item.id}`}
+                                checked={item.isChecked}
+                                onCheckedChange={() => toggleItemChecked(item.id)}
+                                className="mt-1 h-5 w-5"
+                            />
+                            <Label htmlFor={`item-${item.id}`} className="flex-1 grid gap-1 cursor-pointer">
+                                <p className={cn("font-semibold leading-tight", item.isChecked && "line-through text-muted-foreground")}>{item.name} <span className="text-muted-foreground font-normal">({item.quantity})</span></p>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                    {getCategoryIcon(item.category)}
+                                    {item.reasoning}
+                                </p>
+                            </Label>
+                           <div className="text-right">
+                                <p className={cn("font-semibold", item.isChecked && "line-through text-muted-foreground")}>₱{item.estimatedCost.toFixed(2)}</p>
+                                <p className="text-xs capitalize text-muted-foreground">{item.priority}</p>
+                           </div>
+                        </div>
                     ))}
                 </CardContent>
+                <CardFooter className="flex-col items-stretch gap-4">
+                  <Separator />
+                  <div className="flex justify-between items-center text-lg font-semibold">
+                    <span>Selected Total:</span>
+                    <span className="text-primary">₱{checkedItemsCost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">List Total:</span>
+                    <span className="font-medium">₱{generatedList.totalEstimatedCost.toFixed(2)}</span>
+                  </div>
+                </CardFooter>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><FileText className="h-4 w-4" /> Generation Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div className="p-2 bg-secondary rounded-md">
-                        <p className="text-2xl font-bold">{generatedList.generationSource.pantryItemsConsidered}</p>
-                        <p className="text-xs text-muted-foreground">Pantry Items</p>
-                    </div>
-                     <div className="p-2 bg-secondary rounded-md">
-                        <p className="text-2xl font-bold">{generatedList.generationSource.wasteLogsAnalyzed}</p>
-                        <p className="text-xs text-muted-foreground">Waste Logs</p>
-                    </div>
-                     <div className="p-2 bg-secondary rounded-md">
-                        <p className="text-2xl font-bold">{generatedList.generationSource.stapleItemsIncluded}</p>
-                        <p className="text-xs text-muted-foreground">Staples Added</p>
-                    </div>
-                     <div className="p-2 bg-secondary rounded-md">
-                        <p className="text-2xl font-bold">{generatedList.generationSource.daysOfDataUsed}</p>
-                        <p className="text-xs text-muted-foreground">Days Analyzed</p>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Button onClick={() => setGeneratedList(null)}>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Done Shopping
-            </Button>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={() => handleGenerateList()} disabled={isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                  Regenerate
+              </Button>
+              <Button onClick={() => setGeneratedList(null)}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Clear List
+              </Button>
+            </div>
         </>
       )}
     </div>
