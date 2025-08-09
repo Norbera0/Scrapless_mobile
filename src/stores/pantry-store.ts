@@ -20,6 +20,7 @@ export interface PantryLogItem {
   storageLocation?: string;
   useByTimeline?: string;
   purchaseSource?: string;
+  otherPurchaseSourceText?: string;
 }
 
 interface PantryLogState {

@@ -17,6 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { addDays, differenceInDays, startOfToday } from 'date-fns';
+import { Textarea } from '../ui/textarea';
 
 const storageLocations = [
   { value: 'counter', label: 'Counter (room temp)' },
@@ -35,10 +36,13 @@ const useByTimelines = [
 const purchaseSources = [
   { value: 'supermarket', label: 'Supermarket' },
   { value: 'wet_market', label: 'Wet Market/Palengke' },
+  { value: 'sari_sari_store', label: 'Sari-sari Store' },
+  { value: 'minimart', label: 'Minimart' },
   { value: 'online', label: 'Online Grocery' },
   { value: 'bulk_store', label: 'Bulk/Wholesale Store' },
   { value: 'home_grown', label: 'Home Grown'},
   { value: 'gift_shared', label: 'Gift/Shared' },
+  { value: 'other', label: 'Other' },
 ];
 
 const safelyResetThenNavigate = async (
@@ -154,7 +158,7 @@ const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: P
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid gap-1.5">
+                        <div className="grid gap-1.5 md:col-span-2">
                             <Label htmlFor={`source-${item.id}`}>From:</Label>
                             <Select value={item.purchaseSource} onValueChange={(value) => handleItemChange(index, 'purchaseSource', value)}>
                                 <SelectTrigger id={`source-${item.id}`} className="h-11 bg-background"><SelectValue placeholder="Select source..." /></SelectTrigger>
@@ -163,6 +167,18 @@ const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: P
                                 </SelectContent>
                             </Select>
                         </div>
+                         {item.purchaseSource === 'other' && (
+                            <div className="grid gap-1.5 md:col-span-2">
+                                <Label htmlFor={`other-source-${item.id}`}>Other Source</Label>
+                                <Input
+                                    id={`other-source-${item.id}`}
+                                    value={item.otherPurchaseSourceText || ''}
+                                    onChange={(e) => handleItemChange(index, 'otherPurchaseSourceText', e.target.value)}
+                                    placeholder="Please specify"
+                                    className="h-11 bg-background"
+                                />
+                            </div>
+                        )}
                         <div className="grid gap-1.5">
                             <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
                             <Input
@@ -224,9 +240,13 @@ export function ReviewPantryItems() {
       const itemsToSave = items.map(item => {
         const shelfLife = item.shelfLifeByStorage[item.storageLocation as keyof typeof item.shelfLifeByStorage || 'counter'] || 7;
         const expirationDate = addDays(new Date(), shelfLife);
+        
+        const finalPurchaseSource = item.purchaseSource === 'other' ? item.otherPurchaseSourceText : item.purchaseSource;
+
         return {
             ...item,
             estimatedExpirationDate: expirationDate.toISOString(),
+            purchaseSource: finalPurchaseSource,
         }
       });
       
