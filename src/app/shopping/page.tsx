@@ -4,11 +4,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PackagePlus, Loader2, ShoppingCart, Leaf, Sparkles, BarChart, FileText, CheckCircle } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { generateShoppingList } from '@/ai/flows/generate-shopping-list';
+import { useShoppingListStore } from '@/stores/shopping-list-store';
 import type { GenerateShoppingListOutput } from '@/ai/schemas';
 
 export default function ShoppingHubPage() {
@@ -16,7 +17,13 @@ export default function ShoppingHubPage() {
   const { toast } = useToast();
   const { liveItems } = usePantryLogStore();
   const { logs } = useWasteLogStore();
-  const [generatedList, setGeneratedList] = useState<GenerateShoppingListOutput | null>(null);
+  const { generatedList, setGeneratedList } = useShoppingListStore();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    useShoppingListStore.persist.rehydrate();
+  }, []);
 
   const handleGenerateList = async () => {
     setIsLoading(true);
@@ -61,6 +68,13 @@ export default function ShoppingHubPage() {
     }
   }
 
+  if (!isClient) {
+    return (
+        <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
