@@ -3,66 +3,73 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, Sparkles, Landmark, TrendingUp, Info } from 'lucide-react';
-import { useWasteLogStore } from '@/stores/waste-log-store';
-import { usePantryLogStore } from '@/stores/pantry-store';
-import { useSavingsStore } from '@/stores/savings-store';
+import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import type { WasteLog, SavingsEvent } from '@/types';
+import { isAfter, startOfMonth, subMonths } from 'date-fns';
+import { estimateRiceKgFromPesos } from '@/lib/utils';
 
 type Fact = {
   icon: React.ElementType;
   text: string;
-  category: 'Trivia' | 'Tip' | 'BPI' | 'Personalized';
+  category: 'Trivia' | 'Tip' | 'BPI' | 'Personalized' | 'Achievement';
   cta?: {
     label: string;
     href: string;
   };
 };
 
-export function FunFactPanel() {
+interface FunFactPanelProps {
+    wasteLogs: WasteLog[];
+    savingsEvents: SavingsEvent[];
+}
+
+export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   const router = useRouter();
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
-
-  const { logs } = useWasteLogStore();
-  const { savingsEvents } = useSavingsStore();
 
   const facts: Fact[] = useMemo(() => {
     const personalizedFacts: Fact[] = [];
     
-    if (logs.length > 2) {
-      const topWastedCategory = logs
-        .flatMap(l => l.items)
-        .reduce((acc, item) => {
-            // A simple categorization logic
-            const category = item.name.includes('vegetable') ? 'vegetables' : item.name.includes('rice') ? 'rice' : 'other';
-            acc[category] = (acc[category] || 0) + item.pesoValue;
-            return acc;
-        }, {} as Record<string, number>);
+    // Performance comparison: this month vs last month
+    const now = new Date();
+    const startOfThisMonth = startOfMonth(now);
+    const startOfLastMonth = startOfMonth(subMonths(now, 1));
+    const thisMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
+    const lastMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfLastMonth) && !isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
 
-      const topCategory = Object.keys(topWastedCategory).sort((a, b) => topWastedCategory[b] - topWastedCategory[a])[0];
-      if (topCategory !== 'other') {
+    if (lastMonthWaste > 0 && thisMonthWaste > 0) {
+        const percentageChange = ((thisMonthWaste - lastMonthWaste) / lastMonthWaste) * 100;
+        const trend = percentageChange > 0 ? 'higher' : 'lower';
         personalizedFacts.push({
-            icon: TrendingUp,
+            icon: BarChart,
             category: 'Personalized',
-            text: `You've been wasting a lot of ${topCategory}. Try buying smaller portions to save money.`,
+            text: `Your food waste is ${Math.abs(percentageChange).toFixed(0)}% ${trend} than last month.`,
         });
-      }
     }
 
+    // Achievement Framing
     const totalSavings = savingsEvents.reduce((acc, e) => acc + e.amount, 0);
-    if(totalSavings > 100) {
-         personalizedFacts.push({
-            icon: Sparkles,
-            category: 'Personalized',
-            text: `You've saved over ₱${totalSavings.toFixed(0)}! Keep up the great work reducing waste.`,
+    if (totalSavings > 50) {
+        const riceSaved = estimateRiceKgFromPesos(totalSavings);
+        personalizedFacts.push({
+            icon: Leaf,
+            category: 'Achievement',
+            text: `You've avoided ₱${totalSavings.toFixed(0)} in waste so far. That's like saving ${riceSaved.toFixed(1)}kg of rice!`,
         });
     }
 
+    // Relatable Context
+    personalizedFacts.push({
+        icon: Info,
+        category: 'Trivia',
+        text: `Did you know? The average Filipino household wastes around ₱1,200 worth of food every month.`
+    });
+    
+    // Base BPI Facts
     const baseFacts: Fact[] = [
-      { icon: Lightbulb, category: 'Trivia', text: 'Did you know? About one-third of all food produced globally for human consumption is lost or wasted.' },
-      { icon: Info, category: 'Tip', text: 'Store potatoes and onions separately to prevent them from sprouting prematurely.' },
       { icon: Landmark, category: 'BPI', text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!' },
       { icon: Landmark, category: 'BPI', text: 'Using the BPI Mobile App helps reduce your carbon footprint by eliminating trips to a branch.' },
       { icon: Landmark, category: 'BPI', text: 'BPI offers paperless ATM services, like on-screen balance checks, to reduce receipt waste.' },
@@ -75,7 +82,7 @@ export function FunFactPanel() {
     ];
     
     return [...baseFacts, ...personalizedFacts];
-  }, [logs, savingsEvents]);
+  }, [wasteLogs, savingsEvents]);
 
 
   useEffect(() => {
@@ -96,6 +103,7 @@ export function FunFactPanel() {
     Tip: "bg-amber-100 text-amber-800",
     BPI: "bg-red-100 text-red-800",
     Personalized: "bg-green-100 text-green-800",
+    Achievement: "bg-purple-100 text-purple-800",
   }
 
   return (
