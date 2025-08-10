@@ -14,7 +14,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { differenceInDays, isWithinInterval, startOfToday } from 'date-fns';
+import { differenceInDays, isWithinInterval, startOfToday, subDays } from 'date-fns';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
@@ -118,8 +118,10 @@ export default function InsightDetailPage() {
             const lastLogDate = new Date(logs[0].date);
             days = differenceInDays(startOfToday(), lastLogDate);
         }
+        const today = startOfToday();
+        const sevenDaysAgo = subDays(today, 7);
         const weekWaste = logs
-            .filter(l => isWithinInterval(new Date(l.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() }))
+            .filter(l => isWithinInterval(new Date(l.date), { start: sevenDaysAgo, end: today }))
             .reduce((acc, l) => acc + l.totalPesoValue, 0);
         const target = Math.max(0, weekWaste * 0.85);
         return { daysSinceLastWaste: days, weeklyWaste: weekWaste, weeklyTarget: target };
