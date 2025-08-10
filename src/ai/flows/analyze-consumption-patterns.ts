@@ -103,8 +103,8 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
   },
   async (input) => {
     // This check is the primary gate. If no items are in pantry AND no waste logs exist, return default.
-    const hasData = (input.pantryItems && input.pantryItems.length > 0) || (input.wasteLogs && input.wasteLogs.length > 0);
-    if (!hasData) {
+    const hasSufficientData = (input.pantryItems && input.pantryItems.length > 0) || (input.wasteLogs && input.wasteLogs.length > 0);
+    if (!hasSufficientData) {
         console.log("No data provided to analyze. Returning default insight.");
         return generateDefaultInsight();
     }
