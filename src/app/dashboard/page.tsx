@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -305,7 +304,7 @@ export default function DashboardPage() {
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-green-200">Virtual Savings</p>
                     <p className="text-3xl font-bold text-white">{formatPeso(weeklySavingsStats.totalSavings)}</p>
-                    <p className="text-xs text-white/80">From using items before expiry</p>
+                    <p className="text-xs text-white/80">From using items before they spoil, based on their cost and waste risk.</p>
                 </div>
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
@@ -313,9 +312,9 @@ export default function DashboardPage() {
                     <p className="text-xs text-white/60">Story-based comparison</p>
                 </div>
                 <div className="space-y-1">
-                     <p className="text-sm font-medium text-red-200">Food Waste Logged</p>
-                    <p className="text-3xl font-bold text-white">{formatPeso(weeklyWasteStats.totalPesoValue)}</p>
-                    <p className="text-xs text-white/80">Track and reduce weekly losses</p>
+                     <p className="text-sm font-medium text-red-200">Total Carbon Footprint</p>
+                    <p className="text-3xl font-bold text-white">{weeklyWasteStats.totalCarbonFootprint.toFixed(2)}<span className="text-xl">kg CO₂e</span></p>
+                    <p className="text-xs text-white/80">From items wasted this week</p>
                 </div>
             </CardContent>
         </Card>
@@ -516,11 +515,3 @@ export default function DashboardPage() {
   );
 
     
-
-
-
-    
-
-    
-
-
