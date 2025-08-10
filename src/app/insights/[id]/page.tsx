@@ -7,7 +7,7 @@ import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles, AlertTriangle, HelpCircle, TrendingUp, Landmark } from 'lucide-react';
+import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles, AlertTriangle, HelpCircle, TrendingUp, Landmark, RefreshCw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
@@ -74,6 +74,7 @@ export default function InsightDetailPage() {
     const { liveItems } = usePantryLogStore();
     const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
     const [isLevelingUp, setIsLevelingUp] = useState(false);
+    const [isRegenerating, setIsRegenerating] = useState(false);
     const [bpiInsight, setBpiInsight] = useState<Insight | null>(null);
 
     useEffect(() => {
@@ -147,6 +148,34 @@ export default function InsightDetailPage() {
         }
     }
 
+    const handleRegenerate = async () => {
+        if (!user) return;
+        setIsRegenerating(true);
+        try {
+            const input = {
+                pantryItems: liveItems,
+                wasteLogs: logs,
+                bpiTrackPlanData: isBpiLinked ? trackPlanData : undefined,
+            };
+
+            const newInsightId = await generateNewInsight(user, input, true);
+            toast({
+                title: 'Insight Regenerated!',
+                description: "We've created a new analysis for you.",
+            });
+            router.push(`/insights/${newInsightId}`);
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Could not regenerate insight.',
+            });
+        } finally {
+            setIsRegenerating(false);
+        }
+    };
+
     const milestone = useMemo(() => {
         let days = -1;
         if (logs.length > 0) {
@@ -186,14 +215,20 @@ export default function InsightDetailPage() {
 
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-            <div className="flex items-center gap-2 md:gap-4">
-                <Button variant="outline" size="icon" onClick={() => router.back()}>
-                    <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <div className="space-y-1">
-                    <h1 className="text-xl font-bold tracking-tight">{displayInsight.patternAlert}</h1>
-                    <p className="text-sm text-muted-foreground">Insight from {new Date(displayInsight.date).toLocaleDateString()}</p>
+            <div className="flex items-center justify-between gap-2 md:gap-4">
+                <div className="flex items-center gap-2 md:gap-4">
+                    <Button variant="outline" size="icon" onClick={() => router.back()}>
+                        <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="space-y-1">
+                        <h1 className="text-xl font-bold tracking-tight">{displayInsight.patternAlert}</h1>
+                        <p className="text-sm text-muted-foreground">Insight from {new Date(displayInsight.date).toLocaleDateString()}</p>
+                    </div>
                 </div>
+                 <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isRegenerating || isLevelingUp}>
+                    {isRegenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
+                    Regenerate
+                </Button>
             </div>
 
             <div className="grid gap-6">
