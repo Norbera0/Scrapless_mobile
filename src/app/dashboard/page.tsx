@@ -39,6 +39,7 @@ import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSaving
 import type { PantryItem } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { updatePantryItemStatus } from '@/lib/data';
+import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -318,6 +319,10 @@ export default function DashboardPage() {
                 </div>
             </CardContent>
         </Card>
+        
+        <div className="mb-8">
+            <FunFactPanel />
+        </div>
 
         {/* Quick Actions Section (tap-friendly, mobile-first) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -517,4 +522,5 @@ export default function DashboardPage() {
     
 
     
+
 
