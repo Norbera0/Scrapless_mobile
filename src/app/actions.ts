@@ -2,6 +2,9 @@
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
+import { analyzeConsumptionPatterns, type AnalyzeConsumptionPatternsInput, type AnalyzeConsumptionPatternsOutput } from '@/ai/flows/analyze-consumption-patterns';
+import { saveInsight } from '@/lib/data';
+import type { Insight, User } from '@/types';
 
 /**
  * Server Action to get recipe suggestions.
@@ -22,5 +25,47 @@ export async function getRecipeSuggestions(input: SuggestRecipesInput): Promise<
         // In a real app, you might want more sophisticated error handling here.
         // For now, we'll re-throw to let the client-side catch it.
         throw new Error("Failed to generate recipe recommendations.");
+    }
+}
+
+
+/**
+ * Server Action to generate and save a new insight for a user.
+ * This is now the single source of truth for creating insights.
+ */
+export async function generateNewInsight(user: User, data: {
+    pantryItems: any[],
+    wasteLogs: any[],
+    bpiTrackPlanData: any,
+}): Promise<string> {
+    
+    const analysisInput: AnalyzeConsumptionPatternsInput = {
+        userName: user.name?.split(' ')[0] || 'User',
+        pantryItems: data.pantryItems.map(item => ({
+            name: item.name,
+            estimatedExpirationDate: item.estimatedExpirationDate,
+            estimatedAmount: `${item.quantity} ${item.unit}`,
+        })),
+        wasteLogs: data.wasteLogs,
+        bpiTrackPlanData: data.bpiTrackPlanData || undefined,
+    };
+
+    try {
+        // The flow now handles errors gracefully and returns a default insight if needed.
+        const analysisResult = await analyzeConsumptionPatterns(analysisInput);
+        
+        const newInsight: Omit<Insight, 'id'> = {
+            ...analysisResult,
+            userId: user.uid,
+            date: new Date().toISOString(),
+            status: 'new',
+        };
+
+        const newInsightId = await saveInsight(newInsight);
+        return newInsightId;
+
+    } catch (error) {
+        console.error("Failed to generate and save new insight via server action:", error);
+        throw new Error("Failed to generate a new insight.");
     }
 }
