@@ -59,7 +59,7 @@ export const LogPantryItemOutputSchema = z.object({
             refrigerator: z.number().describe("Shelf life in days if stored in the refrigerator."),
             freezer: z.number().describe("Shelf life in days if stored in the freezer."),
         }).describe("The estimated shelf life of the item in days, broken down by storage method."),
-        carbonFootprint: z.number().optional().describe("The estimated carbonFootprint in kg CO2e."),
+        carbonFootprint: z.number().optional().describe("The estimated carbonFootPrint in kg CO2e."),
         estimatedCost: z.number().optional().describe("The estimated cost of the item in PHP."),
         purchaseSource: z.string().optional().describe("The source where the item was purchased (e.g., 'supermarket', 'wet_market', 'sari_sari_store', 'minimart', 'online', 'home_grown', 'gift_shared', 'other')."),
       })
@@ -160,7 +160,7 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 
 export const AnalyzeConsumptionPatternsOutputSchema = z.object({
-    predictionAlertBody: z.string().optional().describe("A high-confidence prediction about likely future waste, if any is detected."),
+    predictionAlertBody: z.string().optional().describe("A high-confidence prediction about likely future waste, if any is detected. This should integrate BPI data if available, e.g., 'BPI data shows high grocery spending...'"),
     keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
     patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
     smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
@@ -175,7 +175,7 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
             successRate: z.number().min(0).max(1).describe("The estimated success rate of this solution (e.g., 0.75 for 75%)."),
             estimatedSavings: z.number().optional().describe("The estimated financial savings in PHP if the user follows this solution."),
         })
-    ).describe("A list of 3-4 actionable alternative solutions."),
+    ).describe("A list of 3-4 actionable alternative solutions. If BPI data is present, one solution should be BPI-related."),
     similarUserStory: z.string().describe("An encouraging story about similar users (e.g., 'Users who fixed this pattern typically saved ₱200/month')."),
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
