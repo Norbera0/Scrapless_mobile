@@ -56,8 +56,30 @@ export async function generateNewInsight(
     };
 
     try {
-        // The flow now handles errors gracefully and returns a default insight if needed.
         const analysisResult = await analyzeConsumptionPatterns(analysisInput);
+        
+        // This is a critical check. If the AI flow returns a default/empty insight,
+        // it won't have a keyObservation, but we should still process it gracefully.
+        if (!analysisResult || !analysisResult.keyObservation) {
+             const defaultInsight: Omit<Insight, 'id'> = {
+                keyObservation: "We need a bit more data to identify your unique patterns.",
+                patternAlert: "Start logging waste and pantry items for personalized insights.",
+                smartTip: "The more you log, the smarter the tips become.",
+                smartShoppingPlan: "Let's build a shopping plan together once we have more data.",
+                whatsReallyHappening: "The system is ready to analyze your data.",
+                whyThisPatternExists: "Your habits are unique, and we're excited to discover them with you.",
+                financialImpact: "Unlock potential savings by tracking your food habits.",
+                solutions: [],
+                similarUserStory: "Many users start seeing patterns after just a week of logging!",
+                userId: user.uid,
+                date: new Date().toISOString(),
+                status: 'new',
+            };
+            if(saveToFirestore) {
+                return await saveInsight(defaultInsight);
+            }
+            return defaultInsight;
+        }
         
         const newInsight: Omit<Insight, 'id'> = {
             ...analysisResult,
