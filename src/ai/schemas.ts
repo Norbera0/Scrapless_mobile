@@ -228,6 +228,15 @@ export const GenerateShoppingListOutputSchema = z.object({
       estimatedCost: z.number().describe('The estimated cost of the item in PHP.'),
       priority: z.enum(['essential', 'recommended', 'optional']).describe('The priority of the item.'),
       reasoning: z.string().describe('A human-readable explanation for the suggestion.'),
+      deal: z.object({
+        dealType: z.enum(['cashback', 'bogo', 'points', 'green']).describe("The type of deal."),
+        icon: z.enum(['bpi', 'vybe', 'green_partner']).describe("The icon to display for the deal."),
+        title: z.string().describe("The main title of the deal alert (e.g., 'BPI Deal Alert!', 'BPI Rewards Boost!')."),
+        merchant: z.string().describe("The merchant where the deal is available."),
+        description: z.string().describe("A short description of the deal (e.g., '15% Cashback', 'Buy 1, Get 1 Free')."),
+        terms: z.string().optional().describe("The terms and conditions of the deal (e.g., 'Valid until Aug 31. Min. spend ₱2,000')."),
+        estimatedSavings: z.string().describe("The tangible value for the user (e.g., '~₱57.00', '~₱85.00', '~25 Bonus Points', 'Free Reusable Bag')."),
+      }).optional().describe('An optional promotional deal associated with this item.'),
     })
   ),
   totalEstimatedCost: z.number().describe('The total estimated cost of the shopping list in PHP.'),
