@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -45,6 +46,10 @@ export default {
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
+        },
+        'bpi-brand': {
+          DEFAULT: 'hsl(var(--bpi-brand))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

@@ -32,12 +32,17 @@ export async function getRecipeSuggestions(input: SuggestRecipesInput): Promise<
 /**
  * Server Action to generate and save a new insight for a user.
  * This is now the single source of truth for creating insights.
+ * Can optionally skip saving to Firestore for temporary display.
  */
-export async function generateNewInsight(user: User, data: {
-    pantryItems: any[],
-    wasteLogs: any[],
-    bpiTrackPlanData: any,
-}): Promise<string> {
+export async function generateNewInsight(
+    user: User, 
+    data: {
+        pantryItems: any[],
+        wasteLogs: any[],
+        bpiTrackPlanData?: any,
+    },
+    saveToFirestore: boolean = true
+): Promise<string | Omit<Insight, 'id'>> {
     
     const analysisInput: AnalyzeConsumptionPatternsInput = {
         userName: user.name?.split(' ')[0] || 'User',
@@ -47,7 +52,7 @@ export async function generateNewInsight(user: User, data: {
             estimatedAmount: `${item.quantity} ${item.unit}`,
         })),
         wasteLogs: data.wasteLogs,
-        bpiTrackPlanData: data.bpiTrackPlanData || undefined,
+        bpiTrackPlanData: data.bpiTrackPlanData, // Can be undefined
     };
 
     try {
@@ -61,8 +66,12 @@ export async function generateNewInsight(user: User, data: {
             status: 'new',
         };
 
-        const newInsightId = await saveInsight(newInsight);
-        return newInsightId;
+        if (saveToFirestore) {
+            const newInsightId = await saveInsight(newInsight);
+            return newInsightId;
+        } else {
+            return newInsight; // Return the object without saving
+        }
 
     } catch (error) {
         console.error("Failed to generate and save new insight via server action:", error);

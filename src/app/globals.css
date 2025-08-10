@@ -28,6 +28,10 @@
     
     --destructive: 13 100% 50%; /* #FF3C00 - Vibrant Orange */
     --destructive-foreground: 0 0% 100%;
+
+    /* BPI Brand Color */
+    --bpi-brand-rgb: 177 17 22;
+    --bpi-brand: 358 82% 39%; /* hsl(358, 82%, 39%) for #B11116 */
     
     --border: 40 8% 85%;
     --input: 40 8% 85%;
@@ -74,6 +78,10 @@
     
     --destructive: 13 100% 50%; /* #FF3C00 */
     --destructive-foreground: 0 0% 100%;
+
+    /* BPI Brand Color */
+    --bpi-brand-rgb: 177 17 22;
+    --bpi-brand: 358 82% 39%;
 
     --border: 165 73% 25%;
     --input: 165 73% 25%;
@@ -415,5 +423,3 @@
         }
     }
 }
-
-    

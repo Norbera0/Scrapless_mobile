@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { differenceInDays, isWithinInterval, startOfToday, subDays } from 'date-fns';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { generateNewInsight } from '@/app/actions';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     const isBpiSolution = solution.solution.toLowerCase().includes('bpi');
@@ -69,7 +71,10 @@ export default function InsightDetailPage() {
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
     const { logs } = useWasteLogStore();
-    const { isLinked: isBpiLinked } = useBpiTrackPlanStore();
+    const { liveItems } = usePantryLogStore();
+    const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
+    const [isLevelingUp, setIsLevelingUp] = useState(false);
+    const [bpiInsight, setBpiInsight] = useState<Insight | null>(null);
 
     useEffect(() => {
         if (insightsInitialized && id) {
@@ -111,6 +116,36 @@ export default function InsightDetailPage() {
             setIsUpdatingStatus(false);
         }
     }
+    
+    const handleLevelUp = async () => {
+        if (!user) return;
+        setIsLevelingUp(true);
+        try {
+            const input = {
+                pantryItems: liveItems,
+                wasteLogs: logs,
+                bpiTrackPlanData: trackPlanData, // Always include BPI data for level up
+            };
+
+            // We generate a new insight but don't save it, just for display
+            const analysisResult = await generateNewInsight(user, input, false);
+            setBpiInsight(analysisResult as Insight); // Assume the action returns the full object
+            toast({
+                title: 'BPI Insights Unlocked!',
+                description: 'Check out your enhanced analysis.',
+            });
+
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: 'Could not generate BPI insights.',
+            });
+        } finally {
+            setIsLevelingUp(false);
+        }
+    }
 
     const milestone = useMemo(() => {
         let days = -1;
@@ -134,18 +169,20 @@ export default function InsightDetailPage() {
             </div>
         )
     }
+    
+    const displayInsight = bpiInsight || insight;
 
-    if (!insight) {
+    if (!displayInsight) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <h2 className="text-2xl font-bold">Insight Not Found</h2>
                 <p className="text-muted-foreground">This insight may have been deleted or never existed.</p>
-                <Button onClick={() => router.push('/insights/history')} className="mt-4">Go to History</Button>
+                <Button onClick={() => router.push('/insights')} className="mt-4">Go to Insights Hub</Button>
             </div>
         )
     }
     
-    const financialValue = insight.financialImpact.match(/₱(\d+)/)?.[1];
+    const financialValue = displayInsight.financialImpact.match(/₱(\d+)/)?.[1];
 
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
@@ -154,19 +191,37 @@ export default function InsightDetailPage() {
                     <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div className="space-y-1">
-                    <h1 className="text-xl font-bold tracking-tight">{insight.patternAlert}</h1>
-                    <p className="text-sm text-muted-foreground">Insight from {new Date(insight.date).toLocaleDateString()}</p>
+                    <h1 className="text-xl font-bold tracking-tight">{displayInsight.patternAlert}</h1>
+                    <p className="text-sm text-muted-foreground">Insight from {new Date(displayInsight.date).toLocaleDateString()}</p>
                 </div>
             </div>
 
             <div className="grid gap-6">
-                 {isBpiLinked && insight.predictionAlertBody && (
+                 {bpiInsight && bpiInsight.predictionAlertBody && (
                     <Card className="bg-blue-50 border-blue-200">
                         <CardHeader>
                             <CardTitle className="text-base flex items-center gap-2 text-blue-800"><Landmark /> BPI-Powered Prediction</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-blue-900">{insight.predictionAlertBody}</p>
+                            <p className="text-sm text-blue-900">{bpiInsight.predictionAlertBody}</p>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {!bpiInsight && isBpiLinked && (
+                    <Card className="bg-bpi-brand/10 border-bpi-brand/20">
+                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <Landmark className="w-8 h-8 text-bpi-brand" />
+                                <div>
+                                    <h3 className="font-bold text-bpi-brand">Level Up Your Insights</h3>
+                                    <p className="text-sm text-bpi-brand/80">Connect your BPI data for a deeper financial analysis.</p>
+                                </div>
+                            </div>
+                            <Button className="bg-bpi-brand hover:bg-bpi-brand/90 w-full sm:w-auto" onClick={handleLevelUp} disabled={isLevelingUp}>
+                                {isLevelingUp ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2"/>}
+                                Level Up with BPI
+                            </Button>
                         </CardContent>
                     </Card>
                 )}
@@ -178,7 +233,7 @@ export default function InsightDetailPage() {
                             <Wallet className="h-4 w-4 text-red-700" />
                         </CardHeader>
                         <CardContent>
-                             <div className="text-2xl font-bold text-red-800">{financialValue ? `₱${financialValue}` : insight.financialImpact.split(' ')[0]}</div>
+                             <div className="text-2xl font-bold text-red-800">{financialValue ? `₱${financialValue}` : displayInsight.financialImpact.split(' ')[0]}</div>
                              <p className="text-xs text-red-600">
                                 {financialValue ? `in wasted vegetables over 4 weekends` : `est. monthly loss`}
                             </p>
@@ -190,7 +245,7 @@ export default function InsightDetailPage() {
                             <Sparkles className="h-4 w-4 text-green-700" />
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-green-900 font-semibold">{insight.smartTip}</p>
+                            <p className="text-sm text-green-900 font-semibold">{displayInsight.smartTip}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -201,7 +256,7 @@ export default function InsightDetailPage() {
                             <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
+                            <p className="text-sm text-muted-foreground">{displayInsight.whatsReallyHappening}</p>
                         </CardContent>
                     </Card>
                      <Card>
@@ -209,7 +264,7 @@ export default function InsightDetailPage() {
                             <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
+                            <p className="text-sm text-muted-foreground">{displayInsight.whyThisPatternExists}</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -234,7 +289,7 @@ export default function InsightDetailPage() {
              <div>
                 <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {insight.solutions.map((solution, index) => (
+                    {displayInsight.solutions.map((solution, index) => (
                         <SolutionCard 
                             key={index} 
                             solution={solution} 
@@ -251,7 +306,7 @@ export default function InsightDetailPage() {
                     <CardTitle className="flex items-center gap-2 text-base"><Users className="text-primary" /> You're Not Alone</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground italic">"{insight.similarUserStory}"</p>
+                    <p className="text-sm text-muted-foreground italic">"{displayInsight.similarUserStory}"</p>
                 </CardContent>
             </Card>
 

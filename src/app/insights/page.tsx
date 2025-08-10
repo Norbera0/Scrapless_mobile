@@ -62,20 +62,10 @@ export default function InsightsPage() {
     };
 
 
-    useEffect(() => {
-        // This effect redirects to the latest insight if one exists.
-        // It no longer shows a loading spinner for the whole page.
-        // The page will render its content, and then redirect if needed.
-        if (insightsInitialized && insights.length > 0) {
-            // Check to avoid redirect loop if already on a detail page that this hub might render behind
-            if (!window.location.pathname.startsWith('/insights/')) {
-                 router.replace(`/insights/${insights[0].id}`);
-            }
-        }
-    }, [insights, insightsInitialized, router]);
+    // This page is now a hub. It no longer redirects automatically.
+    // The user can choose to view their latest insight or generate a new one.
+    const latestInsight = insights.length > 0 ? insights[0] : null;
 
-    // This is the content shown when no insights exist OR while the initial check is happening.
-    // The redirect effect above will handle navigation if an insight is found.
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -98,29 +88,33 @@ export default function InsightsPage() {
             </div>
 
             {(!insightsInitialized || isGenerating) ? (
-                <div className="flex h-full w-full items-center justify-center p-4">
+                <div className="flex h-64 w-full items-center justify-center p-4">
                     <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
-            ) : insights.length === 0 ? (
+            ) : latestInsight ? (
+                 <Card 
+                    className="bg-primary/10 border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors"
+                    onClick={() => router.push(`/insights/${latestInsight.id}`)}
+                >
+                    <CardHeader>
+                        <CardTitle>Latest Insight</CardTitle>
+                        <CardDescription>{new Date(latestInsight.date).toLocaleString()}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="font-semibold">{latestInsight.patternAlert}</p>
+                        <p className="text-sm text-muted-foreground mt-2">{latestInsight.smartTip}</p>
+                    </CardContent>
+                </Card>
+            ) : (
                 <Card>
                     <CardContent className="pt-6">
                         <div className="text-center text-muted-foreground py-10">
                             <Lightbulb className="w-12 h-12 mx-auto mb-4 text-primary/30" />
                             <h3 className="text-lg font-semibold">No insights yet</h3>
-                            <p className="text-sm">Log your waste and pantry items to generate your first one!</p>
-                             <Button onClick={() => router.push('/log-waste?method=camera')} className="mt-4">
-                                Log Waste
-                            </Button>
+                            <p className="text-sm">Click 'Generate New Insight' to get started!</p>
                         </div>
                     </CardContent>
                  </Card>
-            ) : (
-                // When an insight exists, the user will be redirected by the useEffect.
-                // This content is a fallback while redirecting.
-                <div className="flex h-full w-full items-center justify-center p-4">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <p className="ml-2">Loading your latest insight...</p>
-                </div>
             )}
         </div>
     );
