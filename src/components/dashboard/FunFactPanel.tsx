@@ -63,10 +63,15 @@ export function FunFactPanel() {
     const baseFacts: Fact[] = [
       { icon: Lightbulb, category: 'Trivia', text: 'Did you know? About one-third of all food produced globally for human consumption is lost or wasted.' },
       { icon: Info, category: 'Tip', text: 'Store potatoes and onions separately to prevent them from sprouting prematurely.' },
-      { icon: Landmark, category: 'BPI', text: 'Link your BPI account to transfer your eco-savings and earn exclusive rewards.', cta: { label: 'Link Account', href: '/bpi' }},
+      { icon: Landmark, category: 'BPI', text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!' },
+      { icon: Landmark, category: 'BPI', text: 'Using the BPI Mobile App helps reduce your carbon footprint by eliminating trips to a branch.' },
+      { icon: Landmark, category: 'BPI', text: 'BPI offers paperless ATM services, like on-screen balance checks, to reduce receipt waste.' },
+      { icon: Landmark, category: 'BPI', text: "Fun fact! BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite." },
+      { icon: Landmark, category: 'BPI', text: 'Did you know BPI was the first Philippine bank to get Green Building certification for its branches?' },
+      { icon: Landmark, category: 'BPI', text: 'You can donate to charities like WWF directly from your BPI app using the eDonate feature.', cta: { label: 'Explore BPI Hub', href: '/bpi' }},
+      { icon: Landmark, category: 'BPI', text: 'You can get a Solar Mortgage from BPI to help finance solar panels for your home.', cta: { label: 'Learn More in BPI Hub', href: '/bpi' }},
       { icon: Info, category: 'Tip', text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.' },
       { icon: Lightbulb, category: 'Trivia', text: 'In the Philippines, food waste per capita is estimated at 20kg per year.' },
-      { icon: Landmark, category: 'BPI', text: 'Use your BPI card at partner eco-merchants to get up to 8% cashback.', cta: { label: 'See Partners', href: '/bpi/marketplace' }},
     ];
     
     return [...baseFacts, ...personalizedFacts];
