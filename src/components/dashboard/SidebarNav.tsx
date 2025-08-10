@@ -65,11 +65,6 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
-    { href: '/bpi', label: 'BPI Hub', icon: Landmark, relatedPaths: ['/bpi/login', '/bpi/dashboard', '/bpi/rewards', '/bpi/marketplace', '/bpi/goals', '/bpi/transfer'] },
-  ];
-
-  const bottomMenuItems = [
-    { href: '/profile', label: 'Profile', icon: User },
   ];
   
   const getInitials = (name?: string | null) => {
@@ -124,24 +119,6 @@ export function SidebarNav({ user }: { user: UserType }) {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2">
-        <SidebarMenu>
-          {bottomMenuItems.map((item) => {
-             const Icon = item.icon;
-             return (
-               <SidebarMenuItem key={item.href}>
-                 <SidebarMenuButton
-                   onClick={() => handleNavigation(item.href)}
-                   isActive={isActive(item.href, item.relatedPaths)}
-                   className="w-full justify-start text-base h-12"
-                   tooltip={item.label}
-                 >
-                   <Icon className="h-5 w-5" />
-                   <span>{item.label}</span>
-                 </SidebarMenuButton>
-               </SidebarMenuItem>
-             );
-          })}
-        </SidebarMenu>
         <SidebarSeparator />
         <div 
           className="flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-secondary/50 transition-colors"
@@ -158,10 +135,6 @@ export function SidebarNav({ user }: { user: UserType }) {
             <span className="text-xs text-muted-foreground truncate">{user.email}</span>
           </div>
         </div>
-        <Button variant="ghost" className="w-full justify-start gap-2 group-data-[[data-collapsible=icon]]/sidebar-wrapper:justify-center" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
-          <span className='group-data-[[data-collapsible=icon]]/sidebar-wrapper:hidden'>Log Out</span>
-        </Button>
       </SidebarFooter>
     </>
   );
