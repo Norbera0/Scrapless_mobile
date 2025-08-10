@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark } from 'lucide-react';
 import { signOut } from 'firebase/auth';
-import { auth, cleanupListeners } from '@/lib/firebase';
+import { auth } from '@/lib/firebase';
+import { cleanupListeners } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 
 const getInitials = (name?: string | null) => {
