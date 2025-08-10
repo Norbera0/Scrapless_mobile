@@ -59,22 +59,22 @@ For some of the generated items, find and embed a relevant BPI deal. Make the de
 
 -   **DEAL CHANCE:** Do not add a deal to every item. Apply deals to 2-3 items in the list where it makes the most sense.
 -   **DEAL STRUCTURE:** If you add a deal, you **MUST** populate all fields in the optional 'deal' object:
-    -   `dealType`: 'cashback', 'bogo' (Buy One Get One), 'points', or 'green'.
-    -   `icon`: 'bpi' for credit card, 'vybe' for QR payment, 'green_partner' for ESG deals.
-    -   `title`: A catchy title like "BPI Deal Alert!" or "BPI Rewards Boost!".
-    -   `merchant`: A realistic PH merchant (e.g., Robinsons Supermarket, Landmark, S&R).
-    -   `description`: The core offer (e.g., "15% Cashback", "Buy 1, Get 1 Free").
-    -   `terms`: (Optional) Concise terms (e.g., "Valid until Aug 31. Min. spend ₱2,000").
-    -   `estimatedSavings`: The tangible value to the user (e.g., "~₱57.00", "~25 Bonus Points", "Free Reusable Bag").
+    -   \`dealType\`: 'cashback', 'bogo' (Buy One Get One), 'points', or 'green'.
+    -   \`icon\`: 'bpi' for credit card, 'vybe' for QR payment, 'green_partner' for ESG deals.
+    -   \`title\`: A catchy title like "BPI Deal Alert!" or "BPI Rewards Boost!".
+    -   \`merchant\`: A realistic PH merchant (e.g., Robinsons Supermarket, Landmark, S&R).
+    -   \`description\`: The core offer (e.g., "15% Cashback", "Buy 1, Get 1 Free").
+    -   \`terms\`: (Optional) Concise terms (e.g., "Valid until Aug 1. Min. spend ₱2,000").
+    -   \`estimatedSavings\`: The tangible value to the user (e.g., "~₱57.00", "~25 Bonus Points", "Free Reusable Bag").
 
 -   **EXAMPLE DEAL (for Chicken Breast):**
-    -   `dealType`: 'cashback'
-    -   `icon`: 'bpi'
-    -   `title`: "BPI Deal Alert!"
-    -   `merchant`: "Robinsons Supermarket"
-    -   `description`: "15% Cashback"
-    -   `terms`: "when you pay with your BPI Credit Card. (Valid until Aug 31. Min. spend ₱2,000)"
-    -   `estimatedSavings`: "~₱57.00"
+    -   \`dealType\`: 'cashback'
+    -   \`icon\`: 'bpi'
+    -   \`title\`: "BPI Deal Alert!"
+    -   \`merchant\`: "Robinsons Supermarket"
+    -   \`description\`: "15% Cashback"
+    -   \`terms\`: "when you pay with your BPI Credit Card. (Valid until Aug 31. Min. spend ₱2,000)"
+    -   \`estimatedSavings\`: "~₱57.00"
 
 **OUTPUT FORMATTING:**
 -   For each item, provide a unique ID, name, category, quantity, estimated cost in PHP, priority, and clear reasoning.
