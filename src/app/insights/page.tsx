@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useInsightStore } from '@/stores/insight-store';
 import type { Insight, User } from '@/types';
 import { Loader2, Lightbulb, History, Plus } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { generateNewInsight } from '@/app/actions';
 import { useAuth } from '@/hooks/use-auth';
