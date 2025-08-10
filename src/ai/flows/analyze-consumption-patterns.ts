@@ -102,17 +102,19 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
     outputSchema: AnalyzeConsumptionPatternsOutputSchema,
   },
   async (input) => {
+    // This check is the primary gate. If no items are in pantry AND no waste logs exist, return default.
+    const hasData = (input.pantryItems && input.pantryItems.length > 0) || (input.wasteLogs && input.wasteLogs.length > 0);
+    if (!hasData) {
+        console.log("No data provided to analyze. Returning default insight.");
+        return generateDefaultInsight();
+    }
+    
     try {
-        const hasData = input.pantryItems.length > 0 || input.wasteLogs.length > 0;
-        if (!hasData) {
-             console.log("No data provided to analyze. Returning default insight.");
-             return generateDefaultInsight();
-        }
-
         const { output } = await prompt(input);
         
+        // This is a secondary check. If the AI returns a null/empty output despite having data, fall back.
         if (!output || !output.keyObservation) {
-            console.log("AI did not return a valid output. Returning default insight.");
+            console.log("AI did not return a valid output despite having data. Returning default insight.");
             return generateDefaultInsight();
         }
         
@@ -128,8 +130,8 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
         return output;
 
     } catch (error) {
-        console.error("Error in analyzeConsumptionPatternsFlow:", error);
-        // If any error occurs during the AI call, return the default insight.
+        console.error("Error during AI prompt execution in analyzeConsumptionPatternsFlow:", error);
+        // If any error occurs during the AI call itself, return the default insight.
         return generateDefaultInsight();
     }
   }
