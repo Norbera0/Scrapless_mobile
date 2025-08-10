@@ -9,6 +9,7 @@ import { getLatestInsight, saveInsight, getExpiredPantryItems, moveExpiredItemsT
 import { analyzeConsumptionPatterns } from '@/ai/flows/analyze-consumption-patterns';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -18,6 +19,8 @@ const fetchAndSaveNewInsight = async (user: User, wasteLogs: WasteLog[], pantryI
   }
   
   try {
+    const { isLinked, trackPlanData } = useBpiTrackPlanStore.getState();
+
     const analysisResult = await analyzeConsumptionPatterns({
       userName: user.name?.split(' ')[0] || 'User',
       wasteLogs: wasteLogs,
@@ -26,6 +29,7 @@ const fetchAndSaveNewInsight = async (user: User, wasteLogs: WasteLog[], pantryI
           estimatedExpirationDate: item.estimatedExpirationDate,
           estimatedAmount: `${item.quantity} ${item.unit}`,
       })),
+      bpiTrackPlanData: isLinked ? trackPlanData || undefined : undefined,
     });
 
     const newInsight: Omit<Insight, 'id'> = {

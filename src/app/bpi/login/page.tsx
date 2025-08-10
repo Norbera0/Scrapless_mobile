@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -6,10 +7,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useBpiLinking } from '@/lib/bpi';
+import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { useToast } from '@/hooks/use-toast';
 
 export default function BpiLoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const { state, link, unlink } = useBpiLinking();
+  const { isLinked: isTrackPlanLinked, linkAccount, fetchMockData, unlinkAccount } = useBpiTrackPlanStore();
+
   const [consent, setConsent] = useState(false);
   const [scopes, setScopes] = useState<string[]>(['accounts.read']);
 
@@ -19,34 +25,51 @@ export default function BpiLoginPage() {
 
   const handleLink = () => {
     if (!consent) return;
+    // Link main BPI account
     link(scopes);
+    // Link mock Track & Plan
+    linkAccount();
+    fetchMockData();
+
+    toast({
+        title: "Mock BPI Account Linked!",
+        description: "Sample Track & Plan data is now available for insights.",
+    });
     router.push('/bpi/dashboard');
   };
+
+  const handleUnlink = () => {
+    unlink();
+    unlinkAccount();
+    toast({
+        title: "Mock BPI Account Unlinked",
+        description: "Sample data has been cleared.",
+    });
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Mock BPI Login & Permissions</CardTitle>
-        <CardDescription>Authenticate and grant read access to accounts and balances. This is a non-production demo.</CardDescription>
+        <CardDescription>Authenticate and grant read access to accounts, balances, and Track & Plan spending data. This is a non-production demo.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={scopes.includes('accounts.read')} onCheckedChange={() => toggleScope('accounts.read')} /> Read accounts & balances</label>
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={scopes.includes('transactions.read')} onCheckedChange={() => toggleScope('transactions.read')} /> Read transactions</label>
           <label className="flex items-center gap-2 text-sm"><Checkbox checked={scopes.includes('transfers.create')} onCheckedChange={() => toggleScope('transfers.create')} /> Create transfers (sandbox)</label>
+          <label className="flex items-center gap-2 text-sm"><Checkbox checked={isTrackPlanLinked || scopes.includes('track_plan.read')} onCheckedChange={() => toggleScope('track_plan.read')} /> Access Track & Plan spending data</label>
         </div>
         <label className="flex items-center gap-2 text-sm">
           <Checkbox checked={consent} onCheckedChange={(v) => setConsent(Boolean(v))} /> I consent to securely share selected data for the purpose of sustainability-linked features.
         </label>
         <div className="flex gap-2">
           <Button onClick={handleLink} disabled={!consent}>Continue</Button>
-          {state.isLinked && (
-            <Button variant="secondary" onClick={() => unlink()}>Unlink</Button>
+          {(state.isLinked || isTrackPlanLinked) && (
+            <Button variant="secondary" onClick={handleUnlink}>Unlink</Button>
           )}
         </div>
       </CardContent>
     </Card>
   );
 }
-
-

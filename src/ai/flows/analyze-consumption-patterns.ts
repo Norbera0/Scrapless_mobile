@@ -25,7 +25,7 @@ const prompt = ai.definePrompt({
   name: 'analyzeConsumptionPatternsPrompt',
   input: { schema: AnalyzeConsumptionPatternsInputSchema },
   output: { schema: AnalyzeConsumptionPatternsOutputSchema },
-  prompt: `You are a data analyst for Scrapless, a food waste reduction app for users in the Philippines. Your task is to analyze a user's food consumption and waste data to provide one clear, actionable, and detailed insight package.
+  prompt: `You are a data analyst for Scrapless, a food waste reduction app for users in the Philippines. Your task is to analyze a user's food consumption, waste, and financial data to provide one clear, actionable, and detailed insight package.
 
 CONTEXT DATA:
 - User Name: {{userName}}
@@ -45,21 +45,33 @@ CONTEXT DATA:
 {{else}}
   - No waste logged.
 {{/if}}
+{{#if bpiTrackPlanData}}
+- BPI Track & Plan Data (Financial Context):
+  {{#if bpiTrackPlanData.spendingCategories}}
+    - Grocery Spending: ~₱{{#each bpiTrackPlanData.spendingCategories}}{{#if (eq this.category "Groceries")}}{{this.amount}}{{/if}}{{/each}} ({{#each bpiTrackPlanData.spendingCategories}}{{#if (eq this.category "Groceries")}}{{this.trend}}{{/if}}{{/each}})
+  {{/if}}
+  {{#if bpiTrackPlanData.cashFlowAlert}}
+    - Cash Flow Alert: "{{bpiTrackPlanData.cashFlowAlert}}"
+  {{/if}}
+  {{#if bpiTrackPlanData.unusualTransactions}}
+    - Unusual Transactions Noted: {{#each bpiTrackPlanData.unusualTransactions}}"{{this}}", {{/each}}
+  {{/if}}
+{{/if}}
 
 YOUR TASK:
-Analyze all the provided data. Based on the analysis, provide a single, impactful insight package.
+Analyze all the provided data. If BPI data is present, you MUST integrate it into your analysis to provide richer, more contextual insights. Based on the analysis, provide a single, impactful insight package.
 
 **Insight Package Components:**
-1.  **predictionAlertBody (Optional)**: If you detect a very strong, high-confidence pattern about likely imminent waste, formulate a predictive alert. For example: "Based on your pattern, you'll likely waste vegetables this weekend. You've done this 3 of the last 4 weekends." If no high-confidence prediction is possible, leave this field blank.
-2.  **keyObservation**: A brief, one-sentence summary of the most significant pattern you found. (e.g., "You're on track to reduce waste this month!" or "Your biggest source of waste is vegetables that spoil.").
-3.  **patternAlert**: A one-sentence description of a specific, recurring behavior that leads to waste. (e.g., "You frequently waste vegetables bought on weekends.").
-4.  **smartTip**: A concrete, actionable tip to address the pattern. (e.g., "Try buying vegetables twice a week in smaller amounts instead of a large haul on Saturdays.").
-5.  **smartShoppingPlan**: A concise, one-sentence shopping tip related to the analysis. For example: "Next time, buy 4 tomatoes instead of 6 to save an estimated ₱80/month." or "Consider buying leafy greens on Wednesdays for maximum freshness."
-6.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data. (e.g., "Over the last 4 weekends, your logs show you wasted kangkong, pechay, and tomatoes that were purchased on Friday or Saturday.").
-7.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens because weekend meal plans change unexpectedly, causing fresh produce bought on Friday to sit unused until it's no longer fresh by Tuesday.").
+1.  **predictionAlertBody (Optional)**: If you detect a strong pattern (e.g., high grocery spend + high waste), formulate a predictive alert. Example: "BPI data shows high grocery spending on Fridays, and your logs show you often waste vegetables bought then. You might waste ₱150-₱200 this weekend."
+2.  **keyObservation**: A brief, one-sentence summary of the most significant pattern. (e.g., "Your grocery spending trend on BPI matches your vegetable waste pattern.").
+3.  **patternAlert**: A one-sentence description of a specific, recurring behavior. (e.g., "You frequently waste vegetables bought during periods of high grocery spending.").
+4.  **smartTip**: A concrete, actionable tip to address the pattern. If BPI data is available, make the tip financially oriented. (e.g., "Try setting a grocery budget alert in your BPI app before your weekend shop.").
+5.  **smartShoppingPlan**: A concise, one-sentence shopping tip. (e.g., "Your BPI data suggests a ₱1500 grocery budget. Stick to it by buying just enough for 2-3 meals.").
+6.  **whatsReallyHappening**: A detailed, 1-2 sentence explanation of the pattern, citing specific data from user logs and BPI data if available. (e.g., "BPI shows your grocery spending jumped 15% this month, and your waste logs show a corresponding increase in spoiled kangkong and tomatoes.").
+7.  **whyThisPatternExists**: Your analysis of the likely root cause. (e.g., "This often happens when high 'impulse' spending at the grocery store isn't backed by a solid meal plan, leading to unused items.").
 8.  **financialImpact**: The estimated financial cost of this specific pattern. (e.g., "This pattern has led to an estimated ₱180 in vegetable waste over the past month.").
-9.  **solutions**: A list of 3 actionable, alternative solutions. For each solution, provide a solution description, an estimated success rate, and an **estimatedSavings** in PHP based on the financialImpact. (e.g., [{solution: "Plan one specific weekend meal before shopping", successRate: 0.8, estimatedSavings: 90}, {solution: "Store leafy greens in paper towels to extend freshness", successRate: 0.6, estimatedSavings: 50}]).
-10. **similarUserStory**: An encouraging, relatable story. (e.g., "Many users who start planning just one weekend meal in advance cut their vegetable waste by 50% within a month!").
+9.  **solutions**: A list of 3 actionable, alternative solutions. If BPI data is present, include a BPI-related solution. For each, provide a description, success rate, and estimated savings. (e.g., [{solution: "Set a BPI spending alert for 'Groceries' category", successRate: 0.8, estimatedSavings: 100}]).
+10. **similarUserStory**: An encouraging, relatable story.
 
 Keep the tone encouraging, positive, and helpful. Focus on the single most important pattern you can find. If there is not enough data, provide a generic welcome/encouragement message for all fields.
 `,
@@ -98,6 +110,15 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
             return generateDefaultInsight();
         }
         
+        // If BPI data was used, enhance the solutions with a BPI-specific one if AI didn't add it.
+        if (input.bpiTrackPlanData && output.solutions && !output.solutions.some(s => s.solution.toLowerCase().includes('bpi'))) {
+            output.solutions.unshift({
+                solution: "Set a budget alert for 'Groceries' in your BPI app.",
+                successRate: 0.75,
+                estimatedSavings: 150
+            });
+        }
+
         return output;
 
     } catch (error) {

@@ -151,6 +151,11 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
         })
     ).describe("A list of items currently in the user's pantry."),
     wasteLogs: z.array(z.any()).describe("A list of recent waste log objects (last 30 days)."),
+    bpiTrackPlanData: z.object({
+        spendingCategories: z.array(z.object({ category: z.string(), amount: z.number(), trend: z.string() })).optional(),
+        cashFlowAlert: z.string().optional(),
+        unusualTransactions: z.array(z.string()).optional(),
+    }).optional().describe("Optional spending data from BPI Track & Plan for enhanced insights."),
 });
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 

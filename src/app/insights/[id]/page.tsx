@@ -7,7 +7,7 @@ import { useInsightStore } from '@/stores/insight-store';
 import { type Insight, type InsightSolution } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles, AlertTriangle, HelpCircle, TrendingUp } from 'lucide-react';
+import { Loader2, ArrowLeft, Lightbulb, Target, Wallet, Users, Check, Sparkles, AlertTriangle, HelpCircle, TrendingUp, Landmark } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { updateInsightStatus } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
@@ -15,12 +15,17 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { differenceInDays, isWithinInterval, startOfToday } from 'date-fns';
+import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
+    const isBpiSolution = solution.solution.toLowerCase().includes('bpi');
     return (
-        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className={cn("bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300", isBpiSolution && "bg-blue-50 border-blue-200")}>
             <CardHeader>
-                <CardTitle className='text-base'>{solution.solution}</CardTitle>
+                <CardTitle className='text-base flex items-center gap-2'>
+                    {isBpiSolution && <Landmark className="w-5 h-5 text-blue-600" />}
+                    {solution.solution}
+                </CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0 space-y-3 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
@@ -64,7 +69,7 @@ export default function InsightDetailPage() {
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
     const { logs } = useWasteLogStore();
-    const [showMore, setShowMore] = useState<{ what: boolean; why: boolean }>({ what: false, why: false });
+    const { isLinked: isBpiLinked } = useBpiTrackPlanStore();
 
     useEffect(() => {
         if (insightsInitialized && id) {
@@ -72,9 +77,6 @@ export default function InsightDetailPage() {
             if (foundInsight) {
                 setInsight(foundInsight);
                 if (foundInsight.status === 'acted_on' && foundInsight.solutions) {
-                    // Pre-populate selections if the insight was already acted on.
-                    // Assuming all solutions were selected previously for simplicity.
-                    // A more advanced implementation might store selected solution IDs.
                     const solutionNames = new Set(foundInsight.solutions.map(s => s.solution));
                     setSelectedSolutions(solutionNames);
                 }
@@ -88,17 +90,12 @@ export default function InsightDetailPage() {
         if (!user || !insight) return;
         setIsUpdatingStatus(true);
         try {
-            // Update the local state for immediate feedback
             const newSelectedSolutions = new Set(selectedSolutions);
-            if (newSelectedSolutions.has(solutionToSelect.solution)) {
-                // For now, we only allow adding, not toggling off, to keep it simple.
-                // A toggle could be added here if desired.
-            } else {
+            if (!newSelectedSolutions.has(solutionToSelect.solution)) {
                 newSelectedSolutions.add(solutionToSelect.solution);
             }
             setSelectedSolutions(newSelectedSolutions);
 
-            // If this is the first solution selected, update the insight's overall status
             if (insight.status !== 'acted_on') {
                 await updateInsightStatus(user.uid, insight.id, 'acted_on');
                 setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
@@ -107,7 +104,6 @@ export default function InsightDetailPage() {
             
         } catch (error) {
             toast({ variant: 'destructive', title: 'Error', description: 'Could not update insight status.' });
-            // Revert optimistic update on failure
             const revertedSolutions = new Set(selectedSolutions);
             revertedSolutions.delete(solutionToSelect.solution);
             setSelectedSolutions(revertedSolutions);
@@ -116,7 +112,6 @@ export default function InsightDetailPage() {
         }
     }
 
-    // Milestones & challenge data
     const milestone = useMemo(() => {
         let days = -1;
         if (logs.length > 0) {
@@ -163,6 +158,17 @@ export default function InsightDetailPage() {
             </div>
 
             <div className="grid gap-6">
+                 {isBpiLinked && insight.predictionAlertBody && (
+                    <Card className="bg-blue-50 border-blue-200">
+                        <CardHeader>
+                            <CardTitle className="text-base flex items-center gap-2 text-blue-800"><Landmark /> BPI-Powered Prediction</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-blue-900">{insight.predictionAlertBody}</p>
+                        </CardContent>
+                    </Card>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-4">
                      <Card className="bg-red-50 border-red-200">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -194,9 +200,6 @@ export default function InsightDetailPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm text-muted-foreground">{insight.whatsReallyHappening}</p>
-                            <div className="mt-2">
-                                <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, what: !s.what }))}>{showMore.what ? 'Show less' : 'Learn more'}</Button>
-                            </div>
                         </CardContent>
                     </Card>
                      <Card>
@@ -205,9 +208,6 @@ export default function InsightDetailPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm text-muted-foreground">{insight.whyThisPatternExists}</p>
-                            <div className="mt-2">
-                                <Button variant="outline" size="sm" onClick={() => setShowMore(s => ({ ...s, why: !s.why }))}>{showMore.why ? 'Show less' : 'Learn more'}</Button>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>

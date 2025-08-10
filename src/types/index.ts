@@ -234,3 +234,10 @@ export interface ShoppingList {
     stapleItemsIncluded: number;
   };
 }
+
+// BPI Track & Plan Mock Data
+export interface TrackPlanData {
+    spendingCategories: { category: string; amount: number; trend: string }[];
+    cashFlowAlert: string;
+    unusualTransactions: string[];
+}
