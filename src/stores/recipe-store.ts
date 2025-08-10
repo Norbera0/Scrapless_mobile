@@ -25,6 +25,11 @@ export const useRecipeStore = create<RecipeState>()(
         // Use localStorage only in the browser
         isBrowser ? window.localStorage : undefined
       ),
+      // Exclude large photoDataUri from being persisted
+      partialize: (state) => ({
+        ...state,
+        recipes: state.recipes.map(({ photoDataUri, ...rest }) => rest),
+      }),
       // Only run persistence logic in the browser
       skipHydration: !isBrowser, 
     }
