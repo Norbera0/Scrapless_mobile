@@ -29,6 +29,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/saves')) return 'My Saves';
     if (pathname.startsWith('/review-items')) return 'Review Items';
     if (pathname.startsWith('/review-pantry-items')) return 'Review Pantry Items';
+    if (pathname.startsWith('/profile')) return 'Profile';
     return 'Scrapless';
 }
 

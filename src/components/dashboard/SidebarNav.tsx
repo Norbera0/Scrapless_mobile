@@ -11,7 +11,8 @@ import {
     Bookmark,
     PackagePlus,
     PiggyBank,
-    Landmark
+    Landmark,
+    User
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -27,14 +28,14 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
-import type { User } from '@/types';
+import type { User as UserType } from '@/types';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
-export function SidebarNav({ user }: { user: User }) {
+export function SidebarNav({ user }: { user: UserType }) {
   const pathname = usePathname();
   const router = useRouter();
   const { state: sidebarState, setOpenMobile } = useSidebar();
@@ -66,6 +67,10 @@ export function SidebarNav({ user }: { user: User }) {
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
     { href: '/bpi', label: 'BPI Hub', icon: Landmark, relatedPaths: ['/bpi/login', '/bpi/dashboard', '/bpi/rewards', '/bpi/marketplace', '/bpi/goals', '/bpi/transfer'] },
     { href: '/saves', label: 'My Saves', icon: Bookmark },
+  ];
+
+  const bottomMenuItems = [
+    { href: '/profile', label: 'Profile', icon: User },
   ];
   
   const getInitials = (name?: string | null) => {
@@ -99,7 +104,7 @@ export function SidebarNav({ user }: { user: User }) {
         </div>
         <SidebarTrigger className="md:hidden" />
       </SidebarHeader>
-      <SidebarContent className="p-2">
+      <SidebarContent className="p-2 flex-grow">
         <SidebarMenu>
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -120,6 +125,24 @@ export function SidebarNav({ user }: { user: User }) {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2">
+        <SidebarMenu>
+          {bottomMenuItems.map((item) => {
+             const Icon = item.icon;
+             return (
+               <SidebarMenuItem key={item.href}>
+                 <SidebarMenuButton
+                   onClick={() => handleNavigation(item.href)}
+                   isActive={isActive(item.href, item.relatedPaths)}
+                   className="w-full justify-start text-base h-12"
+                   tooltip={item.label}
+                 >
+                   <Icon className="h-5 w-5" />
+                   <span>{item.label}</span>
+                 </SidebarMenuButton>
+               </SidebarMenuItem>
+             );
+          })}
+        </SidebarMenu>
         <SidebarSeparator />
         <div className="flex items-center gap-3 p-2">
           <Avatar>
