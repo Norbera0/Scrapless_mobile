@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette } from 'lucide-react';
+import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth, cleanupListeners } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
@@ -85,6 +85,17 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-3">
                             <UserIcon className="w-5 h-5 text-primary" />
                             <p className="font-medium">Account Information</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+
+                    <div 
+                        className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
+                        onClick={() => router.push('/saves')}
+                    >
+                        <div className="flex items-center gap-3">
+                            <Bookmark className="w-5 h-5 text-primary" />
+                            <p className="font-medium">My Saves</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>

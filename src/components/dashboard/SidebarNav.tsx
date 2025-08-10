@@ -66,7 +66,6 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/insights', label: 'Insights', icon: Lightbulb },
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
     { href: '/bpi', label: 'BPI Hub', icon: Landmark, relatedPaths: ['/bpi/login', '/bpi/dashboard', '/bpi/rewards', '/bpi/marketplace', '/bpi/goals', '/bpi/transfer'] },
-    { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
 
   const bottomMenuItems = [
@@ -144,7 +143,13 @@ export function SidebarNav({ user }: { user: UserType }) {
           })}
         </SidebarMenu>
         <SidebarSeparator />
-        <div className="flex items-center gap-3 p-2">
+        <div 
+          className="flex items-center gap-3 p-2 rounded-md cursor-pointer hover:bg-secondary/50 transition-colors"
+          onClick={() => handleNavigation('/profile')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleNavigation('/profile')}
+        >
           <Avatar>
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
