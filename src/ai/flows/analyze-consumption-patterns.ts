@@ -103,10 +103,16 @@ const analyzeConsumptionPatternsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+        const hasData = input.pantryItems.length > 0 || input.wasteLogs.length > 0;
+        if (!hasData) {
+             console.log("No data provided to analyze. Returning default insight.");
+             return generateDefaultInsight();
+        }
+
         const { output } = await prompt(input);
         
-        if (!output) {
-            console.log("AI did not return an output. Returning default insight.");
+        if (!output || !output.keyObservation) {
+            console.log("AI did not return a valid output. Returning default insight.");
             return generateDefaultInsight();
         }
         
