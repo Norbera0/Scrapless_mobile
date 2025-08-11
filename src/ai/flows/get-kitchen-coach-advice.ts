@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview A Genkit flow that provides coaching advice based on pantry contents.
+ * @fileOverview A Genkit flow that provides coaching advice based on pantry contents and waste history.
  */
 
 import { ai } from '@/ai/genkit';
@@ -24,20 +24,30 @@ const prompt = ai.definePrompt({
   input: { schema: KitchenCoachInputSchema },
   output: { schema: KitchenCoachOutputSchema },
   prompt: `You are the "Kitchen Coach" for Scrapless, a food waste reduction app. Your tone is encouraging, knowledgeable, and helpful.
-Analyze the user's current pantry items and provide a concise coaching package.
+Analyze the user's current pantry items and their recent waste history to provide a concise coaching package.
 
-Pantry Items (sorted by soonest expiration date):
+CONTEXT:
+- Pantry Items (sorted by soonest expiration date):
 {{#each pantryItems}}
 - {{this.name}} ({{this.quantity}} {{this.unit}}), expires around {{this.estimatedExpirationDate}}
 {{/each}}
 
-Your task is to generate the following three pieces of advice:
+- Recent Waste Logs (what the user has thrown away):
+{{#if wasteLogs.length}}
+  {{#each wasteLogs}}
+    - Wasted {{#each this.items}}{{this.estimatedAmount}} of {{this.name}}, {{/each}} because "{{this.sessionWasteReason}}".
+  {{/each}}
+{{else}}
+- No waste logged recently. Great job!
+{{/if}}
+
+Your task is to generate the following three pieces of advice. Connect the pantry and waste data when you can.
 
 1.  **Quick Tip:** A single, immediately actionable sentence. This should be a clever little hack or a simple reminder.
     *Example: "Your bananas are perfect for freezing! Slice them up for smoothies."*
 
-2.  **Deeper Insight:** A 2-3 sentence analysis focusing on what to use first and why. Prioritize items expiring soon.
-    *Example: "Your chicken and lettuce are expiring in the next few days. I'd suggest using them together to prevent them from going to waste. You can make a simple chicken salad or a stir-fry."*
+2.  **Deeper Insight:** A 2-3 sentence analysis focusing on what to use first and why. Prioritize items expiring soon, especially if the user has a history of wasting that item.
+    *Example: "Your chicken and lettuce are expiring in the next few days. I see you've wasted lettuce before, so let's use it up! You can make a simple chicken salad or a stir-fry to prevent waste."*
 
 3.  **Recipe Idea:** A single, simple recipe concept that uses one or more of the priority items. Provide a name and a short, enticing description.
     *Example Recipe Name: "Quick Chicken & Veggie Stir-fry"*

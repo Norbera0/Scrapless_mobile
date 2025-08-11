@@ -223,12 +223,13 @@ export const KitchenCoachInputSchema = z.object({
             estimatedExpirationDate: z.string(),
         })
     ).describe("A list of items currently in the user's pantry."),
+    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects."),
 });
 export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 
 export const KitchenCoachOutputSchema = z.object({
     quickTip: z.string().describe("A single, immediately actionable tip based on the pantry items."),
-    deeperInsight: z.string().describe("A more detailed insight about which items to prioritize and why, focusing on expiring items."),
+    deeperInsight: z.string().describe("A more detailed insight about which items to prioritize and why, focusing on expiring items and past waste."),
     recipeIdea: z.object({
         name: z.string().describe("The name of a suggested recipe."),
         description: z.string().describe("A brief description of the recipe."),

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, ChefHat, AlertTriangle } from 'lucide-react';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useWasteLogStore } from '@/stores/waste-log-store';
 import { getCoachAdvice } from '../actions';
 import { type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +14,7 @@ import Image from 'next/image';
 
 export default function KitchenCoachPage() {
     const { liveItems, pantryInitialized } = usePantryLogStore();
+    const { logs, logsInitialized } = useWasteLogStore();
     const [isLoading, setIsLoading] = useState(false);
     const [advice, setAdvice] = useState<KitchenCoachOutput | null>(null);
     const { toast } = useToast();
@@ -57,7 +59,7 @@ export default function KitchenCoachPage() {
                 estimatedExpirationDate: item.estimatedExpirationDate
             }));
 
-            const result = await getCoachAdvice({ pantryItems: pantryData });
+            const result = await getCoachAdvice({ pantryItems: pantryData, wasteLogs: logs });
             setAdvice(result);
         } catch (error) {
             console.error(error);
