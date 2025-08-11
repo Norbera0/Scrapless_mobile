@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
@@ -17,6 +17,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { format, parseISO } from 'date-fns';
+import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -69,6 +70,7 @@ export default function KitchenCoachPage() {
     
     const [analysis, setAnalysis] = useState<KitchenCoachOutput | null>(null);
     const [solutions, setSolutions] = useState<Solutions | null>(null);
+    const [showWizard, setShowWizard] = useState(false);
     
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
 
@@ -112,18 +114,19 @@ export default function KitchenCoachPage() {
             setAnalysis(analysisResult);
             
             // Now, fetch solutions based on the analysis
-            if (analysisResult.insightType === 'pattern_detected') {
+            if (analysisResult) {
                 setIsFetchingSolutions(true);
                 const solutionsInput: GetCoachSolutionsInput = {
                     analysis: analysisResult,
                     userContext: {
                         userStage: 'regular_user',
-                        previouslyAttemptedSolutions: [] // This could be populated from user history
+                        previouslyAttemptedSolutions: []
                     }
                 };
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
                 setSolutions(solutionsResult);
                 setIsFetchingSolutions(false);
+                setShowWizard(true); // Open the wizard once all data is ready
             }
 
         } catch (error) {
@@ -161,103 +164,59 @@ export default function KitchenCoachPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-            <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">Kitchen Coach</h1>
-                <p className="text-muted-foreground">
-                    Your AI partner for a smarter, less wasteful kitchen.
-                </p>
-            </div>
-            
-            <div className="text-center">
-                 <Button 
-                    size="lg" 
-                    className="h-14 text-lg"
-                    onClick={handleAskCoach} 
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Analyzing your kitchen...
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles className="mr-2 h-5 w-5" />
-                            Ask Your Coach for Advice
-                        </>
-                    )}
-                </Button>
-            </div>
-
-
-            {analysis && (
-                <div className="grid gap-6">
-                    <div className="space-y-1">
-                        <h1 className="text-xl font-bold tracking-tight">{analysis.title}</h1>
-                        <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
-                    </div>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> The Story</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div>
-                                <h3 className="font-semibold text-sm mb-1">What's Happening:</h3>
-                                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
-                                    {analysis.story.situation.map((line, i) => <li key={i}>{line}</li>)}
-                                </ul>
-                            </div>
-                             <div>
-                                <h3 className="font-semibold text-sm mb-1">The Root Cause:</h3>
-                                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
-                                    {analysis.story.rootCause.map((line, i) => <li key={i}>{line}</li>)}
-                                </ul>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <Card className="bg-red-50 border-red-200">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-red-800">Financial Impact</CardTitle>
-                                <Wallet className="h-4 w-4 text-red-700" />
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-red-900 font-semibold">{analysis.story.impact}</p>
-                            </CardContent>
-                        </Card>
-                        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                            <h4 className="font-semibold flex items-center gap-2 mb-1 text-red-800"><AlertTriangle className="w-5 h-5" /> Prediction</h4>
-                            <p className="text-sm text-red-900">{analysis.prediction}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
-                        {isFetchingSolutions ? (
-                             <div className="flex justify-center items-center py-10">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            </div>
-                        ) : solutions ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {solutions.solutions.map((solution, index) => (
-                                    <SolutionCard 
-                                        key={index} 
-                                        solution={solution} 
-                                        onSelect={() => handleSelectSolution(solution.title)} 
-                                        isSelected={selectedSolutions.has(solution.title)}
-                                        isUpdating={isLoading}
-                                    />
-                                ))}
-                            </div>
-                        ) : null}
-                    </div>
+        <>
+            <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight">Kitchen Coach</h1>
+                    <p className="text-muted-foreground">
+                        Your AI partner for a smarter, less wasteful kitchen.
+                    </p>
                 </div>
+                
+                <div className="text-center">
+                     <Button 
+                        size="lg" 
+                        className="h-14 text-lg"
+                        onClick={handleAskCoach} 
+                        disabled={isLoading || isFetchingSolutions}
+                    >
+                        {isLoading || isFetchingSolutions ? (
+                            <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                {isFetchingSolutions ? 'Building your plan...' : 'Analyzing your kitchen...'}
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="mr-2 h-5 w-5" />
+                                Ask Your Coach for Advice
+                            </>
+                        )}
+                    </Button>
+                </div>
+
+                {analysis && !showWizard && (
+                    <div className="grid gap-6">
+                        <div className="space-y-1">
+                            <h1 className="text-xl font-bold tracking-tight">{analysis.title}</h1>
+                            <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+                        </div>
+                        <Button onClick={() => setShowWizard(true)}>View Plan</Button>
+                    </div>
+                )}
+            </div>
+
+            {analysis && solutions && (
+                 <KitchenCoachWizard 
+                    isOpen={showWizard}
+                    onClose={() => setShowWizard(false)}
+                    analysis={analysis}
+                    solutions={solutions}
+                    onSelectSolution={handleSelectSolution}
+                    selectedSolutions={selectedSolutions}
+                    isUpdatingSolution={isLoading}
+                 />
             )}
-        </div>
+        </>
     );
 }
 
-    
