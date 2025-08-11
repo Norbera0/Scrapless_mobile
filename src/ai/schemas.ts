@@ -320,7 +320,6 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 
 export const AnalyzeConsumptionPatternsOutputSchema = z.object({
-  predictionAlertBody: z.string().optional(),
   keyObservation: z.string(),
   patternAlert: z.string(),
   smartTip: z.string(),
@@ -334,7 +333,7 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
       successRate: z.number(),
       estimatedSavings: z.number().optional(),
     })
-  ),
+  ).describe("A list of 2 actionable, alternative solutions."),
   similarUserStory: z.string(),
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
