@@ -2,10 +2,10 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Sparkles, Lightbulb, ChefHat, AlertTriangle, ArrowRight, TrendingUp, Check, Info, Wallet, Brain, Clock } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check } from 'lucide-react';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { getCoachAdvice } from '../actions';
@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { Info } from 'lucide-react';
 
 const InsightStory = ({ story }: { story: KitchenCoachOutput['story'] }) => (
     <div className="space-y-4">
@@ -71,8 +72,8 @@ const InsightSolutions = ({ solutions }: { solutions: KitchenCoachOutput['soluti
 
 export default function KitchenCoachPage() {
     const { user } = useAuth();
-    const { liveItems, pantryInitialized } = usePantryLogStore();
-    const { logs, logsInitialized } = useWasteLogStore();
+    const { liveItems } = usePantryLogStore();
+    const { logs } = useWasteLogStore();
     const [isLoading, setIsLoading] = useState(false);
     const [advice, setAdvice] = useState<KitchenCoachOutput | null>(null);
     const { toast } = useToast();
@@ -91,7 +92,7 @@ export default function KitchenCoachPage() {
             const input: KitchenCoachInput = {
                 userName: user?.name?.split(' ')[0] || 'User',
                 userStage: 'regular_user', // This can be dynamic in the future
-                daysActive: 90, // This can be dynamic
+                daysActive: analytics.waste.daysSinceLastLog > 0 ? analytics.waste.daysSinceLastLog : 0,
                 hasBpiData: false, // This can be dynamic
                 weather: analytics.weather ? {
                     temperature: analytics.weather.temperature,
