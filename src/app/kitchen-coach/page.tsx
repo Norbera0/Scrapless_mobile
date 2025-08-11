@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
-import { usePantryLogStore } from '@/stores/pantry-log-store';
+import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { getCoachAdvice } from '../actions';
 import { type KitchenCoachOutput, type KitchenCoachInput } from '@/ai/schemas';
@@ -100,7 +100,6 @@ export default function KitchenCoachPage() {
                         topWastedCategory: analytics.waste.topWastedCategoryByFrequency?.name || 'N/A',
                         avgWeeklyWaste: analytics.waste.avgWeeklyValue,
                         wasteFrequency: `${analytics.waste.wasteLogFrequency.toFixed(1)} times/week`,
-                        avgWasteLagTime: analytics.waste.avgWasteLagTime,
                     }
                 },
                 pantryData: {
@@ -110,13 +109,7 @@ export default function KitchenCoachPage() {
                         category: 'unknown'
                     })),
                     healthScore: analytics.pantryHealthScore,
-                    consumptionVelocity: analytics.pantry.consumptionVelocity as any,
                 },
-                 userHistory: {
-                    savingsPerWastePeso: analytics.savingsPerWastePeso,
-                    mostFrequentPositiveAction: "Used expiring item", // Mock
-                    previouslyAttemptedSolutions: [] // Mock
-                }
             };
 
             const result = await getCoachAdvice(input);
