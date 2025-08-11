@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -12,7 +13,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { isWithinInterval, add, differenceInDays, startOfToday, startOfMonth } from 'date-fns';
+import { differenceInDays, startOfToday } from 'date-fns';
 import { 
   Sparkles, 
   TrendingUp, 
@@ -39,6 +40,7 @@ import type { PantryItem } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { updatePantryItemStatus } from '@/lib/data';
 import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -87,6 +89,7 @@ export default function DashboardPage() {
   const { insights } = useInsightStore();
   const { liveItems, archiveItem } = usePantryLogStore();
   const { savingsEvents } = useSavingsStore();
+  const analytics = useAnalytics();
   const { toast } = useToast();
   
   const [greeting, setGreeting] = useState("Good morning");
@@ -100,64 +103,18 @@ export default function DashboardPage() {
     else setGreeting("Good evening");
   }, []);
 
-  // Calculate weekly stats
-  const weeklyWasteStats = logs
-    .filter(log => isWithinInterval(new Date(log.date), { 
-      start: new Date(new Date().setDate(new Date().getDate() - 7)), 
-      end: new Date() 
-    }))
-    .reduce((acc, log) => {
-      acc.totalPesoValue += log.totalPesoValue;
-      acc.totalCarbonFootprint += log.totalCarbonFootprint;
-      return acc;
-    }, { totalPesoValue: 0, totalCarbonFootprint: 0 });
-
-  const weeklySavingsStats = savingsEvents
-    .filter(event => isWithinInterval(new Date(event.date), {
-        start: new Date(new Date().setDate(new Date().getDate() - 7)),
-        end: new Date()
-    }))
-    .reduce((acc, event) => {
-        acc.totalSavings += event.amount;
-        return acc;
-    }, { totalSavings: 0 });
-
-  // Storytelling equivalents for savings
-  const weeklyRiceKg = estimateRiceKgFromPesos(weeklySavingsStats.totalSavings);
-  const weeklyWaterSavedL = estimateWaterSavedLitersFromSavings(weeklySavingsStats.totalSavings);
-
-  // Calculate pantry health stats
-  const freshItems = liveItems.filter(item => {
-    const expirationDate = new Date(item.estimatedExpirationDate);
-    const threeDaysFromNow = add(new Date(), { days: 3 });
-    return expirationDate > threeDaysFromNow;
-  });
-
   const expiringSoonItems = liveItems.filter(item => {
     const expirationDate = new Date(item.estimatedExpirationDate);
     const today = new Date();
-    const threeDaysFromNow = add(today, { days: 3 });
-    return expirationDate >= today && expirationDate <= threeDaysFromNow;
+    const threeDaysFromNow = new Date(today.setDate(today.getDate() + 3));
+    return expirationDate >= new Date() && expirationDate <= threeDaysFromNow;
   });
-
-  const expiredItems = liveItems.filter(item => 
-    new Date(item.estimatedExpirationDate) < new Date()
-  );
-
-  const healthPercentage = liveItems.length > 0 
-    ? Math.round(
-        ((freshItems.length * 100) + (expiringSoonItems.length * 50) + (expiredItems.length * 0)) / liveItems.length
-      )
-    : 100;
 
   const latestInsight = insights.length > 0 ? insights[0] : null;
 
   // Monthly savings goal progress (hackathon placeholder goal)
   const savingsGoal = 5000;
-  const monthStart = startOfMonth(new Date());
-  const monthSavings = savingsEvents
-    .filter(e => new Date(e.date) >= monthStart)
-    .reduce((acc, e) => acc + e.amount, 0);
+  const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
 
   const sortedWatchlistItems = useMemo(() => {
@@ -223,6 +180,14 @@ export default function DashboardPage() {
       setIsUpdatingItemId(null);
     }
   };
+  
+  if (!analytics) {
+     return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F7F7] p-4 sm:p-6 md:p-8">
@@ -240,7 +205,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-pink-700">Total Items</p>
-                  <p className="text-3xl font-semibold text-pink-900">{liveItems.length}</p>
+                  <p className="text-3xl font-semibold text-pink-900">{analytics.pantry.totalItems}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 rounded-xl flex items-center justify-center">
                   <Package className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
@@ -254,7 +219,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                  <p className="text-3xl font-semibold text-yellow-900">{expiringSoonItems.length}</p>
+                  <p className="text-3xl font-semibold text-yellow-900">{analytics.pantry.expiringSoonItems}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                   <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
@@ -267,8 +232,8 @@ export default function DashboardPage() {
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-700">Pantry Health Score</p>
-                  <p className="text-3xl font-semibold text-green-900">{healthPercentage}%</p>
+                  <p className="text-sm font-medium text-green-700">Pantry Health</p>
+                  <p className="text-3xl font-semibold text-green-900">{analytics.pantryHealthScore}%</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
@@ -281,8 +246,8 @@ export default function DashboardPage() {
             <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-700">This Week's Logs</p>
-                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => isWithinInterval(new Date(log.date), { start: new Date(new Date().setDate(new Date().getDate() - 7)), end: new Date() })).length}</p>
+                  <p className="text-sm font-medium text-blue-700">Waste Logs (Wk)</p>
+                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => new Date(log.date) > new Date(new Date().setDate(new Date().getDate() - 7))).length}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                   <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
@@ -303,17 +268,17 @@ export default function DashboardPage() {
             <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-green-200">Virtual Savings</p>
-                    <p className="text-3xl font-bold text-white">{formatPeso(weeklySavingsStats.totalSavings)}</p>
+                    <p className="text-3xl font-bold text-white">{formatPeso(analytics.savings.thisWeekAmount)}</p>
                      <p className="text-xs text-white/80">From using items before they spoil, based on their cost and waste risk.</p>
                 </div>
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
-                    <p className="text-sm text-white/90">≈ {weeklyRiceKg.toFixed(1)} kg rice or ~{weeklyWaterSavedL.toFixed(0)} L water saved</p>
+                    <p className="text-sm text-white/90">≈ {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg rice or ~{estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L water saved</p>
                     <p className="text-xs text-white/60">Story-based comparison</p>
                 </div>
                 <div className="space-y-1">
                      <p className="text-sm font-medium text-red-200">Total Carbon Footprint</p>
-                    <p className="text-3xl font-bold text-white">{weeklyWasteStats.totalCarbonFootprint.toFixed(2)}<span className="text-xl">kg CO₂e</span></p>
+                    <p className="text-3xl font-bold text-white">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-xl">kg CO₂e</span></p>
                     <p className="text-xs text-white/80">From items wasted this week</p>
                 </div>
             </CardContent>
@@ -515,3 +480,4 @@ export default function DashboardPage() {
   );
 
     
+

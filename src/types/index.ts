@@ -241,3 +241,52 @@ export interface TrackPlanData {
     cashFlowAlert: string;
     unusualTransactions: string[];
 }
+
+// --- New Comprehensive Analytics Data Structure ---
+export interface AnalyticsData {
+    // Top-level KPIs
+    pantryHealthScore: number;
+    totalVirtualSavings: number;
+    totalWasteValue: number;
+    totalWasteCO2e: number;
+
+    // Waste Analysis
+    waste: {
+        thisWeekValue: number;
+        lastWeekValue: number;
+        weekOverWeekChange: number | null;
+        thisMonthValue: number;
+        lastMonthValue: number;
+        monthOverMonthChange: number | null;
+        avgWeeklyValue: number;
+        topWastedCategoryByValue: { name: string; value: number } | null;
+        topWastedCategoryByFrequency: { name: string; count: number } | null;
+        topWasteReason: { name: string; count: number } | null;
+        wasteLogFrequency: number; // logs per week
+        daysSinceLastLog: number;
+    };
+
+    // Pantry Analysis
+    pantry: {
+        totalValue: number;
+        totalItems: number;
+        freshItems: number;
+        expiringSoonItems: number;
+        expiredItems: number;
+        avgItemDuration: number; // days
+        turnoverRate: number; // percentage
+    };
+
+    // Savings Analysis
+    savings: {
+        thisWeekAmount: number;
+        thisMonthAmount: number;
+        avgAmountPerEvent: number;
+        byType: Record<SavingsEvent['type'], number>;
+    };
+
+    // Combined & Ratio Metrics
+    useRate: number; // percentage of items used vs wasted
+    savingsPerWastePeso: number; // How many pesos saved for every peso wasted
+}
+
