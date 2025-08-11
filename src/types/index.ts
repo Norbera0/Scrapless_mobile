@@ -249,6 +249,7 @@ export interface AnalyticsData {
     totalVirtualSavings: number;
     totalWasteValue: number;
     totalWasteCO2e: number;
+    engagementScore: number; // 0-10 scale
 
     // Waste Analysis
     waste: {
@@ -264,6 +265,9 @@ export interface AnalyticsData {
         topWasteReason: { name: string; count: number } | null;
         wasteLogFrequency: number; // logs per week
         daysSinceLastLog: number;
+        // Feature Engineering
+        wasteRateByCategory: Record<string, number>; // waste % for each food category
+        avgWasteLagTime: number; // avg days from pantry add to waste
     };
 
     // Pantry Analysis
@@ -275,6 +279,8 @@ export interface AnalyticsData {
         expiredItems: number;
         avgItemDuration: number; // days
         turnoverRate: number; // percentage
+        // Feature Engineering
+        consumptionVelocity: Record<string, { avgDays: number; count: number }>;
     };
 
     // Savings Analysis
@@ -289,4 +295,3 @@ export interface AnalyticsData {
     useRate: number; // percentage of items used vs wasted
     savingsPerWastePeso: number; // How many pesos saved for every peso wasted
 }
-

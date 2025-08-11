@@ -93,8 +93,8 @@ export function useAnalytics(): AnalyticsData | null {
             }
             return sum;
         }, 0);
-        const avgItemDuration = archivedItems.length > 0 ? totalArchivedDuration / archivedItems.length : 0;
-        const turnoverRate = liveItems.length > 0 && archivedItems.length > 0 ? (usedItems.length / (liveItems.length + usedItems.length)) * 100 : 0;
+        const avgItemDuration = usedItems.length > 0 ? totalArchivedDuration / usedItems.length : 0;
+        const turnoverRate = liveItems.length > 0 && usedItems.length > 0 ? (usedItems.length / (liveItems.length + usedItems.length)) * 100 : 0;
 
         // --- SAVINGS ANALYSIS ---
         const totalVirtualSavings = savingsEvents.reduce((sum, e) => sum + e.amount, 0);
@@ -106,16 +106,58 @@ export function useAnalytics(): AnalyticsData | null {
             return acc;
         }, {} as Record<SavingsEvent['type'], number>);
         
-        // --- COMBINED & RATIO METRICS ---
-        const wastedItemsCount = archivedItems.filter(i => i.status === 'wasted').length;
-        const useRate = (usedItems.length + wastedItemsCount) > 0 ? (usedItems.length / (usedItems.length + wastedItemsCount)) * 100 : 100;
+        // --- FEATURE ENGINEERING ---
+        const wastedItems = archivedItems.filter(i => i.status === 'wasted');
+        const useRate = (usedItems.length + wastedItems.length) > 0 ? (usedItems.length / (usedItems.length + wastedItems.length)) * 100 : 100;
         const savingsPerWastePeso = totalWasteValue > 0 ? totalVirtualSavings / totalWasteValue : totalVirtualSavings;
+
+        const categoryUsage = archivedItems.reduce((acc, item) => {
+            const category = getFoodCategory(item.name);
+            if (!acc[category]) {
+                acc[category] = { used: 0, wasted: 0 };
+            }
+            if (item.status === 'used') {
+                acc[category].used++;
+            } else {
+                acc[category].wasted++;
+            }
+            return acc;
+        }, {} as Record<string, { used: number, wasted: number }>);
+        
+        const wasteRateByCategory = Object.entries(categoryUsage).reduce((acc, [category, counts]) => {
+            const total = counts.used + counts.wasted;
+            acc[category] = total > 0 ? (counts.wasted / total) * 100 : 0;
+            return acc;
+        }, {} as Record<string, number>);
+
+        const totalWasteLagTime = wastedItems.reduce((sum, item) => {
+             if (item.usedDate) { // 'usedDate' is when it was archived (used or wasted)
+                return sum + differenceInDays(parseISO(item.usedDate), parseISO(item.addedDate));
+            }
+            return sum;
+        }, 0);
+        const avgWasteLagTime = wastedItems.length > 0 ? totalWasteLagTime / wastedItems.length : 0;
+
+        const consumptionVelocity = usedItems.reduce((acc, item) => {
+            const category = getFoodCategory(item.name);
+            const duration = item.usedDate ? differenceInDays(parseISO(item.usedDate), parseISO(item.addedDate)) : avgItemDuration;
+            if (!acc[category]) {
+                acc[category] = { totalDuration: 0, count: 0, avgDays: 0};
+            }
+            acc[category].totalDuration += duration;
+            acc[category].count++;
+            acc[category].avgDays = acc[category].totalDuration / acc[category].count;
+            return acc;
+        }, {} as Record<string, { totalDuration: number; count: number; avgDays: number; }>);
+        
+        const engagementScore = Math.min(10, (pantryInitialized ? 2 : 0) + (logsInitialized ? 2 : 0) + Math.min(6, Math.floor(logs.length / 5)));
 
         return {
             pantryHealthScore,
             totalVirtualSavings,
             totalWasteValue,
             totalWasteCO2e,
+            engagementScore,
             waste: {
                 thisWeekValue,
                 lastWeekValue,
@@ -129,6 +171,8 @@ export function useAnalytics(): AnalyticsData | null {
                 topWasteReason: topWasteReason ? { name: topWasteReason[0], count: topWasteReason[1] } : null,
                 wasteLogFrequency,
                 daysSinceLastLog,
+                wasteRateByCategory,
+                avgWasteLagTime,
             },
             pantry: {
                 totalValue: totalPantryValue,
@@ -137,7 +181,8 @@ export function useAnalytics(): AnalyticsData | null {
                 expiringSoonItems,
                 expiredItems,
                 avgItemDuration,
-                turnoverRate
+                turnoverRate,
+                consumptionVelocity,
             },
             savings: {
                 thisWeekAmount: thisWeekSavings.reduce((sum, e) => sum + e.amount, 0),
