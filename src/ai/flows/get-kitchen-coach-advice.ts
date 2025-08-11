@@ -87,20 +87,28 @@ BPI Data (if available):
 
 Generate exactly ONE insight focusing on the most impactful pattern. Structure the entire output as a single JSON object that strictly follows this schema, including all specified fields.
 
+The output must be tailored and dynamic based on the user's context:
+1.  **Narrative Storytelling**: For \`story.situation\`, you MUST use the "smoking gun" evidence found in Step 3. Tell a short, personal story. For example: "Last Saturday you bought fresh Kangkong, but it was logged as 'wasted' on Friday..."
+2.  **Personalized Root Cause**: For \`story.rootCause\`, you MUST explicitly reference the "User Persona" diagnosed in Step 1. For example: "This is a classic sign of the 'Weekend Impulse Buyer' habit..."
+3.  **Dynamic Solutions**: Solutions MUST be tailored based on \`userStage\` and \`userHistory.previouslyAttemptedSolutions\`.
+    -   If a solution has been previously attempted, DO NOT suggest it again.
+    -   For 'advanced_user', provide "Level Up" challenges instead of basic tips.
+    -   For 'new_user', provide simple, foundational habits.
+
 {
   "insightType": "pattern_detected|getting_started|first_steps|re_engagement|connect_the_dots",
   "confidence": "high|medium|low",
   "title": "Clear, specific pattern name (e.g., 'Weekend Vegetable Overbuying')",
   "story": {
-    "situation": ["What's happening (2-3 bullets, specific to user data)"],
+    "situation": ["What's happening (2-3 bullets, specific to user data, citing the 'smoking gun' example)"],
     "impact": "Financial + environmental cost (specific numbers)",
-    "rootCause": ["Why this happens (psychological/cultural reasons, 2-3 bullets)"]
+    "rootCause": ["Why this happens (psychological/cultural reasons, referencing the user persona, 2-3 bullets)"]
   },
   "prediction": "What happens if nothing changes (specific timeline)",
   "solutions": [
     {
-      "title": "Primary solution",
-      "description": "Specific action steps",
+      "title": "Primary solution (Tailored to user stage and history)",
+      "description": "Specific action steps (Dynamic based on user context)",
       "difficulty": "easy|medium|hard",
       "timeToSee": "Days/weeks until results",
       "estimatedSavings": "number_php_monthly",
@@ -111,7 +119,6 @@ Generate exactly ONE insight focusing on the most impactful pattern. Structure t
   "quickWin": "One thing to try today",
   "encouragement": "Personalized motivational message referencing user progress"
 }
-
 `,
 });
 
