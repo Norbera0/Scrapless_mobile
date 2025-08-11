@@ -4,15 +4,71 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Sparkles, Lightbulb, ChefHat, AlertTriangle } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, ChefHat, AlertTriangle, ArrowRight, TrendingUp, Check, Info, Wallet, Brain, Clock } from 'lucide-react';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { getCoachAdvice } from '../actions';
-import { type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
+import { type KitchenCoachOutput, type KitchenCoachInput } from '@/ai/flows/get-kitchen-coach-advice';
 import { useToast } from '@/hooks/use-toast';
-import Image from 'next/image';
+import { useAuth } from '@/hooks/use-auth';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
+const InsightStory = ({ story }: { story: KitchenCoachOutput['story'] }) => (
+    <div className="space-y-4">
+        <div>
+            <h4 className="font-semibold flex items-center gap-2 mb-2"><Info className="w-5 h-5 text-blue-500" /> Situation</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
+                {story.situation.map((line, i) => <li key={i}>{line}</li>)}
+            </ul>
+        </div>
+         <div>
+            <h4 className="font-semibold flex items-center gap-2 mb-2"><Wallet className="w-5 h-5 text-green-500" /> Impact</h4>
+            <p className="text-sm text-muted-foreground">{story.impact}</p>
+        </div>
+         <div>
+            <h4 className="font-semibold flex items-center gap-2 mb-2"><Brain className="w-5 h-5 text-purple-500" /> Root Cause</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
+                 {story.rootCause.map((line, i) => <li key={i}>{line}</li>)}
+            </ul>
+        </div>
+    </div>
+);
+
+const InsightSolutions = ({ solutions }: { solutions: KitchenCoachOutput['solutions'] }) => (
+    <Accordion type="single" collapsible className="w-full">
+        {solutions.map((s, i) => (
+             <AccordionItem value={`item-${i}`} key={i}>
+                <AccordionTrigger className="font-semibold text-base">{s.title}</AccordionTrigger>
+                <AccordionContent className="space-y-3">
+                    <p className="text-muted-foreground">{s.description}</p>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="flex items-center gap-2 p-2 bg-secondary/50 rounded-md">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <div>
+                                <p className="font-medium">Time to See Results</p>
+                                <p className="text-muted-foreground">{s.timeToSee}</p>
+                            </div>
+                        </div>
+                         <div className="flex items-center gap-2 p-2 bg-secondary/50 rounded-md">
+                            <Wallet className="w-4 h-4 text-green-600" />
+                            <div>
+                                <p className="font-medium">Est. Savings</p>
+                                <p className="text-muted-foreground">~₱{s.estimatedSavings}/mo</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground pt-2 italic border-t mt-2">
+                        <strong>Filipino Context:</strong> {s.filipinoContext}
+                    </p>
+                </AccordionContent>
+            </AccordionItem>
+        ))}
+    </Accordion>
+);
+
 
 export default function KitchenCoachPage() {
+    const { user } = useAuth();
     const { liveItems, pantryInitialized } = usePantryLogStore();
     const { logs, logsInitialized } = useWasteLogStore();
     const [isLoading, setIsLoading] = useState(false);
@@ -20,46 +76,63 @@ export default function KitchenCoachPage() {
     const { toast } = useToast();
 
     const pantrySummary = useMemo(() => {
-        if (!pantryInitialized) return { totalItems: 0, expiringSoon: 0, topCategory: 'N/A' };
-
+        if (!pantryInitialized) return { totalItems: 0, expiringSoon: 0 };
         const expiringSoon = liveItems.filter(item => {
             const daysLeft = (new Date(item.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
             return daysLeft <= 3;
         }).length;
-
-        const categoryCounts: Record<string, number> = {};
-        liveItems.forEach(item => {
-            // A simple categorization logic for summary
-            if (item.name.toLowerCase().includes('chicken') || item.name.toLowerCase().includes('beef') || item.name.toLowerCase().includes('pork')) {
-                categoryCounts['Meat'] = (categoryCounts['Meat'] || 0) + 1;
-            } else if (item.name.toLowerCase().includes('lettuce') || item.name.toLowerCase().includes('tomato') || item.name.toLowerCase().includes('carrot')) {
-                categoryCounts['Vegetables'] = (categoryCounts['Vegetables'] || 0) + 1;
-            } else {
-                categoryCounts['Other'] = (categoryCounts['Other'] || 0) + 1;
-            }
-        });
-
-        const topCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+        return { totalItems: liveItems.length, expiringSoon };
+    }, [liveItems, pantryInitialized]);
+    
+    const wasteSummary = useMemo(() => {
+        if (!logsInitialized) return { last30DaysCount: 0, avgWeeklyWaste: 0 };
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const recentLogs = logs.filter(log => new Date(log.date) > thirtyDaysAgo);
+        const totalWasteValue = recentLogs.reduce((sum, log) => sum + log.totalPesoValue, 0);
         
         return {
-            totalItems: liveItems.length,
-            expiringSoon,
-            topCategory
-        };
-    }, [liveItems, pantryInitialized]);
+            last30DaysCount: recentLogs.length,
+            avgWeeklyWaste: totalWasteValue / 4.3,
+        }
+    }, [logs, logsInitialized]);
 
     const handleAskCoach = async () => {
         setIsLoading(true);
         setAdvice(null);
         try {
-            const pantryData = liveItems.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                unit: item.unit,
-                estimatedExpirationDate: item.estimatedExpirationDate
-            }));
+            const input: KitchenCoachInput = {
+                userName: user?.name?.split(' ')[0] || 'User',
+                userStage: 'regular_user', // This can be dynamic in the future
+                daysActive: 90, // This can be dynamic
+                hasBpiData: false, // This can be dynamic
+                wasteData: {
+                    logs: logs.map(l => ({
+                        date: l.date,
+                        items: l.items.map(i => ({ name: i.name, amount: i.estimatedAmount, category: 'unknown' })), // Category can be enhanced
+                        reason: l.sessionWasteReason || 'other',
+                        totalValue: l.totalPesoValue,
+                        dayOfWeek: new Date(l.date).toLocaleString('en-us', { weekday: 'long' })
+                    })),
+                    patterns: {
+                        topWastedCategory: 'Vegetables', // This can be calculated
+                        avgWeeklyWaste: wasteSummary.avgWeeklyWaste,
+                        wasteFrequency: '2-3 times a week' // This can be calculated
+                    }
+                },
+                pantryData: {
+                    currentItems: liveItems.map(i => ({
+                        name: i.name,
+                        expiresIn: Math.max(0, Math.ceil((new Date(i.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24))),
+                        category: 'unknown'
+                    })),
+                    healthScore: 85 // This can be calculated
+                },
+                pantryItemsCount: liveItems.length,
+                wasteLogsCount: logs.length
+            };
 
-            const result = await getCoachAdvice({ pantryItems: pantryData, wasteLogs: logs });
+            const result = await getCoachAdvice(input);
             setAdvice(result);
         } catch (error) {
             console.error(error);
@@ -74,31 +147,30 @@ export default function KitchenCoachPage() {
     };
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6">
+        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
             <div className="space-y-1">
                 <h1 className="text-3xl font-bold tracking-tight">Kitchen Coach</h1>
                 <p className="text-muted-foreground">
-                    Get personalized advice on how to use your pantry items effectively.
+                    Your AI partner for a smarter, less wasteful kitchen.
                 </p>
             </div>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-primary to-green-700 text-primary-foreground">
                 <CardHeader>
-                    <CardTitle>Pantry Snapshot</CardTitle>
-                    <CardDescription>Here's a quick look at your current pantry.</CardDescription>
+                    <CardTitle>Kitchen Vitals</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="p-4 bg-secondary rounded-lg">
-                        <p className="text-sm font-medium text-muted-foreground">Total Items</p>
+                    <div className="p-4 bg-white/10 rounded-lg">
+                        <p className="text-sm font-medium">Pantry Items</p>
                         <p className="text-2xl font-bold">{pantrySummary.totalItems}</p>
                     </div>
-                    <div className="p-4 bg-secondary rounded-lg">
-                        <p className="text-sm font-medium text-muted-foreground">Expiring Soon</p>
-                        <p className="text-2xl font-bold">{pantrySummary.expiringSoon}</p>
+                     <div className="p-4 bg-white/10 rounded-lg">
+                        <p className="text-sm font-medium">Waste Logs (30d)</p>
+                        <p className="text-2xl font-bold">{wasteSummary.last30DaysCount}</p>
                     </div>
-                    <div className="p-4 bg-secondary rounded-lg">
-                        <p className="text-sm font-medium text-muted-foreground">Top Category</p>
-                        <p className="text-2xl font-bold">{pantrySummary.topCategory}</p>
+                     <div className="p-4 bg-white/10 rounded-lg">
+                        <p className="text-sm font-medium">Avg. Weekly Waste</p>
+                        <p className="text-2xl font-bold">~₱{wasteSummary.avgWeeklyWaste.toFixed(0)}</p>
                     </div>
                 </CardContent>
             </Card>
@@ -106,8 +178,9 @@ export default function KitchenCoachPage() {
             <div className="text-center">
                 <Button 
                     size="lg" 
+                    className="h-14 text-lg"
                     onClick={handleAskCoach} 
-                    disabled={isLoading || liveItems.length === 0}
+                    disabled={isLoading}
                 >
                     {isLoading ? (
                         <>
@@ -117,59 +190,44 @@ export default function KitchenCoachPage() {
                     ) : (
                         <>
                             <Sparkles className="mr-2 h-5 w-5" />
-                            Ask Kitchen Coach
+                            Ask Your Coach
                         </>
                     )}
                 </Button>
-                {liveItems.length === 0 && (
-                    <p className="text-sm text-muted-foreground mt-2">Add items to your pantry to get advice.</p>
-                )}
             </div>
 
             {advice && (
-                <div className="grid gap-6 mt-4">
-                    <Card className="bg-blue-50 border-blue-200">
-                        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-                            <Lightbulb className="w-6 h-6 text-blue-600" />
-                            <CardTitle className="text-blue-800">Quick Tip</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-blue-900">{advice.quickTip}</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="bg-green-50 border-green-200">
-                        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-                            <AlertTriangle className="w-6 h-6 text-green-600" />
-                            <CardTitle className="text-green-800">What to Prioritize</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-green-900">{advice.deeperInsight}</p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="bg-amber-50 border-amber-200">
-                        <CardHeader className="flex flex-row items-center gap-3 space-y-0">
-                            <ChefHat className="w-6 h-6 text-amber-600" />
-                            <CardTitle className="text-amber-800">Recipe Idea</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex flex-col sm:flex-row items-start gap-4">
-                            {advice.recipeIdea.photoDataUri && (
-                                <Image 
-                                    src={advice.recipeIdea.photoDataUri}
-                                    alt={advice.recipeIdea.name}
-                                    width={120}
-                                    height={120}
-                                    className="rounded-lg object-cover w-full sm:w-32 h-32"
-                                />
-                            )}
-                            <div className="flex-1">
-                                <h4 className="font-bold">{advice.recipeIdea.name}</h4>
-                                <p className="text-sm text-muted-foreground">{advice.recipeIdea.description}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                <Card className="shadow-lg">
+                    <CardHeader className="bg-secondary/50">
+                        <CardTitle className="text-2xl flex items-center gap-3">
+                             <Lightbulb className="w-8 h-8 text-amber-500" />
+                             {advice.title}
+                        </CardTitle>
+                        <CardDescription>
+                            Insight Type: {advice.insightType.replace(/_/g, ' ')} | Confidence: {advice.confidence}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-6">
+                        <InsightStory story={advice.story} />
+                        
+                        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                             <h4 className="font-semibold flex items-center gap-2 mb-1 text-red-800"><AlertTriangle className="w-5 h-5" /> Prediction</h4>
+                             <p className="text-sm text-red-900">{advice.prediction}</p>
+                        </div>
+                        
+                        <div>
+                             <h3 className="font-bold text-lg mb-2">Actionable Solutions</h3>
+                             <InsightSolutions solutions={advice.solutions} />
+                        </div>
+                        
+                         <div className="p-4 rounded-lg bg-green-50 border border-green-200">
+                             <h4 className="font-semibold flex items-center gap-2 mb-1 text-green-800"><Check className="w-5 h-5" /> Quick Win</h4>
+                             <p className="text-sm text-green-900">{advice.quickWin}</p>
+                        </div>
+                        
+                        <p className="text-sm text-center italic text-muted-foreground pt-4 border-t">"{advice.encouragement}"</p>
+                    </CardContent>
+                </Card>
             )}
         </div>
     );

@@ -16,7 +16,6 @@ import { cn } from '@/lib/utils';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { differenceInDays, isWithinInterval, startOfToday, subDays } from 'date-fns';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
-import { generateNewInsight } from '@/app/actions';
 import { usePantryLogStore } from '@/stores/pantry-store';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
@@ -73,8 +72,6 @@ export default function InsightDetailPage() {
     const { logs } = useWasteLogStore();
     const { liveItems } = usePantryLogStore();
     const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
-    const [isLevelingUp, setIsLevelingUp] = useState(false);
-    const [isRegenerating, setIsRegenerating] = useState(false);
     const [bpiInsight, setBpiInsight] = useState<Insight | null>(null);
 
     useEffect(() => {
@@ -117,64 +114,6 @@ export default function InsightDetailPage() {
             setIsUpdatingStatus(false);
         }
     }
-    
-    const handleLevelUp = async () => {
-        if (!user) return;
-        setIsLevelingUp(true);
-        try {
-            const input = {
-                pantryItems: liveItems,
-                wasteLogs: logs,
-                bpiTrackPlanData: trackPlanData, // Always include BPI data for level up
-            };
-
-            // We generate a new insight but don't save it, just for display
-            const analysisResult = await generateNewInsight(user, input, false);
-            setBpiInsight(analysisResult as Insight); // Assume the action returns the full object
-            toast({
-                title: 'BPI Insights Unlocked!',
-                description: 'Check out your enhanced analysis.',
-            });
-
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Could not generate BPI insights.',
-            });
-        } finally {
-            setIsLevelingUp(false);
-        }
-    }
-
-    const handleRegenerate = async () => {
-        if (!user) return;
-        setIsRegenerating(true);
-        try {
-            const input = {
-                pantryItems: liveItems,
-                wasteLogs: logs,
-                bpiTrackPlanData: isBpiLinked ? trackPlanData : undefined,
-            };
-
-            const newInsightId = await generateNewInsight(user, input, true);
-            toast({
-                title: 'Insight Regenerated!',
-                description: "We've created a new analysis for you.",
-            });
-            router.push(`/insights/${newInsightId}`);
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Could not regenerate insight.',
-            });
-        } finally {
-            setIsRegenerating(false);
-        }
-    };
 
     const milestone = useMemo(() => {
         let days = -1;
@@ -225,10 +164,6 @@ export default function InsightDetailPage() {
                         <p className="text-sm text-muted-foreground">Insight from {new Date(displayInsight.date).toLocaleDateString()}</p>
                     </div>
                 </div>
-                 <Button variant="outline" size="sm" onClick={handleRegenerate} disabled={isRegenerating || isLevelingUp}>
-                    {isRegenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                    Regenerate
-                </Button>
             </div>
 
             <div className="grid gap-6">
@@ -239,24 +174,6 @@ export default function InsightDetailPage() {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm text-blue-900">{bpiInsight.predictionAlertBody}</p>
-                        </CardContent>
-                    </Card>
-                )}
-
-                {!bpiInsight && isBpiLinked && (
-                    <Card className="bg-bpi-brand/10 border-bpi-brand/20">
-                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <Landmark className="w-8 h-8 text-bpi-brand" />
-                                <div>
-                                    <h3 className="font-bold text-bpi-brand">Level Up Your Insights</h3>
-                                    <p className="text-sm text-bpi-brand/80">Connect your BPI data for a deeper financial analysis.</p>
-                                </div>
-                            </div>
-                            <Button className="bg-bpi-brand hover:bg-bpi-brand/90 w-full sm:w-auto" onClick={handleLevelUp} disabled={isLevelingUp}>
-                                {isLevelingUp ? <Loader2 className="w-4 h-4 mr-2 animate-spin"/> : <Sparkles className="w-4 h-4 mr-2"/>}
-                                Level Up with BPI
-                            </Button>
                         </CardContent>
                     </Card>
                 )}

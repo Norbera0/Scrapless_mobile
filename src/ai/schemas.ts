@@ -215,25 +215,63 @@ export type GenerateShoppingListOutput = z.infer<typeof GenerateShoppingListOutp
 
 // Kitchen Coach Schemas
 export const KitchenCoachInputSchema = z.object({
-    pantryItems: z.array(
-        z.object({
-            name: z.string(),
-            quantity: z.number(),
-            unit: z.string(),
-            estimatedExpirationDate: z.string(),
-        })
-    ).describe("A list of items currently in the user's pantry."),
-    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects."),
+  userName: z.string(),
+  userStage: z.enum(['new_user', 'regular_user', 'advanced_user']),
+  daysActive: z.number(),
+  hasBpiData: z.boolean(),
+  pantryItemsCount: z.number(),
+  wasteLogsCount: z.number(),
+  wasteData: z.object({
+    logs: z.array(z.object({
+      date: z.string(),
+      items: z.array(z.object({ name: z.string(), amount: z.string(), category: z.string() })),
+      reason: z.string(),
+      totalValue: z.number(),
+      dayOfWeek: z.string(),
+    })),
+    patterns: z.object({
+      topWastedCategory: z.string(),
+      avgWeeklyWaste: z.number(),
+      wasteFrequency: z.string(),
+    }),
+  }),
+  pantryData: z.object({
+    currentItems: z.array(z.object({
+      name: z.string(),
+      expiresIn: z.number(),
+      category: z.string(),
+    })),
+    healthScore: z.number(),
+  }),
+  bpiData: z.object({
+    grocerySpend: z.number(),
+    spendTrend: z.string(),
+    cashFlow: z.string(),
+    alerts: z.array(z.string()),
+  }).optional(),
 });
 export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 
 export const KitchenCoachOutputSchema = z.object({
-    quickTip: z.string().describe("A single, immediately actionable tip based on the pantry items."),
-    deeperInsight: z.string().describe("A more detailed insight about which items to prioritize and why, focusing on expiring items and past waste."),
-    recipeIdea: z.object({
-        name: z.string().describe("The name of a suggested recipe."),
-        description: z.string().describe("A brief description of the recipe."),
-        photoDataUri: z.string().optional().describe("A data URI of a generated image of the recipe."),
-    }).describe("A simple recipe idea that uses items from the pantry."),
+  insightType: z.enum(['pattern_detected', 'getting_started', 'first_steps']),
+  confidence: z.enum(['high', 'medium', 'low']),
+  title: z.string(),
+  story: z.object({
+    situation: z.array(z.string()),
+    impact: z.string(),
+    rootCause: z.array(z.string()),
+  }),
+  prediction: z.string(),
+  solutions: z.array(z.object({
+    title: z.string(),
+    description: z.string(),
+    difficulty: z.enum(['easy', 'medium', 'hard']),
+    timeToSee: z.string(),
+    estimatedSavings: z.number(),
+    successRate: z.number(),
+    filipinoContext: z.string(),
+  })),
+  quickWin: z.string(),
+  encouragement: z.string(),
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
