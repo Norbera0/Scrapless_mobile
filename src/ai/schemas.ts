@@ -1,4 +1,5 @@
 
+
 /**
  * @fileOverview This file defines shared Zod schemas for Genkit flows.
  */
@@ -221,6 +222,11 @@ export const KitchenCoachInputSchema = z.object({
   hasBpiData: z.boolean(),
   pantryItemsCount: z.number(),
   wasteLogsCount: z.number(),
+  weather: z.object({
+    temperature: z.number(),
+    condition: z.string(),
+    humidity: z.number(),
+  }).optional(),
   wasteData: z.object({
     logs: z.array(z.object({
       date: z.string(),
@@ -253,7 +259,7 @@ export const KitchenCoachInputSchema = z.object({
 export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 
 export const KitchenCoachOutputSchema = z.object({
-  insightType: z.enum(['pattern_detected', 'getting_started', 'first_steps']),
+  insightType: z.enum(['pattern_detected', 'getting_started', 'first_steps', 're_engagement', 'connect_the_dots']),
   confidence: z.enum(['high', 'medium', 'low']),
   title: z.string(),
   story: z.object({
@@ -275,3 +281,60 @@ export const KitchenCoachOutputSchema = z.object({
   encouragement: z.string(),
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
+
+// Consumption Analysis Schemas
+export const AnalyzeConsumptionPatternsInputSchema = z.object({
+  userName: z.string(),
+  pantryItems: z.array(
+    z.object({
+      name: z.string(),
+      estimatedExpirationDate: z.string(),
+    })
+  ),
+  wasteLogs: z.array(
+    z.object({
+      date: z.string(),
+      items: z.array(
+        z.object({
+          name: z.string(),
+          estimatedAmount: z.string(),
+        })
+      ),
+      sessionWasteReason: z.string(),
+    })
+  ),
+  bpiTrackPlanData: z
+    .object({
+      spendingCategories: z.array(
+        z.object({
+          category: z.string(),
+          amount: z.number(),
+          trend: z.string(),
+        })
+      ),
+      cashFlowAlert: z.string(),
+      unusualTransactions: z.array(z.string()),
+    })
+    .optional(),
+});
+export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
+
+export const AnalyzeConsumptionPatternsOutputSchema = z.object({
+  predictionAlertBody: z.string().optional(),
+  keyObservation: z.string(),
+  patternAlert: z.string(),
+  smartTip: z.string(),
+  smartShoppingPlan: z.string(),
+  whatsReallyHappening: z.string(),
+  whyThisPatternExists: z.string(),
+  financialImpact: z.string(),
+  solutions: z.array(
+    z.object({
+      solution: z.string(),
+      successRate: z.number(),
+      estimatedSavings: z.number().optional(),
+    })
+  ),
+  similarUserStory: z.string(),
+});
+export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;

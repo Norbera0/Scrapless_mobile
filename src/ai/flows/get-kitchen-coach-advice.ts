@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -26,6 +27,9 @@ Name: {{userName}}
 App Usage Stage: {{userStage}} // "new_user", "regular_user", "advanced_user"
 Days Active: {{daysActive}}
 Cultural Context: Filipino household, likely shops at: wet markets, supermarkets, sari-sari stores
+{{#if weather}}
+Weather Context: {{weather.temperature}}°C, {{weather.condition}}, {{weather.humidity}}% humidity. Consider how this affects food storage and cooking habits.
+{{/if}}
 
 ## DATA ANALYSIS FRAMEWORK
 
@@ -45,6 +49,7 @@ Look for these patterns in order of priority:
 2. **Category Patterns**: Vegetable spoilage, protein waste, grain/staple patterns  
 3. **Behavioral Patterns**: Overbuying, forgetting items, poor storage
 4. **Financial Patterns**: High-cost waste, impulse buying (if BPI data available)
+5. **Weather-influenced patterns**: e.g. leafy greens spoiling faster in hot weather.
 
 ### STEP 3: Filipino Context Integration
 Consider these cultural factors:
@@ -86,7 +91,7 @@ BPI Data (if available):
 Generate exactly ONE insight focusing on the most impactful pattern. Structure the entire output as a single JSON object that strictly follows this schema, including all specified fields.
 
 {
-  "insightType": "pattern_detected|getting_started|first_steps",
+  "insightType": "pattern_detected|getting_started|first_steps|re_engagement|connect_the_dots",
   "confidence": "high|medium|low",
   "title": "Clear, specific pattern name (e.g., 'Weekend Vegetable Overbuying')",
   "story": {

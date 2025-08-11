@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -8,10 +9,11 @@ import { Loader2, Sparkles, Lightbulb, ChefHat, AlertTriangle, ArrowRight, Trend
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { getCoachAdvice } from '../actions';
-import { type KitchenCoachOutput, type KitchenCoachInput } from '@/ai/flows/get-kitchen-coach-advice';
+import { type KitchenCoachOutput, type KitchenCoachInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 const InsightStory = ({ story }: { story: KitchenCoachOutput['story'] }) => (
     <div className="space-y-4">
@@ -74,40 +76,30 @@ export default function KitchenCoachPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [advice, setAdvice] = useState<KitchenCoachOutput | null>(null);
     const { toast } = useToast();
-
-    const pantrySummary = useMemo(() => {
-        if (!pantryInitialized) return { totalItems: 0, expiringSoon: 0 };
-        const expiringSoon = liveItems.filter(item => {
-            const daysLeft = (new Date(item.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
-            return daysLeft <= 3;
-        }).length;
-        return { totalItems: liveItems.length, expiringSoon };
-    }, [liveItems, pantryInitialized]);
-    
-    const wasteSummary = useMemo(() => {
-        if (!logsInitialized) return { last30DaysCount: 0, avgWeeklyWaste: 0 };
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const recentLogs = logs.filter(log => new Date(log.date) > thirtyDaysAgo);
-        const totalWasteValue = recentLogs.reduce((sum, log) => sum + log.totalPesoValue, 0);
-        
-        return {
-            last30DaysCount: recentLogs.length,
-            avgWeeklyWaste: totalWasteValue / 4.3,
-        }
-    }, [logs, logsInitialized]);
+    const analytics = useAnalytics();
 
     const handleAskCoach = async () => {
         setIsLoading(true);
         setAdvice(null);
+        if (!user || !analytics) {
+            toast({ variant: 'destructive', title: 'Could not get advice', description: 'User or analytics data is not available.' });
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const input: KitchenCoachInput = {
                 userName: user?.name?.split(' ')[0] || 'User',
                 userStage: 'regular_user', // This can be dynamic in the future
                 daysActive: 90, // This can be dynamic
                 hasBpiData: false, // This can be dynamic
+                weather: analytics.weather ? {
+                    temperature: analytics.weather.temperature,
+                    condition: analytics.weather.condition,
+                    humidity: analytics.weather.humidity,
+                } : undefined,
                 wasteData: {
-                    logs: logs.map(l => ({
+                    logs: logs.slice(0, 30).map(l => ({ // Limit logs for performance
                         date: l.date,
                         items: l.items.map(i => ({ name: i.name, amount: i.estimatedAmount, category: 'unknown' })), // Category can be enhanced
                         reason: l.sessionWasteReason || 'other',
@@ -115,9 +107,9 @@ export default function KitchenCoachPage() {
                         dayOfWeek: new Date(l.date).toLocaleString('en-us', { weekday: 'long' })
                     })),
                     patterns: {
-                        topWastedCategory: 'Vegetables', // This can be calculated
-                        avgWeeklyWaste: wasteSummary.avgWeeklyWaste,
-                        wasteFrequency: '2-3 times a week' // This can be calculated
+                        topWastedCategory: analytics.waste.topWastedCategoryByFrequency?.name || 'N/A',
+                        avgWeeklyWaste: analytics.waste.avgWeeklyValue,
+                        wasteFrequency: `${analytics.waste.wasteLogFrequency.toFixed(1)} times/week`
                     }
                 },
                 pantryData: {
@@ -126,7 +118,7 @@ export default function KitchenCoachPage() {
                         expiresIn: Math.max(0, Math.ceil((new Date(i.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24))),
                         category: 'unknown'
                     })),
-                    healthScore: 85 // This can be calculated
+                    healthScore: analytics.pantryHealthScore
                 },
                 pantryItemsCount: liveItems.length,
                 wasteLogsCount: logs.length
@@ -146,6 +138,15 @@ export default function KitchenCoachPage() {
         }
     };
 
+    if (!analytics) {
+        return (
+            <div className="flex h-full items-center justify-center p-4">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <p className="ml-2">Loading analytics...</p>
+            </div>
+        )
+    }
+
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
             <div className="space-y-1">
@@ -162,15 +163,15 @@ export default function KitchenCoachPage() {
                 <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 bg-white/10 rounded-lg">
                         <p className="text-sm font-medium">Pantry Items</p>
-                        <p className="text-2xl font-bold">{pantrySummary.totalItems}</p>
+                        <p className="text-2xl font-bold">{analytics.pantry.totalItems}</p>
                     </div>
                      <div className="p-4 bg-white/10 rounded-lg">
                         <p className="text-sm font-medium">Waste Logs (30d)</p>
-                        <p className="text-2xl font-bold">{wasteSummary.last30DaysCount}</p>
+                        <p className="text-2xl font-bold">{analytics.waste.thisMonthValue.toFixed(0)}</p>
                     </div>
                      <div className="p-4 bg-white/10 rounded-lg">
-                        <p className="text-sm font-medium">Avg. Weekly Waste</p>
-                        <p className="text-2xl font-bold">~₱{wasteSummary.avgWeeklyWaste.toFixed(0)}</p>
+                        <p className="text-sm font-medium">Pantry Health</p>
+                        <p className="text-2xl font-bold">{analytics.pantryHealthScore}%</p>
                     </div>
                 </CardContent>
             </Card>

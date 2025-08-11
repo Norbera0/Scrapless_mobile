@@ -242,6 +242,13 @@ export interface TrackPlanData {
     unusualTransactions: string[];
 }
 
+export interface WeatherData {
+    location: string;
+    temperature: number; // in Celsius
+    condition: 'sunny' | 'cloudy' | 'rainy' | 'stormy';
+    humidity: number; // percentage
+}
+
 // --- New Comprehensive Analytics Data Structure ---
 export interface AnalyticsData {
     // Top-level KPIs
@@ -294,4 +301,7 @@ export interface AnalyticsData {
     // Combined & Ratio Metrics
     useRate: number; // percentage of items used vs wasted
     savingsPerWastePeso: number; // How many pesos saved for every peso wasted
+
+    // Contextual Data
+    weather: WeatherData | null;
 }

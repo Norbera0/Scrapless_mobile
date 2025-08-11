@@ -1,12 +1,13 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import type { AnalyticsData, PantryItem, SavingsEvent, WasteLog } from '@/types';
+import type { AnalyticsData, PantryItem, SavingsEvent, WasteLog, WeatherData } from '@/types';
 import { differenceInDays, isAfter, isBefore, startOfDay, subDays, parseISO, startOfMonth, subMonths } from 'date-fns';
+import { getWeatherForMakati } from '@/services/weather';
 
 const getFoodCategory = (itemName: string): string => {
     const lowerItem = itemName.toLowerCase();
@@ -23,6 +24,11 @@ export function useAnalytics(): AnalyticsData | null {
     const { logs, logsInitialized } = useWasteLogStore();
     const { liveItems, archivedItems, pantryInitialized } = usePantryLogStore();
     const { savingsEvents, savingsInitialized } = useSavingsStore();
+    const [weather, setWeather] = useState<WeatherData | null>(null);
+
+    useEffect(() => {
+        getWeatherForMakati().then(setWeather);
+    }, []);
 
     const analyticsData = useMemo(() => {
         if (!logsInitialized || !pantryInitialized || !savingsInitialized) {
@@ -158,6 +164,7 @@ export function useAnalytics(): AnalyticsData | null {
             totalWasteValue,
             totalWasteCO2e,
             engagementScore,
+            weather,
             waste: {
                 thisWeekValue,
                 lastWeekValue,
@@ -194,7 +201,7 @@ export function useAnalytics(): AnalyticsData | null {
             savingsPerWastePeso,
         };
 
-    }, [logs, liveItems, archivedItems, savingsEvents, logsInitialized, pantryInitialized, savingsInitialized]);
+    }, [logs, liveItems, archivedItems, savingsEvents, logsInitialized, pantryInitialized, savingsInitialized, weather]);
 
     return analyticsData;
 }
