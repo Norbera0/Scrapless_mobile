@@ -113,7 +113,6 @@ export default function KitchenCoachPage() {
             const analysisResult = await getCoachAdvice(input);
             setAnalysis(analysisResult);
             
-            // Now, fetch solutions based on the analysis
             if (analysisResult) {
                 setIsFetchingSolutions(true);
                 const solutionsInput: GetCoachSolutionsInput = {
@@ -126,7 +125,7 @@ export default function KitchenCoachPage() {
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
                 setSolutions(solutionsResult);
                 setIsFetchingSolutions(false);
-                setShowWizard(true); // Open the wizard once all data is ready
+                setShowWizard(true); 
             }
 
         } catch (error) {
@@ -194,18 +193,98 @@ export default function KitchenCoachPage() {
                     </Button>
                 </div>
 
-                {analysis && !showWizard && (
+                {analysis && solutions && !showWizard && (
                     <div className="grid gap-6">
-                        <div className="space-y-1">
-                            <h1 className="text-xl font-bold tracking-tight">{analysis.title}</h1>
-                            <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+                        {/* Analysis Section */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-base"><Brain className="text-primary" /> The Analysis</CardTitle>
+                                <CardDescription>{analysis.title}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                                                {analysis.story.situation.map((s, i) => <li key={i}>{s}</li>)}
+                                            </ul>
+                                        </CardContent>
+                                    </Card>
+                                    <Card>
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                                                {analysis.story.rootCause.map((s, i) => <li key={i}>{s}</li>)}
+                                            </ul>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                                 <Card className="bg-red-50 border-red-200">
+                                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                        <CardTitle className="text-sm font-medium text-red-800">Financial Impact</CardTitle>
+                                        <Wallet className="h-4 w-4 text-red-700" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-red-900 font-semibold">{analysis.story.impact}</p>
+                                    </CardContent>
+                                </Card>
+                                <Card className="bg-amber-50 border-amber-200">
+                                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                        <CardTitle className="text-sm font-medium text-amber-800">Prediction</CardTitle>
+                                        <AlertTriangle className="h-4 w-4 text-amber-700" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-amber-900 font-semibold">{analysis.prediction}</p>
+                                    </CardContent>
+                                </Card>
+                            </CardContent>
+                        </Card>
+
+                        {/* Solutions Section */}
+                        <div>
+                            <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {solutions.solutions.map((solution, index) => (
+                                    <SolutionCard 
+                                        key={index} 
+                                        solution={solution} 
+                                        onSelect={() => handleSelectSolution(solution.title)} 
+                                        isSelected={selectedSolutions.has(solution.title)}
+                                        isUpdating={isLoading}
+                                    />
+                                ))}
+                            </div>
                         </div>
-                        <Button onClick={() => setShowWizard(true)}>View Plan</Button>
+
+                        {/* Quick Win & Encouragement */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base"><Check className="text-primary" /> Quick Win</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{solutions.quickWin}</p>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base"><Sparkles className="text-primary" /> A Little Encouragement</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{solutions.encouragement}</p>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 )}
             </div>
 
-            {analysis && solutions && (
+            {analysis && solutions && showWizard && (
                  <KitchenCoachWizard 
                     isOpen={showWizard}
                     onClose={() => setShowWizard(false)}
@@ -219,4 +298,3 @@ export default function KitchenCoachPage() {
         </>
     );
 }
-
