@@ -24,7 +24,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/log-waste')) return 'Log Waste';
     if (pathname.startsWith('/add-to-pantry')) return 'Add to Pantry';
     if (pathname.startsWith('/my-waste')) return 'My Waste';
-    if (pathname.startsWith('/insights')) return 'AI Insights';
+    if (pathname.startsWith('/kitchen-coach')) return 'Kitchen Coach';
     if (pathname.startsWith('/shopping')) return 'Shopping Hub';
     if (pathname.startsWith('/saves')) return 'My Saves';
     if (pathname.startsWith('/review-items')) return 'Review Items';

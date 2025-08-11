@@ -2,9 +2,10 @@
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { analyzeConsumptionPatterns, type AnalyzeConsumptionPatternsInput, type AnalyzeConsumptionPatternsOutput } from '@/ai/flows/analyze-consumption-patterns';
 import { saveInsight } from '@/lib/data';
 import type { Insight, User } from '@/types';
+import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
+
 
 /**
  * Server Action to get recipe suggestions.
@@ -28,75 +29,11 @@ export async function getRecipeSuggestions(input: SuggestRecipesInput): Promise<
     }
 }
 
-
-/**
- * Server Action to generate and save a new insight for a user.
- * This is now the single source of truth for creating insights.
- * Can optionally skip saving to Firestore for temporary display.
- */
-export async function generateNewInsight(
-    user: User, 
-    data: {
-        pantryItems: any[],
-        wasteLogs: any[],
-        bpiTrackPlanData?: any,
-    },
-    saveToFirestore: boolean = true
-): Promise<string | Omit<Insight, 'id'>> {
-    
-    const analysisInput: AnalyzeConsumptionPatternsInput = {
-        userName: user.name?.split(' ')[0] || 'User',
-        pantryItems: data.pantryItems.map(item => ({
-            name: item.name,
-            estimatedExpirationDate: item.estimatedExpirationDate,
-            estimatedAmount: `${item.quantity} ${item.unit}`,
-        })),
-        wasteLogs: data.wasteLogs,
-        bpiTrackPlanData: data.bpiTrackPlanData, // Can be undefined
-    };
-
+export async function getCoachAdvice(input: KitchenCoachInput): Promise<KitchenCoachOutput> {
     try {
-        const analysisResult = await analyzeConsumptionPatterns(analysisInput);
-        
-        // This is a critical check. If the AI flow returns a default/empty insight,
-        // it won't have a keyObservation, but we should still process it gracefully.
-        if (!analysisResult || !analysisResult.keyObservation) {
-             const defaultInsight: Omit<Insight, 'id'> = {
-                keyObservation: "We need a bit more data to identify your unique patterns.",
-                patternAlert: "Start logging waste and pantry items for personalized insights.",
-                smartTip: "The more you log, the smarter the tips become.",
-                smartShoppingPlan: "Let's build a shopping plan together once we have more data.",
-                whatsReallyHappening: "The system is ready to analyze your data.",
-                whyThisPatternExists: "Your habits are unique, and we're excited to discover them with you.",
-                financialImpact: "Unlock potential savings by tracking your food habits.",
-                solutions: [],
-                similarUserStory: "Many users start seeing patterns after just a week of logging!",
-                userId: user.uid,
-                date: new Date().toISOString(),
-                status: 'new',
-            };
-            if(saveToFirestore) {
-                return await saveInsight(defaultInsight);
-            }
-            return defaultInsight;
-        }
-        
-        const newInsight: Omit<Insight, 'id'> = {
-            ...analysisResult,
-            userId: user.uid,
-            date: new Date().toISOString(),
-            status: 'new',
-        };
-
-        if (saveToFirestore) {
-            const newInsightId = await saveInsight(newInsight);
-            return newInsightId;
-        } else {
-            return newInsight; // Return the object without saving
-        }
-
+        return await getKitchenCoachAdvice(input);
     } catch (error) {
-        console.error("Failed to generate and save new insight via server action:", error);
-        throw new Error("Failed to generate a new insight.");
+        console.error("Error getting kitchen coach advice in server action:", error);
+        throw new Error("Failed to get advice from the Kitchen Coach.");
     }
 }

@@ -140,47 +140,6 @@ export const ChatWithAssistantOutputSchema = z.object({
 });
 export type ChatWithAssistantOutput = z.infer<typeof ChatWithAssistantOutputSchema>;
 
-// Consumption Analysis Schemas
-export const AnalyzeConsumptionPatternsInputSchema = z.object({
-    userName: z.string().describe("The user's first name."),
-    pantryItems: z.array(
-        z.object({
-            name: z.string(),
-            estimatedExpirationDate: z.string(),
-            estimatedAmount: z.string(),
-        })
-    ).describe("A list of items currently in the user's pantry."),
-    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects (last 30 days)."),
-    bpiTrackPlanData: z.object({
-        spendingCategories: z.array(z.object({ category: z.string(), amount: z.number(), trend: z.string() })).optional(),
-        cashFlowAlert: z.string().optional(),
-        unusualTransactions: z.array(z.string()).optional(),
-    }).optional().describe("Optional spending data from BPI Track & Plan for enhanced insights."),
-});
-export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
-
-export const AnalyzeConsumptionPatternsOutputSchema = z.object({
-    predictionAlertBody: z.string().optional().describe("A high-confidence prediction about likely future waste, if any is detected. This should integrate BPI data if available, e.g., 'BPI data shows high grocery spending...'"),
-    keyObservation: z.string().describe("A brief, one-sentence summary of the most significant pattern."),
-    patternAlert: z.string().describe("A one-sentence description of a specific, recurring behavior."),
-    smartTip: z.string().describe("A concrete, actionable tip to address the pattern."),
-    smartShoppingPlan: z.string().describe("A concise, one-sentence shopping tip related to the analysis."),
-    // Deep dive fields
-    whatsReallyHappening: z.string().describe("A detailed explanation of what is happening, citing specific data from user logs."),
-    whyThisPatternExists: z.string().describe("The AI's analysis of the root cause of this behavior pattern."),
-    financialImpact: z.string().describe("The estimated financial cost of this pattern (e.g., '₱180 in vegetables wasted over 4 weekends')."),
-    solutions: z.array(
-        z.object({
-            solution: z.string().describe("A specific, actionable solution to address the pattern."),
-            successRate: z.number().min(0).max(1).describe("The estimated success rate of this solution (e.g., 0.75 for 75%)."),
-            estimatedSavings: z.number().optional().describe("The estimated financial savings in PHP if the user follows this solution."),
-        })
-    ).describe("A list of 3-4 actionable alternative solutions. If BPI data is present, one solution should be BPI-related."),
-    similarUserStory: z.string().describe("An encouraging story about similar users (e.g., 'Users who fixed this pattern typically saved ₱200/month')."),
-});
-export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
-
-
 // Item-specific Insights Schemas
 export const GetItemInsightsInputSchema = z.object({
     name: z.string().describe('The name of the food item.'),
@@ -253,3 +212,27 @@ export const GenerateShoppingListOutputSchema = z.object({
   }),
 });
 export type GenerateShoppingListOutput = z.infer<typeof GenerateShoppingListOutputSchema>;
+
+// Kitchen Coach Schemas
+export const KitchenCoachInputSchema = z.object({
+    pantryItems: z.array(
+        z.object({
+            name: z.string(),
+            quantity: z.number(),
+            unit: z.string(),
+            estimatedExpirationDate: z.string(),
+        })
+    ).describe("A list of items currently in the user's pantry."),
+});
+export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
+
+export const KitchenCoachOutputSchema = z.object({
+    quickTip: z.string().describe("A single, immediately actionable tip based on the pantry items."),
+    deeperInsight: z.string().describe("A more detailed insight about which items to prioritize and why, focusing on expiring items."),
+    recipeIdea: z.object({
+        name: z.string().describe("The name of a suggested recipe."),
+        description: z.string().describe("A brief description of the recipe."),
+        photoDataUri: z.string().optional().describe("A data URI of a generated image of the recipe."),
+    }).describe("A simple recipe idea that uses items from the pantry."),
+});
+export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
