@@ -2,9 +2,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Check, CheckCircle, Landmark, Lightbulb, Loader2, Sparkles, Target, Users, Wallet, Brain, AlertTriangle } from 'lucide-react';
@@ -120,7 +120,13 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-lg p-0 border-0 gap-0">
-                <div className="p-6">
+                <DialogHeader className="p-6 pb-0">
+                    <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
+                    <DialogDescription>
+                        A step-by-step guide to understanding and improving your kitchen habits.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="p-6 pt-0">
                     <Carousel setApi={setApi} className="w-full">
                         <CarouselContent>
                             {steps.map((step) => (
