@@ -31,40 +31,27 @@ Cultural Context: Filipino household, likely shops at: wet markets, supermarkets
 Weather Context: {{weather.temperature}}°C, {{weather.condition}}, {{weather.humidity}}% humidity. Use this to inform spoilage rates and suggest appropriate recipes (e.g., 'no-cook' on hot days).
 {{/if}}
 
-## DATA ANALYSIS FRAMEWORK
+## DATA ANALYSIS FRAMEWORK (INTERNAL CHAIN-OF-THOUGHT)
+Before generating the final JSON, you must internally follow this reasoning process:
 
-### STEP 1: Data Quality Check
-Available Data:
-- Waste Logs: {{wasteLogsCount}} entries (last 30 days)
-- Pantry Items: {{pantryItemsCount}} items tracked
-- Financial Data: {{#if hasBpiData}}BPI Track & Plan connected{{else}}No financial data{{/if}}
+### STEP 1: Diagnose User Persona
+Based on the summaryMetrics, silently classify the user into an archetype. Examples:
+- "The Weekend Impulse Buyer": High weekend grocery spend, high waste lag time.
+- "The Aspirational Cook": Buys specialty ingredients but has low consumption velocity for them.
+- "The Efficient Planner": Low waste, high use rate, high savings per waste peso.
+- "The Leftover Neglector": High waste reason for "Cooked too much".
 
-If wasteLogsCount < 3: Focus on "Getting Started" insights
-If pantryItemsCount is 0 AND wasteLogsCount is 0: Focus on "First Steps" guidance
-If wasteLogsCount > 5: Focus on "Pattern Detection"
+### STEP 2: Formulate a Core Hypothesis
+Based on the persona and data, state a single, clear hypothesis for the primary cause of waste.
+- Hypothesis Example 1: "The user's high vegetable waste is caused by a long purchase-to-use lag, not poor meal planning."
+- Hypothesis Example 2: "The user cooks large portions for family meals but struggles to manage the leftovers, leading to 'cooked too much' waste."
 
-### STEP 2: Pattern Detection (Choose ONE primary pattern)
-Look for these patterns in order of priority:
-1. **Behavioral Patterns**: Analyze waste reasons, lag time, and previously attempted solutions. Does the user buy and forget? Do they struggle with leftovers?
-2. **Category Patterns**: Use wasteRateByCategory to identify specific problem areas like 'Vegetables' or 'Meat'.
-3. **Temporal Patterns**: Weekend vs weekday waste, shopping day patterns.
-4. **Financial Patterns**: High-cost waste, impulse buying (if BPI data available).
-5. **Weather-influenced patterns**: e.g. leafy greens spoiling faster in hot weather.
+### STEP 3: Find "Smoking Gun" Evidence
+Scan the \`rawData\` to find a specific, undeniable example that proves your hypothesis. You must be prepared to cite this example in your final output.
+- Evidence Example: "The rawData shows that on August 2nd, the user bought 'Lettuce', but the waste logs show 'Wilted Lettuce' was thrown out on August 10th. This 8-day gap is the smoking gun for the 'buy and forget' pattern."
 
-### STEP 3: Filipino Context Integration
-Actively integrate cultural factors in your root cause analysis and solutions:
-- Family eating patterns (large portions, communal meals for 'ulam')
-- Shopping habits (bulk buying, 'tingi' culture, wet market freshness expectations)
-- Storage limitations (tropical climate, limited fridge space)
-- Economic consciousness (waste = lost money)
-- Local ingredients (kangkong, tomatoes, rice as staples)
-
-### STEP 4: Solution Prioritization
-After identifying a pattern, select solutions. AVOID suggesting solutions from the 'previouslyAttemptedSolutions' list. Rank new solutions by:
-1. Ease of implementation (easy, medium, hard)
-2. Cultural fit (does it work for Filipino families?)
-3. Financial impact potential
-4. Habit-forming potential
+### STEP 4: Construct the Insight Package
+Use the persona, hypothesis, and evidence to generate the final JSON output. The "story.situation" and "story.rootCause" should reflect your findings.
 
 ## INPUT DATA STRUCTURE
 
