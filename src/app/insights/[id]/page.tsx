@@ -17,6 +17,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { differenceInDays, isWithinInterval, startOfToday, subDays } from 'date-fns';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { InsightWizard } from '@/components/insights/InsightWizard';
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: InsightSolution, onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     const isBpiSolution = solution.solution.toLowerCase().includes('bpi');
@@ -65,28 +66,32 @@ export default function InsightDetailPage() {
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
-    const { insights, insightsInitialized } = useInsightStore();
-    const [insight, setInsight] = useState<Insight | null>(null);
+    const { insights, insightsInitialized, setInsightStatus } = useInsightStore();
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
     const { logs } = useWasteLogStore();
-    const { liveItems } = usePantryLogStore();
-    const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
+    const { isLinked: isBpiLinked } = useBpiTrackPlanStore();
+    
+    const [showWizard, setShowWizard] = useState(false);
+
+    const insight = useMemo(() => {
+        if (!id) return null;
+        return insights.find(i => i.id === id) || null;
+    }, [id, insights]);
 
     useEffect(() => {
-        if (insightsInitialized && id) {
-            const foundInsight = insights.find(i => i.id === id);
-            if (foundInsight) {
-                setInsight(foundInsight);
-                if (foundInsight.status === 'acted_on' && foundInsight.solutions) {
-                    const solutionNames = new Set(foundInsight.solutions.map(s => s.solution));
-                    setSelectedSolutions(solutionNames);
-                }
-            } else {
-                setInsight(null);
-            }
+        if (insight?.status === 'new') {
+            setShowWizard(true);
         }
-    }, [id, insights, insightsInitialized]);
+    }, [insight]);
+
+    useEffect(() => {
+        if (insight?.status === 'acted_on' && insight.solutions) {
+            const solutionNames = new Set(insight.solutions.map(s => s.solution));
+            setSelectedSolutions(solutionNames);
+        }
+    }, [insight]);
+
 
     const handleSelectSolution = async (solutionToSelect: InsightSolution) => {
         if (!user || !insight) return;
@@ -100,7 +105,7 @@ export default function InsightDetailPage() {
 
             if (insight.status !== 'acted_on') {
                 await updateInsightStatus(user.uid, insight.id, 'acted_on');
-                setInsight(prev => prev ? { ...prev, status: 'acted_on' } : null);
+                setInsightStatus(insight.id, 'acted_on');
                 toast({ title: 'Great!', description: 'We\'ve marked this insight as something you\'re working on.' });
             }
             
@@ -113,6 +118,19 @@ export default function InsightDetailPage() {
             setIsUpdatingStatus(false);
         }
     }
+    
+    const handleWizardComplete = async () => {
+        setShowWizard(false);
+        if (user && insight && insight.status === 'new') {
+            try {
+                await updateInsightStatus(user.uid, insight.id, 'acknowledged');
+                setInsightStatus(insight.id, 'acknowledged');
+            } catch(e) {
+                console.error("Failed to update insight status to acknowledged", e);
+            }
+        }
+    };
+
 
     const milestone = useMemo(() => {
         let days = -1;
@@ -145,6 +163,19 @@ export default function InsightDetailPage() {
                 <Button onClick={() => router.push('/insights')} className="mt-4">Go to Insights Hub</Button>
             </div>
         )
+    }
+    
+    if (showWizard) {
+        return (
+             <InsightWizard
+                insight={insight}
+                isBpiLinked={isBpiLinked}
+                onClose={handleWizardComplete}
+                onSelectSolution={handleSelectSolution}
+                selectedSolutions={selectedSolutions}
+                isUpdatingSolution={isUpdatingStatus}
+            />
+        );
     }
     
     const financialValue = insight.financialImpact.match(/₱(\d+)/)?.[1];
@@ -262,3 +293,5 @@ export default function InsightDetailPage() {
         </div>
     )
 }
+
+    
