@@ -74,9 +74,10 @@ interface KitchenCoachWizardProps {
     onSelectSolution: (solutionTitle: string) => void;
     selectedSolutions: Set<string>;
     isUpdatingSolution: boolean;
+    isBpiLinked: boolean;
 }
 
-export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSelectSolution, selectedSolutions, isUpdatingSolution }: KitchenCoachWizardProps) {
+export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSelectSolution, selectedSolutions, isUpdatingSolution, isBpiLinked }: KitchenCoachWizardProps) {
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
 
@@ -87,10 +88,22 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
             { id: 'root-cause', icon: Lightbulb, title: 'The Root Cause', content: <ul>{analysis.story.rootCause.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
             { id: 'impact', icon: Wallet, title: 'The Impact', content: <p>{analysis.story.impact}</p> },
             { id: 'prediction', icon: AlertTriangle, title: 'The Prediction', content: <p>{analysis.prediction}</p> },
-            { id: 'solutions', icon: Check, title: 'Your Action Plan', content: 'solutions_placeholder' },
         ];
+        
+        const bpiSolution = solutions.solutions.find(s => s.title.toLowerCase().includes('bpi'));
+        if (isBpiLinked && bpiSolution) {
+            baseSteps.push({
+                id: 'bpi-solution',
+                icon: Landmark,
+                title: bpiSolution.title,
+                content: <p>{bpiSolution.description}</p>
+            });
+        }
+        
+        baseSteps.push({ id: 'solutions', icon: Check, title: 'Your Action Plan', content: 'solutions_placeholder' });
+        
         return baseSteps;
-    }, [analysis]);
+    }, [analysis, solutions, isBpiLinked]);
     
     const totalSteps = steps.length;
 
@@ -121,7 +134,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                                                 <h2 className="text-2xl font-bold mb-1">Your Action Plan</h2>
                                                 <p className="text-muted-foreground mb-4">Choose one or more solutions to work on.</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full flex-1">
-                                                    {solutions.solutions.map((s, i) => (
+                                                    {solutions.solutions.filter(s => !s.title.toLowerCase().includes('bpi')).map((s, i) => (
                                                          <SolutionCard 
                                                             key={i} 
                                                             solution={s} 

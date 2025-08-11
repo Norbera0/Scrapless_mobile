@@ -236,6 +236,17 @@ export const KitchenCoachOutputSchema = z.object({
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
 
+const BpiTrackPlanDataSchema = z.object({
+    spendingCategories: z.array(
+      z.object({
+        category: z.string(),
+        amount: z.number(),
+        trend: z.string(),
+      })
+    ),
+    cashFlowAlert: z.string(),
+    unusualTransactions: z.array(z.string()),
+}).optional();
 
 // Schema for the solutions generation flow
 export const GetCoachSolutionsInputSchema = z.object({
@@ -243,6 +254,7 @@ export const GetCoachSolutionsInputSchema = z.object({
     userContext: z.object({
         userStage: z.enum(['new_user', 'regular_user', 'advanced_user']),
         previouslyAttemptedSolutions: z.array(z.string()).optional(),
+        bpiTrackPlanData: BpiTrackPlanDataSchema,
     }).describe("Context about the user to tailor solutions."),
 });
 export type GetCoachSolutionsInput = z.infer<typeof GetCoachSolutionsInputSchema>;
@@ -285,19 +297,7 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
       sessionWasteReason: z.string(),
     })
   ),
-  bpiTrackPlanData: z
-    .object({
-      spendingCategories: z.array(
-        z.object({
-          category: z.string(),
-          amount: z.number(),
-          trend: z.string(),
-        })
-      ),
-      cashFlowAlert: z.string(),
-      unusualTransactions: z.array(z.string()),
-    })
-    .optional(),
+  bpiTrackPlanData: BpiTrackPlanDataSchema,
 });
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 
