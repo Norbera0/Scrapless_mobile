@@ -8,7 +8,6 @@ import type { User } from '@/types';
 import { Loader2, Lightbulb, History, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { generateNewInsight } from '@/app/actions';
 import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -27,41 +26,6 @@ export default function InsightsPage() {
 
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const handleGenerateNew = async () => {
-        if (!user) {
-            toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in.' });
-            return;
-        }
-
-        setIsGenerating(true);
-        try {
-            const input = {
-                pantryItems: liveItems,
-                wasteLogs: logs,
-                bpiTrackPlanData: isBpiLinked ? trackPlanData : undefined
-            };
-
-            const newInsightId = await generateNewInsight(user as User, input);
-            
-            toast({
-                title: 'New Insight Generated!',
-                description: "We've analyzed your latest data.",
-            });
-            router.push(`/insights/${newInsightId}`);
-
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Could not generate a new insight. Please try again later.',
-            });
-        } finally {
-            setIsGenerating(false);
-        }
-    };
-
-
     // This page is now a hub. It no longer redirects automatically.
     // The user can choose to view their latest insight or generate a new one.
     const latestInsight = insights.length > 0 ? insights[0] : null;
@@ -79,10 +43,6 @@ export default function InsightsPage() {
                      <Button variant="outline" onClick={() => router.push('/insights/history')}>
                         <History className="w-4 h-4 mr-2" />
                         View History
-                    </Button>
-                    <Button onClick={handleGenerateNew} disabled={isGenerating}>
-                        {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-                        {isGenerating ? 'Analyzing...' : 'Generate New Insight'}
                     </Button>
                 </div>
             </div>
@@ -111,7 +71,7 @@ export default function InsightsPage() {
                         <div className="text-center text-muted-foreground py-10">
                             <Lightbulb className="w-12 h-12 mx-auto mb-4 text-primary/30" />
                             <h3 className="text-lg font-semibold">No insights yet</h3>
-                            <p className="text-sm">Click 'Generate New Insight' to get started!</p>
+                            <p className="text-sm">You'll see AI-powered tips here once you've logged some data.</p>
                         </div>
                     </CardContent>
                  </Card>
