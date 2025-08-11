@@ -167,6 +167,3 @@ export function InsightWizard({ insight, isBpiLinked, onClose, onSelectSolution,
         </Dialog>
     );
 }
-
-
-    
