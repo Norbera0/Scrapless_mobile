@@ -1,23 +1,26 @@
 
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
-import { usePantryLogStore } from '@/stores/pantry-store';
-import { useWasteLogStore } from '@/stores/waste-log-store';
-import { getCoachAdvice } from '../actions';
-import { type KitchenCoachOutput, type KitchenCoachInput } from '@/ai/schemas';
+import { getCoachAdvice, fetchCoachSolutions } from '../actions';
+import { type KitchenCoachOutput, type GetCoachSolutionsOutput, type KitchenCoachInput, type GetCoachSolutionsInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { useWasteLogStore } from '@/stores/waste-log-store';
+import { usePantryLogStore } from '@/stores/pantry-store';
+import { useSavingsStore } from '@/stores/savings-store';
+import { format, parseISO } from 'date-fns';
 
-function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: KitchenCoachOutput['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
+type Solutions = GetCoachSolutionsOutput;
+
+function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
         <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader>
@@ -57,10 +60,16 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
 
 export default function KitchenCoachPage() {
     const { user } = useAuth();
-    const { liveItems } = usePantryLogStore();
     const { logs } = useWasteLogStore();
+    const { liveItems, archivedItems } = usePantryLogStore();
+    const { savingsEvents } = useSavingsStore();
+
     const [isLoading, setIsLoading] = useState(false);
-    const [advice, setAdvice] = useState<KitchenCoachOutput | null>(null);
+    const [isFetchingSolutions, setIsFetchingSolutions] = useState(false);
+    
+    const [analysis, setAnalysis] = useState<KitchenCoachOutput | null>(null);
+    const [solutions, setSolutions] = useState<Solutions | null>(null);
+    
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
 
     const { toast } = useToast();
@@ -68,7 +77,8 @@ export default function KitchenCoachPage() {
 
     const handleAskCoach = async () => {
         setIsLoading(true);
-        setAdvice(null);
+        setAnalysis(null);
+        setSolutions(null);
         if (!user || !analytics) {
             toast({ variant: 'destructive', title: 'Could not get advice', description: 'User or analytics data is not available.' });
             setIsLoading(false);
@@ -77,43 +87,45 @@ export default function KitchenCoachPage() {
 
         try {
             const input: KitchenCoachInput = {
-                userName: user?.name?.split(' ')[0] || 'User',
-                userStage: 'regular_user',
-                daysActive: analytics.waste.daysSinceLastLog > 0 ? analytics.waste.daysSinceLastLog : 0,
-                hasBpiData: false,
-                pantryItemsCount: liveItems.length,
-                wasteLogsCount: logs.length,
-                weather: analytics.weather ? {
-                    temperature: analytics.weather.temperature,
-                    condition: analytics.weather.condition,
-                    humidity: analytics.weather.humidity,
-                } : undefined,
-                wasteData: {
-                    logs: logs.slice(0, 30).map(l => ({
-                        date: l.date,
-                        items: l.items.map(i => ({ name: i.name, amount: i.estimatedAmount, category: 'unknown' })),
-                        reason: l.sessionWasteReason || 'other',
-                        totalValue: l.totalPesoValue,
-                        dayOfWeek: new Date(l.date).toLocaleString('en-us', { weekday: 'long' })
-                    })),
-                    patterns: {
-                        topWastedCategory: analytics.waste.topWastedCategoryByFrequency?.name || 'N/A',
-                        avgWeeklyWaste: analytics.waste.avgWeeklyValue,
-                        wasteFrequency: `${analytics.waste.wasteLogFrequency.toFixed(1)} times/week`,
+                summaryMetrics: {
+                    pantryHealthScore: analytics.pantryHealthScore,
+                    totalVirtualSavings: analytics.totalVirtualSavings,
+                    totalWasteValue: analytics.totalWasteValue,
+                    engagementScore: analytics.engagementScore,
+                    weather: analytics.weather,
+                    waste: analytics.waste,
+                    pantry: analytics.pantry,
+                    savings: {
+                        useRate: analytics.useRate,
+                        savingsPerWastePeso: analytics.savingsPerWastePeso,
                     }
                 },
-                pantryData: {
-                    currentItems: liveItems.map(i => ({
-                        name: i.name,
-                        expiresIn: Math.max(0, Math.ceil((new Date(i.estimatedExpirationDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24))),
-                        category: 'unknown'
-                    })),
-                    healthScore: analytics.pantryHealthScore,
-                },
+                rawData: {
+                    recentWasteLogs: logs.slice(0, 10).map(l => ({ date: l.date, items: l.items.map(i => ({name: i.name, pesoValue: i.pesoValue})), sessionWasteReason: l.sessionWasteReason })),
+                    recentPantryLogs: liveItems.slice(0,10).map(i => ({ date: i.addedDate, items: [{name: i.name, estimatedCost: i.estimatedCost }]})),
+                    recentUsageLogs: archivedItems.filter(i => i.status === 'used').slice(0, 5).map(i => ({ name: i.name, dateAdded: i.addedDate, dateUsed: i.usedDate })),
+                    recentSavingsEvents: savingsEvents.slice(0,5).map(e => ({ type: e.type, amount: e.amount, date: e.date, description: e.description })),
+                }
             };
+            
+            const analysisResult = await getCoachAdvice(input);
+            setAnalysis(analysisResult);
+            
+            // Now, fetch solutions based on the analysis
+            if (analysisResult.insightType === 'pattern_detected') {
+                setIsFetchingSolutions(true);
+                const solutionsInput: GetCoachSolutionsInput = {
+                    analysis: analysisResult,
+                    userContext: {
+                        userStage: 'regular_user',
+                        previouslyAttemptedSolutions: [] // This could be populated from user history
+                    }
+                };
+                const solutionsResult = await fetchCoachSolutions(solutionsInput);
+                setSolutions(solutionsResult);
+                setIsFetchingSolutions(false);
+            }
 
-            const result = await getCoachAdvice(input);
-            setAdvice(result);
         } catch (error) {
             console.error(error);
             toast({
@@ -179,12 +191,32 @@ export default function KitchenCoachPage() {
             </div>
 
 
-            {advice && (
+            {analysis && (
                 <div className="grid gap-6">
                     <div className="space-y-1">
-                        <h1 className="text-xl font-bold tracking-tight">{advice.title}</h1>
+                        <h1 className="text-xl font-bold tracking-tight">{analysis.title}</h1>
                         <p className="text-sm text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
                     </div>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> The Story</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <h3 className="font-semibold text-sm mb-1">What's Happening:</h3>
+                                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
+                                    {analysis.story.situation.map((line, i) => <li key={i}>{line}</li>)}
+                                </ul>
+                            </div>
+                             <div>
+                                <h3 className="font-semibold text-sm mb-1">The Root Cause:</h3>
+                                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
+                                    {analysis.story.rootCause.map((line, i) => <li key={i}>{line}</li>)}
+                                </ul>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     <div className="grid md:grid-cols-2 gap-4">
                         <Card className="bg-red-50 border-red-200">
@@ -193,63 +225,39 @@ export default function KitchenCoachPage() {
                                 <Wallet className="h-4 w-4 text-red-700" />
                             </CardHeader>
                             <CardContent>
-                                <p className="text-sm text-red-900 font-semibold">{advice.story.impact}</p>
+                                <p className="text-sm text-red-900 font-semibold">{analysis.story.impact}</p>
                             </CardContent>
                         </Card>
-                        <Card className="bg-green-50 border-green-200">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-green-800">Quick Win</CardTitle>
-                                <Sparkles className="h-4 w-4 text-green-700" />
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-green-900 font-semibold">{advice.quickWin}</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
-                                {advice.story.situation.map((line, i) => <li key={i}>{line}</li>)}
-                            </ul>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground pl-2">
-                                {advice.story.rootCause.map((line, i) => <li key={i}>{line}</li>)}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                    
-                    <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-                        <h4 className="font-semibold flex items-center gap-2 mb-1 text-red-800"><AlertTriangle className="w-5 h-5" /> Prediction</h4>
-                        <p className="text-sm text-red-900">{advice.prediction}</p>
+                        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                            <h4 className="font-semibold flex items-center gap-2 mb-1 text-red-800"><AlertTriangle className="w-5 h-5" /> Prediction</h4>
+                            <p className="text-sm text-red-900">{analysis.prediction}</p>
+                        </div>
                     </div>
 
                     <div>
                         <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {advice.solutions.map((solution, index) => (
-                                <SolutionCard 
-                                    key={index} 
-                                    solution={solution} 
-                                    onSelect={() => handleSelectSolution(solution.title)} 
-                                    isSelected={selectedSolutions.has(solution.title)}
-                                    isUpdating={isLoading}
-                                />
-                            ))}
-                        </div>
+                        {isFetchingSolutions ? (
+                             <div className="flex justify-center items-center py-10">
+                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            </div>
+                        ) : solutions ? (
+                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                {solutions.solutions.map((solution, index) => (
+                                    <SolutionCard 
+                                        key={index} 
+                                        solution={solution} 
+                                        onSelect={() => handleSelectSolution(solution.title)} 
+                                        isSelected={selectedSolutions.has(solution.title)}
+                                        isUpdating={isLoading}
+                                    />
+                                ))}
+                            </div>
+                        ) : null}
                     </div>
                 </div>
             )}
         </div>
     );
 }
+
+    

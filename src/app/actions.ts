@@ -5,6 +5,7 @@ import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } f
 import { saveInsight } from '@/lib/data';
 import type { Insight, User } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
+import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
 
 
 /**
@@ -37,3 +38,14 @@ export async function getCoachAdvice(input: KitchenCoachInput): Promise<KitchenC
         throw new Error("Failed to get advice from the Kitchen Coach.");
     }
 }
+
+export async function fetchCoachSolutions(input: GetCoachSolutionsInput): Promise<GetCoachSolutionsOutput> {
+    try {
+        return await getCoachSolutions(input);
+    } catch (error) {
+        console.error("Error getting kitchen coach solutions in server action:", error);
+        throw new Error("Failed to get solutions from the Kitchen Coach.");
+    }
+}
+
+    

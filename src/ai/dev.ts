@@ -12,3 +12,6 @@ import '@/ai/flows/get-item-insights.ts';
 import '@/ai/flows/food-image-generation.ts';
 import '@/ai/flows/generate-shopping-list.ts';
 import '@/ai/flows/get-kitchen-coach-advice.ts';
+import '@/ai/flows/get-coach-solutions.ts';
+
+    

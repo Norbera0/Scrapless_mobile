@@ -215,72 +215,54 @@ export const GenerateShoppingListOutputSchema = z.object({
 export type GenerateShoppingListOutput = z.infer<typeof GenerateShoppingListOutputSchema>;
 
 // Kitchen Coach Schemas
+
+// Schema for the main analysis flow
 export const KitchenCoachInputSchema = z.object({
-  userName: z.string(),
-  userStage: z.enum(['new_user', 'regular_user', 'advanced_user']),
-  daysActive: z.number(),
-  hasBpiData: z.boolean(),
-  pantryItemsCount: z.number(),
-  wasteLogsCount: z.number(),
-  weather: z.object({
-    temperature: z.number(),
-    condition: z.string(),
-    humidity: z.number(),
-  }).optional(),
-  wasteData: z.object({
-    logs: z.array(z.object({
-      date: z.string(),
-      items: z.array(z.object({ name: z.string(), amount: z.string(), category: z.string() })),
-      reason: z.string(),
-      totalValue: z.number(),
-      dayOfWeek: z.string(),
-    })),
-    patterns: z.object({
-      topWastedCategory: z.string(),
-      avgWeeklyWaste: z.number(),
-      wasteFrequency: z.string(),
-    }),
-  }),
-  pantryData: z.object({
-    currentItems: z.array(z.object({
-      name: z.string(),
-      expiresIn: z.number(),
-      category: z.string(),
-    })),
-    healthScore: z.number(),
-  }),
-  bpiData: z.object({
-    grocerySpend: z.number(),
-    spendTrend: z.string(),
-    cashFlow: z.string(),
-    alerts: z.array(z.string()),
-  }).optional(),
+  summaryMetrics: z.any(), // Keeping this flexible for now
+  rawData: z.any(),
 });
 export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 
 export const KitchenCoachOutputSchema = z.object({
   insightType: z.enum(['pattern_detected', 'getting_started', 'first_steps', 're_engagement', 'connect_the_dots']),
   confidence: z.enum(['high', 'medium', 'low']),
-  title: z.string(),
+  title: z.string().describe("A clear, specific pattern name (e.g., 'Weekend Vegetable Overbuying')"),
   story: z.object({
-    situation: z.array(z.string()),
-    impact: z.string(),
-    rootCause: z.array(z.string()),
+    situation: z.array(z.string()).describe("What's happening (2-3 bullets, specific to user data, citing the 'smoking gun' example)"),
+    impact: z.string().describe("Financial + environmental cost (specific numbers)"),
+    rootCause: z.array(z.string()).describe("Why this happens (psychological/cultural reasons, referencing the user persona, 2-3 bullets)"),
   }),
-  prediction: z.string(),
-  solutions: z.array(z.object({
-    title: z.string(),
-    description: z.string(),
-    difficulty: z.enum(['easy', 'medium', 'hard']),
-    timeToSee: z.string(),
-    estimatedSavings: z.number(),
-    successRate: z.number(),
-    filipinoContext: z.string(),
-  })),
-  quickWin: z.string(),
-  encouragement: z.string(),
+  prediction: z.string().describe("What happens if nothing changes (specific timeline)"),
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
+
+
+// Schema for the solutions generation flow
+export const GetCoachSolutionsInputSchema = z.object({
+    analysis: KitchenCoachOutputSchema.describe("The full analysis output from the main Kitchen Coach flow."),
+    userContext: z.object({
+        userStage: z.enum(['new_user', 'regular_user', 'advanced_user']),
+        previouslyAttemptedSolutions: z.array(z.string()).optional(),
+    }).describe("Context about the user to tailor solutions."),
+});
+export type GetCoachSolutionsInput = z.infer<typeof GetCoachSolutionsInputSchema>;
+
+
+export const GetCoachSolutionsOutputSchema = z.object({
+  solutions: z.array(z.object({
+    title: z.string().describe("Primary solution (Tailored to user stage and history)"),
+    description: z.string().describe("Specific action steps (Dynamic based on user context)"),
+    difficulty: z.enum(['easy', 'medium', 'hard']),
+    timeToSee: z.string().describe("Days/weeks until results"),
+    estimatedSavings: z.number().describe("Estimated savings in PHP per month"),
+    successRate: z.number().describe("Success rate from 0 to 1"),
+    filipinoContext: z.string().describe("Why this works for Filipino families"),
+  })),
+  quickWin: z.string().describe("One thing to try today"),
+  encouragement: z.string().describe("Personalized motivational message referencing user progress"),
+});
+export type GetCoachSolutionsOutput = z.infer<typeof GetCoachSolutionsOutputSchema>;
+
 
 // Consumption Analysis Schemas
 export const AnalyzeConsumptionPatternsInputSchema = z.object({
@@ -337,3 +319,5 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
   similarUserStory: z.string(),
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
+
+    
