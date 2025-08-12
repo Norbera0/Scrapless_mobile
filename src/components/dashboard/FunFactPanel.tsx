@@ -56,29 +56,34 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     const now = new Date();
     const startOfThisMonth = startOfMonth(now);
     const startOfLastMonth = startOfMonth(subMonths(now, 1));
-    const thisMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
-    const lastMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfLastMonth) && !isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
+    
+    if(wasteLogs && wasteLogs.length > 0) {
+        const thisMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
+        const lastMonthWaste = wasteLogs.filter(log => isAfter(new Date(log.date), startOfLastMonth) && !isAfter(new Date(log.date), startOfThisMonth)).reduce((acc, log) => acc + log.totalPesoValue, 0);
 
-    if (lastMonthWaste > 0 && thisMonthWaste > 0) {
-        const percentageChange = ((thisMonthWaste - lastMonthWaste) / lastMonthWaste) * 100;
-        const trend = percentageChange > 0 ? 'higher' : 'lower';
-        personalizedFacts.push({
-            icon: BarChart,
-            category: 'Personalized',
-            text: `Your food waste is ${Math.abs(percentageChange).toFixed(0)}% ${trend} than last month.`,
-            source: 'Scrapless Analytics',
-        });
+        if (lastMonthWaste > 0 && thisMonthWaste > 0) {
+            const percentageChange = ((thisMonthWaste - lastMonthWaste) / lastMonthWaste) * 100;
+            const trend = percentageChange > 0 ? 'higher' : 'lower';
+            personalizedFacts.push({
+                icon: BarChart,
+                category: 'Personalized',
+                text: `Your food waste is ${Math.abs(percentageChange).toFixed(0)}% ${trend} than last month.`,
+                source: 'Scrapless Analytics',
+            });
+        }
     }
 
-    const totalSavings = savingsEvents.reduce((acc, e) => acc + e.amount, 0);
-    if (totalSavings > 50) {
-        const riceSaved = estimateRiceKgFromPesos(totalSavings);
-        personalizedFacts.push({
-            icon: Leaf,
-            category: 'Achievement',
-            text: `You've avoided ₱${totalSavings.toFixed(0)} in waste so far. That's like saving ${riceSaved.toFixed(1)}kg of rice!`,
-            source: 'Your Savings History',
-        });
+    if(savingsEvents && savingsEvents.length > 0) {
+        const totalSavings = savingsEvents.reduce((acc, e) => acc + e.amount, 0);
+        if (totalSavings > 50) {
+            const riceSaved = estimateRiceKgFromPesos(totalSavings);
+            personalizedFacts.push({
+                icon: Leaf,
+                category: 'Achievement',
+                text: `You've avoided ₱${totalSavings.toFixed(0)} in waste so far. That's like saving ${riceSaved.toFixed(1)}kg of rice!`,
+                source: 'Your Savings History',
+            });
+        }
     }
 
     // New enhanced fact based on prompt
@@ -111,6 +116,12 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         source: 'BPI Internal Data',
         cta: { label: 'Go Paperless with BPI', href: '/bpi' }
       },
+      {
+        icon: Recycle,
+        category: 'Tip',
+        text: 'Revive wilted greens like lettuce or kangkong by soaking them in a bowl of ice water for 5-10 minutes.',
+        source: 'Common Kitchen Hack',
+      }
     ];
     
     return [enhancedFact, ...baseFacts, ...personalizedFacts];
