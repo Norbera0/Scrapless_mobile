@@ -133,18 +133,15 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   return (
     <div 
         className={cn(
-            "relative overflow-hidden rounded-2xl p-6 min-h-[140px] flex items-center",
-            "bg-gradient-to-br from-green-500 to-green-700 text-white",
-            "shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            "relative overflow-hidden rounded-2xl p-6 min-h-[160px] flex items-center",
+            "bg-white border-l-4 border-green-500",
+            "shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
         )}
     >
-        {/* Glassmorphism background effect */}
-        <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
-
-        <div className="relative z-10 flex items-center gap-6 w-full">
+        <div className="flex items-center gap-6 w-full">
             {/* Icon Section */}
-            <div className="flex-shrink-0 w-20 h-20 bg-white/30 rounded-full flex items-center justify-center icon-pulse">
-                <Icon className="w-10 h-10 text-white" />
+            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center icon-pulse shadow-lg">
+                <Icon className="w-8 h-8 text-white" />
             </div>
 
             {/* Content Section */}
@@ -156,20 +153,24 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.5 }}
+                        className="flex flex-col h-full"
                     >
-                        <h3 className="font-bold text-lg text-white drop-shadow-sm">Did You Know?</h3>
-                        <p className="text-white/90 text-sm mt-1 leading-relaxed">{currentFact.text}</p>
-                        <p className="text-xs text-white/60 mt-2">Source: {currentFact.source}</p>
+                        <div>
+                            <h3 className="font-bold text-lg text-green-900">Did You Know?</h3>
+                            <p className="text-gray-700 text-sm mt-1 leading-relaxed">{currentFact.text}</p>
+                            <p className="text-xs text-gray-500 mt-2">Source: {currentFact.source}</p>
+                        </div>
                         {currentFact.cta && (
-                            <Button
-                                size="sm"
-                                variant="secondary"
-                                className="mt-4 bg-white/20 text-white hover:bg-white/30"
-                                onClick={() => router.push(currentFact.cta!.href)}
-                            >
-                                {currentFact.cta.label}
-                                <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
+                            <div className="mt-4">
+                                <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 text-white rounded-lg h-9"
+                                    onClick={() => router.push(currentFact.cta!.href)}
+                                >
+                                    {currentFact.cta.label}
+                                    <ArrowRight className="w-4 h-4 ml-2" />
+                                </Button>
+                            </div>
                         )}
                     </motion.div>
                 </AnimatePresence>
