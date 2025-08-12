@@ -293,7 +293,13 @@ export default function DashboardPage() {
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-green-200">Virtual Savings</p>
                     <p className="text-3xl font-bold text-white">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                     <p className="text-xs text-white/80">From using items before they spoil, based on their cost and waste risk.</p>
+                     <Button 
+                        variant="link" 
+                        className="text-green-200 p-0 h-auto text-xs hover:text-white"
+                        onClick={() => router.push('/my-savings')}
+                    >
+                        See the breakdown →
+                    </Button>
                 </div>
                 <div className="space-y-1">
                     <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
@@ -471,6 +477,7 @@ export default function DashboardPage() {
   );
 
     
+
 
 
 

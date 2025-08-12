@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useBpiLinking, getStoredAccounts, estimateTimeDepositEarnings, useSavingsSummary } from '@/lib/bpi';
+import { PiggyBank, Sparkles } from 'lucide-react';
 
 export default function BpiHubPage() {
   const { state } = useBpiLinking();
@@ -50,16 +52,28 @@ export default function BpiHubPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Rewards</CardTitle>
-            <CardDescription>Green spend → BPI Rewards</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline"><Link href="/bpi/rewards">View mock rewards</Link></Button>
-          </CardContent>
+       <div className="grid gap-4 md:grid-cols-2">
+         <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><PiggyBank className="w-5 h-5 text-primary" />Virtual Savings Hub</CardTitle>
+                <CardDescription>Review your savings from reducing waste and see a detailed breakdown of your earnings.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow flex items-end">
+                <Button asChild variant="outline" className="w-full"><Link href="/my-savings">View My Savings</Link></Button>
+            </CardContent>
         </Card>
+        <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" />Green Rewards Hub</CardTitle>
+                <CardDescription>Convert your Green Points to BPI Rewards and redeem them in the VYBE app.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow flex items-end">
+                <Button asChild variant="outline" className="w-full"><Link href="/rewards">View Green Rewards</Link></Button>
+            </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Marketplace</CardTitle>
@@ -82,5 +96,3 @@ export default function BpiHubPage() {
     </div>
   );
 }
-
-
