@@ -3,17 +3,19 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf } from 'lucide-react';
+import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { WasteLog, SavingsEvent } from '@/types';
 import { isAfter, startOfMonth, subMonths } from 'date-fns';
 import { estimateRiceKgFromPesos } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 type Fact = {
   icon: React.ElementType;
   text: string;
+  source: string;
   category: 'Trivia' | 'Tip' | 'BPI' | 'Personalized' | 'Achievement';
   cta?: {
     label: string;
@@ -24,6 +26,15 @@ type Fact = {
 interface FunFactPanelProps {
     wasteLogs: WasteLog[];
     savingsEvents: SavingsEvent[];
+}
+
+const categoryIcons = {
+    'Trivia': Lightbulb,
+    'Tip': Recycle,
+    'BPI': Landmark,
+    'Personalized': Sparkles,
+    'Achievement': Leaf,
+    'Ocean Conservation': Globe, // Added for sample
 }
 
 export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
@@ -47,6 +58,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
             icon: BarChart,
             category: 'Personalized',
             text: `Your food waste is ${Math.abs(percentageChange).toFixed(0)}% ${trend} than last month.`,
+            source: 'Scrapless Analytics',
         });
     }
 
@@ -58,6 +70,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
             icon: Leaf,
             category: 'Achievement',
             text: `You've avoided ₱${totalSavings.toFixed(0)} in waste so far. That's like saving ${riceSaved.toFixed(1)}kg of rice!`,
+            source: 'Your Savings History',
         });
     }
 
@@ -65,20 +78,16 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     personalizedFacts.push({
         icon: Info,
         category: 'Trivia',
-        text: `Did you know? The average Filipino household wastes around ₱1,200 worth of food every month.`
+        text: `The average Filipino household wastes around ₱1,200 worth of food every month.`,
+        source: 'FNRI-DOST Study'
     });
     
     // Base BPI Facts
     const baseFacts: Fact[] = [
-      { icon: Landmark, category: 'BPI', text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!' },
-      { icon: Landmark, category: 'BPI', text: 'Using the BPI Mobile App helps reduce your carbon footprint by eliminating trips to a branch.' },
-      { icon: Landmark, category: 'BPI', text: 'BPI offers paperless ATM services, like on-screen balance checks, to reduce receipt waste.' },
-      { icon: Landmark, category: 'BPI', text: "Fun fact! BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite." },
-      { icon: Landmark, category: 'BPI', text: 'Did you know BPI was the first Philippine bank to get Green Building certification for its branches?' },
-      { icon: Landmark, category: 'BPI', text: 'You can donate to charities like WWF directly from your BPI app using the eDonate feature.', cta: { label: 'Explore BPI Hub', href: '/bpi' }},
-      { icon: Landmark, category: 'BPI', text: 'You can get a Solar Mortgage from BPI to help finance solar panels for your home.', cta: { label: 'Learn More in BPI Hub', href: '/bpi' }},
-      { icon: Info, category: 'Tip', text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.' },
-      { icon: Lightbulb, category: 'Trivia', text: 'In the Philippines, food waste per capita is estimated at 20kg per year.' },
+      { icon: Landmark, category: 'BPI', text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!', source: 'BPI Internal Data' },
+      { icon: Landmark, category: 'BPI', text: 'BPI was the first Philippine bank to get Green Building certification for its branches.', source: 'BPI Sustainability Report' },
+      { icon: Globe, category: 'BPI', text: 'BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite, helping protect endangered species.', source: 'BPI Foundation' },
+      { icon: Lightbulb, category: 'Tip', text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.', source: 'Common Kitchen Hack' },
     ];
     
     return [...baseFacts, ...personalizedFacts];
@@ -96,48 +105,42 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   if (facts.length === 0) return null;
 
   const currentFact = facts[currentFactIndex];
-  const Icon = currentFact.icon;
-
-  const categoryColors: Record<Fact['category'], string> = {
-    Trivia: "bg-blue-100 text-blue-800",
-    Tip: "bg-amber-100 text-amber-800",
-    BPI: "bg-red-100 text-red-800",
-    Personalized: "bg-green-100 text-green-800",
-    Achievement: "bg-purple-100 text-purple-800",
-  }
+  const Icon = categoryIcons[currentFact.category as keyof typeof categoryIcons] || Lightbulb;
 
   return (
-    <Card className="shadow-sm bg-white overflow-hidden">
-      <CardContent className="p-4">
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={currentFactIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="flex items-start gap-4"
-            >
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/5">
-                    <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                    <p className={`text-xs font-bold uppercase tracking-wider ${categoryColors[currentFact.category]}`}>{currentFact.category}</p>
-                    <p className="text-sm text-foreground mt-1">{currentFact.text}</p>
-                    {currentFact.cta && (
-                        <Button
-                            variant="link"
-                            size="sm"
-                            className="p-0 h-auto mt-2 text-primary"
-                            onClick={() => router.push(currentFact.cta!.href)}
-                        >
-                            {currentFact.cta.label}
-                        </Button>
-                    )}
-                </div>
-            </motion.div>
-        </AnimatePresence>
-      </CardContent>
-    </Card>
+    <div 
+        className={cn(
+            "relative overflow-hidden rounded-2xl p-6 min-h-[140px] flex items-center",
+            "bg-gradient-to-br from-green-500 to-green-700 text-white",
+            "shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+        )}
+    >
+        {/* Glassmorphism background effect */}
+        <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+
+        <div className="relative z-10 flex items-center gap-6 w-full">
+            {/* Icon Section */}
+            <div className="flex-shrink-0 w-20 h-20 bg-white/30 rounded-full flex items-center justify-center icon-pulse">
+                <Icon className="w-10 h-10 text-white" />
+            </div>
+
+            {/* Content Section */}
+            <div className="flex-1">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentFactIndex}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <h3 className="font-bold text-lg text-white drop-shadow-sm">Did You Know?</h3>
+                        <p className="text-white/90 text-sm mt-1 leading-relaxed">{currentFact.text}</p>
+                        <p className="text-xs text-white/60 mt-2">Source: {currentFact.source}</p>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </div>
+    </div>
   );
 }
