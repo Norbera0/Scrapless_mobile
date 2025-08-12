@@ -32,7 +32,8 @@ import {
   Edit,
   ShoppingBasket,
   Lightbulb,
-  Loader2
+  Loader2,
+  Bot
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -43,6 +44,8 @@ import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useExpiryStore } from '@/stores/expiry-store';
 import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
+import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
+import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -96,6 +99,7 @@ export default function DashboardPage() {
   const analytics = useAnalytics();
   const { toast } = useToast();
   const { setExpiredItemsToShow } = useExpiryStore();
+  const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
@@ -205,6 +209,21 @@ export default function DashboardPage() {
     }
   };
   
+  const monthlyWaste = useMemo(() => {
+    const startOfCurrentMonth = new Date();
+    startOfCurrentMonth.setDate(1);
+    startOfCurrentMonth.setHours(0, 0, 0, 0);
+
+    return logs
+        .filter(log => new Date(log.date) >= startOfCurrentMonth)
+        .reduce((sum, log) => sum + log.totalPesoValue, 0);
+  }, [logs]);
+
+  const bpiDiscretionarySpending = useMemo(() => {
+    if (!isBpiLinked || !trackPlanData) return 0;
+    return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
+  }, [isBpiLinked, trackPlanData]);
+  
   if (!analytics) {
      return (
       <div className="flex h-screen items-center justify-center">
@@ -282,34 +301,38 @@ export default function DashboardPage() {
         </div>
 
         {/* This Week's Impact (prioritize savings and impact equivalences) */}
-        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-r from-green-600 to-emerald-500 text-white">
-            <CardHeader className="bg-white/10 p-4">
-                <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5" />
+        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
+            <CardHeader className="bg-green-600 p-4">
+                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
+                    <TrendingUp className="w-5 h-5" />
                     This Week's Impact
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div className="space-y-1">
-                    <p className="text-sm font-medium text-green-200">Virtual Savings</p>
-                    <p className="text-3xl font-bold text-white">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                    <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
+                    <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
                      <Button 
                         variant="link" 
-                        className="text-green-200 p-0 h-auto text-xs hover:text-white"
+                        className="text-primary p-0 h-auto text-xs hover:text-primary/80"
                         onClick={() => router.push('/my-savings')}
                     >
                         See the breakdown →
                     </Button>
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-medium text-emerald-200">Impact Equivalents</p>
-                    <p className="text-sm text-white/90">≈ {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg rice or ~{estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L water saved</p>
-                    <p className="text-xs text-white/60">Story-based comparison</p>
+                    <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
+                    <div className="text-lg text-gray-800">
+                        <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
+                        <span className="mx-2 text-gray-300">•</span>
+                        <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
+                    </div>
+                    <p className="text-xs text-gray-400">rice & water saved</p>
                 </div>
                 <div className="space-y-1">
-                     <p className="text-sm font-medium text-red-200">Total Carbon Footprint</p>
-                    <p className="text-3xl font-bold text-white">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-xl">kg CO₂e</span></p>
-                    <p className="text-xs text-white/80">From items wasted this week</p>
+                    <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
+                    <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
+                    <p className="text-xs text-gray-400">CO₂e from waste</p>
                 </div>
             </CardContent>
         </Card>
@@ -317,6 +340,15 @@ export default function DashboardPage() {
         <div className="mb-8">
             <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents} />
         </div>
+        
+        {isBpiLinked && (
+            <div className="mb-8">
+                <FinancialWellnessDashboard 
+                    monthlyWaste={monthlyWaste}
+                    bpiDiscretionarySpending={bpiDiscretionarySpending}
+                />
+            </div>
+        )}
 
         {/* Quick Actions Section (tap-friendly, mobile-first) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -477,6 +509,7 @@ export default function DashboardPage() {
   );
 
     
+
 
 
 
