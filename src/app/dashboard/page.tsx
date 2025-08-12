@@ -38,12 +38,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
 import type { PantryItem } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { updatePantryItemStatus } from '@/lib/data';
+import { getExpiredPantryItems, updatePantryItemStatus } from '@/lib/data';
 import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { useExpiryStore } from '@/stores/expiry-store';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
+
+const oneHour = 60 * 60 * 1000;
 
 const emojiMap: { [key: string]: string } = {
     'pork': '🐷',
@@ -85,12 +88,13 @@ const getItemEmoji = (itemName: string) => {
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { logs } = useWasteLogStore();
+  const { logs, logsInitialized } = useWasteLogStore();
   const { insights } = useInsightStore();
-  const { liveItems, archiveItem } = usePantryLogStore();
+  const { liveItems, pantryInitialized, archiveItem } = usePantryLogStore();
   const { savingsEvents } = useSavingsStore();
   const analytics = useAnalytics();
   const { toast } = useToast();
+  const { setExpiredItemsToShow } = useExpiryStore();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
@@ -102,6 +106,25 @@ export default function DashboardPage() {
     else if (hour < 18) setGreeting("Good afternoon");
     else setGreeting("Good evening");
   }, []);
+
+  useEffect(() => {
+    if (user && logsInitialized && pantryInitialized) {
+      const now = new Date().getTime();
+      
+      const lastExpiredCheck = localStorage.getItem(`lastExpiredCheck_${user.uid}`);
+      const shouldCheck = !lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour;
+
+      if (shouldCheck) {
+         getExpiredPantryItems(user.uid).then(expiredItems => {
+            if (expiredItems.length > 0) {
+                setExpiredItemsToShow(expiredItems);
+            }
+         });
+         localStorage.setItem(`lastExpiredCheck_${user.uid}`, now.toString());
+      }
+    }
+  }, [user, logsInitialized, pantryInitialized, setExpiredItemsToShow]);
+
 
   const expiringSoonItems = liveItems.filter(item => {
     const expirationDate = new Date(item.estimatedExpirationDate);
@@ -480,4 +503,5 @@ export default function DashboardPage() {
   );
 
     
+
 
