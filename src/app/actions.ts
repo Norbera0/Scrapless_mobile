@@ -6,7 +6,7 @@ import { saveInsight } from '@/lib/data';
 import type { Insight, User } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
-
+import { analyzeWastePatterns as analyzeWastePatternsFlow, type AnalyzeWastePatternsInput, type AnalyzeWastePatternsOutput } from '@/ai/flows/analyze-waste-patterns';
 
 /**
  * Server Action to get recipe suggestions.
@@ -48,4 +48,11 @@ export async function fetchCoachSolutions(input: GetCoachSolutionsInput): Promis
     }
 }
 
-    
+export async function analyzeWastePatterns(input: AnalyzeWastePatternsInput): Promise<AnalyzeWastePatternsOutput> {
+    try {
+        return await analyzeWastePatternsFlow(input);
+    } catch (error) {
+        console.error("Error analyzing waste patterns in server action:", error);
+        throw new Error("Failed to analyze waste patterns.");
+    }
+}

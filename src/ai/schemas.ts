@@ -320,4 +320,16 @@ export const AnalyzeConsumptionPatternsOutputSchema = z.object({
 });
 export type AnalyzeConsumptionPatternsOutput = z.infer<typeof AnalyzeConsumptionPatternsOutputSchema>;
 
+// My Waste Page Insights Schemas
+export const AnalyzeWastePatternsInputSchema = z.object({
+  wasteLogs: z.array(z.any()).describe('A list of recent waste log objects (last 30 days).'),
+});
+export type AnalyzeWastePatternsInput = z.infer<typeof AnalyzeWastePatternsInputSchema>;
+
+export const AnalyzeWastePatternsOutputSchema = z.object({
+    hiddenPattern: z.string().describe("A non-obvious pattern discovered from the waste logs."),
+    disposalTip: z.string().describe("A smart, actionable tip for disposing of or repurposing the common types of waste."),
+    preventionSolutions: z.array(z.string()).length(2).describe("A list of exactly two creative solutions to prevent future waste."),
+});
+export type AnalyzeWastePatternsOutput = z.infer<typeof AnalyzeWastePatternsOutputSchema>;
     

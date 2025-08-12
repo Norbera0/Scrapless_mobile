@@ -13,11 +13,12 @@ import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { useInsightStore } from '@/stores/insight-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
+import { analyzeWastePatterns } from '../actions';
+import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -304,9 +305,10 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
 export default function MyWastePage() {
   const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
-  const { insights, insightsInitialized } = useInsightStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
+  const [isLoadingInsight, setIsLoadingInsight] = useState(false);
+  const [insight, setInsight] = useState<AnalyzeWastePatternsOutput | null>(null);
   const isMobile = useIsMobile();
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
@@ -384,6 +386,20 @@ export default function MyWastePage() {
     return { categoryData, reasonData };
   }, [logs]);
   
+  const handleRevealPattern = async () => {
+    setIsLoadingInsight(true);
+    setInsight(null);
+    try {
+        const result = await analyzeWastePatterns({ wasteLogs: logs });
+        setInsight(result);
+    } catch(e) {
+        console.error("Failed to analyze waste patterns", e);
+        // Optionally show a toast error
+    } finally {
+        setIsLoadingInsight(false);
+    }
+  }
+
   const chartConfig = {
     totalPesoValue: {
       label: "Waste Value (₱)",
@@ -399,8 +415,6 @@ export default function MyWastePage() {
       value: { label: 'Value' },
       ...categoryData.reduce((acc, cur) => ({...acc, [cur.name]: { label: cur.name, color: COLORS[categoryData.indexOf(cur) % COLORS.length] } }), {}),
   }
-  
-  const latestInsight = insights.length > 0 ? insights[0] : null;
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50">
@@ -417,7 +431,7 @@ export default function MyWastePage() {
             </Button>
         </div>
 
-      {!logsInitialized || !insightsInitialized ? (
+      {!logsInitialized ? (
           <div className="flex h-64 w-full items-center justify-center p-4">
               <Loader2 className="h-8 w-8 animate-spin" />
           </div>
@@ -544,31 +558,34 @@ export default function MyWastePage() {
                   <CardDescription>Smart patterns & predictions from your data</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                  {latestInsight ? (
-                      <>
-                          {latestInsight.predictionAlertBody && (
-                               <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
-                                  <div className="flex items-start gap-3">
-                                      <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5"/>
-                                      <div>
-                                          <h3 className="font-semibold text-blue-800">Prediction Alert</h3>
-                                          <p className="text-sm text-blue-700">{latestInsight.predictionAlertBody}</p>
-                                      </div>
-                                  </div>
-                              </div>
-                          )}
-                           <div className="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-lg">
-                               <div className="flex items-start gap-3">
-                                  <Lightbulb className="h-5 w-5 text-amber-600 mt-0.5"/>
-                                  <div>
-                                      <h3 className="font-semibold text-amber-800">Pattern Detected</h3>
-                                      <p className="text-sm text-amber-700">{latestInsight.patternAlert}</p>
-                                  </div>
-                              </div>
-                          </div>
-                      </>
+                  {isLoadingInsight ? (
+                     <div className="flex justify-center items-center h-24">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                     </div>
+                  ) : insight ? (
+                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                        <div className="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-lg">
+                           <h3 className="font-semibold text-amber-800">Hidden Pattern Detected</h3>
+                           <p className="text-sm text-amber-700">{insight.hiddenPattern}</p>
+                        </div>
+                         <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
+                           <h3 className="font-semibold text-blue-800">Smart Disposal Tip</h3>
+                           <p className="text-sm text-blue-700">{insight.disposalTip}</p>
+                        </div>
+                         <div className="space-y-2">
+                             <h3 className="font-semibold text-green-800">Prevention Solutions</h3>
+                             {insight.preventionSolutions.map((solution, i) => (
+                                <p key={i} className="text-sm text-green-700 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                    {solution}
+                                </p>
+                             ))}
+                         </div>
+                     </motion.div>
                   ) : (
-                      <p className="text-center text-muted-foreground py-4">No insights generated yet. Keep logging to see AI-powered tips!</p>
+                     <Button className="w-full" onClick={handleRevealPattern} disabled={isLoadingInsight}>
+                        <Brain className="mr-2 h-4 w-4" />
+                        Reveal Waste Pattern
+                     </Button>
                   )}
               </CardContent>
             </Card>
