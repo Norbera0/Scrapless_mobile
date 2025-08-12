@@ -1,9 +1,10 @@
 
+
 'use client';
 
 import { differenceInDays, startOfToday, parseISO } from 'date-fns';
-import type { User, PantryItem, Recipe, SavingsEvent } from '@/types';
-import { saveSavingsEvent, getUserWasteStats, updatePantryItemStatus } from './data';
+import type { User, PantryItem, Recipe, SavingsEvent, GreenPointsEvent } from '@/types';
+import { saveSavingsEvent, getUserWasteStats, updatePantryItemStatus, saveGreenPointsEvent } from './data';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { FOOD_DATA_MAP } from './food-data';
 import { parse } from 'path';
@@ -30,8 +31,21 @@ const getBaseUnit = (unit: string): string => {
 /**
  * Mechanism 1: Avoided Expiry Savings (Advanced Formula)
  * Calculates savings based on a dynamic model of spoil probability and user behavior.
+ * Also awards Green Points for using an item.
  */
 export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem, usageEfficiency: number) => {
+    // Award Green Points for using an item
+    const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+        userId: user.uid,
+        date: new Date().toISOString(),
+        type: 'use_pantry_item',
+        points: 25,
+        description: `Used "${item.name}" from pantry.`,
+        relatedPantryItemId: item.id,
+    };
+    saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);
+
+
     // Ensure item has a cost and was used before expiry.
     const usedDate = startOfToday();
     const expiryDate = parseISO(item.estimatedExpirationDate);
@@ -91,9 +105,20 @@ export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem
 /**
  * Mechanism 2: Recipe Following Savings
  * Calculates savings when a user follows a recipe instead of choosing a more expensive alternative.
- * Also deducts the used ingredients from the pantry.
+ * Also deducts the used ingredients from the pantry and awards Green Points.
  */
 export const calculateAndSaveRecipeSavings = async (user: User, recipe: Recipe) => {
+    // Award Green Points for cooking a recipe
+    const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+        userId: user.uid,
+        date: new Date().toISOString(),
+        type: 'cook_recipe',
+        points: 50,
+        description: `Cooked the recipe: ${recipe.name}.`,
+        relatedRecipeId: recipe.id,
+    };
+    saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);
+
     const liveItems = usePantryLogStore.getState().liveItems;
     const batchUpdates: Array<{itemId: string, newQuantity: number}> = [];
     const savingsFromItems: Array<{name: string, savedAmount: number}> = [];

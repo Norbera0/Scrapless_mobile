@@ -1,7 +1,8 @@
 
+
 'use client';
 import { db } from './firebase';
-import type { Insight, WasteLog, PantryItem, Recipe, User, SavingsEvent } from '@/types';
+import type { Insight, WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent } from '@/types';
 import { 
     collection, 
     addDoc, 
@@ -26,6 +27,7 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { useInsightStore } from '@/stores/insight-store';
 import type { PantryLogItem } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
+import { useGreenPointsStore } from '@/stores/green-points-store';
 import { FOOD_DATA_MAP } from './food-data';
 
 // --- Listener Management ---
@@ -36,9 +38,10 @@ const listenerManager: { [key: string]: Unsubscribe[] } = {
     savedRecipes: [],
     insights: [],
     savingsEvents: [],
+    greenPointsEvents: [],
 };
 
-export const cleanupListeners = (key?: 'wasteLogs' | 'pantry' | 'userSettings' | 'savedRecipes' | 'insights' | 'savingsEvents') => {
+export const cleanupListeners = (key?: keyof typeof listenerManager) => {
     const unsubscribeAll = (keys: string[]) => {
         keys.forEach(k => {
             if (listenerManager[k]) {
@@ -62,6 +65,7 @@ export const initializeUserCache = (userId: string) => {
     usePantryLogStore.getState().setPantryInitialized(false);
     useInsightStore.getState().setInsightsInitialized(false);
     useSavingsStore.getState().setSavingsInitialized(false);
+    useGreenPointsStore.getState().setPointsInitialized(false);
 
     // Listener for Waste Logs
     const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
@@ -120,6 +124,18 @@ export const initializeUserCache = (userId: string) => {
         useSavingsStore.getState().setSavingsInitialized(true);
     });
     listenerManager.savingsEvents.push(savingsUnsub);
+
+    // Listener for Green Points Events
+    const greenPointsQuery = query(collection(db, `users/${userId}/greenPointsEvents`), orderBy('date', 'desc'));
+    const greenPointsUnsub = onSnapshot(greenPointsQuery, (snapshot) => {
+        const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as GreenPointsEvent));
+        useGreenPointsStore.getState().setEvents(events);
+        useGreenPointsStore.getState().setPointsInitialized(true);
+    }, (error) => {
+        console.error("Error with Green Points listener:", error);
+        useGreenPointsStore.getState().setPointsInitialized(true);
+    });
+    listenerManager.greenPointsEvents.push(greenPointsUnsub);
 };
 
 
@@ -237,6 +253,18 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
         
         batch.set(docRef, newItemData);
         savedItems.push({ ...newItemData, id: item.id });
+
+        // Award Green Points for logging an item
+        const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+            userId,
+            date: new Date().toISOString(),
+            type: 'log_pantry_item',
+            points: 10,
+            description: `Logged "${item.name}" in pantry.`,
+            relatedPantryItemId: item.id,
+        };
+        const pointsDocRef = doc(collection(db, `users/${userId}/greenPointsEvents`));
+        batch.set(pointsDocRef, pointsEvent);
     });
 
     await batch.commit();
@@ -356,5 +384,13 @@ export const saveUserSettings = async (userId: string, settings: any) => {
 export const saveSavingsEvent = async (userId: string, event: Omit<SavingsEvent, 'id'>): Promise<string> => {
     const savingsCollection = collection(db, `users/${userId}/savingsEvents`);
     const docRef = await addDoc(savingsCollection, event);
+    return docRef.id;
+};
+
+
+// --- Green Points Functions ---
+export const saveGreenPointsEvent = async (userId: string, event: Omit<GreenPointsEvent, 'id'>): Promise<string> => {
+    const greenPointsCollection = collection(db, `users/${userId}/greenPointsEvents`);
+    const docRef = await addDoc(greenPointsCollection, event);
     return docRef.id;
 };

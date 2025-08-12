@@ -164,6 +164,18 @@ export interface SavingsEvent {
     transferDate?: string; // ISO string
 }
 
+export interface GreenPointsEvent {
+    id: string;
+    userId: string;
+    date: string; // ISO string
+    type: 'log_pantry_item' | 'use_pantry_item' | 'cook_recipe' | 'zero_waste_week';
+    points: number;
+    description: string;
+    relatedPantryItemId?: string;
+    relatedRecipeId?: string;
+}
+
+
 export interface SolutionSavings {
     id: string;
     userId: string;

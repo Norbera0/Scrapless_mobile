@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { 
@@ -14,7 +15,8 @@ import {
     Landmark,
     User,
     Bot,
-    Gift
+    Gift,
+    Sparkles
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -67,6 +69,7 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
     { href: '/my-savings', label: 'My Savings', icon: PiggyBank },
+    { href: '/rewards', label: 'Green Rewards', icon: Sparkles },
   ];
   
   const getInitials = (name?: string | null) => {
