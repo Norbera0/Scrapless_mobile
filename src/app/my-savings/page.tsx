@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote, Gift } from 'lucide-react';
+import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote } from 'lucide-react';
 import type { SavingsEvent } from '@/types';
 import { format, parseISO } from 'date-fns';
-import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const eventIcons: Record<SavingsEvent['type'], React.ElementType> = {
     avoided_expiry: CheckCircle,
@@ -20,13 +20,12 @@ const eventIcons: Record<SavingsEvent['type'], React.ElementType> = {
     solution_implemented: Sparkles,
 };
 
-const PESO_TO_POINTS_CONVERSION_RATE = 10;
-
-export default function MyRewardsPage() {
+export default function MySavingsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { savingsEvents, savingsInitialized } = useSavingsStore();
     const [isLoading, setIsLoading] = useState(true);
     const { toast } = useToast();
+    const router = useRouter();
 
     useEffect(() => {
         if (!isAuthLoading && savingsInitialized) {
@@ -34,16 +33,12 @@ export default function MyRewardsPage() {
         }
     }, [isAuthLoading, savingsInitialized]);
 
-    const totalPoints = useMemo(() => {
-        const totalPesos = savingsEvents.reduce((acc, event) => acc + event.amount, 0);
-        return Math.floor(totalPesos * PESO_TO_POINTS_CONVERSION_RATE);
+    const totalSavings = useMemo(() => {
+        return savingsEvents.reduce((acc, event) => acc + event.amount, 0);
     }, [savingsEvents]);
 
     const handleTransfer = () => {
-        toast({
-            title: "Points Converted!",
-            description: `${totalPoints} points have been added to your BPI VYBE account. (This is a mock-up)`,
-        })
+        router.push('/bpi/transfer');
     };
 
     if (isLoading) {
@@ -57,18 +52,18 @@ export default function MyRewardsPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">🎁 My Rewards</h1>
+                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Savings</h1>
                 <p className="text-muted-foreground">
-                    Your Green Points hub. Convert your points to BPI Rewards in VYBE.
+                    Your virtual savings from reducing food waste.
                 </p>
             </div>
 
             <Card className="bg-gradient-to-br from-primary to-emerald-700 text-white shadow-lg">
                 <CardHeader>
-                    <CardTitle className="text-lg">Total Green Points</CardTitle>
+                    <CardTitle className="text-lg">Total Virtual Savings</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-5xl font-bold tracking-tighter">{totalPoints.toLocaleString()}</p>
+                    <p className="text-5xl font-bold tracking-tighter">₱{totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     <p className="text-green-200 mt-1">Earned from your sustainable actions.</p>
                 </CardContent>
                 <CardFooter>
@@ -77,23 +72,22 @@ export default function MyRewardsPage() {
                         className="bg-white/90 text-primary hover:bg-white w-full h-12 text-base"
                         onClick={handleTransfer}
                     >
-                        <Image src="/vybe-logo.png" alt="VYBE Logo" width={24} height={24} className="mr-2" />
-                        Convert to BPI Points via VYBE
+                        <Banknote className="mr-2" />
+                        Transfer to BPI Green Saver
                     </Button>
                 </CardFooter>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Points History</CardTitle>
-                    <CardDescription>See how your smart habits are earning you points.</CardDescription>
+                    <CardTitle>Savings History</CardTitle>
+                    <CardDescription>See how your smart habits are adding up.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      {savingsEvents.length > 0 ? (
                         <div className="space-y-3">
                             {savingsEvents.map(event => {
                                 const Icon = eventIcons[event.type] || Sparkles;
-                                const pointsEarned = Math.floor(event.amount * PESO_TO_POINTS_CONVERSION_RATE);
                                 return (
                                     <div key={event.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
                                         <div className="flex items-center gap-3">
@@ -104,7 +98,7 @@ export default function MyRewardsPage() {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                             <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ {pointsEarned} pts</p>
+                                             <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ ₱{event.amount.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 )
@@ -112,13 +106,12 @@ export default function MyRewardsPage() {
                         </div>
                      ) : (
                          <div className="text-center text-muted-foreground py-10">
-                            <p>You haven't earned any points yet.</p>
-                            <p className="text-sm">Log items and use your pantry to start earning!</p>
+                            <p>You haven't earned any savings yet.</p>
+                            <p className="text-sm">Log items and use your pantry to start saving!</p>
                         </div>
                      )}
                 </CardContent>
             </Card>
-
         </div>
     );
 }
