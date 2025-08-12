@@ -3,19 +3,21 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import type { ReactNode } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { SidebarNav } from '@/components/dashboard/SidebarNav';
 import { Sidebar, SidebarInset, SidebarRail, SidebarTrigger } from '@/components/ui/sidebar';
 import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 import { Button } from '@/components/ui/button';
-import { PanelLeft, Bell } from 'lucide-react';
+import { PanelLeft, Bell, Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNotifications } from '@/hooks/use-notifications';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NotificationPanel } from '@/components/dashboard/NotificationPanel';
+import { useGreenPointsStore } from '@/stores/green-points-store';
 
 
 const getPageTitle = (pathname: string) => {
@@ -30,6 +32,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/review-items')) return 'Review Items';
     if (pathname.startsWith('/review-pantry-items')) return 'Review Pantry Items';
     if (pathname.startsWith('/profile')) return 'Profile';
+    if (pathname.startsWith('/rewards')) return 'Green Rewards';
     return 'Scrapless';
 }
 
@@ -41,6 +44,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { notifications, totalNew, priorityColor } = useNotifications();
   const [hasOpenedNotifications, setHasOpenedNotifications] = useState(false);
+  const { events: greenPointsEvents } = useGreenPointsStore();
+
+  const totalGreenPoints = useMemo(() => {
+    return greenPointsEvents.reduce((acc, event) => acc + event.points, 0);
+  }, [greenPointsEvents]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -97,6 +105,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-4 md:gap-6 ml-auto">
+                 <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg">
+                    <Leaf className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
+                 </div>
                  <div className="hidden md:flex flex-col items-end">
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
                     <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
