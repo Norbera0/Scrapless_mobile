@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight } from 'lucide-react';
+import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,6 +21,15 @@ type Fact = {
     label: string;
     href: string;
   };
+  mainFact?: {
+    value: string;
+    description: string;
+  };
+  subFacts?: {
+      label: string;
+      value: string;
+  }[];
+  relatedTip?: string;
 };
 
 interface FunFactPanelProps {
@@ -34,7 +43,7 @@ const categoryIcons = {
     'BPI': Landmark,
     'Personalized': Sparkles,
     'Achievement': Leaf,
-    'Ocean Conservation': Globe, // Added for sample
+    'Ocean Conservation': Globe, 
 }
 
 export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
@@ -44,7 +53,6 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   const facts: Fact[] = useMemo(() => {
     const personalizedFacts: Fact[] = [];
     
-    // Performance comparison: this month vs last month
     const now = new Date();
     const startOfThisMonth = startOfMonth(now);
     const startOfLastMonth = startOfMonth(subMonths(now, 1));
@@ -62,7 +70,6 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         });
     }
 
-    // Achievement Framing
     const totalSavings = savingsEvents.reduce((acc, e) => acc + e.amount, 0);
     if (totalSavings > 50) {
         const riceSaved = estimateRiceKgFromPesos(totalSavings);
@@ -74,15 +81,28 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         });
     }
 
-    // Relatable Context
-    personalizedFacts.push({
+    // New enhanced fact based on prompt
+    const enhancedFact: Fact = {
         icon: Info,
         category: 'Trivia',
-        text: `The average Filipino household wastes around ₱1,200 worth of food every month.`,
-        source: 'FNRI-DOST Study'
-    });
+        text: 'Average Filipino household food waste.', // Fallback text
+        mainFact: {
+            value: "₱1,200",
+            description: "per month"
+        },
+        subFacts: [
+            { label: "Per week", value: "₱300" },
+            { label: "Per person", value: "₱240" },
+            { label: "Potential Savings", value: "60%" },
+        ],
+        relatedTip: "Meal planning can reduce waste by up to 40%.",
+        source: 'FNRI-DOST Study',
+        cta: {
+            label: 'Beat the average!',
+            href: '/log-waste?method=camera'
+        }
+    };
     
-    // Base BPI Facts
     const baseFacts: Fact[] = [
       { 
         icon: Landmark, 
@@ -91,29 +111,9 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         source: 'BPI Internal Data',
         cta: { label: 'Go Paperless with BPI', href: '/bpi' }
       },
-      { 
-        icon: Landmark, 
-        category: 'BPI', 
-        text: 'BPI was the first Philippine bank to get Green Building certification for its branches.', 
-        source: 'BPI Sustainability Report',
-        cta: { label: 'Explore BPI Sustainability', href: '/bpi' }
-      },
-      { 
-        icon: Globe, 
-        category: 'BPI', 
-        text: 'BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite, helping protect endangered species.', 
-        source: 'BPI Foundation',
-        cta: { label: 'Learn About BPI Foundation', href: '/bpi' }
-      },
-      { 
-        icon: Lightbulb, 
-        category: 'Tip', 
-        text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.', 
-        source: 'Common Kitchen Hack' 
-      },
     ];
     
-    return [...baseFacts, ...personalizedFacts];
+    return [enhancedFact, ...baseFacts, ...personalizedFacts];
   }, [wasteLogs, savingsEvents]);
 
 
@@ -131,51 +131,64 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   const Icon = categoryIcons[currentFact.category as keyof typeof categoryIcons] || Lightbulb;
 
   return (
-    <div 
-        className={cn(
-            "relative overflow-hidden rounded-2xl p-6 min-h-[160px] flex items-center",
-            "bg-white border-l-4 border-green-500",
-            "shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-        )}
-    >
-        <div className="flex items-center gap-6 w-full">
-            {/* Icon Section */}
-            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center icon-pulse shadow-lg">
-                <Icon className="w-8 h-8 text-white" />
-            </div>
+     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50/50 to-white p-5 shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={currentFactIndex}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col h-full"
+            >
+                <div className="flex items-start gap-4 mb-4">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center icon-pulse shadow-lg">
+                        <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-bold text-base text-green-900">Did You Know?</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">{currentFact.source}</p>
+                    </div>
+                </div>
 
-            {/* Content Section */}
-            <div className="flex-1">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={currentFactIndex}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.5 }}
-                        className="flex flex-col h-full"
-                    >
-                        <div>
-                            <h3 className="font-bold text-lg text-green-900">Did You Know?</h3>
-                            <p className="text-gray-700 text-sm mt-1 leading-relaxed">{currentFact.text}</p>
-                            <p className="text-xs text-gray-500 mt-2">Source: {currentFact.source}</p>
-                        </div>
-                        {currentFact.cta && (
-                            <div className="mt-4">
-                                <Button
-                                    size="sm"
-                                    className="bg-green-600 hover:bg-green-700 text-white rounded-lg h-9"
-                                    onClick={() => router.push(currentFact.cta!.href)}
-                                >
-                                    {currentFact.cta.label}
-                                    <ArrowRight className="w-4 h-4 ml-2" />
-                                </Button>
+                {currentFact.mainFact ? (
+                    <div className="mb-4">
+                        <p className="text-4xl font-bold text-[#2d5016]">{currentFact.mainFact.value}</p>
+                        <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
+                    </div>
+                ) : (
+                    <p className="text-gray-700 text-sm mt-1 leading-relaxed mb-4">{currentFact.text}</p>
+                )}
+
+                {currentFact.subFacts && (
+                    <div className="grid grid-cols-3 gap-2 text-center text-xs text-green-800 mb-4">
+                        {currentFact.subFacts.map(sub => (
+                            <div key={sub.label} className="bg-green-100/70 p-1.5 rounded-md">
+                                <p className="font-semibold">{sub.value}</p>
+                                <p className="opacity-80">{sub.label}</p>
                             </div>
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-        </div>
+                        ))}
+                    </div>
+                )}
+                
+                {currentFact.relatedTip && (
+                     <div className="text-xs text-center text-gray-600 bg-yellow-100/60 p-2 rounded-md border border-yellow-200/80">
+                        <span className="font-semibold">💡 Quick Tip:</span> {currentFact.relatedTip}
+                    </div>
+                )}
+                
+                {currentFact.cta && (
+                    <Button
+                        size="sm"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg h-9 mt-4"
+                        onClick={() => router.push(currentFact.cta!.href)}
+                    >
+                        {currentFact.cta.label}
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                )}
+            </motion.div>
+        </AnimatePresence>
     </div>
   );
 }
