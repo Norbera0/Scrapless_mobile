@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -13,7 +12,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { differenceInDays, startOfToday } from 'date-fns';
+import { differenceInDays, startOfToday, parseISO } from 'date-fns';
 import { 
   Sparkles, 
   TrendingUp, 
@@ -37,7 +36,7 @@ import {
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
-import type { PantryItem } from '@/types';
+import type { PantryItem, WasteLog } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { getExpiredPantryItems, updatePantryItemStatus } from '@/lib/data';
 import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
@@ -46,6 +45,7 @@ import { useExpiryStore } from '@/stores/expiry-store';
 import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
 import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { startOfMonth } from 'date-fns';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -89,6 +89,13 @@ const getItemEmoji = (itemName: string) => {
     return '🍽️'; // Default emoji
 };
 
+const calculateMonthlyWaste = (logs: WasteLog[]): number => {
+    const startOfCurrentMonth = startOfMonth(new Date());
+    return logs
+        .filter(log => new Date(log.date) >= startOfCurrentMonth)
+        .reduce((sum, log) => sum + log.totalPesoValue, 0);
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -104,6 +111,13 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
   const [isUpdatingItemId, setIsUpdatingItemId] = useState<string | null>(null);
+
+  const monthlyWaste = useMemo(() => calculateMonthlyWaste(logs), [logs]);
+    
+  const bpiDiscretionarySpending = useMemo(() => {
+      if (!isBpiLinked || !trackPlanData) return 0;
+      return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
+  }, [isBpiLinked, trackPlanData]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -140,9 +154,8 @@ export default function DashboardPage() {
 
   const latestInsight = insights.length > 0 ? insights[0] : null;
 
-  // Monthly savings goal progress (hackathon placeholder goal)
-  const savingsGoal = 5000;
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
+  const savingsGoal = 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
 
   const sortedWatchlistItems = useMemo(() => {
@@ -191,13 +204,10 @@ export default function DashboardPage() {
     if (!user) return;
     setIsUpdatingItemId(item.id);
     try {
-      // Optimistic UI update
       archiveItem(item.id, 'used');
       
-      // Server update (fire and forget for better UX)
       updatePantryItemStatus(user.uid, item.id, 'used').catch(err => {
         console.error("Failed to mark item as used on server", err);
-        // Here you might add logic to revert the optimistic update if needed
       });
 
       toast({ title: "Item used!", description: `You've used "${item.name}".`});
@@ -208,21 +218,6 @@ export default function DashboardPage() {
       setIsUpdatingItemId(null);
     }
   };
-  
-  const monthlyWaste = useMemo(() => {
-    const startOfCurrentMonth = new Date();
-    startOfCurrentMonth.setDate(1);
-    startOfCurrentMonth.setHours(0, 0, 0, 0);
-
-    return logs
-        .filter(log => new Date(log.date) >= startOfCurrentMonth)
-        .reduce((sum, log) => sum + log.totalPesoValue, 0);
-  }, [logs]);
-
-  const bpiDiscretionarySpending = useMemo(() => {
-    if (!isBpiLinked || !trackPlanData) return 0;
-    return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
-  }, [isBpiLinked, trackPlanData]);
   
   if (!analytics) {
      return (
@@ -337,10 +332,6 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
         
-        <div className="mb-8">
-            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents} />
-        </div>
-        
         {isBpiLinked && (
             <div className="mb-8">
                 <FinancialWellnessDashboard 
@@ -388,6 +379,10 @@ export default function DashboardPage() {
                     <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
                 </div>
             </div>
+        </div>
+
+        <div className="mb-8">
+            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents} />
         </div>
         
         {/* Bottom Grid */}
@@ -507,10 +502,4 @@ export default function DashboardPage() {
       </div>
     </div>
   );
-
-    
-
-
-
-
-
+}
