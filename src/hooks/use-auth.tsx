@@ -10,7 +10,6 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
-const twelveHours = 12 * 60 * 60 * 1000;
 const oneHour = 60 * 60 * 1000;
 
 export function useAuth() {
