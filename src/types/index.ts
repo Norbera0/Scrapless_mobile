@@ -168,11 +168,12 @@ export interface GreenPointsEvent {
     id: string;
     userId: string;
     date: string; // ISO string
-    type: 'log_pantry_item' | 'use_pantry_item' | 'cook_recipe' | 'zero_waste_week';
+    type: 'log_pantry_item' | 'use_pantry_item' | 'cook_recipe' | 'zero_waste_week' | 'acted_on_insight';
     points: number;
     description: string;
     relatedPantryItemId?: string;
     relatedRecipeId?: string;
+    relatedInsightId?: string;
 }
 
 

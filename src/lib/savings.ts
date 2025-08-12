@@ -8,6 +8,7 @@ import { saveSavingsEvent, getUserWasteStats, updatePantryItemStatus, saveGreenP
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { FOOD_DATA_MAP } from './food-data';
 import { parse } from 'path';
+import { GREEN_POINTS_CONFIG } from './points-config';
 
 const RECIPE_ALTERNATIVE_COST = 150; // ₱150
 const RECIPE_SAVINGS_CAP = 100; // ₱100
@@ -35,12 +36,13 @@ const getBaseUnit = (unit: string): string => {
  */
 export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem, usageEfficiency: number) => {
     // Award Green Points for using an item
+    const pointsConfig = GREEN_POINTS_CONFIG.use_pantry_item;
     const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
         userId: user.uid,
         date: new Date().toISOString(),
         type: 'use_pantry_item',
-        points: 25,
-        description: `Used "${item.name}" from pantry.`,
+        points: pointsConfig.points,
+        description: pointsConfig.defaultDescription(item.name),
         relatedPantryItemId: item.id,
     };
     saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);
@@ -109,12 +111,13 @@ export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem
  */
 export const calculateAndSaveRecipeSavings = async (user: User, recipe: Recipe) => {
     // Award Green Points for cooking a recipe
+    const pointsConfig = GREEN_POINTS_CONFIG.cook_recipe;
     const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
         userId: user.uid,
         date: new Date().toISOString(),
         type: 'cook_recipe',
-        points: 50,
-        description: `Cooked the recipe: ${recipe.name}.`,
+        points: pointsConfig.points,
+        description: pointsConfig.defaultDescription(recipe.name),
         relatedRecipeId: recipe.id,
     };
     saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);

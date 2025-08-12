@@ -29,6 +29,7 @@ import type { PantryLogItem } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useGreenPointsStore } from '@/stores/green-points-store';
 import { FOOD_DATA_MAP } from './food-data';
+import { GREEN_POINTS_CONFIG } from './points-config';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -255,12 +256,13 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
         savedItems.push({ ...newItemData, id: item.id });
 
         // Award Green Points for logging an item
+        const pointsConfig = GREEN_POINTS_CONFIG.log_pantry_item;
         const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
             userId,
             date: new Date().toISOString(),
             type: 'log_pantry_item',
-            points: 10,
-            description: `Logged "${item.name}" in pantry.`,
+            points: pointsConfig.points,
+            description: pointsConfig.defaultDescription(item.name),
             relatedPantryItemId: item.id,
         };
         const pointsDocRef = doc(collection(db, `users/${userId}/greenPointsEvents`));
@@ -365,6 +367,21 @@ export const saveInsight = async (insightData: Omit<Insight, 'id'>): Promise<str
 export const updateInsightStatus = async (userId: string, insightId: string, status: Insight['status']) => {
     const insightRef = doc(db, `users/${userId}/insights`, insightId);
     await updateDoc(insightRef, { status });
+
+    if (status === 'acted_on') {
+        const insightDoc = await getDoc(insightRef);
+        const insightData = insightDoc.data() as Insight;
+        const pointsConfig = GREEN_POINTS_CONFIG.acted_on_insight;
+        const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+            userId,
+            date: new Date().toISOString(),
+            type: 'acted_on_insight',
+            points: pointsConfig.points,
+            description: pointsConfig.defaultDescription(insightData.patternAlert),
+            relatedInsightId: insightId,
+        };
+        saveGreenPointsEvent(userId, pointsEvent);
+    }
 };
 
 

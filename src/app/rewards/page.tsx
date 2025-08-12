@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useGreenPointsStore } from '@/stores/green-points-store';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Sparkles, Gift, CookingPot, CheckCircle } from 'lucide-react';
+import { Loader2, Sparkles, Gift, CookingPot, CheckCircle, Lightbulb } from 'lucide-react';
 import type { GreenPointsEvent } from '@/types';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
@@ -17,6 +17,7 @@ const eventIcons: Record<GreenPointsEvent['type'], React.ElementType> = {
     use_pantry_item: Gift,
     cook_recipe: CookingPot,
     zero_waste_week: Sparkles,
+    acted_on_insight: Lightbulb,
 };
 
 export default function GreenRewardsPage() {
