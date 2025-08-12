@@ -517,7 +517,6 @@ export default function DashboardPage() {
                 />
             </div>
         )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div
                 className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
@@ -558,7 +557,7 @@ export default function DashboardPage() {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <FunFactPanel />
+            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
             <SmartBPIWidget />
         </div>
         
