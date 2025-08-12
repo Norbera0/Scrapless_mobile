@@ -8,7 +8,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 import { analyzeWastePatterns } from '../actions';
 import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
+import { useWasteInsightStore } from '@/stores/waste-insight-store';
 
 type ChartTimeframe = '7d' | '30d' | '90d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -308,7 +309,7 @@ export default function MyWastePage() {
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
-  const [insight, setInsight] = useState<AnalyzeWastePatternsOutput | null>(null);
+  const { insight, setInsight } = useWasteInsightStore();
   const isMobile = useIsMobile();
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
@@ -386,7 +387,7 @@ export default function MyWastePage() {
     return { categoryData, reasonData };
   }, [logs]);
   
-  const handleRevealPattern = async () => {
+  const handleFetchPattern = async () => {
     setIsLoadingInsight(true);
     setInsight(null);
     try {
@@ -550,12 +551,20 @@ export default function MyWastePage() {
               </div>
             
             <Card>
-              <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5" />
-                      AI Waste Insights
-                  </CardTitle>
-                  <CardDescription>Smart patterns & predictions from your data</CardDescription>
+              <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                        <Lightbulb className="h-5 w-5" />
+                        Waste Pattern
+                    </CardTitle>
+                    <CardDescription>Smart patterns & predictions from your data</CardDescription>
+                  </div>
+                   {insight && (
+                        <Button variant="outline" size="sm" onClick={handleFetchPattern} disabled={isLoadingInsight}>
+                           <RefreshCw className="mr-2 h-4 w-4" />
+                           Refresh Pattern
+                       </Button>
+                   )}
               </CardHeader>
               <CardContent className="space-y-4">
                   {isLoadingInsight ? (
@@ -582,7 +591,7 @@ export default function MyWastePage() {
                          </div>
                      </motion.div>
                   ) : (
-                     <Button className="w-full" onClick={handleRevealPattern} disabled={isLoadingInsight}>
+                     <Button className="w-full" onClick={handleFetchPattern} disabled={isLoadingInsight}>
                         <Brain className="mr-2 h-4 w-4" />
                         Reveal Waste Pattern
                      </Button>
