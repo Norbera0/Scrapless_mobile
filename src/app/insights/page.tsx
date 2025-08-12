@@ -1,34 +1,45 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useInsightStore } from '@/stores/insight-store';
-import type { User } from '@/types';
-import { Loader2, Lightbulb, History, Plus } from 'lucide-react';
+import { Loader2, Lightbulb, History } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
-import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { useToast } from '@/hooks/use-toast';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
+import { startOfMonth } from 'date-fns';
+import type { WasteLog } from '@/types';
+
+
+const calculateMonthlyWaste = (logs: WasteLog[]): number => {
+    const startOfCurrentMonth = startOfMonth(new Date());
+    return logs
+        .filter(log => new Date(log.date) >= startOfCurrentMonth)
+        .reduce((sum, log) => sum + log.totalPesoValue, 0);
+};
 
 
 export default function InsightsPage() {
     const router = useRouter();
-    const { toast } = useToast();
-    const { user } = useAuth();
     const { insights, insightsInitialized } = useInsightStore();
-    const { liveItems } = usePantryLogStore();
-    const { logs } = useWasteLogStore();
+    const { logs, logsInitialized } = useWasteLogStore();
     const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
 
     const [isGenerating, setIsGenerating] = useState(false);
 
-    // This page is now a hub. It no longer redirects automatically.
-    // The user can choose to view their latest insight or generate a new one.
     const latestInsight = insights.length > 0 ? insights[0] : null;
+
+    const monthlyWaste = useMemo(() => calculateMonthlyWaste(logs), [logs]);
+    
+    const bpiDiscretionarySpending = useMemo(() => {
+        if (!isBpiLinked || !trackPlanData) return 0;
+        return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
+    }, [isBpiLinked, trackPlanData]);
+
 
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6">
@@ -46,8 +57,16 @@ export default function InsightsPage() {
                     </Button>
                 </div>
             </div>
+            
+             {isBpiLinked && (
+                <FinancialWellnessDashboard 
+                    monthlyWaste={monthlyWaste}
+                    bpiDiscretionarySpending={bpiDiscretionarySpending}
+                />
+            )}
 
-            {(!insightsInitialized || isGenerating) ? (
+
+            {(!insightsInitialized || isGenerating || !logsInitialized) ? (
                 <div className="flex h-64 w-full items-center justify-center p-4">
                     <Loader2 className="h-8 w-8 animate-spin" />
                 </div>
