@@ -18,6 +18,8 @@ import { useNotifications } from '@/hooks/use-notifications';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NotificationPanel } from '@/components/dashboard/NotificationPanel';
 import { useGreenPointsStore } from '@/stores/green-points-store';
+import Image from 'next/image';
+import Link from 'next/link';
 
 
 const getPageTitle = (pathname: string) => {
@@ -105,10 +107,30 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-4 md:gap-6 ml-auto">
-                 <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg">
-                    <Leaf className="w-4 h-4 text-primary" />
-                    <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
-                 </div>
+                 <Popover>
+                    <PopoverTrigger asChild>
+                        <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-secondary transition-colors">
+                            <Leaf className="w-4 h-4 text-primary" />
+                            <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
+                        </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Green Rewards</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Your points can be converted to rewards in the BPI ecosystem.
+                                </p>
+                            </div>
+                             <Button asChild>
+                                <Link href="/rewards">
+                                    <Image src="/vybe-logo.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
+                                    Convert via VYBE
+                                </Link>
+                            </Button>
+                        </div>
+                    </PopoverContent>
+                 </Popover>
                  <div className="hidden md:flex flex-col items-end">
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
                     <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
