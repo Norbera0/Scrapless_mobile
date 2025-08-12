@@ -32,7 +32,8 @@ import {
   ShoppingBasket,
   Lightbulb,
   Loader2,
-  Bot
+  Bot,
+  Landmark
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -158,9 +159,7 @@ function SmartBPIWidget() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-br from-[#2d7d32] to-[#388e3c] rounded-xl flex items-center justify-center shadow-sm">
-            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4zm8-15L3 12v7h2v-6h2v6h6v-6h2v6h2v-7L12 6z"/>
-            </svg>
+            <Landmark className="w-6 h-6 text-white" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">BPI Smart Savings</h3>
@@ -520,42 +519,40 @@ export default function DashboardPage() {
         )}
 
         {/* Quick Actions Section (tap-friendly, mobile-first) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
-                onClick={() => router.push('/add-to-pantry')}
-            >
-                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
-                            <ShoppingBasket className="h-6 w-6 text-amber-700" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
-                            <p className="text-sm text-gray-500">Stock your pantry</p>
-                        </div>
+        <div
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
+            onClick={() => router.push('/add-to-pantry')}
+        >
+            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+            <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                        <ShoppingBasket className="h-6 w-6 text-amber-700" />
                     </div>
-                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                        <p className="text-sm text-gray-500">Stock your pantry</p>
+                    </div>
                 </div>
+                <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
             </div>
-            <div
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
-                onClick={() => router.push('/log-waste?method=camera')}
-            >
-                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
-                            <BarChart3 className="h-6 w-6 text-green-700" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
-                            <p className="text-sm text-gray-500">Track your impact</p>
-                        </div>
+        </div>
+        <div
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
+            onClick={() => router.push('/log-waste?method=camera')}
+        >
+            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+            <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                        <BarChart3 className="h-6 w-6 text-green-700" />
                     </div>
-                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                        <p className="text-sm text-gray-500">Track your impact</p>
+                    </div>
                 </div>
+                <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
             </div>
         </div>
 
