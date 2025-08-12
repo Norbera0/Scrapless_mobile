@@ -158,7 +158,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                     </div>
                     <div className="flex-1">
                         <h3 className="font-bold text-base text-green-900">Did You Know?</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{currentFact.source}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Source: {currentFact.source}</p>
                     </div>
                 </div>
 
