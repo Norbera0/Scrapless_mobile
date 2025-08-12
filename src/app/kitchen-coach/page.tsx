@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
@@ -16,11 +16,21 @@ import { Progress } from '@/components/ui/progress';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, startOfMonth } from 'date-fns';
 import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
+import type { WasteLog } from '@/types';
 
 type Solutions = GetCoachSolutionsOutput;
+
+const calculateMonthlyWaste = (logs: WasteLog[]): number => {
+    const startOfCurrentMonth = startOfMonth(new Date());
+    return logs
+        .filter(log => new Date(log.date) >= startOfCurrentMonth)
+        .reduce((sum, log) => sum + log.totalPesoValue, 0);
+};
+
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
@@ -79,6 +89,13 @@ export default function KitchenCoachPage() {
 
     const { toast } = useToast();
     const analytics = useAnalytics();
+    
+    const monthlyWaste = useMemo(() => calculateMonthlyWaste(logs), [logs]);
+    
+    const bpiDiscretionarySpending = useMemo(() => {
+        if (!isBpiLinked || !trackPlanData) return 0;
+        return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
+    }, [isBpiLinked, trackPlanData]);
 
     const handleAskCoach = async () => {
         setIsLoading(true);
@@ -176,6 +193,13 @@ export default function KitchenCoachPage() {
                     </p>
                 </div>
                 
+                 {isBpiLinked && (
+                    <FinancialWellnessDashboard 
+                        monthlyWaste={monthlyWaste}
+                        bpiDiscretionarySpending={bpiDiscretionarySpending}
+                    />
+                )}
+
                 <div className="text-center">
                      <Button 
                         size="lg" 
