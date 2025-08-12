@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe } from 'lucide-react';
+import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -84,10 +84,33 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     
     // Base BPI Facts
     const baseFacts: Fact[] = [
-      { icon: Landmark, category: 'BPI', text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!', source: 'BPI Internal Data' },
-      { icon: Landmark, category: 'BPI', text: 'BPI was the first Philippine bank to get Green Building certification for its branches.', source: 'BPI Sustainability Report' },
-      { icon: Globe, category: 'BPI', text: 'BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite, helping protect endangered species.', source: 'BPI Foundation' },
-      { icon: Lightbulb, category: 'Tip', text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.', source: 'Common Kitchen Hack' },
+      { 
+        icon: Landmark, 
+        category: 'BPI', 
+        text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!', 
+        source: 'BPI Internal Data',
+        cta: { label: 'Go Paperless with BPI', href: '/bpi' }
+      },
+      { 
+        icon: Landmark, 
+        category: 'BPI', 
+        text: 'BPI was the first Philippine bank to get Green Building certification for its branches.', 
+        source: 'BPI Sustainability Report',
+        cta: { label: 'Explore BPI Sustainability', href: '/bpi' }
+      },
+      { 
+        icon: Globe, 
+        category: 'BPI', 
+        text: 'BPI Wealth adopted 280 pawikan (sea turtle) nests to celebrate its Sustainable Fund Suite, helping protect endangered species.', 
+        source: 'BPI Foundation',
+        cta: { label: 'Learn About BPI Foundation', href: '/bpi' }
+      },
+      { 
+        icon: Lightbulb, 
+        category: 'Tip', 
+        text: 'Revive wilted greens by soaking them in a bowl of ice water for 5-10 minutes.', 
+        source: 'Common Kitchen Hack' 
+      },
     ];
     
     return [...baseFacts, ...personalizedFacts];
@@ -137,6 +160,17 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                         <h3 className="font-bold text-lg text-white drop-shadow-sm">Did You Know?</h3>
                         <p className="text-white/90 text-sm mt-1 leading-relaxed">{currentFact.text}</p>
                         <p className="text-xs text-white/60 mt-2">Source: {currentFact.source}</p>
+                        {currentFact.cta && (
+                            <Button
+                                size="sm"
+                                variant="secondary"
+                                className="mt-4 bg-white/20 text-white hover:bg-white/30"
+                                onClick={() => router.push(currentFact.cta!.href)}
+                            >
+                                {currentFact.cta.label}
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                            </Button>
+                        )}
                     </motion.div>
                 </AnimatePresence>
             </div>
