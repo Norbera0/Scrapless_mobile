@@ -1,15 +1,16 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote } from 'lucide-react';
+import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote, Gift } from 'lucide-react';
 import type { SavingsEvent } from '@/types';
 import { format, parseISO } from 'date-fns';
+import Image from 'next/image';
 
 const eventIcons: Record<SavingsEvent['type'], React.ElementType> = {
     avoided_expiry: CheckCircle,
@@ -19,7 +20,9 @@ const eventIcons: Record<SavingsEvent['type'], React.ElementType> = {
     solution_implemented: Sparkles,
 };
 
-export default function MySavingsPage() {
+const PESO_TO_POINTS_CONVERSION_RATE = 10;
+
+export default function MyRewardsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { savingsEvents, savingsInitialized } = useSavingsStore();
     const [isLoading, setIsLoading] = useState(true);
@@ -31,12 +34,15 @@ export default function MySavingsPage() {
         }
     }, [isAuthLoading, savingsInitialized]);
 
-    const totalSavings = savingsEvents.reduce((acc, event) => acc + event.amount, 0);
+    const totalPoints = useMemo(() => {
+        const totalPesos = savingsEvents.reduce((acc, event) => acc + event.amount, 0);
+        return Math.floor(totalPesos * PESO_TO_POINTS_CONVERSION_RATE);
+    }, [savingsEvents]);
 
     const handleTransfer = () => {
         toast({
-            title: "Feature Coming Soon!",
-            description: "BPI SaveUp integration is on the way."
+            title: "Points Converted!",
+            description: `${totalPoints} points have been added to your BPI VYBE account. (This is a mock-up)`,
         })
     };
 
@@ -51,42 +57,43 @@ export default function MySavingsPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Savings</h1>
+                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">🎁 My Rewards</h1>
                 <p className="text-muted-foreground">
-                    Your virtual piggy bank for reducing food waste.
+                    Your Green Points hub. Convert your points to BPI Rewards in VYBE.
                 </p>
             </div>
 
-            <Card className="bg-gradient-to-br from-green-600 to-emerald-700 text-white shadow-lg">
+            <Card className="bg-gradient-to-br from-primary to-emerald-700 text-white shadow-lg">
                 <CardHeader>
-                    <CardTitle className="text-lg">Total Virtual Savings</CardTitle>
+                    <CardTitle className="text-lg">Total Green Points</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-5xl font-bold tracking-tighter">₱{totalSavings.toFixed(2)}</p>
-                    <p className="text-green-200 mt-1">Saved since you started using Scrapless.</p>
+                    <p className="text-5xl font-bold tracking-tighter">{totalPoints.toLocaleString()}</p>
+                    <p className="text-green-200 mt-1">Earned from your sustainable actions.</p>
                 </CardContent>
                 <CardFooter>
                      <Button 
                         variant="secondary" 
-                        className="bg-white/90 text-green-800 hover:bg-white w-full"
+                        className="bg-white/90 text-primary hover:bg-white w-full h-12 text-base"
                         onClick={handleTransfer}
                     >
-                        <Banknote className="w-5 h-5 mr-2" />
-                        Transfer to BPI SaveUp (Coming Soon)
+                        <Image src="/vybe-logo.png" alt="VYBE Logo" width={24} height={24} className="mr-2" />
+                        Convert to BPI Points via VYBE
                     </Button>
                 </CardFooter>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Savings Breakdown</CardTitle>
-                    <CardDescription>See how your smart habits are adding up.</CardDescription>
+                    <CardTitle>Points History</CardTitle>
+                    <CardDescription>See how your smart habits are earning you points.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      {savingsEvents.length > 0 ? (
                         <div className="space-y-3">
                             {savingsEvents.map(event => {
                                 const Icon = eventIcons[event.type] || Sparkles;
+                                const pointsEarned = Math.floor(event.amount * PESO_TO_POINTS_CONVERSION_RATE);
                                 return (
                                     <div key={event.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
                                         <div className="flex items-center gap-3">
@@ -97,7 +104,7 @@ export default function MySavingsPage() {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                             <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ ₱{event.amount.toFixed(2)}</p>
+                                             <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ {pointsEarned} pts</p>
                                         </div>
                                     </div>
                                 )
@@ -105,8 +112,8 @@ export default function MySavingsPage() {
                         </div>
                      ) : (
                          <div className="text-center text-muted-foreground py-10">
-                            <p>You haven't earned any savings yet.</p>
-                            <p className="text-sm">Keep using items from your pantry to see your savings grow!</p>
+                            <p>You haven't earned any points yet.</p>
+                            <p className="text-sm">Log items and use your pantry to start earning!</p>
                         </div>
                      )}
                 </CardContent>
