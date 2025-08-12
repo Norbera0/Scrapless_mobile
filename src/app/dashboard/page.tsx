@@ -42,6 +42,7 @@ import { getExpiredPantryItems, updatePantryItemStatus } from '@/lib/data';
 import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useExpiryStore } from '@/stores/expiry-store';
+import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
 
 type SortKey = 'name' | 'daysUntilExpiration';
 type SortDirection = 'asc' | 'desc';
@@ -353,40 +354,7 @@ export default function DashboardPage() {
         
         {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* AI Insights Card */}
-          <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                 ✨ {latestInsight ? latestInsight.keyObservation : 'Fresh AI Insight'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {latestInsight ? (
-                <>
-                  <p className="text-sm text-white/80 mb-2">Fresh AI Insight</p>
-                  <Badge className="mb-4 bg-green-500 hover:bg-green-500">AI Powered</Badge>
-                  <div className="bg-white/10 rounded-xl p-4 mb-4 border border-white/20">
-                    <p className="text-white/90 text-base leading-relaxed">
-                      {latestInsight.smartTip}
-                    </p>
-                  </div>
-                  <Button 
-                    variant="outline"
-                    className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300 h-11"
-                    onClick={() => router.push(`/insights/${latestInsight.id}`)}
-                  >
-                    View Full Analysis →
-                  </Button>
-                </>
-              ) : (
-                <div className="text-center text-white/70 py-6">
-                  <Lightbulb className="w-10 h-10 mx-auto mb-3" />
-                  <p className="font-semibold">No insights generated yet</p>
-                  <p className="text-sm text-white/60">Keep logging your waste and pantry items to see AI-powered tips!</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <KitchenCoachPanel />
 
           {/* Progress Card */}
           <Card className="shadow-sm">
@@ -503,5 +471,6 @@ export default function DashboardPage() {
   );
 
     
+
 
 
