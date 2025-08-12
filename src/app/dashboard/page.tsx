@@ -145,7 +145,7 @@ function SmartBPIWidget() {
   if (!user) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300 group"
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300 group h-full"
       role="article"
       aria-labelledby="bpi-widget-title"
       aria-describedby="bpi-widget-description"
@@ -518,47 +518,52 @@ export default function DashboardPage() {
             </div>
         )}
 
-        {/* Quick Actions Section (tap-friendly, mobile-first) */}
-        <div
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
-            onClick={() => router.push('/add-to-pantry')}
-        >
-            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
-            <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
-                        <ShoppingBasket className="h-6 w-6 text-amber-700" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
-                        <p className="text-sm text-gray-500">Stock your pantry</p>
-                    </div>
-                </div>
-                <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
-            </div>
-        </div>
-        <div
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
-            onClick={() => router.push('/log-waste?method=camera')}
-        >
-            <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-            <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
-                        <BarChart3 className="h-6 w-6 text-green-700" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
-                        <p className="text-sm text-gray-500">Track your impact</p>
-                    </div>
-                </div>
-                <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
-            </div>
-        </div>
-
+        {/* Combined Actions and Info Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents} />
-            <SmartBPIWidget />
+            {/* Left Column: Quick Actions */}
+            <div className="space-y-6">
+                <div
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
+                    onClick={() => router.push('/add-to-pantry')}
+                >
+                    <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                                <ShoppingBasket className="h-6 w-6 text-amber-700" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                                <p className="text-sm text-gray-500">Stock your pantry</p>
+                            </div>
+                        </div>
+                        <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
+                    </div>
+                </div>
+                <div
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
+                    onClick={() => router.push('/log-waste?method=camera')}
+                >
+                    <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                                <BarChart3 className="h-6 w-6 text-green-700" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                                <p className="text-sm text-gray-500">Track your impact</p>
+                            </div>
+                        </div>
+                        <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
+                    </div>
+                </div>
+            </div>
+            {/* Right Column: Info Panels */}
+            <div className="space-y-6">
+                 <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents} />
+                 <SmartBPIWidget />
+            </div>
         </div>
         
         {/* Bottom Grid */}
