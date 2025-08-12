@@ -31,7 +31,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/my-waste')) return 'My Waste';
     if (pathname.startsWith('/kitchen-coach')) return 'Kitchen Coach';
     if (pathname.startsWith('/shopping')) return 'Shopping Hub';
-    if (pathname.startsWith('/saves')) return 'My Saves';
+    if (pathname.startsWith('/my-savings')) return 'My Savings';
     if (pathname.startsWith('/review-items')) return 'Review Items';
     if (pathname.startsWith('/review-pantry-items')) return 'Review Pantry Items';
     if (pathname.startsWith('/profile')) return 'Profile';
@@ -103,8 +103,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <SidebarNav user={user} />
           <SidebarRail />
         </Sidebar>
-        <SidebarInset className="flex-1 w-full max-w-full overflow-x-hidden">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
+        <SidebarInset className="flex-1 flex flex-col w-full max-w-full overflow-x-hidden">
+          <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-4 md:gap-6 ml-auto">
@@ -168,7 +168,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
           </header>
-          <div className="bg-background w-full max-w-full overflow-x-hidden">
+          <div className="flex-1 bg-background w-full max-w-full overflow-y-auto">
             {children}
           </div>
         </SidebarInset>
