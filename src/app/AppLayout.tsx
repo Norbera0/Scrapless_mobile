@@ -98,13 +98,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full max-w-full overflow-x-hidden">
+      <div className="flex h-screen w-full overflow-hidden">
         <Sidebar>
           <SidebarNav user={user} />
           <SidebarRail />
         </Sidebar>
-        <SidebarInset className="flex-1 flex flex-col w-full max-w-full overflow-x-hidden">
-          <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 w-full max-w-full">
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-4 md:gap-6 ml-auto">
@@ -168,10 +168,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
           </header>
-          <div className="flex-1 bg-background w-full max-w-full overflow-y-auto">
+          <main className="flex-1 overflow-y-auto bg-background">
             {children}
-          </div>
-        </SidebarInset>
+          </main>
+        </div>
       </div>
       <FloatingChatAssistant />
       <ExpiredItemsDialog />
