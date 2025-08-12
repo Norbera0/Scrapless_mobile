@@ -9,6 +9,7 @@ import { getExpiredPantryItems, moveExpiredItemsToWaste } from '@/lib/data';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { useExpiryStore } from '@/stores/expiry-store';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -17,6 +18,7 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
   const { logsInitialized } = useWasteLogStore();
   const { pantryInitialized } = usePantryLogStore();
+  const { setExpiredItemsToShow } = useExpiryStore();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -40,18 +42,20 @@ export function useAuth() {
       const now = new Date().getTime();
       
       const lastExpiredCheck = localStorage.getItem(`lastExpiredCheck_${user.uid}`);
-      if (!lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour) {
+      const shouldCheck = !lastExpiredCheck || now - parseInt(lastExpiredCheck, 10) > oneHour;
+
+      if (shouldCheck) {
          console.log("Checking for expired items...");
          getExpiredPantryItems(user.uid).then(expiredItems => {
             if (expiredItems.length > 0) {
-                console.log(`Found ${expiredItems.length} expired items. Moving to waste...`);
-                moveExpiredItemsToWaste(user.uid, expiredItems);
+                console.log(`Found ${expiredItems.length} expired items. Prompting user...`);
+                setExpiredItemsToShow(expiredItems);
             }
          });
          localStorage.setItem(`lastExpiredCheck_${user.uid}`, now.toString());
       }
     }
-  }, [user, logsInitialized, pantryInitialized]);
+  }, [user, logsInitialized, pantryInitialized, setExpiredItemsToShow]);
 
 
   return { user, isLoading };

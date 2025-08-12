@@ -20,6 +20,7 @@ import { NotificationPanel } from '@/components/dashboard/NotificationPanel';
 import { useGreenPointsStore } from '@/stores/green-points-store';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ExpiredItemsDialog } from '@/components/pantry/ExpiredItemsDialog';
 
 
 const getPageTitle = (pathname: string) => {
@@ -173,6 +174,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </SidebarInset>
       </div>
       <FloatingChatAssistant />
+      <ExpiredItemsDialog />
     </SidebarProvider>
   );
 }
