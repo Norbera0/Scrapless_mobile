@@ -112,7 +112,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
             ) : (
                 <header className="flex-shrink-0 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 sticky top-0 z-10">
                     <SidebarTrigger className="md:flex" />
-                    <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
+                    <div className="flex items-center gap-2 md:hidden">
+                       <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+                       <span className="font-bold text-lg">Scrapless</span>
+                    </div>
+                    <h1 className="text-lg font-semibold md:text-xl truncate flex-1 hidden md:block">{getPageTitle(pathname)}</h1>
                     <div className="flex items-center gap-4 md:gap-6 ml-auto">
                         <Popover>
                         <PopoverTrigger asChild>
