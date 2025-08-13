@@ -33,7 +33,9 @@ import {
   Lightbulb,
   Loader2,
   Bot,
-  Landmark
+  Landmark,
+  ShoppingCart,
+  Trash2
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -45,11 +47,8 @@ import { useAnalytics } from '@/hooks/use-analytics';
 import { useExpiryStore } from '@/stores/expiry-store';
 import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
 import { cn } from '@/lib/utils';
+import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 
-type SortKey = 'name' | 'daysUntilExpiration';
-type SortDirection = 'asc' | 'desc';
-
-const oneHour = 60 * 60 * 1000;
 
 const emojiMap: { [key: string]: string } = {
     'pork': '🐷',
@@ -261,6 +260,23 @@ function SmartBPIWidget() {
   );
 }
 
+const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.ElementType, label: string, onClick: () => void, className?: string }) => {
+    const Icon = icon;
+    return (
+        <div className="flex flex-col items-center gap-2">
+            <Button
+                size="icon"
+                className={cn("h-16 w-16 rounded-full bg-[#1B5E20] hover:bg-[#2d7d32] shadow-lg", className)}
+                onClick={onClick}
+                aria-label={label}
+            >
+                <Icon className="h-8 w-8 text-white" />
+            </Button>
+            <p className="text-xs font-medium text-gray-600">{label}</p>
+        </div>
+    );
+};
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -393,66 +409,45 @@ export default function DashboardPage() {
           <h1 className="text-3xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
           <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
       </div>
+
+       {/* Quick Actions Section */}
+      <Card className="mb-8">
+        <CardContent className="p-4">
+            <div className="flex items-center justify-around">
+                <QuickActionButton 
+                    icon={ShoppingCart} 
+                    label="Add Pantry" 
+                    onClick={() => router.push('/add-to-pantry')}
+                />
+                <QuickActionButton 
+                    icon={Trash2} 
+                    label="Log Waste" 
+                    onClick={() => router.push('/log-waste?method=camera')}
+                />
+                <QuickActionButton 
+                    icon={Landmark} 
+                    label="BPI Widget" 
+                    onClick={() => router.push('/bpi')}
+                />
+                <QuickActionButton 
+                    icon={Bot} 
+                    label="AI Chatbot" 
+                    onClick={() => {
+                       // This is a placeholder for opening the chatbot.
+                       // A real implementation would use a state management library (e.g., Zustand, Redux)
+                       // to control the visibility of the FloatingChatAssistant.
+                       // For this prototype, we'll just log to the console.
+                       console.log("Open AI Chatbot");
+                       const chatButton = document.querySelector('[aria-label="Open Chat"]');
+                        if (chatButton instanceof HTMLElement) {
+                            chatButton.click();
+                        }
+                    }}
+                />
+            </div>
+        </CardContent>
+      </Card>
       
-      {/* Key Metrics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-pink-700">Total Items</p>
-                <p className="text-3xl font-semibold text-pink-900">{analytics.pantry.totalItems}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                <p className="text-3xl font-semibold text-yellow-900">{analytics.pantry.expiringSoonItems}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-700">Pantry Health</p>
-                <p className="text-3xl font-semibold text-green-900">{analytics.pantryHealthScore}%</p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-700">Waste Logs (Wk)</p>
-                <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => new Date(log.date) > new Date(new Date().setDate(new Date().getDate() - 7))).length}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* This Week's Impact (prioritize savings and impact equivalences) */}
       <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
           <CardHeader className="bg-green-600 p-4">
@@ -651,3 +646,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
