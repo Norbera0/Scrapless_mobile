@@ -104,8 +104,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <SidebarRail />
         </Sidebar>
         <div className="flex-1 flex flex-col h-full">
-            <header className="flex-shrink-0 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 sticky top-0 z-10">
-                <SidebarTrigger className="md:flex" />
+            <header className="flex-shrink-0 flex h-14 items-center gap-4 bg-primary text-primary-foreground px-4 sm:h-16 sm:px-6 sticky top-0 z-10">
+                <SidebarTrigger className="md:flex hover:bg-white/20" />
                 <div className="flex items-center gap-2 md:hidden">
                     <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
                     <span className="font-bold text-lg">Scrapless</span>
@@ -114,8 +114,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-4 md:gap-6 ml-auto">
                     <Popover>
                     <PopoverTrigger asChild>
-                        <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-secondary transition-colors">
-                            <Leaf className="w-4 h-4 text-primary" />
+                        <div className="hidden md:flex items-center gap-2 bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                            <Leaf className="w-4 h-4 text-white" />
                             <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
                         </div>
                     </PopoverTrigger>
@@ -138,7 +138,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     </Popover>
                     <div className="hidden md:flex flex-col items-end">
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
-                    <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
+                    <div className="text-xs text-white/80">{format(currentDate, 'h:mm a')}</div>
                     </div>
                     <Popover onOpenChange={(open) => {
                     if(open) {
@@ -146,7 +146,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     }
                     }}>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" className="relative">
+                        <Button variant="ghost" size="icon" className="relative hover:bg-white/20">
                         <Bell className="h-5 w-5" />
                         {totalNew > 0 && !hasOpenedNotifications && (
                             <span className={cn("absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white", badgeColorClass)}>
@@ -162,10 +162,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <div className="flex items-center gap-2">
                     <div className="hidden sm:flex flex-col items-end text-right">
                         <div className="text-sm font-medium">{user?.name || 'User'}</div>
-                        <div className="text-xs text-muted-foreground">{user?.email}</div>
+                        <div className="text-xs text-white/80">{user?.email}</div>
                     </div>
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-primary-foreground">
+                    <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-primary">
                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </span>
                     </div>
