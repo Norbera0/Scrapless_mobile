@@ -30,6 +30,7 @@ import { useSavingsStore } from '@/stores/savings-store';
 import { useGreenPointsStore } from '@/stores/green-points-store';
 import { FOOD_DATA_MAP } from './food-data';
 import { GREEN_POINTS_CONFIG } from './points-config';
+import { differenceInDays, parseISO, startOfToday } from 'date-fns';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -65,7 +66,7 @@ export const initializeUserCache = (userId: string) => {
     useWasteLogStore.getState().setLogsInitialized(false);
     usePantryLogStore.getState().setPantryInitialized(false);
     useInsightStore.getState().setInsightsInitialized(false);
-    useSavingsStore.getState().setSavingsInitialized(false);
+    useSavingsStore.getState().setSavingsInitialized(true); // Should be true, as it's just a local cache for now.
     useGreenPointsStore.getState().setPointsInitialized(false);
 
     // Listener for Waste Logs
@@ -119,10 +120,8 @@ export const initializeUserCache = (userId: string) => {
     const savingsUnsub = onSnapshot(savingsQuery, (snapshot) => {
         const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as SavingsEvent));
         useSavingsStore.getState().setSavingsEvents(events);
-        useSavingsStore.getState().setSavingsInitialized(true);
     }, (error) => {
         console.error("Error with savings listener:", error);
-        useSavingsStore.getState().setSavingsInitialized(true);
     });
     listenerManager.savingsEvents.push(savingsUnsub);
 
@@ -142,7 +141,34 @@ export const initializeUserCache = (userId: string) => {
 
 // --- Waste Log Functions ---
 export const saveWasteLog = async (logData: Omit<WasteLog, 'id'>): Promise<string> => {
-    const docRef = await addDoc(collection(db, `users/${logData.userId}/wasteLogs`), logData);
+    const batch = writeBatch(db);
+    const wasteLogsCollection = collection(db, `users/${logData.userId}/wasteLogs`);
+    const docRef = doc(wasteLogsCollection);
+    batch.set(docRef, logData);
+
+    // Check for zero-waste week achievement before this log
+    const lastLogQuery = query(wasteLogsCollection, orderBy('date', 'desc'), limit(1));
+    const lastLogSnapshot = await getDocs(lastLogQuery);
+
+    if (!lastLogSnapshot.empty) {
+        const lastLog = lastLogSnapshot.docs[0].data() as WasteLog;
+        const daysBetween = differenceInDays(parseISO(logData.date), parseISO(lastLog.date));
+        
+        if (daysBetween >= 7) {
+            const pointsConfig = GREEN_POINTS_CONFIG.zero_waste_week;
+            const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+                userId: logData.userId,
+                date: new Date().toISOString(),
+                type: 'zero_waste_week',
+                points: pointsConfig.points,
+                description: pointsConfig.defaultDescription(),
+            };
+            const pointsDocRef = doc(collection(db, `users/${logData.userId}/greenPointsEvents`));
+            batch.set(pointsDocRef, pointsEvent);
+        }
+    }
+
+    await batch.commit();
     return docRef.id;
 };
 
@@ -380,7 +406,7 @@ export const updateInsightStatus = async (userId: string, insightId: string, sta
             description: pointsConfig.defaultDescription(insightData.patternAlert),
             relatedInsightId: insightId,
         };
-        saveGreenPointsEvent(userId, pointsEvent);
+        await saveGreenPointsEvent(userId, pointsEvent);
     }
 };
 
