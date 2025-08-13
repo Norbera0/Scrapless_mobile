@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from 'react';
@@ -7,12 +8,37 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useBpiLinking, getStoredAccounts, greenImpactToSavings, useSavingsSummary } from '@/lib/bpi';
+import { useWasteLogStore } from '@/stores/waste-log-store';
+import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
+import type { WasteLog } from '@/types';
+import { startOfMonth } from 'date-fns';
+
+
+const calculateMonthlyWaste = (logs: WasteLog[]): number => {
+    const startOfCurrentMonth = startOfMonth(new Date());
+    return logs
+        .filter(log => new Date(log.date) >= startOfCurrentMonth)
+        .reduce((sum, log) => sum + log.totalPesoValue, 0);
+};
+
 
 export default function BpiSustainabilityDashboard() {
   const { state } = useBpiLinking();
   const { savingsEvents } = useSavingsStore();
   const { total, available } = useSavingsSummary(savingsEvents);
   const accounts = getStoredAccounts();
+
+  const { logs } = useWasteLogStore();
+  const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
+
+  const monthlyWaste = useMemo(() => calculateMonthlyWaste(logs), [logs]);
+    
+  const bpiDiscretionarySpending = useMemo(() => {
+      if (!isBpiLinked || !trackPlanData) return 0;
+      return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
+  }, [isBpiLinked, trackPlanData]);
+
 
   const mockImpact = useMemo(() => {
     // Derive mock eco metrics from recent savings volume
@@ -39,6 +65,15 @@ export default function BpiSustainabilityDashboard() {
             <Button asChild><Link href="/bpi/login">Link BPI account</Link></Button>
           </CardContent>
         </Card>
+      )}
+
+      {isBpiLinked && (
+        <div className="mb-8">
+            <FinancialWellnessDashboard 
+                monthlyWaste={monthlyWaste}
+                bpiDiscretionarySpending={bpiDiscretionarySpending}
+            />
+        </div>
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -113,5 +148,3 @@ export default function BpiSustainabilityDashboard() {
     </div>
   );
 }
-
-
