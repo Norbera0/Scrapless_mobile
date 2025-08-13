@@ -35,7 +35,8 @@ import {
   Bot,
   Landmark,
   ShoppingCart,
-  Trash2
+  Trash2,
+  Info
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -422,16 +423,20 @@ export default function DashboardPage() {
               </CardTitle>
           </CardHeader>
           <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
+               <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="text-muted-foreground h-5 w-5"
+                        onClick={() => router.push('/my-savings')}
+                    >
+                        <Info className="h-4 w-4" />
+                        <span className="sr-only">See breakdown</span>
+                    </Button>
+                  </div>
                   <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                   <Button 
-                      variant="link" 
-                      className="text-primary p-0 h-auto text-xs hover:text-primary/80"
-                      onClick={() => router.push('/my-savings')}
-                  >
-                      See the breakdown →
-                  </Button>
               </div>
               <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
@@ -601,5 +606,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
