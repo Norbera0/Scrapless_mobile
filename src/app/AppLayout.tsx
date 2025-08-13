@@ -35,7 +35,7 @@ const getPageTitle = (pathname: string) => {
     if (pathname.startsWith('/review-items')) return 'Review Items';
     if (pathname.startsWith('/review-pantry-items')) return 'Review Pantry Items';
     if (pathname.startsWith('/profile')) return 'Profile';
-    if (pathname.startsWith('/rewards')) return 'Green Rewards';
+    if (pathname.startsWith('/rewards')) return 'Green Points';
     return 'Scrapless';
 }
 
@@ -118,7 +118,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <PopoverContent className="w-80" align="end">
                         <div className="grid gap-4">
                             <div className="space-y-2">
-                                <h4 className="font-medium leading-none">Green Rewards</h4>
+                                <h4 className="font-medium leading-none">Green Points</h4>
                                 <p className="text-sm text-muted-foreground">
                                     Your points can be converted to rewards in the BPI ecosystem.
                                 </p>

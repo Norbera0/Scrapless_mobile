@@ -64,11 +64,11 @@ export default function BpiHubPage() {
         </Card>
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" />Green Rewards Hub</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-amber-500" />Green Points Hub</CardTitle>
                 <CardDescription>Convert your Green Points to BPI Rewards and redeem them in the VYBE app.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex items-end">
-                <Button asChild variant="outline" className="w-full"><Link href="/rewards">View Green Rewards</Link></Button>
+                <Button asChild variant="outline" className="w-full"><Link href="/rewards">View Green Points</Link></Button>
             </CardContent>
         </Card>
       </div>

@@ -20,7 +20,7 @@ const eventIcons: Record<GreenPointsEvent['type'], React.ElementType> = {
     acted_on_insight: Lightbulb,
 };
 
-export default function GreenRewardsPage() {
+export default function GreenPointsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { events, pointsInitialized } = useGreenPointsStore();
     const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +60,7 @@ export default function GreenRewardsPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">✨ Green Rewards</h1>
+                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">✨ Green Points</h1>
                 <p className="text-muted-foreground">
                     Earn points for your sustainable actions.
                 </p>
