@@ -318,23 +318,26 @@ export default function DashboardPage() {
               <p className="text-base md:text-lg text-gray-500">Ready to make a difference? 🌱</p>
           </div>
 
-          <Card className="bg-gradient-to-br from-primary to-emerald-700 text-white shadow-lg">
-            <CardHeader>
-                <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-green-100">This Week's Impact</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
-                <div>
-                    <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
-                    <div className="flex items-center justify-center gap-2">
-                        <p className="text-3xl md:text-4xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                        <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
-                    </div>
-                </div>
-                 <div>
-                    <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
-                    <p className="text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg font-medium text-green-200">kg</span></p>
-                </div>
-            </CardContent>
+          <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('https://i.imgur.com/YZsLBs4.png')"}}>
+            <div className="absolute inset-0 bg-black/40 z-0"></div>
+            <div className="relative z-10">
+              <CardHeader>
+                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-white">This Week's Impact</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
+                  <div>
+                      <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
+                      <div className="flex items-center justify-center gap-2">
+                          <p className="text-3xl md:text-4xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                          <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
+                      </div>
+                  </div>
+                  <div>
+                      <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
+                      <p className="text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg font-medium text-green-200">kg</span></p>
+                  </div>
+              </CardContent>
+            </div>
           </Card>
         
         <Card>
