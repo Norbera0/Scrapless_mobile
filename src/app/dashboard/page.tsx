@@ -421,7 +421,7 @@ export default function DashboardPage() {
                   This Week's Impact
               </CardTitle>
           </CardHeader>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
               <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
                   <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
@@ -432,15 +432,6 @@ export default function DashboardPage() {
                   >
                       See the breakdown →
                   </Button>
-              </div>
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
-                  <div className="text-lg text-gray-800">
-                      <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
-                      <span className="mx-2 text-gray-300">•</span>
-                      <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
-                  </div>
-                  <p className="text-xs text-gray-400">rice & water saved</p>
               </div>
               <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
@@ -610,3 +601,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
