@@ -411,7 +411,7 @@ export default function DashboardPage() {
       {/* Header Section */}
       <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
           <h1 className="text-2xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
-          <p className="text-base md:text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
+          <p className="text-base md:text-lg text-gray-600 mt-1">Ready to make a difference? 🌍</p>
       </div>
 
        {/* This Week's Impact (prioritize savings and impact equivalences) */}
@@ -606,5 +606,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
