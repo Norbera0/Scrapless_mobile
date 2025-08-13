@@ -96,7 +96,7 @@ export function SidebarNav({ user }: { user: UserType }) {
     <>
       <SidebarHeader className="p-4 flex items-center justify-between">
         <div className={cn("flex items-center gap-3", sidebarState === 'collapsed' && 'hidden')}>
-          <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+          <Image src="/scrapless_logo_white.png" alt="Scrapless Logo" width={32} height={32} />
           <span className="text-xl font-bold">Scrapless</span>
         </div>
         <SidebarTrigger className="md:hidden" />

@@ -107,7 +107,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <header className="flex-shrink-0 flex h-14 items-center gap-4 bg-primary text-primary-foreground px-4 sm:h-16 sm:px-6 sticky top-0 z-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.1)]">
                 <SidebarTrigger className="md:flex hover:bg-white/20" />
                 <div className="flex items-center gap-2 md:hidden">
-                    <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+                    <Image src="/scrapless_logo_white.png" alt="Scrapless Logo" width={32} height={32} />
                     <span className="font-bold text-lg">Scrapless</span>
                 </div>
                 <h1 className="text-lg font-semibold md:text-xl truncate flex-1 hidden md:block">{getPageTitle(pathname)}</h1>
