@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight, User } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
@@ -142,64 +142,66 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   const Icon = categoryIcons[currentFact.category as keyof typeof categoryIcons] || Lightbulb;
 
   return (
-     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50/50 to-white p-5 shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1">
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={currentFactIndex}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5 }}
-                className="flex flex-col h-full"
-            >
-                <div className="flex items-start gap-4 mb-4">
-                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center icon-pulse shadow-lg">
-                        <Icon className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="flex-1">
-                        <h3 className="font-bold text-base text-green-900">Did You Know?</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">Source: {currentFact.source}</p>
-                    </div>
-                </div>
-
-                {currentFact.mainFact ? (
-                    <div className="mb-4">
-                        <p className="text-4xl font-bold text-[#2d5016]">{currentFact.mainFact.value}</p>
-                        <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
-                    </div>
-                ) : (
-                    <p className="text-gray-700 text-sm mt-1 leading-relaxed mb-4">{currentFact.text}</p>
-                )}
-
-                {currentFact.subFacts && (
-                    <div className="grid grid-cols-3 gap-2 text-center text-xs text-green-800 mb-4">
-                        {currentFact.subFacts.map(sub => (
-                            <div key={sub.label} className="bg-green-100/70 p-1.5 rounded-md">
-                                <p className="font-semibold">{sub.value}</p>
-                                <p className="opacity-80">{sub.label}</p>
+     <Card className="shadow-sm">
+        <CardHeader>
+             <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+                <Icon className="w-5 h-5" />
+                Did You Know?
+            </CardTitle>
+        </CardHeader>
+        <CardContent>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentFactIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.5 }}
+                    className="flex flex-col h-full"
+                >
+                    <div className="flex-1 space-y-4">
+                        {currentFact.mainFact ? (
+                            <div className="mb-4">
+                                <p className="text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
+                                <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
                             </div>
-                        ))}
+                        ) : (
+                            <p className="text-muted-foreground text-sm mt-1 leading-relaxed mb-4">{currentFact.text}</p>
+                        )}
+
+                        {currentFact.subFacts && (
+                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-green-800 mb-4">
+                                {currentFact.subFacts.map(sub => (
+                                    <div key={sub.label} className="bg-green-100/70 p-1.5 rounded-md">
+                                        <p className="font-semibold">{sub.value}</p>
+                                        <p className="opacity-80">{sub.label}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {currentFact.relatedTip && (
+                            <div className="text-xs text-center text-gray-600 bg-yellow-100/60 p-2 rounded-md border border-yellow-200/80">
+                                <span className="font-semibold">💡 Quick Tip:</span> {currentFact.relatedTip}
+                            </div>
+                        )}
                     </div>
-                )}
-                
-                {currentFact.relatedTip && (
-                     <div className="text-xs text-center text-gray-600 bg-yellow-100/60 p-2 rounded-md border border-yellow-200/80">
-                        <span className="font-semibold">💡 Quick Tip:</span> {currentFact.relatedTip}
-                    </div>
-                )}
-                
-                {currentFact.cta && (
-                    <Button
-                        size="sm"
-                        className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg h-9 mt-4"
-                        onClick={() => router.push(currentFact.cta!.href)}
-                    >
-                        {currentFact.cta.label}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                )}
-            </motion.div>
-        </AnimatePresence>
-    </div>
+                    
+                    {currentFact.cta && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full mt-4"
+                            onClick={() => router.push(currentFact.cta!.href)}
+                        >
+                            {currentFact.cta.label}
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-4 text-right">Source: {currentFact.source}</p>
+                </motion.div>
+            </AnimatePresence>
+        </CardContent>
+    </Card>
   );
 }
