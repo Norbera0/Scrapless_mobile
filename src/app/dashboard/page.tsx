@@ -277,6 +277,9 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
     );
 };
 
+const oneHour = 60 * 60 * 1000;
+type SortKey = keyof PantryItem | 'daysUntilExpiration';
+type SortDirection = 'asc' | 'desc';
 
 export default function DashboardPage() {
   const router = useRouter();
