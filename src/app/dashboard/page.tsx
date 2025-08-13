@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -248,7 +249,7 @@ function SmartBPIWidget() {
 
       {/* Action Button */}
        <button 
-        className="w-full bg-gradient-to-r from-[#2d7d32] to-[#388e3c] text-white py-4 rounded-xl font-semibold text-base hover:from-green-700 hover:to-[#2d7d32] transform hover:scale-[1.02] transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group"
+        className="w-full bg-gradient-to-r from-[#2d7d32] to-[#388e3c] text-white py-3 md:py-4 rounded-xl font-semibold text-sm md:text-base hover:from-green-700 hover:to-[#2d7d32] transform hover:scale-[1.02] transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-label="View BPI deals and start smart shopping"
       >
