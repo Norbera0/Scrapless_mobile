@@ -320,7 +320,7 @@ export default function DashboardPage() {
 
           <Card>
             <CardHeader>
-                <CardTitle className="text-base sm:text-lg">This Week's Impact</CardTitle>
+                <CardTitle className="text-lg font-bold text-green-800 tracking-tight sm:text-xl">This Week's Impact</CardTitle>
             </CardHeader>
             <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
                 <div>
