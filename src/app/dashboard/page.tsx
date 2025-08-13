@@ -103,7 +103,7 @@ function SmartBPIWidget() {
   };
 
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -196,7 +196,7 @@ function SmartBPIWidget() {
 
         {/* Action Button */}
          <Button 
-          className="w-full"
+          className="w-full text-base py-3 h-auto"
           variant="outline"
           onClick={() => setIsExpanded(!isExpanded)}
         >
@@ -292,10 +292,6 @@ export default function DashboardPage() {
   return (
     <div className="bg-gray-50 min-h-full">
       <div className="p-5 space-y-6">
-          <div className="space-y-1">
-              <h2 className="text-2xl md:text-4xl font-semibold text-green-900">{greeting}, {user?.name?.split(' ')[0] || 'User'}!</h2>
-              <p className="text-base md:text-lg text-gray-500">Ready to make a difference? 🌱</p>
-          </div>
 
           <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
             <Image src="https://i.imgur.com/YZsLBs4.png" layout="fill" objectFit="fill" alt="Impact background" className="z-0" />
