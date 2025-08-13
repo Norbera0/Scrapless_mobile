@@ -94,7 +94,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 2500); // Increased interval to 2.5 seconds
+            }, 1700);
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
