@@ -413,6 +413,43 @@ export default function DashboardPage() {
           <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
       </div>
 
+       {/* This Week's Impact (prioritize savings and impact equivalences) */}
+      <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
+          <CardHeader className="bg-green-600 p-4">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
+                  <TrendingUp className="w-5 h-5" />
+                  This Week's Impact
+              </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
+                  <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                   <Button 
+                      variant="link" 
+                      className="text-primary p-0 h-auto text-xs hover:text-primary/80"
+                      onClick={() => router.push('/my-savings')}
+                  >
+                      See the breakdown →
+                  </Button>
+              </div>
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
+                  <div className="text-lg text-gray-800">
+                      <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
+                      <span className="mx-2 text-gray-300">•</span>
+                      <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
+                  </div>
+                  <p className="text-xs text-gray-400">rice & water saved</p>
+              </div>
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
+                  <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
+                  <p className="text-xs text-gray-400">CO₂e from waste</p>
+              </div>
+          </CardContent>
+      </Card>
+      
        {/* Quick Actions Section */}
       <Card className="mb-8">
         <CardContent className="p-4">
@@ -449,43 +486,6 @@ export default function DashboardPage() {
                 />
             </div>
         </CardContent>
-      </Card>
-      
-      {/* This Week's Impact (prioritize savings and impact equivalences) */}
-      <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
-          <CardHeader className="bg-green-600 p-4">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
-                  <TrendingUp className="w-5 h-5" />
-                  This Week's Impact
-              </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
-                  <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                   <Button 
-                      variant="link" 
-                      className="text-primary p-0 h-auto text-xs hover:text-primary/80"
-                      onClick={() => router.push('/my-savings')}
-                  >
-                      See the breakdown →
-                  </Button>
-              </div>
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
-                  <div className="text-lg text-gray-800">
-                      <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
-                      <span className="mx-2 text-gray-300">•</span>
-                      <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
-                  </div>
-                  <p className="text-xs text-gray-400">rice & water saved</p>
-              </div>
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
-                  <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
-                  <p className="text-xs text-gray-400">CO₂e from waste</p>
-              </div>
-          </CardContent>
       </Card>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -610,7 +610,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    
