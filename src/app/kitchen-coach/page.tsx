@@ -24,11 +24,8 @@ type Solutions = GetCoachSolutionsOutput;
 
 const loadingSteps = [
     "Analyzing your kitchen data...",
-    "Diagnosing user persona...",
     "Formulating core hypothesis...",
-    "Finding 'smoking gun' evidence...",
-    "Constructing the analysis...",
-    "Building your action plan...",
+    "Constructing your action plan...",
 ];
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
@@ -97,7 +94,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 1800);
+            }, 2500); // Increased interval to 2.5 seconds
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
