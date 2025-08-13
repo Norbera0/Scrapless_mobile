@@ -387,269 +387,267 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
-            <h1 className="text-3xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
-            <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
-        </div>
-        
-        {/* Key Metrics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-pink-700">Total Items</p>
-                  <p className="text-3xl font-semibold text-pink-900">{analytics.pantry.totalItems}</p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
-                </div>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+      {/* Header Section */}
+      <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
+          <h1 className="text-3xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
+          <p className="text-lg font-medium text-gray-600 mt-1">Ready to make a difference? 🌍</p>
+      </div>
+      
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <Card className="bg-gradient-to-br from-pink-50 to-rose-50 border-pink-200 shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-pink-700">Total Items</p>
+                <p className="text-3xl font-semibold text-pink-900">{analytics.pantry.totalItems}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-100 rounded-xl flex items-center justify-center">
+                <Package className="w-5 h-5 sm:w-6 sm:h-6 text-pink-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                  <p className="text-3xl font-semibold text-yellow-900">{analytics.pantry.expiringSoonItems}</p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
-                </div>
+        <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
+                <p className="text-3xl font-semibold text-yellow-900">{analytics.pantry.expiringSoonItems}</p>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-green-700">Pantry Health</p>
-                  <p className="text-3xl font-semibold text-green-900">{analytics.pantryHealthScore}%</p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                </div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-blue-700">Waste Logs (Wk)</p>
-                  <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => new Date(log.date) > new Date(new Date().setDate(new Date().getDate() - 7))).length}</p>
-                </div>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* This Week's Impact (prioritize savings and impact equivalences) */}
-        <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
-            <CardHeader className="bg-green-600 p-4">
-                <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
-                    <TrendingUp className="w-5 h-5" />
-                    This Week's Impact
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
-                    <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                     <Button 
-                        variant="link" 
-                        className="text-primary p-0 h-auto text-xs hover:text-primary/80"
-                        onClick={() => router.push('/my-savings')}
-                    >
-                        See the breakdown →
-                    </Button>
-                </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
-                    <div className="text-lg text-gray-800">
-                        <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
-                        <span className="mx-2 text-gray-300">•</span>
-                        <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
-                    </div>
-                    <p className="text-xs text-gray-400">rice & water saved</p>
-                </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
-                    <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
-                    <p className="text-xs text-gray-400">CO₂e from waste</p>
-                </div>
-            </CardContent>
+            </div>
+          </CardContent>
         </Card>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
-                onClick={() => router.push('/add-to-pantry')}
-            >
-                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
-                            <ShoppingBasket className="h-6 w-6 text-amber-700" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
-                            <p className="text-sm text-gray-500">Stock your pantry</p>
-                        </div>
-                    </div>
-                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
-                </div>
-            </div>
-            <div
-                className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
-                onClick={() => router.push('/log-waste?method=camera')}
-            >
-                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
-                <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
-                            <BarChart3 className="h-6 w-6 text-green-700" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
-                            <p className="text-sm text-gray-500">Track your impact</p>
-                        </div>
-                    </div>
-                    <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
-                </div>
-            </div>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
-            <SmartBPIWidget />
-        </div>
-        
-        {/* Bottom Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <KitchenCoachPanel />
-
-          {/* Progress Card */}
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#063627]">
-                 🎉 Great Progress!
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
-              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
-                    <span className="text-2xl font-bold text-green-800">{goalProgress}%</span>
-                  </div>
-                  <Progress value={goalProgress} className="h-3" />
-                </div>
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-green-700">Pantry Health</p>
+                <p className="text-3xl font-semibold text-green-900">{analytics.pantryHealthScore}%</p>
               </div>
-              <Button 
-                variant="outline"
-                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-                onClick={() => {router.push('/my-waste')}}
-              >
-                View Your Trends →
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Pantry Watchlist with suggested next actions */}
-        <Card className="shadow-sm bg-white mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <AlertTriangle className="w-6 h-6 text-primary" />
-                Pantry Watchlist
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {expiringSoonItems.length > 0 ? (
-                <>
-                  {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
-                    <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                      <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
-                      <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
-                        {latestInsight.solutions.slice(0,2).map((s, idx) => (
-                          <li key={idx}>{s.solution}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>
-                            <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
-                              Item {getSortIcon('name')}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right">
-                            <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
-                              Expires In {getSortIcon('daysUntilExpiration')}
-                            </Button>
-                          </TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {sortedWatchlistItems.map((item) => (
-                          <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
-                            <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {getStatusIndicator(item.daysUntilExpiration)}
-                                <span className="font-semibold">{item.daysUntilExpiration} days</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right">
-                               <Button variant="ghost" size="sm" onClick={() => handleMarkAsUsed(item)} disabled={isUpdatingItemId === item.id}>
-                                {isUpdatingItemId === item.id ? (
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                ) : (
-                                  <CheckCircle className="w-4 h-4 mr-2" />
-                                )}
-                                Mark Used
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-                    onClick={() => router.push('/pantry')}
-                  >
-                    Go to Pantry →
-                  </Button>
-                </>
-              ) : (
-                <div className="text-center text-muted-foreground py-10">
-                  <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
-                  <p className="font-semibold">Your pantry is looking fresh!</p>
-                  <p className="text-sm">Nothing is expiring in the next few days. Great job!</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 shadow-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-blue-700">Waste Logs (Wk)</p>
+                <p className="text-3xl font-semibold text-blue-900">{logs.filter(log => new Date(log.date) > new Date(new Date().setDate(new Date().getDate() - 7))).length}</p>
+              </div>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* This Week's Impact (prioritize savings and impact equivalences) */}
+      <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
+          <CardHeader className="bg-green-600 p-4">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
+                  <TrendingUp className="w-5 h-5" />
+                  This Week's Impact
+              </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
+                  <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                   <Button 
+                      variant="link" 
+                      className="text-primary p-0 h-auto text-xs hover:text-primary/80"
+                      onClick={() => router.push('/my-savings')}
+                  >
+                      See the breakdown →
+                  </Button>
+              </div>
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Impact Equivalents</p>
+                  <div className="text-lg text-gray-800">
+                      <span>🌾 {estimateRiceKgFromPesos(analytics.savings.thisWeekAmount).toFixed(1)} kg</span>
+                      <span className="mx-2 text-gray-300">•</span>
+                      <span>💧 {estimateWaterSavedLitersFromSavings(analytics.savings.thisWeekAmount).toFixed(0)} L</span>
+                  </div>
+                  <p className="text-xs text-gray-400">rice & water saved</p>
+              </div>
+              <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
+                  <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
+                  <p className="text-xs text-gray-400">CO₂e from waste</p>
+              </div>
+          </CardContent>
+      </Card>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div
+              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
+              onClick={() => router.push('/add-to-pantry')}
+          >
+              <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500"></div>
+              <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-amber-100 to-orange-200 transition-transform duration-300 group-hover:scale-110">
+                          <ShoppingBasket className="h-6 w-6 text-amber-700" />
+                      </div>
+                      <div>
+                          <h3 className="text-lg font-semibold text-gray-800">Add Groceries</h3>
+                          <p className="text-sm text-gray-500">Stock your pantry</p>
+                      </div>
+                  </div>
+                  <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-amber-600 transition-colors" />
+              </div>
+          </div>
+          <div
+              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-green-500/50"
+              onClick={() => router.push('/log-waste?method=camera')}
+          >
+              <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 to-emerald-500"></div>
+              <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-green-100 to-emerald-200 transition-transform duration-300 group-hover:scale-110">
+                          <BarChart3 className="h-6 w-6 text-green-700" />
+                      </div>
+                      <div>
+                          <h3 className="text-lg font-semibold text-gray-800">Log Food Waste</h3>
+                          <p className="text-sm text-gray-500">Track your impact</p>
+                      </div>
+                  </div>
+                  <ArrowRight className="h-6 w-6 text-gray-400 group-hover:text-green-600 transition-colors" />
+              </div>
+          </div>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
+          <SmartBPIWidget />
+      </div>
+      
+      {/* Bottom Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <KitchenCoachPanel />
+
+        {/* Progress Card */}
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-[#063627]">
+               🎉 Great Progress!
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
+            <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
+            <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
+                  <span className="text-2xl font-bold text-green-800">{goalProgress}%</span>
+                </div>
+                <Progress value={goalProgress} className="h-3" />
+              </div>
+            </div>
+            <Button 
+              variant="outline"
+              className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
+              onClick={() => {router.push('/my-waste')}}
+            >
+              View Your Trends →
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Pantry Watchlist with suggested next actions */}
+      <Card className="shadow-sm bg-white mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary">
+              <AlertTriangle className="w-6 h-6 text-primary" />
+              Pantry Watchlist
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {expiringSoonItems.length > 0 ? (
+              <>
+                {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
+                  <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                    <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
+                    <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
+                      {latestInsight.solutions.slice(0,2).map((s, idx) => (
+                        <li key={idx}>{s.solution}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>
+                          <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
+                            Item {getSortIcon('name')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right">
+                          <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
+                            Expires In {getSortIcon('daysUntilExpiration')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortedWatchlistItems.map((item) => (
+                        <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
+                          <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {getStatusIndicator(item.daysUntilExpiration)}
+                              <span className="font-semibold">{item.daysUntilExpiration} days</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                             <Button variant="ghost" size="sm" onClick={() => handleMarkAsUsed(item)} disabled={isUpdatingItemId === item.id}>
+                              {isUpdatingItemId === item.id ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              ) : (
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                              )}
+                              Mark Used
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
+                  onClick={() => router.push('/pantry')}
+                >
+                  Go to Pantry →
+                </Button>
+              </>
+            ) : (
+              <div className="text-center text-muted-foreground py-10">
+                <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
+                <p className="font-semibold">Your pantry is looking fresh!</p>
+                <p className="text-sm">Nothing is expiring in the next few days. Great job!</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
     </div>
   );
 }
