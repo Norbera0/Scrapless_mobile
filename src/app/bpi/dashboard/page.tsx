@@ -12,6 +12,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 import type { WasteLog } from '@/types';
 import { startOfMonth } from 'date-fns';
+import { TrendingUp, AlertTriangle, Lightbulb } from 'lucide-react';
 
 
 const calculateMonthlyWaste = (logs: WasteLog[]): number => {
@@ -19,6 +20,72 @@ const calculateMonthlyWaste = (logs: WasteLog[]): number => {
     return logs
         .filter(log => new Date(log.date) >= startOfCurrentMonth)
         .reduce((sum, log) => sum + log.totalPesoValue, 0);
+};
+
+const FinancialWellnessDashboard = () => {
+  const { isLinked, trackPlanData } = useBpiTrackPlanStore();
+
+  if (!isLinked || !trackPlanData) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Financial Wellness Insights</CardTitle>
+          <CardDescription>Link your BPI account and sync your Track & Plan data to unlock personalized financial insights and tips.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <Link href="/bpi/login">Link BPI Account</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>BPI Financial Wellness</CardTitle>
+        <CardDescription>Insights from your Track & Plan data to help you save more.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {trackPlanData.cashFlowAlert && (
+          <div className="rounded-lg border bg-green-50 p-3">
+            <div className="flex items-start gap-3">
+              <TrendingUp className="h-5 w-5 text-green-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-green-800">Cash Flow Alert</h4>
+                <p className="text-sm text-green-700">{trackPlanData.cashFlowAlert}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        {trackPlanData.unusualTransactions.map((tx, index) => (
+          <div key={index} className="rounded-lg border bg-amber-50 p-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-amber-800">Pattern Detected</h4>
+                <p className="text-sm text-amber-700">{tx}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+         <div className="rounded-lg border bg-blue-50 p-3">
+            <div className="flex items-start gap-3">
+              <Lightbulb className="h-5 w-5 text-blue-600 mt-1" />
+              <div>
+                <h4 className="font-semibold text-blue-800">Spending Breakdown</h4>
+                 <ul className="text-sm text-blue-700 list-disc list-inside">
+                  {trackPlanData.spendingCategories.map((cat, i) => (
+                    <li key={i}>{cat.category}: ₱{cat.amount.toLocaleString()} ({cat.trend})</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+      </CardContent>
+    </Card>
+  );
 };
 
 
@@ -135,6 +202,7 @@ export default function BpiSustainabilityDashboard() {
           </CardContent>
         </Card>
       </div>
+       <FinancialWellnessDashboard />
     </div>
   );
 }
