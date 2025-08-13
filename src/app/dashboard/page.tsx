@@ -44,9 +44,6 @@ import { FunFactPanel } from '@/components/dashboard/FunFactPanel';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useExpiryStore } from '@/stores/expiry-store';
 import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
-import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
-import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
-import { startOfMonth } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 type SortKey = 'name' | 'daysUntilExpiration';
@@ -89,13 +86,6 @@ const getItemEmoji = (itemName: string) => {
         }
     }
     return '🍽️'; // Default emoji
-};
-
-const calculateMonthlyWaste = (logs: WasteLog[]): number => {
-    const startOfCurrentMonth = startOfMonth(new Date());
-    return logs
-        .filter(log => new Date(log.date) >= startOfCurrentMonth)
-        .reduce((sum, log) => sum + log.totalPesoValue, 0);
 };
 
 const mockBPIData = {
@@ -282,18 +272,10 @@ export default function DashboardPage() {
   const analytics = useAnalytics();
   const { toast } = useToast();
   const { setExpiredItemsToShow } = useExpiryStore();
-  const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
   const [isUpdatingItemId, setIsUpdatingItemId] = useState<string | null>(null);
-
-  const monthlyWaste = useMemo(() => calculateMonthlyWaste(logs), [logs]);
-    
-  const bpiDiscretionarySpending = useMemo(() => {
-      if (!isBpiLinked || !trackPlanData) return 0;
-      return trackPlanData.spendingCategories.reduce((sum, cat) => sum + cat.amount, 0);
-  }, [isBpiLinked, trackPlanData]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -509,14 +491,6 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
         
-        {isBpiLinked && (
-            <div className="mb-8">
-                <FinancialWellnessDashboard 
-                    monthlyWaste={monthlyWaste}
-                    bpiDiscretionarySpending={bpiDiscretionarySpending}
-                />
-            </div>
-        )}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div
                 className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-amber-500/50"
