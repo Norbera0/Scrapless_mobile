@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 165 73% 12%;
     
-    --primary: 122 81% 14%; /* #0A400C - Dark Green */
+    --primary: 165 100% 11%; /* #003726 */
     --primary-foreground: 0 0% 100%; /* #FFFFFF */
     
     --secondary: 40 8% 90%; /* Light gray, slightly darker than background */
@@ -64,7 +64,7 @@
     --popover: 165 73% 12%;
     --popover-foreground: 40 11% 95%;
     
-    --primary: 122 81% 14%; /* #0A400C - Dark Green */
+    --primary: 165 100% 11%; /* #003726 */
     --primary-foreground: 0 0% 100%; /* #FFFFFF */
     
     --secondary: 165 73% 20%;
