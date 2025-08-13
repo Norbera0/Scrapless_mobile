@@ -273,7 +273,7 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
             >
                 <Icon className="h-8 w-8 text-white" />
             </Button>
-            <p className="text-xs font-medium text-gray-600">{label}</p>
+            <p className="text-xs font-medium text-gray-600 text-center">{label}</p>
         </div>
     );
 };
@@ -417,12 +417,12 @@ export default function DashboardPage() {
        {/* This Week's Impact (prioritize savings and impact equivalences) */}
       <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
           <CardHeader className="bg-green-600 p-4">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2 text-white">
+              <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 text-white">
                   <TrendingUp className="w-5 h-5" />
                   This Week's Impact
               </CardTitle>
           </CardHeader>
-          <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+          <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
                <div className="space-y-1">
                   <div className="flex items-center justify-center gap-2">
                     <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
@@ -436,11 +436,11 @@ export default function DashboardPage() {
                         <span className="sr-only">See breakdown</span>
                     </Button>
                   </div>
-                  <p className="text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                  <p className="text-3xl md:text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
               </div>
               <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
-                  <p className="text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
+                  <p className="text-3xl md:text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
                   <p className="text-xs text-gray-400">CO₂e from waste</p>
               </div>
           </CardContent>
@@ -449,7 +449,7 @@ export default function DashboardPage() {
        {/* Quick Actions Section */}
       <Card className="mb-8">
         <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="text-lg md:text-xl flex items-center gap-2">
                 <Zap className="w-5 h-5" /> Quick Actions
             </CardTitle>
         </CardHeader>
@@ -467,18 +467,13 @@ export default function DashboardPage() {
                 />
                 <QuickActionButton 
                     icon={Landmark} 
-                    label="BPI Widget" 
+                    label="BPI Hub" 
                     onClick={() => router.push('/bpi')}
                 />
                 <QuickActionButton 
                     icon={Bot} 
                     label="AI Chatbot" 
                     onClick={() => {
-                       // This is a placeholder for opening the chatbot.
-                       // A real implementation would use a state management library (e.g., Zustand, Redux)
-                       // to control the visibility of the FloatingChatAssistant.
-                       // For this prototype, we'll just log to the console.
-                       console.log("Open AI Chatbot");
                        const chatButton = document.querySelector('[aria-label="Open Chat"]');
                         if (chatButton instanceof HTMLElement) {
                             chatButton.click();
@@ -501,7 +496,7 @@ export default function DashboardPage() {
         {/* Progress Card */}
         <Card className="shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-[#063627]">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-[#063627]">
                🎉 Great Progress!
             </CardTitle>
           </CardHeader>
@@ -512,7 +507,7 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
-                  <span className="text-2xl font-bold text-green-800">{goalProgress}%</span>
+                  <span className="text-xl md:text-2xl font-bold text-green-800">{goalProgress}%</span>
                 </div>
                 <Progress value={goalProgress} className="h-3" />
               </div>
@@ -531,8 +526,8 @@ export default function DashboardPage() {
       {/* Pantry Watchlist with suggested next actions */}
       <Card className="shadow-sm bg-white mb-8">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <AlertTriangle className="w-6 h-6 text-primary" />
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-primary">
+              <AlertTriangle className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
               Pantry Watchlist
             </CardTitle>
           </CardHeader>
@@ -569,11 +564,11 @@ export default function DashboardPage() {
                     <TableBody>
                       {sortedWatchlistItems.map((item) => (
                         <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
-                          <TableCell className="font-semibold text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                          <TableCell className="font-semibold text-sm sm:text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
                               {getStatusIndicator(item.daysUntilExpiration)}
-                              <span className="font-semibold">{item.daysUntilExpiration} days</span>
+                              <span className="font-semibold text-sm sm:text-base">{item.daysUntilExpiration} days</span>
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
@@ -602,8 +597,8 @@ export default function DashboardPage() {
             ) : (
               <div className="text-center text-muted-foreground py-10">
                 <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
-                <p className="font-semibold">Your pantry is looking fresh!</p>
-                <p className="text-sm">Nothing is expiring in the next few days. Great job!</p>
+                <p className="font-semibold text-base sm:text-lg">Your pantry is looking fresh!</p>
+                <p className="text-sm sm:text-base">Nothing is expiring in the next few days. Great job!</p>
               </div>
             )}
           </CardContent>
@@ -611,3 +606,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
