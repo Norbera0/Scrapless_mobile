@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
@@ -21,6 +21,15 @@ import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 
 type Solutions = GetCoachSolutionsOutput;
+
+const loadingSteps = [
+    "Analyzing your kitchen data...",
+    "Diagnosing user persona...",
+    "Formulating core hypothesis...",
+    "Finding 'smoking gun' evidence...",
+    "Constructing the analysis...",
+    "Building your action plan...",
+];
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
@@ -76,9 +85,24 @@ export default function KitchenCoachPage() {
     const [showWizard, setShowWizard] = useState(false);
     
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
+    const [loadingMessage, setLoadingMessage] = useState(loadingSteps[0]);
 
     const { toast } = useToast();
     const analytics = useAnalytics();
+    
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout | undefined;
+        if (isLoading || isFetchingSolutions) {
+            let step = 0;
+            intervalId = setInterval(() => {
+                step = (step + 1) % loadingSteps.length;
+                setLoadingMessage(loadingSteps[step]);
+            }, 1800);
+        } else {
+            setLoadingMessage(loadingSteps[0]); // Reset
+        }
+        return () => clearInterval(intervalId);
+    }, [isLoading, isFetchingSolutions]);
     
     const handleAskCoach = async () => {
         setIsLoading(true);
@@ -186,7 +210,7 @@ export default function KitchenCoachPage() {
                         {isLoading || isFetchingSolutions ? (
                             <>
                                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                {isFetchingSolutions ? 'Building your plan...' : 'Analyzing your kitchen...'}
+                                {loadingMessage}
                             </>
                         ) : (
                             <>
