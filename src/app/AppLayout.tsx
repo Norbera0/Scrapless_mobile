@@ -70,7 +70,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, [user, isLoading, router, pathname]);
   
   const isAuthPage = pathname === '/login';
-  const isDashboard = pathname === '/dashboard';
 
   if (isLoading) {
     return (
@@ -105,80 +104,74 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <SidebarRail />
         </Sidebar>
         <div className="flex-1 flex flex-col h-full">
-            {isDashboard ? (
-                // Custom header for dashboard is handled within the page itself for mobile-first design.
-                // We render an empty div to maintain layout consistency for the sticky main content.
-                <div className="h-0" />
-            ) : (
-                <header className="flex-shrink-0 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 sticky top-0 z-10">
-                    <SidebarTrigger className="md:flex" />
-                    <div className="flex items-center gap-2 md:hidden">
-                       <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
-                       <span className="font-bold text-lg">Scrapless</span>
-                    </div>
-                    <h1 className="text-lg font-semibold md:text-xl truncate flex-1 hidden md:block">{getPageTitle(pathname)}</h1>
-                    <div className="flex items-center gap-4 md:gap-6 ml-auto">
-                        <Popover>
-                        <PopoverTrigger asChild>
-                            <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-secondary transition-colors">
-                                <Leaf className="w-4 h-4 text-primary" />
-                                <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
-                            </div>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80" align="end">
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <h4 className="font-medium leading-none">Green Points</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        Your points can be converted to rewards in the BPI ecosystem.
-                                    </p>
-                                </div>
-                                <Button asChild>
-                                    <Link href="/rewards">
-                                        <Image src="/vybe-logo.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
-                                        Convert via VYBE
-                                    </Link>
-                                </Button>
-                            </div>
-                        </PopoverContent>
-                        </Popover>
-                        <div className="hidden md:flex flex-col items-end">
-                        <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
-                        <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
+            <header className="flex-shrink-0 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6 sticky top-0 z-10">
+                <SidebarTrigger className="md:flex" />
+                <div className="flex items-center gap-2 md:hidden">
+                    <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+                    <span className="font-bold text-lg">Scrapless</span>
+                </div>
+                <h1 className="text-lg font-semibold md:text-xl truncate flex-1 hidden md:block">{getPageTitle(pathname)}</h1>
+                <div className="flex items-center gap-4 md:gap-6 ml-auto">
+                    <Popover>
+                    <PopoverTrigger asChild>
+                        <div className="hidden md:flex items-center gap-2 bg-secondary/80 text-secondary-foreground font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-secondary transition-colors">
+                            <Leaf className="w-4 h-4 text-primary" />
+                            <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
                         </div>
-                        <Popover onOpenChange={(open) => {
-                        if(open) {
-                            setHasOpenedNotifications(true);
-                        }
-                        }}>
-                        <PopoverTrigger asChild>
-                            <Button variant="ghost" size="icon" className="relative">
-                            <Bell className="h-5 w-5" />
-                            {totalNew > 0 && !hasOpenedNotifications && (
-                                <span className={cn("absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white", badgeColorClass)}>
-                                    {totalNew > 9 ? '9+' : totalNew}
-                                </span>
-                            )}
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Green Points</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Your points can be converted to rewards in the BPI ecosystem.
+                                </p>
+                            </div>
+                            <Button asChild>
+                                <Link href="/rewards">
+                                    <Image src="/vybe-logo.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
+                                    Convert via VYBE
+                                </Link>
                             </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-96 p-0" align="end">
-                            <NotificationPanel notifications={notifications} />
-                        </PopoverContent>
-                        </Popover>
-                        <div className="flex items-center gap-2">
-                        <div className="hidden sm:flex flex-col items-end text-right">
-                            <div className="text-sm font-medium">{user?.name || 'User'}</div>
-                            <div className="text-xs text-muted-foreground">{user?.email}</div>
                         </div>
-                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-primary-foreground">
-                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                            </span>
-                        </div>
-                        </div>
+                    </PopoverContent>
+                    </Popover>
+                    <div className="hidden md:flex flex-col items-end">
+                    <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
+                    <div className="text-xs text-muted-foreground">{format(currentDate, 'h:mm a')}</div>
                     </div>
-                </header>
-            )}
+                    <Popover onOpenChange={(open) => {
+                    if(open) {
+                        setHasOpenedNotifications(true);
+                    }
+                    }}>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="relative">
+                        <Bell className="h-5 w-5" />
+                        {totalNew > 0 && !hasOpenedNotifications && (
+                            <span className={cn("absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-xs text-white", badgeColorClass)}>
+                                {totalNew > 9 ? '9+' : totalNew}
+                            </span>
+                        )}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-96 p-0" align="end">
+                        <NotificationPanel notifications={notifications} />
+                    </PopoverContent>
+                    </Popover>
+                    <div className="flex items-center gap-2">
+                    <div className="hidden sm:flex flex-col items-end text-right">
+                        <div className="text-sm font-medium">{user?.name || 'User'}</div>
+                        <div className="text-xs text-muted-foreground">{user?.email}</div>
+                    </div>
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <span className="text-sm font-medium text-primary-foreground">
+                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </span>
+                    </div>
+                    </div>
+                </div>
+            </header>
           <main className="flex-1 overflow-y-auto bg-background">
             {children}
           </main>

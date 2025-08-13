@@ -55,82 +55,7 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import Image from 'next/image';
 import { useGreenScoreStore } from '@/stores/greenScoreStore';
 
-
-const emojiMap: { [key: string]: string } = {
-    'pork': '🐷',
-    'chicken': '🐔',
-    'beef': '🐄',
-    'fish': '🐟',
-    'salmon': '🐟',
-    'tuna': '🐟',
-    'cabbage': '🥬',
-    'garlic': '🧄',
-    'tomato': '🍅',
-    'onion': '🧅',
-    'carrot': '🥕',
-    'potato': '🥔',
-    'milk': '🥛',
-    'cheese': '🧀',
-    'butter': '🧈',
-    'apple': '🍎',
-    'banana': '🍌',
-    'orange': '🍊',
-    'rice': '🍚',
-    'bread': '🍞',
-    'pasta': '🍝',
-    'lettuce': '🥬',
-    'egg': '🥚',
-    'eggplant': '🍆',
-};
-
-const getItemEmoji = (itemName: string) => {
-    const lowerItem = itemName.toLowerCase();
-    for (const key in emojiMap) {
-        if (lowerItem.includes(key)) {
-            return emojiMap[key];
-        }
-    }
-    return '🍽️'; // Default emoji
-};
-
-const mockBPIData = {
-  user: {
-    name: "Raphael Berdin",
-    isConnected: true,
-    lastSync: "2 hours ago",
-    accountStatus: "Active"
-  },
-  currentMonth: {
-    cashbackEarned: 127.50,
-    averageCashbackRate: 12,
-    transactionCount: 8,
-    sustainabilityBonus: 23.50
-  },
-  activeOffers: [
-    {
-      store: "Robinsons Supermarket",
-      cashbackRate: 10,
-      matchingItems: 5,
-      potentialSavings: 45.00,
-      distance: "0.8 km",
-      validUntil: "Aug 15, 2025",
-      details: "Your shopping list matches 5 items.",
-      matchedItems: "Rice, Eggs, Cooking Oil, Onions, Garlic"
-    },
-  ],
-  sustainabilityIntegration: {
-    greenScore: 89,
-    greenBonusEarned: 50,
-    nextMilestone: 95,
-    milestoneReward: "₱50 bonus cashback"
-  },
-  shoppingListMatches: [
-    { item: 'Rice (5kg)', store: 'Robinsons', cashback: 5.00 },
-    { item: 'Eggs (30pcs)', store: 'SM Grocery', cashback: 8.00 },
-    { item: 'Cooking Oil', store: 'Puregold', cashback: 15.00 },
-  ],
-};
-
+const oneHour = 60 * 60 * 1000;
 
 function SmartBPIWidget() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -138,6 +63,44 @@ function SmartBPIWidget() {
   const { user } = useAuth();
   
   if (!user) return null;
+
+  const mockBPIData = {
+    user: {
+      name: "Raphael Berdin",
+      isConnected: true,
+      lastSync: "2 hours ago",
+      accountStatus: "Active"
+    },
+    currentMonth: {
+      cashbackEarned: 127.50,
+      averageCashbackRate: 12,
+      transactionCount: 8,
+      sustainabilityBonus: 23.50
+    },
+    activeOffers: [
+      {
+        store: "Robinsons Supermarket",
+        cashbackRate: 10,
+        matchingItems: 5,
+        potentialSavings: 45.00,
+        distance: "0.8 km",
+        validUntil: "Aug 15, 2025",
+        details: "Your shopping list matches 5 items.",
+        matchedItems: "Rice, Eggs, Cooking Oil, Onions, Garlic"
+      },
+    ],
+    sustainabilityIntegration: {
+      greenScore: 89,
+      greenBonusEarned: 50,
+      nextMilestone: 95,
+      milestoneReward: "₱50 bonus cashback"
+    },
+    shoppingListMatches: [
+      { item: 'Rice (5kg)', store: 'Robinsons', cashback: 5.00 },
+      { item: 'Eggs (30pcs)', store: 'SM Grocery', cashback: 8.00 },
+      { item: 'Cooking Oil', store: 'Puregold', cashback: 15.00 },
+    ],
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-300 group h-full"
@@ -253,12 +216,12 @@ function SmartBPIWidget() {
 
       {/* Action Button */}
        <button 
-        className="w-full bg-gradient-to-r from-[#2d7d32] to-[#388e3c] text-white py-3 md:py-4 rounded-xl font-semibold text-sm md:text-base hover:from-green-700 hover:to-[#2d7d32] transform hover:scale-[1.02] transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group"
+        className="w-full bg-gradient-to-r from-[#2d7d32] to-[#388e3c] text-white py-3 md:py-2.5 rounded-xl font-semibold text-sm hover:from-green-700 hover:to-[#2d7d32] transform hover:scale-[1.02] transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group"
         onClick={() => setIsExpanded(!isExpanded)}
         aria-label="View BPI deals and start smart shopping"
       >
         <span>{isExpanded ? 'Hide Details' : 'View Deals & Shop Smart'}</span>
-        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </button>
@@ -280,10 +243,6 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
     );
 };
 
-const oneHour = 60 * 60 * 1000;
-type SortKey = keyof PantryItem | 'daysUntilExpiration';
-type SortDirection = 'asc' | 'desc';
-
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -297,8 +256,6 @@ export default function DashboardPage() {
   const { score } = useGreenScoreStore();
   
   const [greeting, setGreeting] = useState("Good morning");
-  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
-  const [isUpdatingItemId, setIsUpdatingItemId] = useState<string | null>(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -345,62 +302,6 @@ export default function DashboardPage() {
   const savingsGoal = 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
 
-  const sortedWatchlistItems = useMemo(() => {
-    return [...expiringSoonItems].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [expiringSoonItems, sortConfig]);
-
-  const requestSort = (key: SortKey) => {
-    let direction: SortDirection = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-  
-  const getSortIcon = (key: SortKey) => {
-    if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
-  };
-
-  const getStatusIndicator = (days: number) => {
-    if (days <= 1) return <div className="w-3 h-3 rounded-full bg-red-500 ring-2 ring-red-500/30" title="Urgent"></div>;
-    if (days <= 3) return <div className="w-3 h-3 rounded-full bg-yellow-500 ring-2 ring-yellow-500/30" title="Expiring Soon"></div>;
-    return <div className="w-3 h-3 rounded-full bg-green-500" title="Fresh"></div>;
-  };
-  
-  const getTableRowClass = (days: number) => {
-      if(days <= 1) return "bg-red-500/10 hover:bg-red-500/20";
-      if(days <= 3) return "bg-amber-500/10 hover:bg-amber-500/20";
-      return "bg-white";
-  }
-
-  const handleMarkAsUsed = async (item: PantryItem) => {
-    if (!user) return;
-    setIsUpdatingItemId(item.id);
-    try {
-      archiveItem(item.id, 'used');
-      
-      updatePantryItemStatus(user.uid, item.id, 'used').catch(err => {
-        console.error("Failed to mark item as used on server", err);
-      });
-
-      toast({ title: "Item used!", description: `You've used "${item.name}".`});
-    } catch (error) {
-      console.error("Error marking item as used:", error);
-      toast({ variant: 'destructive', title: 'Error', description: 'Could not mark item as used.' });
-    } finally {
-      setIsUpdatingItemId(null);
-    }
-  };
-  
   if (!analytics) {
      return (
       <div className="flex h-screen items-center justify-center">
@@ -411,48 +312,31 @@ export default function DashboardPage() {
 
   return (
     <div className="bg-gray-50 min-h-full">
-      {/* Custom Header for Dashboard */}
-      <header className="bg-gradient-to-br from-[#1a4d3a] to-[#2d6748] text-white p-5 sticky top-0 z-20">
-          <div className="flex justify-between items-center mb-5">
-              <div className="flex items-center gap-2">
-                 <div className="md:hidden">
-                   <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
-                 </div>
-                 <div className="hidden md:flex items-center gap-2">
-                    <h1 className="text-xl font-bold">Dashboard</h1>
-                 </div>
-                 <div className="flex items-center gap-2 md:hidden">
-                    <span className="font-bold text-lg">Scrapless</span>
-                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">{score}</div>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 h-8 w-8">
-                    <Bell className="h-5 w-5" />
-                  </Button>
-                   <div className="md:hidden">
-                     <SidebarTrigger />
-                   </div>
-              </div>
-          </div>
-          <div className="space-y-2">
-              <h2 className="text-sm opacity-80">This week's impact</h2>
-              <div className="grid grid-cols-2 gap-4">
-                  <div>
-                      <p className="text-2xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-                      <p className="text-xs opacity-80">Virtual Savings</p>
-                  </div>
-                  <div>
-                      <p className="text-2xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg opacity-80">kg</span></p>
-                      <p className="text-xs opacity-80">Carbon Footprint</p>
-                  </div>
-              </div>
-          </div>
-      </header>
-
-      {/* Main Content */}
       <div className="p-5 space-y-6">
-        {/* Quick Actions */}
+          <div className="space-y-1">
+              <h2 className="text-2xl md:text-4xl font-semibold text-green-900">{greeting}, {user?.name?.split(' ')[0] || 'User'}!</h2>
+              <p className="text-base md:text-lg text-gray-500">Ready to make a difference? 🌱</p>
+          </div>
+
+          <Card>
+            <CardHeader>
+                <CardTitle className="text-base sm:text-lg">This Week's Impact</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
+                <div>
+                    <p className="text-xs text-muted-foreground mb-1">Virtual Savings</p>
+                    <div className="flex items-center justify-center gap-2">
+                        <p className="text-3xl md:text-4xl font-bold text-primary">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                        <Info className="w-4 h-4 text-muted-foreground cursor-pointer" onClick={() => router.push('/my-savings')}/>
+                    </div>
+                </div>
+                 <div>
+                    <p className="text-xs text-muted-foreground mb-1">Carbon Footprint</p>
+                    <p className="text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg font-medium text-muted-foreground">kg</span></p>
+                </div>
+            </CardContent>
+          </Card>
+        
         <Card>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
@@ -495,11 +379,8 @@ export default function DashboardPage() {
             <SmartBPIWidget />
         </div>
         
-        {/* Bottom Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <KitchenCoachPanel />
-
-          {/* Progress Card */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-[#063627]">
