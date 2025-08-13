@@ -21,7 +21,7 @@ import { analyzeWastePatterns } from '../actions';
 import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
 import { useWasteInsightStore } from '@/stores/waste-insight-store';
 
-type ChartTimeframe = '7d' | '30d' | '90d';
+type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
 
 const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899'];
@@ -314,8 +314,8 @@ export default function MyWastePage() {
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
+          case '15d': return 15;
           case '30d': return 30;
-          case '90d': return 90;
           default: return 7;
       }
   }
@@ -470,8 +470,8 @@ export default function MyWastePage() {
               <CardContent className="space-y-4">
                   <div className='flex gap-2'>
                        <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7d</Button>
+                       <Button size="sm" variant={timeframe === '15d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('15d')}>15d</Button>
                        <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30d</Button>
-                       <Button size="sm" variant={timeframe === '90d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('90d')}>90d</Button>
                   </div>
                   <ChartContainer config={chartConfig} className="h-[250px] w-full">
                       <LineChart accessibilityLayer data={chartData}>
