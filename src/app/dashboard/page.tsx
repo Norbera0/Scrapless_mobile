@@ -387,7 +387,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F7F7] p-4 sm:p-6 md:p-8">
+    <div className="bg-[#F7F7F7] p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
