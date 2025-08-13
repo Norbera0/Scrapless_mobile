@@ -4,11 +4,8 @@
 import { useMemo } from 'react';
 import type { WasteLog } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { subMonths, isAfter, startOfMonth, differenceInDays, startOfToday } from 'date-fns';
-
-interface TrendsKPIProps {
-  logs: WasteLog[];
-}
+import { subDays, isAfter, startOfDay, differenceInDays, parseISO } from 'date-fns';
+import { useAnalytics } from '@/hooks/use-analytics';
 
 const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | null, inverse?: boolean }) => {
     if (percentage === null || isNaN(percentage) || !isFinite(percentage)) {
@@ -23,59 +20,48 @@ const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | 
     );
 };
 
-export function TrendsKPI({ logs }: TrendsKPIProps) {
+export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
+
+    const analytics = useAnalytics();
 
     const stats = useMemo(() => {
         const now = new Date();
-        const startOfThisMonth = startOfMonth(now);
-        const startOfLastMonth = startOfMonth(subMonths(now, 1));
+        const startOfThisWeek = startOfDay(subDays(now, 7));
+        const startOfLastWeek = startOfDay(subDays(now, 14));
 
-        const thisMonthLogs = logs.filter(log => isAfter(new Date(log.date), startOfThisMonth));
-        const lastMonthLogs = logs.filter(log => isAfter(new Date(log.date), startOfLastMonth) && !isAfter(new Date(log.date), startOfThisMonth));
+        const thisWeekLogs = logs.filter(log => isAfter(parseISO(log.date), startOfThisWeek));
+        const lastWeekLogs = logs.filter(log => isAfter(parseISO(log.date), startOfLastWeek) && !isAfter(parseISO(log.date), startOfThisWeek));
 
-        const thisMonthWaste = thisMonthLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
-        const thisMonthCO2 = thisMonthLogs.reduce((acc, log) => acc + log.totalCarbonFootprint, 0);
+        const thisWeekWaste = thisWeekLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
+        const thisWeekCO2 = thisWeekLogs.reduce((acc, log) => acc + log.totalCarbonFootprint, 0);
         
-        const lastMonthWaste = lastMonthLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
-        const lastMonthCO2 = lastMonthLogs.reduce((acc, log) => acc + log.totalCarbonFootprint, 0);
-        
-        const wasteTrend = lastMonthWaste > 0 ? ((thisMonthWaste - lastMonthWaste) / lastMonthWaste) * 100 : (thisMonthWaste > 0 ? 100 : 0);
-        const co2Trend = lastMonthCO2 > 0 ? ((thisMonthCO2 - lastMonthCO2) / lastMonthCO2) * 100 : (thisMonthCO2 > 0 ? 100 : 0);
-        
-        const threeMonthsAgo = subMonths(now, 3);
-        const startOfThreeMonthsAgo = startOfMonth(threeMonthsAgo);
-        const last90DaysLogs = logs.filter(log => isAfter(new Date(log.date), threeMonthsAgo));
-        const threeMonthsAgoLogs = logs.filter(log => isAfter(new Date(log.date), startOfThreeMonthsAgo) && !isAfter(new Date(log.date), startOfMonth(subMonths(now,2))));
+        const lastWeekWaste = lastWeekLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
 
-        const wasteLast90Days = last90DaysLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
-        const wasteThreeMonthsAgo = threeMonthsAgoLogs.reduce((acc, log) => acc + log.totalPesoValue, 0);
-        const reductionVs90Days = wasteThreeMonthsAgo > 0 ? ((wasteLast90Days - wasteThreeMonthsAgo) / wasteThreeMonthsAgo) * 100 : null;
-
+        const wasteTrend = lastWeekWaste > 0 ? ((thisWeekWaste - lastWeekWaste) / lastWeekWaste) * 100 : (thisWeekWaste > 0 ? 100 : 0);
 
         let daysSinceLastWaste = -1;
         if (logs.length > 0) {
             const lastLogDate = new Date(logs[0].date); // Assuming logs are sorted descending by date
-            daysSinceLastWaste = differenceInDays(startOfToday(), lastLogDate);
+            daysSinceLastWaste = differenceInDays(startOfDay(now), lastLogDate);
         }
 
         return {
-            thisMonthWaste,
-            thisMonthCO2,
+            thisWeekWaste,
+            thisWeekCO2,
             wasteTrend,
-            co2Trend,
-            reductionVs90Days,
-            daysSinceLastWaste
+            daysSinceLastWaste,
+            useRate: analytics?.useRate ?? 0,
         };
-    }, [logs]);
+    }, [logs, analytics]);
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="shadow-md">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">This Month's Waste</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">This Week's Waste</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">₱{stats.thisMonthWaste.toFixed(0)}</div>
+                    <div className="text-2xl font-bold">₱{stats.thisWeekWaste.toFixed(0)}</div>
                     <TrendIndicator percentage={stats.wasteTrend} />
                 </CardContent>
             </Card>
@@ -84,26 +70,26 @@ export function TrendsKPI({ logs }: TrendsKPIProps) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">CO₂e Impact</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{stats.thisMonthCO2.toFixed(1)}kg</div>
-                     <TrendIndicator percentage={stats.co2Trend} />
+                    <div className="text-2xl font-bold">{stats.thisWeekCO2.toFixed(1)}kg</div>
+                     <p className="text-xs text-muted-foreground">this week</p>
                 </CardContent>
             </Card>
              <Card className="shadow-md">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Days Since Last Waste</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}</div>
-                    <p className="text-xs text-muted-foreground">{stats.daysSinceLastWaste !== -1 ? 'Keep it up!' : 'Log waste to start'}</p>
+                    <p className="text-xs text-muted-foreground">{stats.daysSinceLastWaste !== -1 ? 'days' : 'Log waste to start'}</p>
                 </CardContent>
             </Card>
             <Card className="shadow-md">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Waste Reduction</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Food Success Rate</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{stats.reductionVs90Days ? `${Math.abs(stats.reductionVs90Days).toFixed(0)}%` : 'N/A'}</div>
-                    <p className="text-xs text-muted-foreground">vs 3 months ago</p>
+                    <div className="text-2xl font-bold">{stats.useRate.toFixed(0)}%</div>
+                    <p className="text-xs text-muted-foreground">of items used</p>
                 </CardContent>
             </Card>
         </div>
