@@ -5,7 +5,6 @@ import { persist } from 'zustand/middleware';
 import { useWasteLogStore } from './waste-log-store';
 import { usePantryLogStore } from './pantry-store';
 import { useSavingsStore } from './savings-store';
-import { useInsightStore } from './insight-store';
 import { differenceInDays, startOfToday, parseISO } from 'date-fns';
 
 interface GreenScoreState {
@@ -44,7 +43,6 @@ export const useGreenScoreStore = create<GreenScoreState>(
         const wasteLogs = useWasteLogStore.getState().logs;
         const { archivedItems } = usePantryLogStore.getState();
         const totalSavings = useSavingsStore.getState().totalSavings;
-        const { insights } = useInsightStore.getState();
 
         if (archivedItems.length < 3 && wasteLogs.length < 3) {
             set({ score: 350, badges: ['Newbie'], breakdown: get().breakdown });
@@ -69,8 +67,7 @@ export const useGreenScoreStore = create<GreenScoreState>(
         const savingsRatio = totalWasteValue > 0 ? totalSavings / totalWasteValue : 1;
         const savingsRatioPoints = Math.min(100, Math.round(savingsRatio * 100));
         
-        const committedSolutions = insights.filter(i => i.status === 'acted_on').length;
-        const solutionPoints = Math.min(75, committedSolutions * 25);
+        const solutionPoints = 0; // Placeholder for when solution tracking is added
         
         const financial = savingsRatioPoints + solutionPoints;
 

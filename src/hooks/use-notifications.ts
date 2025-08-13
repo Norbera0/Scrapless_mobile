@@ -3,14 +3,12 @@
 
 import { useMemo } from 'react';
 import { usePantryLogStore } from '@/stores/pantry-store';
-import { useInsightStore } from '@/stores/insight-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { differenceInDays, startOfToday, parseISO } from 'date-fns';
 import type { Notification } from '@/types';
 
 export function useNotifications() {
     const { liveItems, pantryInitialized } = usePantryLogStore();
-    const { insights, insightsInitialized } = useInsightStore();
 
     const notifications = useMemo(() => {
         const generated: Notification[] = [];
@@ -53,20 +51,6 @@ export function useNotifications() {
             }
         }
         
-        if (insightsInitialized) {
-            const newInsights = insights.filter(i => i.status === 'new');
-            newInsights.forEach(insight => {
-                 generated.push({
-                    id: `insight-${insight.id}`,
-                    category: 'important',
-                    title: `New AI Insight: ${insight.patternAlert}`,
-                    message: insight.smartTip,
-                    date: insight.date,
-                    isRead: false,
-                });
-            })
-        }
-
         // Dummy success notification for demo
         generated.push({
             id: 'success-dummy-1',
@@ -79,7 +63,7 @@ export function useNotifications() {
 
         return generated.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    }, [liveItems, insights, pantryInitialized, insightsInitialized]);
+    }, [liveItems, pantryInitialized]);
 
     const totalNew = notifications.filter(n => !n.isRead).length;
 

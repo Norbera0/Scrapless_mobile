@@ -5,12 +5,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight, Archive } from 'lucide-react';
 import { getSavedRecipes } from '@/lib/data';
-import type { Recipe, User, Insight, PantryItem } from '@/types';
+import type { Recipe, User, PantryItem } from '@/types';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { useToast } from '@/hooks/use-toast';
 import { unsaveRecipe } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
-import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useRouter } from 'next/navigation';
 import { format, parseISO } from 'date-fns';
@@ -21,16 +20,15 @@ export default function SavedItemsPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
-  const { insights, insightsInitialized } = useInsightStore();
   const { archivedItems, pantryInitialized } = usePantryLogStore();
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isAuthLoading && insightsInitialized && pantryInitialized) {
+    if (!isAuthLoading && pantryInitialized) {
       setIsLoading(false);
     }
-  }, [isAuthLoading, insightsInitialized, pantryInitialized]);
+  }, [isAuthLoading, pantryInitialized]);
 
   useEffect(() => {
     if (user) {
@@ -64,7 +62,6 @@ export default function SavedItemsPage() {
     }
   };
   
-  const solutionsImTrying = insights.filter(i => i.status === 'acted_on');
   const usedItems = archivedItems.filter(i => i.status === 'used');
 
   if (isLoading) {
@@ -107,43 +104,6 @@ export default function SavedItemsPage() {
                     <div className="text-center text-muted-foreground py-10">
                         <p>You haven't saved any recipes yet.</p>
                         <p className="text-sm">Find recipe ideas in your Pantry.</p>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-        
-        {/* Solutions I'm Trying */}
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">💡 Solutions I'm Trying ({solutionsImTrying.length})</CardTitle>
-                <CardDescription>Solutions you've committed to from your insights.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                {solutionsImTrying.length > 0 ? (
-                    <div className="space-y-3">
-                        {solutionsImTrying.map(insight => (
-                            <Card 
-                                key={insight.id} 
-                                className="hover:bg-muted/50 transition-colors bg-green-50 border-green-200"
-                            >
-                                <CardContent className="p-4 flex items-center justify-between">
-                                    <div>
-                                        <p className="font-semibold">{insight.patternAlert}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Committed on {format(new Date(insight.date), 'MMMM d, yyyy')}
-                                        </p>
-                                    </div>
-                                    <Button variant="ghost" size="sm" onClick={() => router.push(`/insights/${insight.id}`)}>
-                                        View Details <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                ) : (
-                        <div className="text-center text-muted-foreground py-10">
-                        <p>You aren't actively trying any solutions.</p>
-                        <p className="text-sm">Visit the Insights page to commit to a new solution.</p>
                     </div>
                 )}
             </CardContent>
@@ -197,18 +157,6 @@ export default function SavedItemsPage() {
             </CardHeader>
         </Card>
         
-        {/* Placeholder for Insights History */}
-        <Card>
-            <CardHeader className="flex-row items-center justify-between">
-                <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2">📜 My Full Insights History</CardTitle>
-                    <CardDescription>Review your log of all past AI-powered insights.</CardDescription>
-                </div>
-                <Button variant="outline" onClick={() => router.push('/insights/history')}>
-                    View History <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-            </CardHeader>
-        </Card>
       </div>
     </div>
   );

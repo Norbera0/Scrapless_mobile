@@ -10,7 +10,6 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { useInsightStore } from '@/stores/insight-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { differenceInDays, startOfToday, parseISO, addDays, isBefore, isAfter } from 'date-fns';
@@ -107,8 +106,8 @@ function SmartBPIWidget() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <Landmark className="w-6 h-6 text-green-700" />
+            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+              <Landmark className="w-6 h-6 text-gray-700" />
             </div>
             <div>
               <CardTitle className="text-lg font-semibold text-gray-900 mb-1">BPI Smart Savings</CardTitle>
@@ -226,7 +225,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { logs, logsInitialized } = useWasteLogStore();
-  const { insights } = useInsightStore();
   const { liveItems, pantryInitialized, archiveItem } = usePantryLogStore();
   const { savingsEvents } = useSavingsStore();
   const analytics = useAnalytics();
@@ -275,8 +273,6 @@ export default function DashboardPage() {
     }));
   }, [liveItems, pantryInitialized]);
 
-  const latestInsight = insights.length > 0 ? insights[0] : null;
-
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const savingsGoal = 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
@@ -290,8 +286,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-full">
-      <div className="p-5 space-y-6">
+    <div className="relative min-h-full">
+       <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('https://imgur.com/a/aTNvSHc')" }}></div>
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+      <div className="relative p-5 space-y-6">
 
           <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
             <Image src="https://i.imgur.com/YZsLBs4.png" layout="fill" objectFit="fill" alt="Impact background" className="z-0" />

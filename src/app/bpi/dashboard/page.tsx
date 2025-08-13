@@ -10,7 +10,6 @@ import { useSavingsStore } from '@/stores/savings-store';
 import { useBpiLinking, getStoredAccounts, greenImpactToSavings, useSavingsSummary } from '@/lib/bpi';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
-import { FinancialWellnessDashboard } from '@/components/insights/FinancialWellnessDashboard';
 import type { WasteLog } from '@/types';
 import { startOfMonth } from 'date-fns';
 
@@ -65,15 +64,6 @@ export default function BpiSustainabilityDashboard() {
             <Button asChild><Link href="/bpi/login">Link BPI account</Link></Button>
           </CardContent>
         </Card>
-      )}
-
-      {isBpiLinked && (
-        <div className="mb-8">
-            <FinancialWellnessDashboard 
-                monthlyWaste={monthlyWaste}
-                bpiDiscretionarySpending={bpiDiscretionarySpending}
-            />
-        </div>
       )}
 
       <div className="grid gap-4 md:grid-cols-3">

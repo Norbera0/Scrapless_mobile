@@ -2,7 +2,7 @@
 
 'use client';
 import { db } from './firebase';
-import type { Insight, WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent } from '@/types';
+import type { WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent } from '@/types';
 import { 
     collection, 
     addDoc, 
@@ -24,7 +24,6 @@ import {
 } from 'firebase/firestore';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
-import { useInsightStore } from '@/stores/insight-store';
 import type { PantryLogItem } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useGreenPointsStore } from '@/stores/green-points-store';
@@ -38,7 +37,6 @@ const listenerManager: { [key: string]: Unsubscribe[] } = {
     pantry: [],
     userSettings: [],
     savedRecipes: [],
-    insights: [],
     savingsEvents: [],
     greenPointsEvents: [],
 };
@@ -65,7 +63,6 @@ export const initializeUserCache = (userId: string) => {
     cleanupListeners();
     useWasteLogStore.getState().setLogsInitialized(false);
     usePantryLogStore.getState().setPantryInitialized(false);
-    useInsightStore.getState().setInsightsInitialized(false);
     useSavingsStore.getState().setSavingsInitialized(true); // Should be true, as it's just a local cache for now.
     useGreenPointsStore.getState().setPointsInitialized(false);
 
@@ -103,18 +100,6 @@ export const initializeUserCache = (userId: string) => {
 
     listenerManager.pantry.push(pantryUnsub, archivedPantryUnsub);
     
-    // Listener for Insights
-    const insightsQuery = query(collection(db, `users/${userId}/insights`), orderBy('date', 'desc'));
-    const insightsUnsub = onSnapshot(insightsQuery, (snapshot) => {
-        const insights = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Insight));
-        useInsightStore.getState().setInsights(insights);
-        useInsightStore.getState().setInsightsInitialized(true);
-    }, (error) => {
-        console.error("Error with insights listener:", error);
-        useInsightStore.getState().setInsightsInitialized(true);
-    });
-    listenerManager.insights.push(insightsUnsub);
-
     // Listener for Savings Events
     const savingsQuery = query(collection(db, `users/${userId}/savingsEvents`), orderBy('date', 'desc'));
     const savingsUnsub = onSnapshot(savingsQuery, (snapshot) => {
@@ -374,42 +359,6 @@ export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string
 export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
-
-// --- Insight Functions ---
-export const getLatestInsight = async (userId: string): Promise<Insight | null> => {
-    const q = query(collection(db, `users/${userId}/insights`), orderBy('date', 'desc'), limit(1));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-        return null;
-    }
-    return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() } as Insight;
-};
-
-export const saveInsight = async (insightData: Omit<Insight, 'id'>): Promise<string> => {
-    const docRef = await addDoc(collection(db, `users/${insightData.userId}/insights`), insightData);
-    return docRef.id;
-};
-
-export const updateInsightStatus = async (userId: string, insightId: string, status: Insight['status']) => {
-    const insightRef = doc(db, `users/${userId}/insights`, insightId);
-    await updateDoc(insightRef, { status });
-
-    if (status === 'acted_on') {
-        const insightDoc = await getDoc(insightRef);
-        const insightData = insightDoc.data() as Insight;
-        const pointsConfig = GREEN_POINTS_CONFIG.acted_on_insight;
-        const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
-            userId,
-            date: new Date().toISOString(),
-            type: 'acted_on_insight',
-            points: pointsConfig.points,
-            description: pointsConfig.defaultDescription(insightData.patternAlert),
-            relatedInsightId: insightId,
-        };
-        await saveGreenPointsEvent(userId, pointsEvent);
-    }
-};
-
 
 // --- User Settings Functions ---
 export const getUserSettings = async (userId: string): Promise<any> => {

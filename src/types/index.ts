@@ -87,32 +87,6 @@ export interface Recipe {
   benefit: string;
 }
 
-// Insight Types
-export interface InsightSolution {
-    solution: string;
-    successRate: number; // e.g., 0.75 for 75%
-    estimatedSavings?: number;
-}
-
-export interface Insight {
-    id: string;
-    userId: string;
-    date: string; // ISO string
-    predictionAlertBody?: string;
-    keyObservation: string;
-    patternAlert: string;
-    smartTip: string;
-    smartShoppingPlan: string;
-    // Deep dive fields
-    whatsReallyHappening: string;
-    whyThisPatternExists: string;
-    financialImpact: string;
-    solutions: InsightSolution[];
-    similarUserStory: string;
-    // User interaction
-    status: 'new' | 'acknowledged' | 'acted_on' | 'ignored';
-}
-
 // Item-specific AI Insights
 export interface ItemRecipeSuggestion {
     id: string;
