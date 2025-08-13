@@ -318,7 +318,8 @@ export default function DashboardPage() {
               <p className="text-base md:text-lg text-gray-500">Ready to make a difference? 🌱</p>
           </div>
 
-          <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl bg-cover bg-center" style={{ backgroundImage: "url('https://i.imgur.com/YZsLBs4.png')"}}>
+          <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
+            <Image src="https://i.imgur.com/YZsLBs4.png" layout="fill" objectFit="fill" alt="Impact background" className="z-0" />
             <div className="absolute inset-0 bg-black/40 z-0"></div>
             <div className="relative z-10">
               <CardHeader>
