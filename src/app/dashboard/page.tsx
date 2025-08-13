@@ -298,7 +298,7 @@ export default function DashboardPage() {
             <div className="absolute inset-0 bg-black/40 z-0"></div>
             <div className="relative z-10">
               <CardHeader>
-                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-white">This Week's Impact</CardTitle>
+                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-white">{user?.name}'s Impact</CardTitle>
               </CardHeader>
               <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
                   <div>
