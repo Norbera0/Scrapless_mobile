@@ -37,7 +37,8 @@ import {
   Landmark,
   ShoppingCart,
   Trash2,
-  Info
+  Info,
+  Bell
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -50,6 +51,9 @@ import { useExpiryStore } from '@/stores/expiry-store';
 import { KitchenCoachPanel } from '@/components/dashboard/KitchenCoachPanel';
 import { cn } from '@/lib/utils';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import Image from 'next/image';
+import { useGreenScoreStore } from '@/stores/greenScoreStore';
 
 
 const emojiMap: { [key: string]: string } = {
@@ -265,17 +269,14 @@ function SmartBPIWidget() {
 const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.ElementType, label: string, onClick: () => void, className?: string }) => {
     const Icon = icon;
     return (
-        <div className="flex flex-col items-center gap-2">
-            <Button
-                size="icon"
-                className={cn("h-16 w-16 rounded-full bg-[#1B5E20] hover:bg-[#2d7d32] shadow-lg", className)}
-                onClick={onClick}
-                aria-label={label}
+        <button className="flex flex-col items-center gap-2 group" onClick={onClick} aria-label={label}>
+            <div
+                className={cn("h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center shadow-sm border border-primary/20 group-hover:bg-primary/20 transition-colors", className)}
             >
-                <Icon className="h-8 w-8 text-white" />
-            </Button>
+                <Icon className="h-8 w-8 text-primary" />
+            </div>
             <p className="text-xs font-medium text-gray-600 text-center">{label}</p>
-        </div>
+        </button>
     );
 };
 
@@ -293,6 +294,7 @@ export default function DashboardPage() {
   const analytics = useAnalytics();
   const { toast } = useToast();
   const { setExpiredItemsToShow } = useExpiryStore();
+  const { score } = useGreenScoreStore();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection }>({ key: 'daysUntilExpiration', direction: 'asc' });
@@ -408,206 +410,206 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
-      {/* Header Section */}
-      <div className="mb-8 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border-b">
-          <h1 className="text-2xl md:text-4xl font-bold text-green-800">{greeting}, {user?.name?.split(' ')[0] || 'Raphael'}!</h1>
-          <p className="text-base md:text-lg text-gray-600 mt-1">Ready to make a difference? 🌍</p>
-      </div>
+    <div className="bg-gray-50 min-h-full">
+      {/* Custom Header for Dashboard */}
+      <header className="bg-gradient-to-br from-[#1a4d3a] to-[#2d6748] text-white p-5 sticky top-0 z-20">
+          <div className="flex justify-between items-center mb-5">
+              <div className="flex items-center gap-2">
+                 <div className="md:hidden">
+                   <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+                 </div>
+                 <div className="hidden md:flex items-center gap-2">
+                    <h1 className="text-xl font-bold">Dashboard</h1>
+                 </div>
+                 <div className="flex items-center gap-2 md:hidden">
+                    <span className="font-bold text-lg">Scrapless</span>
+                 </div>
+              </div>
+              <div className="flex items-center gap-3">
+                  <div className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">{score}</div>
+                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 h-8 w-8">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                   <div className="md:hidden">
+                     <SidebarTrigger />
+                   </div>
+              </div>
+          </div>
+          <div className="space-y-2">
+              <h2 className="text-sm opacity-80">This week's impact</h2>
+              <div className="grid grid-cols-2 gap-4">
+                  <div>
+                      <p className="text-2xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                      <p className="text-xs opacity-80">Virtual Savings</p>
+                  </div>
+                  <div>
+                      <p className="text-2xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg opacity-80">kg</span></p>
+                      <p className="text-xs opacity-80">Carbon Footprint</p>
+                  </div>
+              </div>
+          </div>
+      </header>
 
-       {/* This Week's Impact (prioritize savings and impact equivalences) */}
-      <Card className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-200 bg-gradient-to-b from-green-50 to-white">
-          <CardHeader className="bg-green-600 p-4">
-              <CardTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 text-white">
-                  <TrendingUp className="w-5 h-5" />
-                  This Week's Impact
+      {/* Main Content */}
+      <div className="p-5 space-y-6">
+        {/* Quick Actions */}
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <Zap className="w-5 h-5" /> Quick Actions
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center justify-around">
+                    <QuickActionButton 
+                        icon={ShoppingCart} 
+                        label="Add Pantry" 
+                        onClick={() => router.push('/add-to-pantry')}
+                    />
+                    <QuickActionButton 
+                        icon={Trash2} 
+                        label="Log Waste" 
+                        onClick={() => router.push('/log-waste?method=camera')}
+                    />
+                    <QuickActionButton 
+                        icon={Landmark} 
+                        label="BPI Hub" 
+                        onClick={() => router.push('/bpi')}
+                    />
+                    <QuickActionButton 
+                        icon={Bot} 
+                        label="AI Chatbot" 
+                        onClick={() => {
+                           const chatButton = document.querySelector('[aria-label="Open Chat"]');
+                            if (chatButton instanceof HTMLElement) {
+                                chatButton.click();
+                            }
+                        }}
+                    />
+                </div>
+            </CardContent>
+        </Card>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
+            <SmartBPIWidget />
+        </div>
+        
+        {/* Bottom Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <KitchenCoachPanel />
+
+          {/* Progress Card */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-[#063627]">
+                 🎉 Great Progress!
               </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
-               <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2">
-                    <p className="text-sm font-medium text-gray-500">Virtual Savings</p>
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => router.push('/my-savings')}
-                    >
-                        <Info className="h-4 w-4" />
-                        <span className="sr-only">See breakdown</span>
-                    </Button>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
+              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
+              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
+                    <span className="text-xl md:text-2xl font-bold text-green-800">{goalProgress}%</span>
                   </div>
-                  <p className="text-3xl md:text-4xl font-bold text-green-700">{formatPeso(analytics.savings.thisWeekAmount)}</p>
-              </div>
-              <div className="space-y-1">
-                  <p className="text-sm font-medium text-gray-500">Carbon Footprint</p>
-                  <p className="text-3xl md:text-4xl font-bold text-gray-800">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-2xl text-gray-500">kg</span></p>
-                  <p className="text-xs text-gray-400">CO₂e from waste</p>
-              </div>
-          </CardContent>
-      </Card>
-      
-       {/* Quick Actions Section */}
-      <Card className="mb-8">
-        <CardHeader>
-            <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                <Zap className="w-5 h-5" /> Quick Actions
-            </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 pt-0">
-            <div className="flex items-center justify-around">
-                <QuickActionButton 
-                    icon={ShoppingCart} 
-                    label="Add Pantry" 
-                    onClick={() => router.push('/add-to-pantry')}
-                />
-                <QuickActionButton 
-                    icon={Trash2} 
-                    label="Log Waste" 
-                    onClick={() => router.push('/log-waste?method=camera')}
-                />
-                <QuickActionButton 
-                    icon={Landmark} 
-                    label="BPI Hub" 
-                    onClick={() => router.push('/bpi')}
-                />
-                <QuickActionButton 
-                    icon={Bot} 
-                    label="AI Chatbot" 
-                    onClick={() => {
-                       const chatButton = document.querySelector('[aria-label="Open Chat"]');
-                        if (chatButton instanceof HTMLElement) {
-                            chatButton.click();
-                        }
-                    }}
-                />
-            </div>
-        </CardContent>
-      </Card>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
-          <SmartBPIWidget />
-      </div>
-      
-      {/* Bottom Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <KitchenCoachPanel />
-
-        {/* Progress Card */}
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-[#063627]">
-               🎉 Great Progress!
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
-            <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
-            <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
-                  <span className="text-xl md:text-2xl font-bold text-green-800">{goalProgress}%</span>
+                  <Progress value={goalProgress} className="h-3" />
                 </div>
-                <Progress value={goalProgress} className="h-3" />
               </div>
-            </div>
-            <Button 
-              variant="outline"
-              className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-              onClick={() => {router.push('/my-waste')}}
-            >
-              View Your Trends →
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Pantry Watchlist with suggested next actions */}
-      <Card className="shadow-sm bg-white mb-8">
-          <CardHeader>
-            <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-primary">
-              <AlertTriangle className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
-              Pantry Watchlist
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {expiringSoonItems.length > 0 ? (
-              <>
-                {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
-                  <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                    <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
-                    <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
-                      {latestInsight.solutions.slice(0,2).map((s, idx) => (
-                        <li key={idx}>{s.solution}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
-                            Item {getSortIcon('name')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right">
-                          <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
-                            Expires In {getSortIcon('daysUntilExpiration')}
-                          </Button>
-                        </TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {sortedWatchlistItems.map((item) => (
-                        <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
-                          <TableCell className="font-semibold text-sm sm:text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {getStatusIndicator(item.daysUntilExpiration)}
-                              <span className="font-semibold text-sm sm:text-base">{item.daysUntilExpiration} days</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                             <Button variant="ghost" size="sm" onClick={() => handleMarkAsUsed(item)} disabled={isUpdatingItemId === item.id}>
-                              {isUpdatingItemId === item.id ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              ) : (
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                              )}
-                              Mark Used
+              <Button 
+                variant="outline"
+                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
+                onClick={() => {router.push('/my-waste')}}
+              >
+                View Your Trends →
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Pantry Watchlist */}
+        <Card className="shadow-sm bg-white">
+            <CardHeader>
+              <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-primary">
+                <AlertTriangle className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
+                Pantry Watchlist
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {expiringSoonItems.length > 0 ? (
+                <>
+                  {latestInsight?.solutions && latestInsight.solutions.length > 0 && (
+                    <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                      <p className="text-sm font-semibold text-emerald-800 mb-2">Suggested next actions</p>
+                      <ul className="list-disc list-inside text-sm text-emerald-900 space-y-1">
+                        {latestInsight.solutions.slice(0,2).map((s, idx) => (
+                          <li key={idx}>{s.solution}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>
+                            <Button variant="ghost" onClick={() => requestSort('name')} className="px-0">
+                              Item {getSortIcon('name')}
                             </Button>
-                          </TableCell>
+                          </TableHead>
+                          <TableHead className="text-right">
+                            <Button variant="ghost" onClick={() => requestSort('daysUntilExpiration')} className="px-0">
+                              Expires In {getSortIcon('daysUntilExpiration')}
+                            </Button>
+                          </TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {sortedWatchlistItems.map((item) => (
+                          <TableRow key={item.id} className={getTableRowClass(item.daysUntilExpiration)}>
+                            <TableCell className="font-semibold text-sm sm:text-base">{`${getItemEmoji(item.name)} ${item.name}`}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                {getStatusIndicator(item.daysUntilExpiration)}
+                                <span className="font-semibold text-sm sm:text-base">{item.daysUntilExpiration} days</span>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                               <Button variant="ghost" size="sm" onClick={() => handleMarkAsUsed(item)} disabled={isUpdatingItemId === item.id}>
+                                {isUpdatingItemId === item.id ? (
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                )}
+                                Mark Used
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
+                    onClick={() => router.push('/pantry')}
+                  >
+                    Go to Pantry →
+                  </Button>
+                </>
+              ) : (
+                <div className="text-center text-muted-foreground py-10">
+                  <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
+                  <p className="font-semibold text-base sm:text-lg">Your pantry is looking fresh!</p>
+                  <p className="text-sm sm:text-base">Nothing is expiring in the next few days. Great job!</p>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full mt-4 bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-                  onClick={() => router.push('/pantry')}
-                >
-                  Go to Pantry →
-                </Button>
-              </>
-            ) : (
-              <div className="text-center text-muted-foreground py-10">
-                <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-500" />
-                <p className="font-semibold text-base sm:text-lg">Your pantry is looking fresh!</p>
-                <p className="text-sm sm:text-base">Nothing is expiring in the next few days. Great job!</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              )}
+            </CardContent>
+          </Card>
+      </div>
     </div>
   );
 }
-
-    
-
-    
