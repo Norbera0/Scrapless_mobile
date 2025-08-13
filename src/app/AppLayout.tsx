@@ -103,8 +103,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <SidebarNav user={user} />
           <SidebarRail />
         </Sidebar>
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
+        <div className="flex-1 flex flex-col h-full">
+          <header className="flex-shrink-0 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
               <SidebarTrigger className="md:flex" />
               <h1 className="text-lg font-semibold md:text-xl truncate flex-1">{getPageTitle(pathname)}</h1>
               <div className="flex items-center gap-4 md:gap-6 ml-auto">
@@ -168,7 +168,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </div>
           </header>
-          <main className="flex-1 overflow-y-auto bg-background">
+          <main className="flex-1 min-h-0 overflow-y-auto bg-background">
             {children}
           </main>
         </div>
