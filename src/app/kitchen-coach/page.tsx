@@ -194,7 +194,7 @@ export default function KitchenCoachPage() {
                 <div className="space-y-1 text-center">
                     <DotLottieReact
                       src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
-                      style={{width: '300px', height: '300px', margin: '0 auto'}}
+                      style={{width: '200px', height: '200px', margin: '0 auto'}}
                       loop
                       autoplay
                     />
