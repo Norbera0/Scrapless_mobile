@@ -62,14 +62,14 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
     return (
         <button
             className={cn(
-                "flex items-center justify-center gap-3 group px-6 py-3 rounded-full bg-primary/10 shadow-sm border border-primary/20 hover:bg-primary/20 transition-all duration-300 transform hover:scale-105",
+                "flex items-center justify-center gap-3 group px-6 py-3 rounded-full bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
                 className
             )}
             onClick={onClick}
             aria-label={label}
         >
-            <Icon className="h-6 w-6 text-primary" />
-            <span className="text-base font-semibold text-primary">{label}</span>
+            <Icon className="h-6 w-6 text-primary-foreground" />
+            <span className="text-base font-semibold text-primary-foreground">{label}</span>
         </button>
     );
 };
@@ -247,7 +247,7 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm overflow-hidden">
+        <Card className="shadow-sm overflow-hidden relative">
             <CardContent className="p-0 flex">
                 <div className="p-6 flex-1">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
@@ -260,7 +260,7 @@ export default function DashboardPage() {
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
-                <div className="relative w-1/3 flex-shrink-0">
+                <div className="relative w-1/3 min-w-[120px] h-full flex items-end">
                     <Image
                         src="/dashboard/shopping_guide_dashboard_image.png"
                         alt="Shopping guide illustration"
