@@ -222,9 +222,9 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm overflow-hidden">
-            <CardContent className="p-0 flex items-center justify-between">
-                <div className="p-6 flex-1">
+        <Card className="shadow-sm overflow-hidden relative">
+            <CardContent className="p-0">
+                <div className="relative z-10 p-6">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                         <ChefHat className="w-8 h-8 text-primary" />
                     </div>
@@ -235,13 +235,14 @@ export default function DashboardPage() {
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
-                <div className="hidden md:block w-48 h-full relative flex-shrink-0">
+                 <div className="absolute inset-0 flex justify-end items-center opacity-20 md:opacity-100">
                     <Image 
                         src="/dashboard/recipe_generator_dashboard.png"
                         alt="Fresh vegetables illustration"
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint="fresh vegetables"
+                        width={250}
+                        height={250}
+                        objectFit="contain"
+                        className="pointer-events-none"
                     />
                 </div>
             </CardContent>
