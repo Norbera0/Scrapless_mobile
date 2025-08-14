@@ -124,6 +124,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         category: 'Tip',
         text: 'Revive wilted greens like lettuce or kangkong by soaking them in a bowl of ice water for 5-10 minutes.',
         source: 'Common Kitchen Hack',
+        imageUrl: '/dashboard/revive_vegetables.png',
       }
     ];
     
