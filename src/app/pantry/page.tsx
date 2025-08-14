@@ -70,9 +70,6 @@ export default function PantryPage() {
 
   useEffect(() => {
     setIsClient(true);
-    // Zustand's persist middleware handles hydration, but we can re-trigger
-    // recipe fetching if the pantry is initialized but recipes are empty.
-    useRecipeStore.persist.rehydrate();
   }, []);
 
   const getStatus = useCallback((expirationDate: string) => {
