@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -26,7 +25,7 @@ export function FloatingChatAssistant() {
             >
               <Button
                 size="icon"
-                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-primary hover:bg-primary/90 border border-green-600"
+                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-[#e5ebe9] hover:bg-[#e5ebe9]/90 border border-green-600"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open Chat"
               >
