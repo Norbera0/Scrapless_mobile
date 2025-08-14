@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { ChatAssistant } from './ChatAssistant';
-import { Bot, X, MessageSquare } from 'lucide-react';
+import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export function FloatingChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,11 +25,15 @@ export function FloatingChatAssistant() {
             >
               <Button
                 size="icon"
-                className="h-16 w-16 rounded-full shadow-lg"
+                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open Chat"
               >
-                <Bot className="h-8 w-8" />
+                <DotLottieReact
+                    src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
+                    loop
+                    autoplay
+                />
               </Button>
             </motion.div>
           )}
@@ -48,7 +53,12 @@ export function FloatingChatAssistant() {
               <CardHeader className="flex flex-row items-center justify-between border-b">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-full">
-                        <Bot className="h-6 w-6 text-primary" />
+                        <DotLottieReact 
+                           src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
+                           loop
+                           autoplay
+                           style={{ width: '24px', height: '24px' }} 
+                        />
                     </div>
                     <div className='space-y-1'>
                         <CardTitle>AI Assistant</CardTitle>
