@@ -335,12 +335,12 @@ export default function DashboardPage() {
                 <div className="flex flex-row items-center justify-around gap-4">
                     <QuickActionButton 
                         icon={PackagePlus} 
-                        label="Add Pantry" 
+                        label="Add Pantry Items" 
                         onClick={() => router.push('/add-to-pantry')}
                     />
                     <QuickActionButton 
                         icon={Trash2} 
-                        label="Log Waste" 
+                        label="Log Food Waste" 
                         onClick={() => router.push('/log-waste?method=camera')}
                     />
                 </div>
