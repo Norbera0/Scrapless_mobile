@@ -7,14 +7,20 @@ import { WasteLogger } from '@/components/dashboard/WasteLogger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Mic, ArrowLeft, Type, Trash2, TrendingUp, Flame } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LogWastePage() {
   const resetStore = useWasteLogStore((state) => state.reset);
+  const searchParams = useSearchParams();
   const [selectedMethod, setSelectedMethod] = useState<'camera' | 'voice' | 'text' | null>(null);
 
   useEffect(() => {
     resetStore();
-  }, [resetStore]);
+    const method = searchParams.get('method');
+    if (method === 'camera' || method === 'voice' || method === 'text') {
+        setSelectedMethod(method);
+    }
+  }, [resetStore, searchParams]);
 
   if (selectedMethod) {
     return (
@@ -119,5 +125,3 @@ export default function LogWastePage() {
     </div>
   );
 }
-
-    
