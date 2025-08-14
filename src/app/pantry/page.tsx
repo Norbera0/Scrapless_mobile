@@ -41,6 +41,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 
 const filterOptions = [
     { value: 'all', label: 'All Items' },
@@ -274,13 +275,15 @@ export default function PantryPage() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-2 bg-primary">
-                <div className="grid gap-2">
+                <div className="flex flex-col">
                   <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
                     <Camera className="w-4 h-4 mr-2" /> Scan with Camera
                   </Button>
+                  <Separator className="my-1 bg-white/20" />
                   <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
                     <Mic className="w-4 h-4 mr-2" /> Use Voice Log
                   </Button>
+                  <Separator className="my-1 bg-white/20" />
                   <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
                     <Type className="w-4 h-4 mr-2" /> Type Manually
                   </Button>
