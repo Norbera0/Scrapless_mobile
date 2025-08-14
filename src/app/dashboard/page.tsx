@@ -237,7 +237,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="hidden md:block w-48 h-full relative flex-shrink-0">
                     <Image 
-                        src="https://placehold.co/200x250.png"
+                        src="/dashboard/recipe_generator_dashboard.png"
                         alt="Fresh vegetables illustration"
                         layout="fill"
                         objectFit="cover"
