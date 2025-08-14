@@ -273,15 +273,15 @@ export default function PantryPage() {
                   <Plus className="w-5 h-5 ml-2" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-2">
+              <PopoverContent className="w-auto p-2 bg-primary">
                 <div className="grid gap-2">
-                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('camera')}>
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
                     <Camera className="w-4 h-4 mr-2" /> Scan with Camera
                   </Button>
-                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('voice')}>
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
                     <Mic className="w-4 h-4 mr-2" /> Use Voice Log
                   </Button>
-                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('text')}>
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
                     <Type className="w-4 h-4 mr-2" /> Type Manually
                   </Button>
                 </div>
