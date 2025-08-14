@@ -294,11 +294,11 @@ export default function DashboardPage() {
           <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
             <Image src="/dashboard/user_impact_final.jpg" layout="fill" objectFit="cover" alt="Impact background" className="z-0" />
             <div className="absolute inset-0 bg-black/40 z-0"></div>
-            <div className="relative z-10">
-              <CardHeader>
+            <div className="relative z-10 p-6 space-y-4">
+              <CardHeader className="p-0">
                   <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-white">{user?.name}'s Impact</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 grid grid-cols-2 gap-6 text-center">
+              <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
                   <div>
                       <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
                       <div className="flex items-center justify-center gap-2">
@@ -311,6 +311,13 @@ export default function DashboardPage() {
                       <p className="text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg font-medium text-green-200">kg</span></p>
                   </div>
               </CardContent>
+               <div className="pt-4 border-t border-white/20">
+                    <p className="text-xs text-green-200 mb-1 text-center">Monthly Savings Goal Progress</p>
+                    <div className="flex items-center gap-3">
+                        <Progress value={goalProgress} className="h-2 flex-1" />
+                        <p className="text-sm font-bold">{goalProgress}%</p>
+                    </div>
+                </div>
             </div>
           </Card>
         
