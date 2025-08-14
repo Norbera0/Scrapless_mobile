@@ -437,7 +437,7 @@ export default function MyWastePage() {
             </div>
             <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
               <PopoverTrigger asChild>
-                <Button className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base">
+                <Button className="whitespace-nowrap bg-primary hover:bg-primary/90 h-11 text-base">
                     <Trash className="w-5 h-5 mr-2" />
                     <span>Log Waste</span>
                 </Button>
@@ -633,4 +633,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
