@@ -257,7 +257,7 @@ export default function PantryPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 My Pantry</h1>
             <Button 
               onClick={() => router.push('/add-to-pantry')}
-              className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-base"
+              className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base"
             >
               <span>Add Items</span>
               <Plus className="w-5 h-5 ml-2" />
@@ -366,7 +366,7 @@ export default function PantryPage() {
                 </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
               {filteredItems.map((item) => (
                 <PantryItemCard
                   key={item.id}
