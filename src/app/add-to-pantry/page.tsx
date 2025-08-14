@@ -297,9 +297,9 @@ export default function AddToPantryPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
             <div className="max-w-4xl mx-auto">
-                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-4 text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" onClick={() => router.push('/pantry')} className="mb-4 text-muted-foreground hover:text-foreground">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to methods
+                    Back to pantry
                 </Button>
                 {selectedMethod === 'camera' && (
                     <div className="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-slate-200">
