@@ -251,7 +251,7 @@ export default function DashboardPage() {
         <Card className="shadow-sm overflow-hidden relative">
             <div className="absolute inset-0">
                  <Image 
-                    src="/dashboard/recipe_generator_dashboard.png"
+                    src="/dashboard/shopping_guide_dashboard.png"
                     alt="Shopping basket illustration"
                     layout="fill"
                     objectFit="cover"
