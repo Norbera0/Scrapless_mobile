@@ -94,7 +94,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     const enhancedFact: Fact = {
         icon: Info,
         category: 'Trivia',
-        text: "Planning your pantry ahead of time saves Filipino families around ₱260 monthly. Smart planning = smart savings!",
+        text: "Planning your pantry ahead of time saves more than ₱260 monthly. Smart planning = smart savings!",
         source: 'UN Environment Programme 2024 Food Waste Index Report',
         lottieUrl: 'https://lottie.host/2ccf0ba5-142e-452f-b207-7c5d355560b9/bsQHBXiFyo.lottie',
     };
