@@ -94,8 +94,8 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     const enhancedFact: Fact = {
         icon: Info,
         category: 'Trivia',
-        text: "The average Filipino household wastes 66.8g of food daily - that's ₱53 worth of rice alone per week going to waste!",
-        source: '2018 DOST-FNRI Expanded National Nutrition Survey',
+        text: "Planning your pantry ahead of time saves Filipino families around ₱260 monthly. Smart planning = smart savings!",
+        source: 'UN Environment Programme 2024 Food Waste Index Report',
         lottieUrl: 'https://lottie.host/2ccf0ba5-142e-452f-b207-7c5d355560b9/bsQHBXiFyo.lottie',
     };
     
