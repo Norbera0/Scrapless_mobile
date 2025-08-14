@@ -199,7 +199,7 @@ export default function DashboardPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" /> Explore Other Services
+                    <Sparkles className="w-5 h-5" /> Explore Other Services (plZ Add other services)
                 </CardTitle>
             </CardHeader>
             <CardContent>
