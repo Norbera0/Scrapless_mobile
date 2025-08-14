@@ -11,12 +11,14 @@ import type { WasteLog, SavingsEvent } from '@/types';
 import { isAfter, startOfMonth, subMonths } from 'date-fns';
 import { estimateRiceKgFromPesos } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type Fact = {
   icon: React.ElementType;
   text: string;
   source: string;
   category: 'Trivia' | 'Tip' | 'BPI' | 'Personalized' | 'Achievement';
+  imageUrl?: string;
   cta?: {
     label: string;
     href: string;
@@ -114,7 +116,8 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         category: 'BPI', 
         text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!', 
         source: 'BPI Internal Data',
-        cta: { label: 'Go Paperless with BPI', href: '/bpi' }
+        cta: { label: 'Go Paperless with BPI', href: '/bpi' },
+        imageUrl: '/dashboard/save_paper_funfact.png'
       },
       {
         icon: Recycle,
@@ -160,6 +163,16 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                     className="flex flex-col h-full"
                 >
                     <div className="flex-1 space-y-4">
+                        {currentFact.imageUrl && (
+                            <div className="relative w-full h-32 rounded-lg overflow-hidden mb-2">
+                                <Image
+                                    src={currentFact.imageUrl}
+                                    alt={currentFact.text}
+                                    layout="fill"
+                                    objectFit="contain"
+                                />
+                            </div>
+                        )}
                         {currentFact.mainFact ? (
                             <div className="mb-4">
                                 <p className="text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
