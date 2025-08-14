@@ -201,10 +201,15 @@ export default function DashboardPage() {
                 <div className="flex flex-row items-center justify-around gap-4">
                     <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
                       <PopoverTrigger asChild>
-                        <QuickActionButton 
-                          icon={PackagePlus} 
-                          label="Add Pantry Items"
-                        />
+                        <button
+                          className={cn(
+                              "flex items-center justify-center gap-3 group px-6 py-3 rounded-lg bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
+                          )}
+                          aria-label="Add Pantry Items"
+                        >
+                            <PackagePlus className="h-6 w-6 text-primary-foreground" />
+                            <span className="text-base font-semibold text-primary-foreground">Add Pantry Items</span>
+                        </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-primary">
                         <div className="flex flex-col">
