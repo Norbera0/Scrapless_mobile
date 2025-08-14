@@ -37,7 +37,8 @@ import {
   ShoppingCart,
   Trash2,
   Info,
-  Bell
+  Bell,
+  PackagePlus
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -210,13 +211,16 @@ function SmartBPIWidget() {
 const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.ElementType, label: string, onClick: () => void, className?: string }) => {
     const Icon = icon;
     return (
-        <button className="flex flex-col items-center gap-2 group" onClick={onClick} aria-label={label}>
-            <div
-                className={cn("h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center shadow-sm border border-primary/20 group-hover:bg-primary/20 transition-colors", className)}
-            >
-                <Icon className="h-8 w-8 text-primary" />
-            </div>
-            <p className="text-xs font-medium text-gray-600 text-center">{label}</p>
+        <button
+            className={cn(
+                "flex items-center justify-center gap-3 group px-6 py-3 rounded-full bg-primary/10 shadow-sm border border-primary/20 hover:bg-primary/20 transition-all duration-300 transform hover:scale-105",
+                className
+            )}
+            onClick={onClick}
+            aria-label={label}
+        >
+            <Icon className="h-6 w-6 text-primary" />
+            <span className="text-base font-semibold text-primary">{label}</span>
         </button>
     );
 };
@@ -328,9 +332,9 @@ export default function DashboardPage() {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="flex items-center justify-around">
+                <div className="flex flex-col sm:flex-row items-center justify-around gap-4">
                     <QuickActionButton 
-                        icon={ShoppingCart} 
+                        icon={PackagePlus} 
                         label="Add Pantry" 
                         onClick={() => router.push('/add-to-pantry')}
                     />
@@ -350,22 +354,20 @@ export default function DashboardPage() {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="flex items-center justify-around">
-                    <QuickActionButton 
-                        icon={Landmark} 
-                        label="BPI Hub" 
-                        onClick={() => router.push('/bpi')}
-                    />
-                    <QuickActionButton 
-                        icon={Bot} 
-                        label="AI Chatbot" 
-                        onClick={() => {
+                <div className="grid grid-cols-2 gap-4">
+                    <Button variant="outline" className="h-auto py-3" onClick={() => router.push('/bpi')}>
+                        <Landmark className="w-5 h-5 mr-2" />
+                        <span className="font-semibold">BPI Hub</span>
+                    </Button>
+                    <Button variant="outline" className="h-auto py-3" onClick={() => {
                            const chatButton = document.querySelector('[aria-label="Open Chat"]');
                             if (chatButton instanceof HTMLElement) {
                                 chatButton.click();
                             }
-                        }}
-                    />
+                        }}>
+                        <Bot className="w-5 h-5 mr-2" />
+                        <span className="font-semibold">AI Chatbot</span>
+                    </Button>
                 </div>
             </CardContent>
         </Card>
