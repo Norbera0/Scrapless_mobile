@@ -8,7 +8,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, P
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -20,6 +20,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { analyzeWastePatterns } from '../actions';
 import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
 import { useWasteInsightStore } from '@/stores/waste-insight-store';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 
 type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -311,6 +313,7 @@ export default function MyWastePage() {
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   const { insight, setInsight } = useWasteInsightStore();
   const isMobile = useIsMobile();
+  const [isLogMethodOpen, setIsLogMethodOpen] = useState(false);
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
@@ -401,6 +404,12 @@ export default function MyWastePage() {
     }
   }
 
+  const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
+    setIsLogMethodOpen(false);
+    router.push(`/log-waste?method=${method}`);
+  };
+
+
   const chartConfig = {
     totalPesoValue: {
       label: "Waste Value (₱)",
@@ -423,13 +432,32 @@ export default function MyWastePage() {
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Waste Impact</h1>
                 <p className="text-muted-foreground text-sm md:text-base">
-                    Track your patterns, reduce waste, spend less
+                    Track patterns, reduce waste, save money & the planet.
                 </p>
             </div>
-            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base">
-                <Trash className="w-5 h-5 mr-2" />
-                <span>Log Waste</span>
-            </Button>
+            <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
+              <PopoverTrigger asChild>
+                <Button className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base">
+                    <Trash className="w-5 h-5 mr-2" />
+                    <span>Log Waste</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-primary">
+                <div className="flex flex-col">
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
+                    <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                  </Button>
+                  <Separator className="my-1 bg-white/20" />
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
+                    <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                  </Button>
+                  <Separator className="my-1 bg-white/20" />
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
+                    <Type className="w-4 h-4 mr-2" /> Type Manually
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
         </div>
 
       {!logsInitialized ? (
