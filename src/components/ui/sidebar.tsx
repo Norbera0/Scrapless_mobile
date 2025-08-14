@@ -510,13 +510,13 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-green-400 transition-colors hover:bg-green-600 hover:text-white focus-visible:ring-2 active:bg-green-700 active:text-white disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-green-600 data-[active=true]:text-white data-[active=true]:font-semibold data-[active=true]:border-l-4 data-[active=true]:border-green-300 data-[active=true]:pl-4 data-[state=open]:hover:bg-green-600 data-[state=open]:hover:text-white group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-green-400 transition-colors hover:bg-green-700 hover:text-white focus-visible:ring-2 active:bg-green-800 active:text-white disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-green-800 data-[active=true]:text-white data-[active=true]:font-semibold data-[active=true]:border-l-4 data-[active=true]:border-green-400 data-[active=true]:pl-4 data-[state=open]:hover:bg-green-700 data-[state=open]:hover:text-white group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "hover:bg-green-600 hover:text-white text-gray-300",
+        default: "hover:bg-green-700 hover:text-white text-gray-300",
         outline:
-          "bg-green-800 shadow-[0_0_0_1px_hsl(var(--green-600))] hover:bg-green-600 hover:text-white hover:shadow-[0_0_0_1px_hsl(var(--green-400))]",
+          "bg-green-800 shadow-[0_0_0_1px_hsl(var(--green-700))] hover:bg-green-700 hover:text-white hover:shadow-[0_0_0_1px_hsl(var(--green-500))]",
       },
       size: {
         default: "h-8 text-sm",
@@ -759,5 +759,3 @@ export {
   SidebarTrigger,
   useSidebar,
 }
-
-    
