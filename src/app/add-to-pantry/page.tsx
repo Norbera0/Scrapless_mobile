@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,7 @@ const NUM_WAVEFORM_BARS = 30;
 
 export default function AddToPantryPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const resetStore = usePantryLogStore((state) => state.reset);
@@ -73,7 +74,11 @@ export default function AddToPantryPage() {
 
   useEffect(() => {
     resetStore();
-  }, [resetStore]);
+    const methodFromQuery = searchParams.get('method');
+    if (methodFromQuery && ['camera', 'voice', 'text'].includes(methodFromQuery)) {
+        setSelectedMethod(methodFromQuery);
+    }
+  }, [resetStore, searchParams]);
 
   // Camera Permission Effect
   useEffect(() => {
@@ -589,4 +594,3 @@ export default function AddToPantryPage() {
     </div>
   );
 }
-
