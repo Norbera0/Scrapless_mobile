@@ -259,8 +259,8 @@ export default function PantryPage() {
               onClick={() => router.push('/add-to-pantry')}
               className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-base"
             >
-              <Plus className="w-5 h-5 md:mr-2" />
-              <span className='hidden md:inline'>Add Items</span>
+              <span>Add Items</span>
+              <Plus className="w-5 h-5 ml-2" />
             </Button>
           </div>
           
