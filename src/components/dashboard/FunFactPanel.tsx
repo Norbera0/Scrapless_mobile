@@ -92,20 +92,10 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
     const enhancedFact: Fact = {
         icon: Info,
         category: 'Trivia',
-        text: 'Average Filipino household food waste.', // Fallback text
-        mainFact: {
-            value: "₱1,200",
-            description: "per month"
-        },
-        subFacts: [
-            { label: "Per week", value: "₱300" },
-            { label: "Per person", value: "₱240" },
-            { label: "Potential Savings", value: "60%" },
-        ],
-        relatedTip: "Meal planning can reduce waste by up to 40%.",
-        source: 'FNRI-DOST Study',
+        text: "The average Filipino household wastes 66.8g of food daily - that's ₱53 worth of rice alone per week going to waste! Start tracking with Scrapless and keep those pesos where they belong.",
+        source: 'BMC Public Health study based on 2018 DOST-FNRI Expanded National Nutrition Survey',
         cta: {
-            label: 'Beat the average!',
+            label: 'Start Tracking Now',
             href: '/log-waste?method=camera'
         }
     };
