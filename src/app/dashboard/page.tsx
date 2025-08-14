@@ -373,17 +373,28 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
-            <CardContent className="p-6 flex flex-col">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                    <ChefHat className="w-8 h-8 text-primary" />
+        <Card className="shadow-sm overflow-hidden">
+            <CardContent className="p-0 flex items-center justify-between">
+                <div className="p-6 flex-1">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                        <ChefHat className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
+                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
+                    <Button variant="default" onClick={() => router.push('/pantry')}>
+                        Explore Recipes
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
-                <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
-                <Button variant="default" onClick={() => router.push('/pantry')} className="self-start">
-                    Explore Recipes
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="hidden md:block w-48 h-full relative flex-shrink-0">
+                    <Image 
+                        src="https://placehold.co/200x250.png"
+                        alt="Fresh vegetables illustration"
+                        layout="fill"
+                        objectFit="cover"
+                        data-ai-hint="fresh vegetables"
+                    />
+                </div>
             </CardContent>
         </Card>
         
