@@ -12,6 +12,7 @@ import { isAfter, startOfMonth, subMonths } from 'date-fns';
 import { estimateRiceKgFromPesos } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type Fact = {
   icon: React.ElementType;
@@ -19,6 +20,7 @@ type Fact = {
   source: string;
   category: 'Trivia' | 'Tip' | 'BPI' | 'Personalized' | 'Achievement';
   imageUrl?: string;
+  lottieUrl?: string;
   cta?: {
     label: string;
     href: string;
@@ -94,7 +96,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         category: 'Trivia',
         text: "The average Filipino household wastes 66.8g of food daily - that's ₱53 worth of rice alone per week going to waste!",
         source: '2018 DOST-FNRI Expanded National Nutrition Survey',
-        imageUrl: '/dashboard/save_money_funfact.png',
+        lottieUrl: 'https://lottie.host/2ccf0ba5-142e-452f-b207-7c5d355560b9/bsQHBXiFyo.lottie',
     };
     
     const baseFacts: Fact[] = [
@@ -151,7 +153,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                     className="flex flex-col h-full"
                 >
                     <div className="flex-1 space-y-4">
-                        <div className={cn("flex gap-4", currentFact.imageUrl ? 'flex-row items-start' : 'flex-col')}>
+                        <div className={cn("flex gap-4", (currentFact.imageUrl || currentFact.lottieUrl) ? 'flex-row items-start' : 'flex-col')}>
                             {currentFact.imageUrl && (
                                 <div className="relative w-32 h-32 flex-shrink-0">
                                     <Image
@@ -160,6 +162,15 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                                         layout="fill"
                                         objectFit="contain"
                                         className="rounded-lg"
+                                    />
+                                </div>
+                            )}
+                            {currentFact.lottieUrl && (
+                                <div className="relative w-32 h-32 flex-shrink-0">
+                                    <DotLottieReact
+                                        src={currentFact.lottieUrl}
+                                        loop
+                                        autoplay
                                     />
                                 </div>
                             )}
