@@ -195,7 +195,7 @@ export default function KitchenCoachPage() {
                     <h1 className="text-3xl font-bold tracking-tight flex items-center justify-center gap-2">
                         <DotLottieReact
                           src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
-                          style={{width: '50px', height: '50px'}}
+                          style={{width: '40px', height: '40px'}}
                           loop
                           autoplay
                         />
