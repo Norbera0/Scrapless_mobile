@@ -292,8 +292,7 @@ export function ReviewPantryItems() {
           <div className="flex items-center justify-between">
             <CardTitle>Detected Items</CardTitle>
             <Button variant="outline" size="sm" onClick={handleAddItem}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Item
+              Add more item +
             </Button>
           </div>
         </CardHeader>
