@@ -253,7 +253,7 @@ export default function DashboardPage() {
                     src="/dashboard/shopping_guide_dashboard.png"
                     alt="Shopping basket illustration"
                     layout="fill"
-                    objectFit="contain"
+                    objectFit="cover"
                     className="pointer-events-none opacity-20 md:opacity-100"
                 />
             </div>
