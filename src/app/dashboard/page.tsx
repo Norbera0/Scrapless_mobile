@@ -62,7 +62,7 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
     return (
         <button
             className={cn(
-                "flex items-center justify-center gap-3 group px-6 py-3 rounded-full bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
+                "flex items-center justify-center gap-3 group px-6 py-3 rounded-lg bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
                 className
             )}
             onClick={onClick}
