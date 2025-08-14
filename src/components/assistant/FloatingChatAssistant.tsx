@@ -26,17 +26,15 @@ export function FloatingChatAssistant() {
             >
               <Button
                 size="icon"
-                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-[#e5ebe9] hover:bg-[#e5ebe9]/90 border-[2px] border-[#00382a]"
+                className="h-16 w-16 rounded-full shadow-lg p-2 overflow-hidden bg-[#e5ebe9] hover:bg-[#e5ebe9]/90 border-[2px] border-[#00382a]"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open Chat"
               >
-                <div className="scale-75">
-                  <DotLottieReact
-                      src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
-                      loop
-                      autoplay
-                  />
-                </div>
+                <DotLottieReact
+                    src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
+                    loop
+                    autoplay
+                />
               </Button>
             </motion.div>
           )}
