@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></Script>
+        
       </head>
       <body className={`${inter.variable} ${playfairDisplay.variable} font-body`}>
         <AppLayout>{children}</AppLayout>

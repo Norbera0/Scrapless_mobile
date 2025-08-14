@@ -16,6 +16,7 @@ import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { formatDistanceToNow, isBefore } from 'date-fns';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export function KitchenCoachPanel() {
     const router = useRouter();
@@ -89,7 +90,12 @@ export function KitchenCoachPanel() {
         <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5" />
+                    <DotLottieReact
+                      src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
+                      loop
+                      autoplay
+                      style={{ width: '30px', height: '30px' }}
+                    />
                     Your Kitchen Coach
                 </CardTitle>
                 <CardDescription>

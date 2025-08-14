@@ -19,6 +19,7 @@ import { useSavingsStore } from '@/stores/savings-store';
 import { format, parseISO, startOfMonth } from 'date-fns';
 import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -191,8 +192,12 @@ export default function KitchenCoachPage() {
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
                 <div className="space-y-1 text-center">
-                    {/* @ts-ignore */}
-                    <dotlottie-wc src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie" style={{width: '300px', height: '300px', margin: '0 auto'}} speed="1" autoplay loop></dotlottie-wc>
+                    <DotLottieReact
+                      src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
+                      style={{width: '300px', height: '300px', margin: '0 auto'}}
+                      loop
+                      autoplay
+                    />
                     <h1 className="text-3xl font-bold tracking-tight flex items-center justify-center gap-2">
                         Kitchen Coach
                     </h1>
