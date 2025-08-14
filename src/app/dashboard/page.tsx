@@ -228,10 +228,10 @@ export default function DashboardPage() {
                     alt="Fresh vegetables illustration"
                     layout="fill"
                     objectFit="cover"
-                    className="pointer-events-none opacity-20 md:opacity-100"
+                    className="pointer-events-none"
                 />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-white from-20% via-white/80 to-transparent"></div>
             <CardContent className="p-0">
                 <div className="relative z-10 p-6">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
@@ -254,10 +254,10 @@ export default function DashboardPage() {
                     alt="Shopping basket illustration"
                     layout="fill"
                     objectFit="cover"
-                    className="pointer-events-none opacity-20 md:opacity-100"
+                    className="pointer-events-none"
                 />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-white from-20% via-white/80 to-transparent"></div>
             <CardContent className="p-0">
                 <div className="relative z-10 p-6">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
