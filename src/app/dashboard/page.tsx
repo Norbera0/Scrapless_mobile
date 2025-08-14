@@ -317,7 +317,7 @@ export default function DashboardPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <Zap className="w-5 h-5" /> Quick Actions
+                    <Zap className="w-5 h-5" /> Quick Start
                 </CardTitle>
             </CardHeader>
             <CardContent>
@@ -332,6 +332,18 @@ export default function DashboardPage() {
                         label="Log Waste" 
                         onClick={() => router.push('/log-waste?method=camera')}
                     />
+                </div>
+            </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" /> Explore Other Services
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center justify-around">
                     <QuickActionButton 
                         icon={Landmark} 
                         label="BPI Hub" 
