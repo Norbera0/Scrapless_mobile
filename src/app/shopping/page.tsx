@@ -144,7 +144,10 @@ export default function ShoppingHubPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Shopping Hub</h1>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <ShoppingCart className="w-8 h-8" />
+            Shopping Hub
+        </h1>
         <p className="text-muted-foreground">AI-powered suggestions to help you buy smarter and save more with BPI.</p>
       </div>
       
