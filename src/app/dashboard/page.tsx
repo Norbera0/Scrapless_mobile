@@ -379,33 +379,6 @@ export default function DashboardPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <KitchenCoachPanel />
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-[#063627]">
-                 🎉 Great Progress!
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-2">Savings goal progress</p>
-              <Badge className="mb-4 bg-green-100 text-green-800 hover:bg-green-100">{formatPeso(monthSavings)} this month</Badge>
-              <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 mb-4 border border-green-200">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium text-green-800">Savings Goal ({formatPeso(savingsGoal)})</span>
-                    <span className="text-xl md:text-2xl font-bold text-green-800">{goalProgress}%</span>
-                  </div>
-                  <Progress value={goalProgress} className="h-3" />
-                </div>
-              </div>
-              <Button 
-                variant="outline"
-                className="bg-transparent text-primary border-primary hover:bg-primary hover:text-primary-foreground rounded-full font-semibold transition-colors duration-300 h-11"
-                onClick={() => {router.push('/my-waste')}}
-              >
-                View Your Trends →
-              </Button>
-            </CardContent>
-          </Card>
         </div>
         
       </div>
