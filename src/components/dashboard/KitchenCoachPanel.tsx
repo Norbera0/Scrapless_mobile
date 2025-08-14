@@ -8,7 +8,7 @@ import { useAnalytics } from '@/hooks/use-analytics';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Button } from '../ui/button';
-import { Loader2, Sparkles, Lightbulb, ArrowRight, ChefHat, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, ArrowRight, RefreshCw } from 'lucide-react';
 import { getCoachAdvice } from '@/app/actions';
 import type { KitchenCoachInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
@@ -89,7 +89,9 @@ export function KitchenCoachPanel() {
         <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <ChefHat /> Your Kitchen Coach
+                    {/* @ts-ignore */}
+                    <dotlottie-wc src="https://lottie.host/622d2197-f9b0-4d02-9301-622e4b6c8d07/QUGWvgvzay.lottie" style={{width: '40px', height: '40px'}} speed="1" autoplay loop></dotlottie-wc>
+                    Your Kitchen Coach
                 </CardTitle>
                 <CardDescription>
                     Quick tips to reduce waste today.
