@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -21,7 +20,7 @@ const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['item
     
     const getIcon = () => {
         switch(deal.icon) {
-            case 'bpi': return '/bpi-logo.png';
+            case 'bpi': return '/bpi-logo-2.png';
             case 'vybe': return '/vybe-logo.png';
             case 'green_partner': return null; // Use Lucide icon
             default: return null;
@@ -226,7 +225,7 @@ export default function ShoppingHubPage() {
                   )}
                   <div className="grid grid-cols-2 gap-2 mt-2">
                      <Button>
-                        <Image src="/bpi-logo.png" alt="BPI Logo" width={20} height={20} className="mr-2 rounded-sm" />
+                        <Image src="/bpi-logo-2.png" alt="BPI Logo" width={20} height={20} className="mr-2 rounded-sm" />
                         Pay with BPI
                     </Button>
                     <Button variant="secondary">
