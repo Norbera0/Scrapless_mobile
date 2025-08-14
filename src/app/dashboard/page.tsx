@@ -266,7 +266,7 @@ export default function DashboardPage() {
                         alt="Shopping guide illustration"
                         layout="fill"
                         objectFit="contain"
-                        className="pointer-events-none object-bottom"
+                        className="pointer-events-none object-bottom opacity-70"
                     />
                 </div>
             </CardContent>
