@@ -165,7 +165,10 @@ export default function DashboardPage() {
                   </div>
               </CardContent>
                <div className="pt-4 border-t border-white/20">
-                    <p className="text-xs text-green-200 mb-1 text-center">Monthly Savings Goal Progress</p>
+                    <div className="flex justify-between items-center mb-1">
+                      <p className="text-xs text-green-200">Monthly Savings Goal</p>
+                      <p className="text-xs text-green-200 font-semibold">{formatPeso(monthSavings)} / {formatPeso(savingsGoal)}</p>
+                    </div>
                     <div className="flex items-center gap-3">
                         <Progress value={goalProgress} className="h-2 flex-1" />
                         <p className="text-sm font-bold">{goalProgress}%</p>
