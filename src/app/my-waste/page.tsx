@@ -426,7 +426,7 @@ export default function MyWastePage() {
                     Track patterns, reduce waste, save money & the planet.
                 </p>
             </div>
-            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base w-full sm:w-auto">
+            <Button onClick={() => router.push('/log-waste?method=camera')} className="whitespace-nowrap bg-[#166534] hover:bg-[#166534]/90 h-11 text-base">
                 <Trash className="w-5 h-5 mr-2" />
                 <span>Log Waste</span>
             </Button>
