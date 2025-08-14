@@ -94,9 +94,11 @@ export function SidebarNav({ user }: { user: UserType }) {
 
   return (
     <>
-      <SidebarHeader className="p-4 flex items-center justify-start gap-3">
-        <SidebarTrigger className="md:hidden" />
-        <div className={cn("flex items-center gap-3", sidebarState === 'collapsed' && 'hidden')}>
+      <SidebarHeader className="p-4">
+        <div className="flex items-center justify-start gap-3">
+          <SidebarTrigger className="md:hidden mr-auto" />
+        </div>
+        <div className={cn("flex items-center gap-3 mt-2", sidebarState === 'collapsed' && 'hidden')}>
           <Image src="/scrapless_logo_white.png" alt="Scrapless Logo" width={32} height={32} />
           <span className="text-xl font-bold">Scrapless</span>
         </div>
