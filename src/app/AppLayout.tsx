@@ -114,7 +114,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex-1 flex flex-col">
             <header className="flex-shrink-0 flex h-14 items-center gap-4 bg-primary text-primary-foreground px-4 sm:h-16 sm:px-6 sticky top-0 z-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.1)]">
                 <SidebarTrigger className="md:hidden hover:bg-white/20" />
-                <div className="md:hidden flex-1">
+                <div className="flex-1 md:hidden">
                     <div className="text-xs font-semibold truncate">
                         {greeting}, {user?.name?.split(' ')[0]}
                     </div>
@@ -123,7 +123,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-4 md:gap-6 ml-auto">
                     <Popover>
                     <PopoverTrigger asChild>
-                        <div className="hidden md:flex items-center gap-2 bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                        <div className="flex items-center gap-2 bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
                             <Leaf className="w-4 h-4 text-white" />
                             <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
                         </div>
