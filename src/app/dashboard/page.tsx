@@ -247,9 +247,18 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm">
-            <CardContent className="p-6 flex items-center justify-between gap-4">
-                <div className="flex-1">
+        <Card className="shadow-sm overflow-hidden">
+            <CardContent className="relative p-6">
+                 <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3">
+                    <Image
+                        src="/dashboard/shopping_guide_dashboard_image.png"
+                        alt="Shopping guide illustration"
+                        layout="fill"
+                        objectFit="contain"
+                        className="pointer-events-none"
+                    />
+                </div>
+                <div className="relative z-10 pr-[30%]">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                         <ShoppingCart className="w-8 h-8 text-primary" />
                     </div>
@@ -259,14 +268,6 @@ export default function DashboardPage() {
                         Go Shopping
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
-                </div>
-                <div className="relative w-24 h-32 md:w-32 md:h-48 flex-shrink-0">
-                    <Image
-                        src="/dashboard/shopping_guide_dashboard_image.png"
-                        alt="Shopping guide illustration"
-                        layout="fill"
-                        objectFit="contain"
-                    />
                 </div>
             </CardContent>
         </Card>
