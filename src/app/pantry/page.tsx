@@ -109,26 +109,6 @@ export default function PantryPage() {
     return items.sort((a,b) => new Date(a.estimatedExpirationDate).getTime() - new Date(b.estimatedExpirationDate).getTime());
   }, [liveItems, filter, searchQuery, getStatus]);
 
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const fresh = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'fresh');
-    const expiring = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'expiring');
-    const expired = liveItems.filter(item => getStatus(item.estimatedExpirationDate) === 'expired');
-
-    const healthScore = liveItems.length > 0 
-      ? Math.round(
-          ((fresh.length * 100) + (expiring.length * 50) + (expired.length * 0)) / liveItems.length
-        )
-      : 100;
-
-    return {
-      total: liveItems.length,
-      fresh: fresh.length,
-      expiring: expiring.length,
-      healthScore,
-    };
-  }, [liveItems, getStatus]);
-
   const handleDelete = async (itemId: string) => {
     if (!user) return;
     setIsDeleting(itemId);
@@ -274,7 +254,7 @@ export default function PantryPage() {
                   <Plus className="w-5 h-5 ml-2" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-2 bg-primary">
+              <PopoverContent className="w-auto p-0 bg-primary">
                 <div className="flex flex-col">
                   <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
                     <Camera className="w-4 h-4 mr-2" /> Scan with Camera
@@ -290,47 +270,6 @@ export default function PantryPage() {
                 </div>
               </PopoverContent>
             </Popover>
-          </div>
-          
-           {/* Statistics Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5 mb-8">
-              <Card
-                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-blue-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                  onClick={() => setFilter('all')}
-              >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center mb-2">
-                      <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-blue-800">{stats.total}</p>
-                  <p className="text-sm font-medium text-blue-600">Total Items</p>
-              </Card>
-              <Card
-                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-green-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                  onClick={() => setFilter('fresh')}
-              >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center mb-2">
-                      <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-green-800">{stats.fresh}</p>
-                  <p className="text-sm font-medium text-green-600">Fresh Items</p>
-              </Card>
-              <Card
-                  className="p-4 sm:p-5 rounded-2xl shadow-sm border border-amber-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer"
-                  onClick={() => setFilter('expiring')}
-              >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg flex items-center justify-center mb-2">
-                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-amber-800">{stats.expiring}</p>
-                  <p className="text-sm font-medium text-amber-600">Expiring Soon</p>
-              </Card>
-              <Card className="p-4 sm:p-5 rounded-2xl shadow-sm border border-teal-200 hover:shadow-md hover:-translate-y-1 transition-all cursor-pointer">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-teal-100 to-teal-200 rounded-lg flex items-center justify-center mb-2">
-                    <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-teal-600" />
-                </div>
-                <p className="text-2xl sm:text-3xl font-bold text-teal-800">{stats.healthScore}%</p>
-                <p className="text-sm font-medium text-teal-600">Pantry Health Score</p>
-              </Card>
           </div>
           
           {/* Search and Filter Bar */}
