@@ -292,7 +292,7 @@ export default function DashboardPage() {
       <div className="relative p-5 space-y-6">
 
           <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
-            <Image src="/dashboard/user_impact.jpg" layout="fill" objectFit="cover" alt="Impact background" className="z-0" />
+            <Image src="/dashboard/user_impact_final.jpg" layout="fill" objectFit="cover" alt="Impact background" className="z-0" />
             <div className="absolute inset-0 bg-black/40 z-0"></div>
             <div className="relative z-10">
               <CardHeader>
