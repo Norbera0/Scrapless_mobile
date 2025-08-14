@@ -249,16 +249,16 @@ export default function DashboardPage() {
 
         <Card className="shadow-sm overflow-hidden">
             <CardContent className="relative p-6">
-                 <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3">
+                 <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/2">
                     <Image
                         src="/dashboard/shopping_guide_dashboard_image.png"
                         alt="Shopping guide illustration"
                         layout="fill"
-                        objectFit="contain"
+                        objectFit="cover"
                         className="pointer-events-none"
                     />
                 </div>
-                <div className="relative z-10 pr-[30%]">
+                <div className="relative z-10 pr-[45%]">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                         <ShoppingCart className="w-8 h-8 text-primary" />
                     </div>
