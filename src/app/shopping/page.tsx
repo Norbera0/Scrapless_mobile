@@ -230,7 +230,7 @@ export default function ShoppingHubPage() {
                         Pay with BPI
                     </Button>
                     <Button variant="secondary">
-                        <Image src="/vybe-logo.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
+                        <Image src="/vybe-logo-2 copy.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
                         Scan with VYBE
                     </Button>
                   </div>

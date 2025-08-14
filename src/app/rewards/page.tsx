@@ -84,7 +84,7 @@ export default function GreenPointsPage() {
                         {isConverting ? (
                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         ) : (
-                            <Image src="/vybe-logo.png" alt="VYBE Logo" width={24} height={24} className="mr-2" />
+                            <Image src="/vybe-logo-2 copy.png" alt="VYBE Logo" width={24} height={24} className="mr-2" />
                         )}
                         {isConverting ? 'Converting...' : 'Convert to BPI Points via VYBE'}
                     </Button>

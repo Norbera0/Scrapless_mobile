@@ -114,16 +114,40 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex-1 flex flex-col">
             <header className="flex-shrink-0 flex h-14 items-center gap-4 bg-primary text-primary-foreground px-4 sm:h-16 sm:px-6 sticky top-0 z-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.1)]">
                 <SidebarTrigger className="md:hidden hover:bg-white/20" />
-                <div className="flex-1 md:hidden">
+                <div className="flex-1 md:hidden flex items-center gap-4">
                     <div className="text-xs font-semibold truncate">
                         {greeting}, {user?.name?.split(' ')[0]}
                     </div>
+                     <Popover>
+                    <PopoverTrigger asChild>
+                        <div className="flex items-center gap-2 bg-white/20 text-white font-semibold px-2 py-1 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                            <Leaf className="w-3 h-3 text-white" />
+                            <span className="text-xs">{totalGreenPoints.toLocaleString()}</span>
+                        </div>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80" align="end">
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <h4 className="font-medium leading-none">Green Points</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Your points can be converted to rewards in the BPI ecosystem.
+                                </p>
+                            </div>
+                            <Button asChild>
+                                <Link href="/rewards">
+                                    <Image src="/vybe-logo-2 copy.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
+                                    Convert via VYBE
+                                </Link>
+                            </Button>
+                        </div>
+                    </PopoverContent>
+                    </Popover>
                 </div>
                 <h1 className="text-lg font-semibold md:text-xl truncate hidden md:block">{getPageTitle(pathname)}</h1>
                 <div className="flex items-center gap-4 md:gap-6 ml-auto">
                     <Popover>
                     <PopoverTrigger asChild>
-                        <div className="flex items-center gap-2 bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white/30 transition-colors">
+                        <div className="hidden items-center gap-2 bg-white/20 text-white font-semibold px-3 py-1.5 rounded-lg cursor-pointer hover:bg-white/30 transition-colors md:flex">
                             <Leaf className="w-4 h-4 text-white" />
                             <span className="text-sm">{totalGreenPoints.toLocaleString()}</span>
                         </div>
@@ -138,7 +162,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                             </div>
                             <Button asChild>
                                 <Link href="/rewards">
-                                    <Image src="/vybe-logo.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
+                                    <Image src="/vybe-logo-2 copy.png" alt="VYBE Logo" width={20} height={20} className="mr-2" />
                                     Convert via VYBE
                                 </Link>
                             </Button>
