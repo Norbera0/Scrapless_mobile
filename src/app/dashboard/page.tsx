@@ -373,14 +373,14 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg">
+        <Card className="shadow-sm">
             <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 border-4 border-white/30">
-                    <ChefHat className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                    <ChefHat className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Don't let them go to waste!</h3>
-                <p className="mb-4">Your <span className="font-semibold">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
-                <Button variant="secondary" className="bg-white/90 text-amber-700 hover:bg-white" onClick={() => router.push('/pantry')}>
+                <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
+                <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
+                <Button variant="default" onClick={() => router.push('/pantry')}>
                     Explore Recipes
                     <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
