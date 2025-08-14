@@ -432,7 +432,7 @@ export default function MyWastePage() {
             <div>
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Waste Impact</h1>
                 <p className="text-muted-foreground text-sm md:text-base">
-                    Track patterns, reduce waste, save money & the planet.
+                    Track your patterns, reduce waste, spend less
                 </p>
             </div>
             <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
@@ -633,3 +633,5 @@ export default function MyWastePage() {
     </div>
   );
 }
+
+    
