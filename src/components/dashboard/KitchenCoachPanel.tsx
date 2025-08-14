@@ -86,12 +86,12 @@ export function KitchenCoachPanel() {
     const canRefresh = isEligibleForRefresh();
 
     return (
-        <Card className="bg-gradient-to-br from-[#063627] to-[#227D53] text-white shadow-lg">
+        <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Bot /> Your Kitchen Coach
                 </CardTitle>
-                <CardDescription className="text-green-200">
+                <CardDescription>
                     Quick tips to reduce waste today.
                     {lastGenerated && (
                         <span className="block text-xs mt-1">
@@ -102,29 +102,30 @@ export function KitchenCoachPanel() {
             </CardHeader>
             <CardContent className="min-h-[150px]">
                 {isGenerating && !lastTip ? (
-                     <div className="flex flex-col items-center justify-center h-full text-center text-white/70 py-6">
+                     <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground py-6">
                         <Loader2 className="w-10 h-10 mx-auto mb-3 animate-spin" />
                         <p className="font-semibold">Consulting your coach...</p>
                     </div>
                 ) : lastTip ? (
                     <div className="space-y-4">
-                        <div className="bg-white/10 rounded-xl p-4 border border-white/20">
+                        <div className="bg-secondary/50 rounded-xl p-4 border">
                             <h3 className="font-bold text-lg mb-1">{lastTip.title}</h3>
-                            <p className="text-white/90 text-base leading-relaxed">
+                            <p className="text-muted-foreground text-base leading-relaxed">
                                 {lastTip.story.situation[0] || "Keep up the great work!"}
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                              <Button 
-                                variant="outline"
-                                className="bg-transparent border-white text-white hover:bg-white hover:text-primary rounded-full transition-colors duration-300 h-11 flex-1"
+                                variant="default"
+                                className="h-11 flex-1"
                                 onClick={() => router.push('/kitchen-coach')}
                             >
-                                Get Full Advice →
+                                Get Full Advice
+                                <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
                              <Button 
-                                variant="secondary"
-                                className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-full transition-colors duration-300 h-11 flex-1"
+                                variant="outline"
+                                className="h-11 flex-1"
                                 onClick={handleGenerateTip}
                                 disabled={!canRefresh || isGenerating}
                             >
@@ -134,10 +135,10 @@ export function KitchenCoachPanel() {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center text-white/70 py-6">
+                    <div className="text-center text-muted-foreground py-6">
                         <Lightbulb className="w-10 h-10 mx-auto mb-3" />
                         <p className="font-semibold">No tips available right now</p>
-                        <p className="text-sm text-white/60">Try adding items to your pantry or logging waste.</p>
+                        <p className="text-sm">Try adding items to your pantry or logging waste.</p>
                     </div>
                 )}
             </CardContent>
