@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
@@ -254,7 +253,7 @@ export default function DashboardPage() {
                     src="/dashboard/shopping_guide_dashboard.png"
                     alt="Shopping basket illustration"
                     layout="fill"
-                    objectFit="cover"
+                    objectFit="contain"
                     className="pointer-events-none opacity-20 md:opacity-100"
                 />
             </div>
