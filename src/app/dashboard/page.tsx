@@ -38,7 +38,10 @@ import {
   Info,
   Bell,
   PackagePlus,
-  ChefHat
+  ChefHat,
+  Camera,
+  Mic,
+  Type
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -54,15 +57,20 @@ import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssist
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import Image from 'next/image';
 import { useGreenScoreStore } from '@/stores/greenScoreStore';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 
 const oneHour = 60 * 60 * 1000;
 
-const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.ElementType, label: string, onClick: () => void, className?: string }) => {
+const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.ElementType, label: string, onClick?: () => void, className?: string }) => {
     const Icon = icon;
+    const ButtonComponent = onClick ? 'button' : 'div';
+
     return (
-        <button
+        <ButtonComponent
             className={cn(
                 "flex items-center justify-center gap-3 group px-6 py-3 rounded-lg bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
+                onClick ? '' : 'cursor-default',
                 className
             )}
             onClick={onClick}
@@ -70,7 +78,7 @@ const QuickActionButton = ({ icon, label, onClick, className }: { icon: React.El
         >
             <Icon className="h-6 w-6 text-primary-foreground" />
             <span className="text-base font-semibold text-primary-foreground">{label}</span>
-        </button>
+        </ButtonComponent>
     );
 };
 
@@ -86,6 +94,7 @@ export default function DashboardPage() {
   const { score } = useGreenScoreStore();
   
   const [greeting, setGreeting] = useState("Good morning");
+  const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -129,6 +138,11 @@ export default function DashboardPage() {
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const savingsGoal = 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
+
+  const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
+    setIsAddMethodOpen(false);
+    router.push(`/add-to-pantry?method=${method}`);
+  };
 
   if (!analytics) {
      return (
@@ -185,11 +199,29 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="flex flex-row items-center justify-around gap-4">
-                    <QuickActionButton 
-                        icon={PackagePlus} 
-                        label="Add Pantry Items" 
-                        onClick={() => router.push('/add-to-pantry')}
-                    />
+                    <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
+                      <PopoverTrigger asChild>
+                        <QuickActionButton 
+                          icon={PackagePlus} 
+                          label="Add Pantry Items"
+                        />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-primary">
+                        <div className="flex flex-col">
+                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
+                            <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                          </Button>
+                          <Separator className="my-1 bg-white/20" />
+                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
+                            <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                          </Button>
+                          <Separator className="my-1 bg-white/20" />
+                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
+                            <Type className="w-4 h-4 mr-2" /> Type Manually
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <QuickActionButton 
                         icon={Trash2} 
                         label="Log Food Waste" 
