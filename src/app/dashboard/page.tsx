@@ -287,7 +287,7 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-full">
-       <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('/dashboard_media_assets/total_impact_bg.jpg')" }}></div>
+       <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('/dashboard/total_impact_bg.jpg')" }}></div>
       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
       <div className="relative p-5 space-y-6">
 
