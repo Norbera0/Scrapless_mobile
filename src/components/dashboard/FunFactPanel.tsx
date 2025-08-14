@@ -106,7 +106,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
         text: 'By choosing BPI e-Statements instead of paper, you save at least 36 sheets of paper per account yearly!', 
         source: 'BPI Internal Data',
         cta: { label: 'Go Paperless with BPI', href: '/bpi' },
-        imageUrl: '/dashboard/save_paper_funfact.png'
+        lottieUrl: 'https://lottie.host/4b09862a-3dc0-4ed2-bf19-3e9af473c76f/QqSSRVwczU.lottie'
       },
       {
         icon: Recycle,
