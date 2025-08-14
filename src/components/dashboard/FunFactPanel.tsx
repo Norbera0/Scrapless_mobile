@@ -165,7 +165,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                     <div className="flex-1 space-y-4">
                         <div className={cn("flex gap-4", currentFact.imageUrl ? 'flex-row items-start' : 'flex-col')}>
                             {currentFact.imageUrl && (
-                                <div className="relative w-24 h-24 flex-shrink-0">
+                                <div className="relative w-32 h-32 flex-shrink-0">
                                     <Image
                                         src={currentFact.imageUrl}
                                         alt={currentFact.text}
