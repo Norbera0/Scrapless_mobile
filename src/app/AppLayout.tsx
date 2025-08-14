@@ -159,17 +159,17 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         <NotificationPanel notifications={notifications} />
                     </PopoverContent>
                     </Popover>
-                    <div className="flex items-center gap-2">
-                    <div className="hidden sm:flex flex-col items-end text-right">
-                        <div className="text-sm font-medium">{user?.name || 'User'}</div>
-                        <div className="text-xs text-white/80">{user?.email}</div>
-                    </div>
-                    <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-primary">
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                        </span>
-                    </div>
-                    </div>
+                    <Link href="/profile" className="flex items-center gap-2 rounded-md p-1 hover:bg-white/10 transition-colors">
+                        <div className="hidden sm:flex flex-col items-end text-right">
+                            <div className="text-sm font-medium">{user?.name || 'User'}</div>
+                            <div className="text-xs text-white/80">{user?.email}</div>
+                        </div>
+                        <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-primary">
+                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                            </span>
+                        </div>
+                    </Link>
                 </div>
             </header>
           <main className="flex-1 overflow-y-auto bg-background">
