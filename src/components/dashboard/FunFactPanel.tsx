@@ -163,38 +163,43 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                     className="flex flex-col h-full"
                 >
                     <div className="flex-1 space-y-4">
-                        {currentFact.imageUrl && (
-                            <div className="relative w-full h-32 rounded-lg overflow-hidden mb-2">
-                                <Image
-                                    src={currentFact.imageUrl}
-                                    alt={currentFact.text}
-                                    layout="fill"
-                                    objectFit="contain"
-                                />
-                            </div>
-                        )}
-                        {currentFact.mainFact ? (
-                            <div className="mb-4">
-                                <p className="text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
-                                <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
-                            </div>
-                        ) : (
-                            <p className="text-muted-foreground text-sm mt-1 leading-relaxed mb-4">{currentFact.text}</p>
-                        )}
-
-                        {currentFact.subFacts && (
-                            <div className="grid grid-cols-3 gap-2 text-center text-xs text-green-800 mb-4">
-                                {currentFact.subFacts.map(sub => (
-                                    <div key={sub.label} className="bg-green-100/70 p-1.5 rounded-md">
-                                        <p className="font-semibold">{sub.value}</p>
-                                        <p className="opacity-80">{sub.label}</p>
+                        <div className={cn("flex gap-4", currentFact.imageUrl ? 'flex-row items-start' : 'flex-col')}>
+                            {currentFact.imageUrl && (
+                                <div className="relative w-24 h-24 flex-shrink-0">
+                                    <Image
+                                        src={currentFact.imageUrl}
+                                        alt={currentFact.text}
+                                        layout="fill"
+                                        objectFit="contain"
+                                        className="rounded-lg"
+                                    />
+                                </div>
+                            )}
+                             <div className="flex-1">
+                                {currentFact.mainFact ? (
+                                    <div className="mb-4">
+                                        <p className="text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
+                                        <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    <p className="text-muted-foreground text-sm leading-relaxed">{currentFact.text}</p>
+                                )}
+
+                                {currentFact.subFacts && (
+                                    <div className="grid grid-cols-3 gap-2 text-center text-xs text-green-800 mt-4">
+                                        {currentFact.subFacts.map(sub => (
+                                            <div key={sub.label} className="bg-green-100/70 p-1.5 rounded-md">
+                                                <p className="font-semibold">{sub.value}</p>
+                                                <p className="opacity-80">{sub.label}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
                         
                         {currentFact.relatedTip && (
-                            <div className="text-xs text-center text-gray-600 bg-yellow-100/60 p-2 rounded-md border border-yellow-200/80">
+                            <div className="text-xs text-center text-gray-600 bg-yellow-100/60 p-2 rounded-md border border-yellow-200/80 mt-4">
                                 <span className="font-semibold">💡 Quick Tip:</span> {currentFact.relatedTip}
                             </div>
                         )}
