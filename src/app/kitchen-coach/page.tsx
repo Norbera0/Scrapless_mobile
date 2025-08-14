@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp, ChefHat } from 'lucide-react';
 import { getCoachAdvice, fetchCoachSolutions } from '../actions';
 import { type KitchenCoachOutput, type GetCoachSolutionsOutput, type KitchenCoachInput, type GetCoachSolutionsInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
@@ -191,7 +191,10 @@ export default function KitchenCoachPage() {
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight">Kitchen Coach</h1>
+                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                        <ChefHat className="w-8 h-8" />
+                        Kitchen Coach
+                    </h1>
                     <p className="text-muted-foreground">
                         Your AI partner for a smarter, less wasteful kitchen.
                     </p>
