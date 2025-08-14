@@ -89,8 +89,7 @@ export function KitchenCoachPanel() {
         <Card className="shadow-sm">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    {/* @ts-ignore */}
-                    <dotlottie-wc src="https://lottie.host/622d2197-f9b0-4d02-9301-622e4b6c8d07/QUGWvgvzay.lottie" style={{width: '40px', height: '40px'}} speed="1" autoplay loop></dotlottie-wc>
+                    <Lightbulb className="w-5 h-5" />
                     Your Kitchen Coach
                 </CardTitle>
                 <CardDescription>
