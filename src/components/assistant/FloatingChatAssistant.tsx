@@ -31,7 +31,7 @@ export function FloatingChatAssistant() {
                 aria-label="Open Chat"
               >
                 <DotLottieReact
-                    src="https://lottie.host/361ab64f-6aba-454a-b218-838e1ba93507/HdXT5RqExp.lottie"
+                    src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
                     loop
                     autoplay
                 />
@@ -55,7 +55,7 @@ export function FloatingChatAssistant() {
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-full">
                         <DotLottieReact 
-                           src="https://lottie.host/361ab64f-6aba-454a-b218-838e1ba93507/HdXT5RqExp.lottie"
+                           src="https://lottie.host/554cd717-e4e3-413b-8033-6cf6f70826fc/4y6zuy7Onc.lottie"
                            loop
                            autoplay
                            style={{ width: '24px', height: '24px' }} 
