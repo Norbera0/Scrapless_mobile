@@ -8,6 +8,7 @@ import { ChatAssistant } from './ChatAssistant';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { cn } from '@/lib/utils';
 
 export function FloatingChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +26,7 @@ export function FloatingChatAssistant() {
             >
               <Button
                 size="icon"
-                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden"
+                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-transparent hover:bg-transparent"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open Chat"
               >
