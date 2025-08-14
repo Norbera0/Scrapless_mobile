@@ -332,7 +332,7 @@ export default function DashboardPage() {
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col sm:flex-row items-center justify-around gap-4">
+                <div className="flex flex-row items-center justify-around gap-4">
                     <QuickActionButton 
                         icon={PackagePlus} 
                         label="Add Pantry" 
