@@ -40,7 +40,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday } from 'date-fns';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const filterOptions = [
     { value: 'all', label: 'All Items' },
@@ -266,31 +266,27 @@ export default function PantryPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">🥗 My Pantry</h1>
-            <Dialog open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
-              <DialogTrigger asChild>
+            <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
+              <PopoverTrigger asChild>
                 <Button className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base">
                   <span>Add Items</span>
                   <Plus className="w-5 h-5 ml-2" />
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>How would you like to add items?</DialogTitle>
-                  <DialogDescription>Choose your preferred way to add groceries to your pantry.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <Button variant="outline" className="h-14 text-lg" onClick={() => handleMethodSelect('camera')}>
-                    <Camera className="w-6 h-6 mr-3" /> Scan with Camera
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2">
+                <div className="grid gap-2">
+                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('camera')}>
+                    <Camera className="w-4 h-4 mr-2" /> Scan with Camera
                   </Button>
-                  <Button variant="outline" className="h-14 text-lg" onClick={() => handleMethodSelect('voice')}>
-                    <Mic className="w-6 h-6 mr-3" /> Use Voice Log
+                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('voice')}>
+                    <Mic className="w-4 h-4 mr-2" /> Use Voice Log
                   </Button>
-                  <Button variant="outline" className="h-14 text-lg" onClick={() => handleMethodSelect('text')}>
-                    <Type className="w-6 h-6 mr-3" /> Type Manually
+                  <Button variant="ghost" className="justify-start" onClick={() => handleMethodSelect('text')}>
+                    <Type className="w-4 h-4 mr-2" /> Type Manually
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+              </PopoverContent>
+            </Popover>
           </div>
           
            {/* Statistics Cards */}
