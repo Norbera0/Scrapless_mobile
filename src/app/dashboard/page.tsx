@@ -247,29 +247,29 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm overflow-hidden">
-            <CardContent className="relative p-6">
-                 <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/2">
-                    <Image
-                        src="/dashboard/shopping_guide_dashboard_image.png"
-                        alt="Shopping guide illustration"
-                        layout="fill"
-                        objectFit="cover"
-                        className="pointer-events-none"
-                    />
-                </div>
-                <div className="relative z-10 pr-[45%]">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                        <ShoppingCart className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Running low on essentials?</h3>
-                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Onions, Garlic, and Eggs</span> are low in stock.</p>
-                    <Button variant="default" onClick={() => router.push('/shopping')}>
-                        Go Shopping
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                </div>
-            </CardContent>
+        <Card className="shadow-sm overflow-hidden relative">
+          <CardContent className="relative p-6">
+              <div className="absolute top-0 right-0 h-full w-1/2">
+                  <Image
+                      src="/dashboard/shopping_guide_dashboard_image.png"
+                      alt="Shopping guide illustration"
+                      layout="fill"
+                      objectFit="cover"
+                      className="pointer-events-none"
+                  />
+              </div>
+              <div className="relative z-10 pr-[45%]">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                      <ShoppingCart className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Running low on essentials?</h3>
+                  <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Onions, Garlic, and Eggs</span> are low in stock.</p>
+                  <Button variant="default" onClick={() => router.push('/shopping')}>
+                      Go Shopping
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+              </div>
+          </CardContent>
         </Card>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
