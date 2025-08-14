@@ -26,7 +26,7 @@ export function FloatingChatAssistant() {
             >
               <Button
                 size="icon"
-                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-[#e5ebe9] hover:bg-[#e5ebe9]/90 border-[7px] border-[#00382a]"
+                className="h-16 w-16 rounded-full shadow-lg p-0 overflow-hidden bg-[#e5ebe9] hover:bg-[#e5ebe9]/90 border-[3px] border-[#00382a]"
                 onClick={() => setIsOpen(true)}
                 aria-label="Open Chat"
               >
