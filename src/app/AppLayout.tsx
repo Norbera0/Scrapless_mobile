@@ -48,6 +48,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const { notifications, totalNew, priorityColor } = useNotifications();
   const [hasOpenedNotifications, setHasOpenedNotifications] = useState(false);
   const { events: greenPointsEvents } = useGreenPointsStore();
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
 
   const totalGreenPoints = useMemo(() => {
     return greenPointsEvents.reduce((acc, event) => acc + event.points, 0);
@@ -107,8 +115,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <header className="flex-shrink-0 flex h-14 items-center gap-4 bg-primary text-primary-foreground px-4 sm:h-16 sm:px-6 sticky top-0 z-10 shadow-[inset_0_2px_4px_0_rgba(0,0,0,0.1)]">
                 <SidebarTrigger className="md:flex hover:bg-white/20" />
                 <div className="flex items-center gap-2 md:hidden">
-                    <Image src="/scrapless_logo_white.png" alt="Scrapless Logo" width={32} height={32} />
-                    <span className="font-bold text-lg">Scrapless</span>
+                    <div className="text-lg font-semibold truncate">
+                        {greeting}, {user?.name?.split(' ')[0]}
+                    </div>
                 </div>
                 <h1 className="text-lg font-semibold md:text-xl truncate flex-1 hidden md:block">{getPageTitle(pathname)}</h1>
                 <div className="flex items-center gap-4 md:gap-6 ml-auto">
