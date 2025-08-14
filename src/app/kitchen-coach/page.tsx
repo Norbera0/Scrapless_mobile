@@ -190,9 +190,10 @@ export default function KitchenCoachPage() {
     return (
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <ChefHat className="w-8 h-8" />
+                <div className="space-y-1 text-center">
+                    {/* @ts-ignore */}
+                    <dotlottie-wc src="https://lottie.host/622d2197-f9b0-4d02-9301-622e4b6c8d07/QUGWvgvzay.lottie" style={{width: '200px', height: '200px', margin: '0 auto'}} speed="1" autoplay loop></dotlottie-wc>
+                    <h1 className="text-3xl font-bold tracking-tight">
                         Kitchen Coach
                     </h1>
                     <p className="text-muted-foreground">
