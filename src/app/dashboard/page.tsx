@@ -69,7 +69,7 @@ const QuickActionButton = ({ icon, label, onClick, className, ...props }: { icon
     return (
         <Button
             className={cn(
-                "flex items-center justify-center gap-3 group px-6 py-3 rounded-lg bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
+                "flex flex-col items-center justify-center gap-2 group px-4 py-4 rounded-xl h-24 w-full bg-gradient-to-br from-primary to-green-700 shadow-lg border border-green-600 hover:from-primary hover:to-green-600 transition-all duration-300 transform hover:scale-105",
                 className
             )}
             onClick={onClick}
@@ -77,7 +77,7 @@ const QuickActionButton = ({ icon, label, onClick, className, ...props }: { icon
             {...props}
         >
             <Icon className="h-6 w-6 text-primary-foreground" />
-            <span className="text-base font-semibold text-primary-foreground">{label}</span>
+            <span className="text-xs font-semibold text-primary-foreground">{label}</span>
         </Button>
     );
 };
@@ -197,7 +197,7 @@ export default function DashboardPage() {
             </div>
           </Card>
         
-        <div className="flex flex-row items-center justify-around gap-4">
+        <div className="grid grid-cols-2 items-center justify-around gap-2">
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
                  <QuickActionButton 
