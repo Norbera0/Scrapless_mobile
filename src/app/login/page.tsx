@@ -30,6 +30,9 @@ export default function LoginPage() {
                         Transform food waste into savings.
                     </p>
                     <h1 className="text-3xl font-bold">Log in</h1>
+                    <p className="text-balance text-muted-foreground">
+                        Enter your email and password
+                    </p>
                 </div>
                 <LoginForm />
             </div>
