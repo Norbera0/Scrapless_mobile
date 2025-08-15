@@ -1,3 +1,4 @@
+
 'use client';
 
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -21,13 +22,13 @@ export default function LoginPage() {
         {/* Bottom Section with Form */}
         <div className="flex-1 flex items-start justify-center pt-10">
             <div className="mx-auto grid w-[350px] gap-6">
-                <div className="grid gap-2 text-center">
-                    <h1 className="text-3xl font-bold text-[#003726]">Welcome Back to Scrapless</h1>
+                <div className="grid gap-4 text-center">
+                    <div className="flex items-center justify-center gap-3">
+                        <Image src="/logo.jpg" alt="Scrapless Logo" width={56} height={56} className="rounded-xl" />
+                        <h1 className="text-4xl font-bold text-[#003726]">Scrapless</h1>
+                    </div>
                     <p className="text-balance text-muted-foreground font-medium">
-                        Transform food waste into savings - you're just one login away from making every meal count!
-                    </p>
-                    <p className="text-sm text-muted-foreground pt-2">
-                        Enter your email below to access your account
+                        Transform food waste into savings. You're just one login away from making every meal count.
                     </p>
                 </div>
                 <LoginForm />
