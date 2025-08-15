@@ -28,7 +28,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right Section with Form */}
-        <div className="w-full md:w-1/2 flex flex-1 items-center justify-center p-6 md:p-10">
+        <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-10">
             <div className="mx-auto grid w-full max-w-sm gap-6">
                 <div className="grid gap-4 text-center">
                     <div className="flex items-center justify-center gap-3">
