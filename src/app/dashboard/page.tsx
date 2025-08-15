@@ -186,7 +186,7 @@ export default function DashboardPage() {
               </CardContent>
                <div className="pt-4 border-t border-white/20">
                     <div className="flex justify-between items-center mb-1">
-                      <p className="text-xs text-green-200">Monthly Savings Goal</p>
+                      <p className="text-xs text-green-200">Savings Goal</p>
                       <p className="text-xs text-green-200 font-semibold">{formatPeso(monthSavings)} / {formatPeso(savingsGoal)}</p>
                     </div>
                     <div className="flex items-center gap-3">
