@@ -243,86 +243,82 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
     const isFutureDate = (date: Date) => isAfter(date, today);
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><History className="w-6 h-6" />Recent Waste History</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2 mb-4">
-                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(-dateRange.length)}>
-                        <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                    <div className="flex-1 overflow-x-auto scrollbar-hide" ref={containerRef}>
-                        <div className="flex gap-2 pb-1">
-                            {dateRange.map(date => (
-                                <motion.button
-                                    key={date.toISOString()}
-                                    className={cn(
-                                        "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-all border",
-                                        isSameDay(date, selectedDate)
-                                            ? 'bg-primary text-white border-primary shadow-md'
-                                            : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
-                                    )}
-                                    onClick={() => setSelectedDate(date)}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
-                                    <p className={cn("text-xl font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
-                                </motion.button>
-                            ))}
-                        </div>
+        <div>
+            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4"><History className="w-6 h-6" />Recent Waste History</h2>
+            <div className="flex items-center gap-2 mb-4">
+                <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(-dateRange.length)}>
+                    <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <div className="flex-1 overflow-x-auto scrollbar-hide" ref={containerRef}>
+                    <div className="flex gap-2 pb-1">
+                        {dateRange.map(date => (
+                            <motion.button
+                                key={date.toISOString()}
+                                className={cn(
+                                    "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-all border",
+                                    isSameDay(date, selectedDate)
+                                        ? 'bg-primary text-white border-primary shadow-md'
+                                        : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
+                                )}
+                                onClick={() => setSelectedDate(date)}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
+                                <p className={cn("text-xl font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
+                            </motion.button>
+                        ))}
                     </div>
-                     <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(dateRange.length)} disabled={dateRange.length > 0 && isSameDay(dateRange[dateRange.length-1], today)}>
-                        <ChevronRight className="h-5 w-5" />
-                    </Button>
                 </div>
+                 <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => handleDateChange(dateRange.length)} disabled={dateRange.length > 0 && isSameDay(dateRange[dateRange.length-1], today)}>
+                    <ChevronRight className="h-5 w-5" />
+                </Button>
+            </div>
 
-                <div className="mt-4 min-h-[150px]">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={selectedDate.toISOString()}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            {!hasWasteForSelectedDate ? (
-                                <div className="text-center py-10 bg-gray-50 rounded-lg">
-                                    <p className="text-gray-500">No waste logged for this day.</p>
-                                </div>
-                            ) : (
-                                <>
-                                    {organizedWaste.morning.length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Morning</h3>
-                                            <AnimatePresence>
-                                                {organizedWaste.morning.map(log => <WasteEntryCard key={log.id} entry={log} />)}
-                                            </AnimatePresence>
-                                        </div>
-                                    )}
-                                    {organizedWaste.afternoon.length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Afternoon</h3>
-                                             <AnimatePresence>
-                                                {organizedWaste.afternoon.map(log => <WasteEntryCard key={log.id} entry={log} />)}
-                                            </AnimatePresence>
-                                        </div>
-                                    )}
-                                    {organizedWaste.evening.length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Evening</h3>
-                                             <AnimatePresence>
-                                                {organizedWaste.evening.map(log => <WasteEntryCard key={log.id} entry={log} />)}
-                                            </AnimatePresence>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-            </CardContent>
-        </Card>
+            <div className="mt-4 min-h-[150px]">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={selectedDate.toISOString()}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        {!hasWasteForSelectedDate ? (
+                            <div className="text-center py-10 bg-gray-50 rounded-lg">
+                                <p className="text-gray-500">No waste logged for this day.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {organizedWaste.morning.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Morning</h3>
+                                        <AnimatePresence>
+                                            {organizedWaste.morning.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                                {organizedWaste.afternoon.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Afternoon</h3>
+                                         <AnimatePresence>
+                                            {organizedWaste.afternoon.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                                {organizedWaste.evening.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="text-sm font-semibold text-gray-500 mb-2 pl-2 border-l-2 border-primary">Evening</h3>
+                                         <AnimatePresence>
+                                            {organizedWaste.evening.map(log => <WasteEntryCard key={log.id} entry={log} />)}
+                                        </AnimatePresence>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </div>
     );
 };
 
@@ -556,7 +552,7 @@ export default function PantryPage() {
             <button
               onClick={() => setActiveTab('pantry')}
               className={cn(
-                'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0',
+                'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-0 focus:ring-offset-0',
                 activeTab === 'pantry'
                   ? 'bg-white text-gray-800 shadow-md font-semibold'
                   : 'bg-transparent text-gray-500'
@@ -568,7 +564,7 @@ export default function PantryPage() {
             <button
               onClick={() => setActiveTab('scraps')}
               className={cn(
-                'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus-visible:ring-0 focus-visible:ring-offset-0',
+                'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-0 focus:ring-offset-0',
                 activeTab === 'scraps'
                   ? 'bg-white text-gray-800 shadow-md font-semibold'
                   : 'bg-transparent text-gray-500'
