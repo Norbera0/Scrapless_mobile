@@ -303,14 +303,14 @@ export default function AddToPantryPage() {
                 </Button>
                 {selectedMethod === 'camera' && (
                     <div className="w-full">
-                        <div className="text-center mb-6">
-                            <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Capture Your Groceries</h2>
-                            <p className="text-slate-500 mt-1 text-sm">Point your camera at your items, or upload a photo of your receipt.</p>
+                        <div className="text-center mb-4">
+                            <h2 className="text-base font-semibold text-slate-700 tracking-tight">Capture Your Groceries</h2>
+                            <p className="text-slate-500 text-sm">Point your camera at your items, or upload a photo of your receipt.</p>
                         </div>
 
-                        <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
+                        <div className="w-full aspect-[9/16] sm:aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
                             {photoPreview ? (
-                                <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" className="shadow-lg" />
+                                <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" />
                             ) : hasCameraPermission === false ? (
                                 <div className="text-center p-4 text-white">
                                     <Camera className="w-16 h-16 text-red-400 mx-auto mb-4" />
@@ -332,36 +332,27 @@ export default function AddToPantryPage() {
                         <div className="mt-6">
                             {photoPreview ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Button size="lg" className="h-14 text-lg" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
-                                        {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : <ArrowRight className="w-6 h-6 mr-2" />}
+                                    <Button size="sm" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
+                                        {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowRight className="w-4 h-4 mr-2" />}
                                         Analyze Photo
                                     </Button>
-                                    <Button size="lg" variant="outline" className="h-14 text-lg bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
+                                    <Button size="sm" variant="outline" className="bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
                                         Retake
                                     </Button>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Button size="lg" className="h-14 text-lg bg-primary hover:bg-primary/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
-                                        <Camera className="w-6 h-6 mr-2" />
+                                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
+                                        <Camera className="w-4 h-4 mr-2" />
                                         Capture Photo
                                     </Button>
-                                    <Button size="lg" variant="secondary" className="h-14 text-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg hover:bg-gray-300" onClick={() => fileInputRef.current?.click()}>
-                                        <Upload className="w-6 h-6 mr-2" />
+                                    <Button size="sm" variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                                        <Upload className="w-4 h-4 mr-2" />
                                         Upload
                                     </Button>
                                     <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                                 </div>
                             )}
-                        </div>
-
-                        <div className="mt-8 bg-white/60 rounded-xl p-4 border border-slate-200">
-                             <h4 className="font-semibold text-slate-700 flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Scanning Tips</h4>
-                             <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
-                                 <li>For best results, place items on a plain background.</li>
-                                 <li>Ensure good lighting to avoid shadows and reflections.</li>
-                                 <li>You can also scan a clear, well-lit grocery receipt.</li>
-                             </ul>
                         </div>
                     </div>
                 )}
@@ -540,7 +531,7 @@ export default function AddToPantryPage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4">
                   <span className="text-3xl">⌨️</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Type Manually</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Manual Entry</h3>
                 <p className="text-gray-500 mb-6 text-sm">Add items by typing.</p>
                 <Button className="w-full mt-auto bg-orange-500 hover:bg-orange-600" onClick={() => setSelectedMethod('text')}>Start Typing</Button>
               </CardContent>
