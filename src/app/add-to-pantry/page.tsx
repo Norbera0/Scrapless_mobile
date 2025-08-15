@@ -302,10 +302,10 @@ export default function AddToPantryPage() {
                     Back to pantry
                 </Button>
                 {selectedMethod === 'camera' && (
-                    <div className="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-slate-200">
+                    <div className="w-full">
                         <div className="text-center mb-6">
-                            <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Capture Your Groceries</h2>
-                            <p className="text-slate-500 mt-1">Point your camera at your items, or upload a photo of your receipt.</p>
+                            <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Capture Your Groceries</h2>
+                            <p className="text-slate-500 mt-1 text-sm">Point your camera at your items, or upload a photo of your receipt.</p>
                         </div>
 
                         <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
