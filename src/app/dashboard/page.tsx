@@ -197,68 +197,59 @@ export default function DashboardPage() {
             </div>
           </Card>
         
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <Zap className="w-5 h-5" /> Quick Start
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex flex-row items-center justify-around gap-4">
-                    <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
-                      <PopoverTrigger asChild>
-                         <QuickActionButton 
-                            icon={PackagePlus} 
-                            label="Add Pantry Items" 
-                        />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-primary">
-                        <div className="flex flex-col">
-                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'camera')}>
-                            <Camera className="w-4 h-4 mr-2" /> Scan with Camera
-                          </Button>
-                          <Separator className="my-1 bg-white/20" />
-                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'voice')}>
-                            <Mic className="w-4 h-4 mr-2" /> Use Voice Log
-                          </Button>
-                          <Separator className="my-1 bg-white/20" />
-                          <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'text')}>
-                            <Type className="w-4 h-4 mr-2" /> Type Manually
-                          </Button>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                    <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
-                        <PopoverTrigger asChild>
-                             <QuickActionButton 
-                                icon={Trash2} 
-                                label="Log Food Waste" 
-                            />
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-primary">
-                            <div className="flex flex-col">
-                            <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'camera')}>
-                                <Camera className="w-4 h-4 mr-2" /> Scan with Camera
-                            </Button>
-                            <Separator className="my-1 bg-white/20" />
-                            <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'voice')}>
-                                <Mic className="w-4 h-4 mr-2" /> Use Voice Log
-                            </Button>
-                            <Separator className="my-1 bg-white/20" />
-                            <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'text')}>
-                                <Type className="w-4 h-4 mr-2" /> Type Manually
-                            </Button>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+        <div className="flex flex-row items-center justify-around gap-4">
+            <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
+              <PopoverTrigger asChild>
+                 <QuickActionButton 
+                    icon={PackagePlus} 
+                    label="Add Pantry Items" 
+                />
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-primary">
+                <div className="flex flex-col">
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'camera')}>
+                    <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                  </Button>
+                  <Separator className="my-1 bg-white/20" />
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'voice')}>
+                    <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                  </Button>
+                  <Separator className="my-1 bg-white/20" />
+                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'text')}>
+                    <Type className="w-4 h-4 mr-2" /> Type Manually
+                  </Button>
                 </div>
-            </CardContent>
-        </Card>
+              </PopoverContent>
+            </Popover>
+            <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
+                <PopoverTrigger asChild>
+                     <QuickActionButton 
+                        icon={Trash2} 
+                        label="Log Food Waste" 
+                    />
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-primary">
+                    <div className="flex flex-col">
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'camera')}>
+                        <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                    </Button>
+                    <Separator className="my-1 bg-white/20" />
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'voice')}>
+                        <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                    </Button>
+                    <Separator className="my-1 bg-white/20" />
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'text')}>
+                        <Type className="w-4 h-4 mr-2" /> Type Manually
+                    </Button>
+                    </div>
+                </PopoverContent>
+            </Popover>
+        </div>
         
         <Card>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" /> Explore Other Services (plZ Add other services)
+                    <Sparkles className="w-5 h-5" /> Explore More
                 </CardTitle>
             </CardHeader>
             <CardContent>
