@@ -1,4 +1,3 @@
-
 'use client';
 
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -24,8 +23,8 @@ export default function LoginPage() {
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-4 text-center">
                     <div className="flex items-center justify-center gap-3">
-                        <Image src="/Scrapless Logo PNG - GREEN.png" alt="Scrapless Logo" width={48} height={48} />
-                        <h1 className="text-3xl font-bold text-[#003726]">Scrapless</h1>
+                        <Image src="/Scrapless Logo PNG - GREEN.png" alt="Scrapless Logo" width={40} height={40} />
+                        <h1 className="text-2xl font-bold text-[#003726]">Scrapless</h1>
                     </div>
                     <p className="text-balance text-muted-foreground font-medium">
                         Transform food waste into savings.
