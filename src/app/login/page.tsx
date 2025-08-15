@@ -14,9 +14,8 @@ export default function LoginPage() {
             <Image
                 src="/log_in_page/log_in_bg.png"
                 alt="A bowl of healthy food"
-                width={300}
-                height={300}
-                className="object-contain"
+                layout="fill"
+                className="object-cover"
             />
         </div>
 
