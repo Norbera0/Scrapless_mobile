@@ -63,7 +63,7 @@ export function SidebarNav({ user }: { user: UserType }) {
   };
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items'] },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },

@@ -24,7 +24,7 @@ import { ExpiredItemsDialog } from '@/components/pantry/ExpiredItemsDialog';
 
 
 const getPageTitle = (pathname: string) => {
-    if (pathname.startsWith('/dashboard')) return 'Dashboard';
+    if (pathname.startsWith('/dashboard')) return 'Home';
     if (pathname.startsWith('/pantry')) return 'Pantry';
     if (pathname.startsWith('/log-waste')) return 'Log Waste';
     if (pathname.startsWith('/add-to-pantry')) return 'Add to Pantry';
