@@ -77,7 +77,7 @@ const QuickActionButton = ({ icon, label, onClick, className, ...props }: { icon
             {...props}
         >
             <Icon className="h-6 w-6 text-primary-foreground" />
-            <span className="text-xs font-semibold text-primary-foreground">{label}</span>
+            <span className="text-sm font-semibold text-primary-foreground">{label}</span>
         </Button>
     );
 };
