@@ -6,6 +6,12 @@ export interface User {
   email?: string | null;
 }
 
+export interface UserSettings {
+  language?: 'en' | 'fil';
+  savingsGoal?: number;
+}
+
+
 export interface FoodItem {
   id: string;
   name: string;

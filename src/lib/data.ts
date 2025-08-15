@@ -2,7 +2,7 @@
 
 'use client';
 import { db } from './firebase';
-import type { WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent } from '@/types';
+import type { WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent, UserSettings } from '@/types';
 import { 
     collection, 
     addDoc, 
@@ -30,6 +30,7 @@ import { useGreenPointsStore } from '@/stores/green-points-store';
 import { FOOD_DATA_MAP } from './food-data';
 import { GREEN_POINTS_CONFIG } from './points-config';
 import { differenceInDays, parseISO, startOfToday } from 'date-fns';
+import { useUserSettingsStore } from '@/stores/user-settings-store';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -65,6 +66,27 @@ export const initializeUserCache = (userId: string) => {
     usePantryLogStore.getState().setPantryInitialized(false);
     useSavingsStore.getState().setSavingsInitialized(true); // Should be true, as it's just a local cache for now.
     useGreenPointsStore.getState().setPointsInitialized(false);
+    useUserSettingsStore.getState().setSettingsInitialized(false);
+
+    // Listener for User Settings
+    const settingsDoc = doc(db, `users/${userId}/settings`, 'app');
+    const settingsUnsub = onSnapshot(settingsDoc, (doc) => {
+        const settings = doc.data() as UserSettings;
+        // Ensure a default savings goal if not present
+        if (!settings?.savingsGoal) {
+            useUserSettingsStore.getState().setSettings({ ...settings, savingsGoal: 5000 });
+        } else {
+            useUserSettingsStore.getState().setSettings(settings);
+        }
+        useUserSettingsStore.getState().setSettingsInitialized(true);
+    }, (error) => {
+        console.error("Error with settings listener:", error);
+        // Set default settings on error
+        useUserSettingsStore.getState().setSettings({ savingsGoal: 5000, language: 'en' });
+        useUserSettingsStore.getState().setSettingsInitialized(true);
+    });
+    listenerManager.userSettings.push(settingsUnsub);
+
 
     // Listener for Waste Logs
     const wasteLogsQuery = query(collection(db, `users/${userId}/wasteLogs`), orderBy('date', 'desc'));
@@ -361,13 +383,23 @@ export const unsaveRecipe = async (userId: string, recipeId: string) => {
 }
 
 // --- User Settings Functions ---
-export const getUserSettings = async (userId: string): Promise<any> => {
+export const getUserSettings = async (userId: string): Promise<UserSettings> => {
     const docRef = doc(db, `users/${userId}/settings`, 'app');
     const docSnap = await getDoc(docRef);
-    return docSnap.exists() ? docSnap.data() : {};
+    if (docSnap.exists()) {
+        const settings = docSnap.data() as UserSettings;
+        // Ensure savingsGoal has a default value
+        if (settings.savingsGoal === undefined) {
+            settings.savingsGoal = 5000;
+        }
+        return settings;
+    }
+    // Return default settings if document doesn't exist
+    return { language: 'en', savingsGoal: 5000 };
 };
 
-export const saveUserSettings = async (userId: string, settings: any) => {
+
+export const saveUserSettings = async (userId: string, settings: UserSettings) => {
     const docRef = doc(db, `users/${userId}/settings`, 'app');
     await setDoc(docRef, settings, { merge: true });
 };

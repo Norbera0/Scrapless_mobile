@@ -59,6 +59,7 @@ import Image from 'next/image';
 import { useGreenScoreStore } from '@/stores/greenScoreStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { useUserSettingsStore } from '@/stores/user-settings-store';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -92,6 +93,7 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const { setExpiredItemsToShow } = useExpiryStore();
   const { score } = useGreenScoreStore();
+  const { settings } = useUserSettingsStore();
   
   const [greeting, setGreeting] = useState("Good morning");
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
@@ -137,7 +139,7 @@ export default function DashboardPage() {
   }, [liveItems, pantryInitialized]);
 
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
-  const savingsGoal = 5000;
+  const savingsGoal = settings.savingsGoal || 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
 
   const handleMethodSelect = (type: 'pantry' | 'waste', method: 'camera' | 'voice' | 'text') => {

@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark, ShieldCheck, TrendingUp, ThumbsDown, CheckCircle, BarChart, Info, Leaf, Star, ExternalLink, RefreshCw } from 'lucide-react';
+import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark, ShieldCheck, TrendingUp, ThumbsDown, CheckCircle, BarChart, Info, Leaf, Star, ExternalLink, RefreshCw, Edit, Save, PiggyBank } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { cleanupListeners } from '@/lib/data';
+import { cleanupListeners, saveUserSettings } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useGreenScoreStore } from '@/stores/greenScoreStore';
 import { Gauge } from '@/components/ui/gauge';
@@ -20,6 +21,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { useUserSettingsStore } from '@/stores/user-settings-store';
 
 
 const getInitials = (name?: string | null) => {
@@ -141,11 +143,77 @@ const GreenScoreSection = () => {
     )
 }
 
+const SavingsGoalSection = () => {
+    const { user } = useAuth();
+    const { settings, setSavingsGoal } = useUserSettingsStore();
+    const [isEditing, setIsEditing] = useState(false);
+    const [goal, setGoal] = useState(settings.savingsGoal || 5000);
+    const { toast } = useToast();
+
+    useEffect(() => {
+        setGoal(settings.savingsGoal || 5000);
+    }, [settings.savingsGoal]);
+
+    const handleSave = async () => {
+        if (!user) return;
+        setSavingsGoal(goal);
+        await saveUserSettings(user.uid, { ...settings, savingsGoal: goal });
+        toast({ title: 'Savings goal updated!', description: `Your new goal is ₱${goal.toLocaleString()}.` });
+        setIsEditing(false);
+    };
+
+    return (
+         <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <PiggyBank className="text-primary" />
+                    Monthly Savings Goal
+                </CardTitle>
+                <CardDescription>
+                    Set a target for your virtual savings each month.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {isEditing ? (
+                     <div className="flex items-center gap-2">
+                        <Label htmlFor="savings-goal" className="whitespace-nowrap">Goal (₱)</Label>
+                        <Input
+                            id="savings-goal"
+                            type="number"
+                            value={goal}
+                            onChange={(e) => setGoal(Number(e.target.value))}
+                            className="text-lg font-semibold"
+                        />
+                    </div>
+                ) : (
+                    <p className="text-3xl font-bold text-center p-4 bg-secondary rounded-lg">
+                        ₱{goal.toLocaleString()}
+                    </p>
+                )}
+               
+            </CardContent>
+             <CardContent>
+                 {isEditing ? (
+                    <Button className="w-full" onClick={handleSave}>
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Goal
+                    </Button>
+                ) : (
+                    <Button variant="outline" className="w-full" onClick={() => setIsEditing(true)}>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Change Goal
+                    </Button>
+                )}
+            </CardContent>
+        </Card>
+    )
+}
+
 export default function ProfilePage() {
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
-    const [language, setLanguage] = useState<'en' | 'fil'>('en');
+    const { settings, setSettings } = useUserSettingsStore();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const handleLogout = async () => {
@@ -162,9 +230,12 @@ export default function ProfilePage() {
         }
     };
     
-    const handleLanguageToggle = (isChecked: boolean) => {
+    const handleLanguageToggle = async (isChecked: boolean) => {
+        if (!user) return;
         const newLang = isChecked ? 'fil' : 'en';
-        setLanguage(newLang);
+        const newSettings = { ...settings, language: newLang };
+        setSettings(newSettings);
+        await saveUserSettings(user.uid, newSettings);
         toast({
             title: 'Language Switched',
             description: `App language set to ${newLang === 'fil' ? 'Filipino' : 'English'}. (UI mock-up)`,
@@ -193,6 +264,7 @@ export default function ProfilePage() {
                 </CardHeader>
             </Card>
 
+            <SavingsGoalSection />
             <GreenScoreSection />
 
             {/* Main Settings */}
@@ -240,13 +312,13 @@ export default function ProfilePage() {
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <Label htmlFor="lang-en" className={language === 'en' ? 'font-semibold' : 'text-muted-foreground'}>EN</Label>
+                            <Label htmlFor="lang-en" className={settings.language === 'en' ? 'font-semibold' : 'text-muted-foreground'}>EN</Label>
                             <Switch 
                                 id="language-switch"
-                                checked={language === 'fil'}
+                                checked={settings.language === 'fil'}
                                 onCheckedChange={handleLanguageToggle}
                             />
-                            <Label htmlFor="lang-fil" className={language === 'fil' ? 'font-semibold' : 'text-muted-foreground'}>FIL</Label>
+                            <Label htmlFor="lang-fil" className={settings.language === 'fil' ? 'font-semibold' : 'text-muted-foreground'}>FIL</Label>
                         </div>
                     </div>
                 </CardContent>
