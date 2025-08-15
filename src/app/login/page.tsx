@@ -28,7 +28,7 @@ export default function LoginPage() {
                         <h1 className="text-4xl font-bold text-[#003726]">Scrapless</h1>
                     </div>
                     <p className="text-balance text-muted-foreground font-medium">
-                        Transform food waste into savings. You're just one login away from making every meal count.
+                        Transform food waste into savings.
                     </p>
                 </div>
                 <LoginForm />
