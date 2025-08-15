@@ -324,7 +324,7 @@ export default function KitchenCoachPage() {
                     onClose={() => setShowWizard(false)}
                     analysis={analysis}
                     solutions={solutions}
-                    onSelectSolution={onSelectSolution}
+                    onSelectSolution={handleSelectSolution}
                     selectedSolutions={selectedSolutions}
                     isUpdatingSolution={isLoading}
                     isBpiLinked={isBpiLinked}
