@@ -1,117 +1,107 @@
 
-// Import all the necessary libraries
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
-import * as cheerio from "cheerio";
-// pdf-parse doesn't have default TypeScript types, so we import it like this
-const pdfParse = require("pdf-parse");
+import * as pdf from "pdf-parse";
 
-// Initialize Firebase Admin so we can talk to Firestore
+// Initialize Firebase Admin
 admin.initializeApp();
 const db = admin.firestore();
 
-interface DAResult {
-    pdfPath?: string;
-    rawText?: string; // For debugging
-    prices?: Record<string, any>;
-    error?: string;
-}
+/**
+ * Generates the DA's daily price index PDF URL for the previous day in Manila.
+ * @returns {string} The formatted URL.
+ */
+function generateDailyPdfUrl(): string {
+    const now = new Date();
+    // Adjust for Manila timezone (UTC+8)
+    const manilaDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
 
-// --- Helper Function for Dept. of Agriculture (DA) ---
-async function fetchAndParseDA(): Promise<DAResult> {
-  let pdfPath;
-  try {
-    const daMonitorUrl = "https://www.da.gov.ph/price-monitoring/";
-    const mainPageResponse = await axios.get(daMonitorUrl);
-    const $ = cheerio.load(mainPageResponse.data);
+    // Subtract one day to get yesterday's date
+    manilaDate.setDate(manilaDate.getDate() - 1);
 
-    pdfPath = $('#tablepress-105 > tbody > tr.row-2 > td.column-1 > a').attr('href');
-    if (!pdfPath) {
-      throw new Error("Could not find PDF link on DA page.");
-    }
-    console.log(`Found latest DA PDF link: ${pdfPath}`);
-
-    const pdfResponse = await axios.get(pdfPath, { responseType: 'arraybuffer' });
-    const pdfData = await pdfParse(pdfResponse.data);
-    const rawText = pdfData.text;
-
-    const extractedPrices: Record<string, any> = {};
-    const findPrice = (itemName: string, text: string): number | null => {
-        const regex = new RegExp(`${itemName}\\s*([\\d,]+\\.\\d{2})`, 'i');
-        const match = text.match(regex);
-        if (match?.[1]) {
-            return parseFloat(match[1].replace(',', ''));
-        }
-        return null;
-    };
-
-    extractedPrices.porkLiempo_kg = findPrice("Pork Liempo", rawText);
-    extractedPrices.tilapia_kg = findPrice("Tilapia", rawText);
-    extractedPrices.redOnion_kg = findPrice("Red Onion.*Local", rawText);
-    extractedPrices.importedGarlic_kg = findPrice("Garlic.*Imported", rawText);
+    const year = manilaDate.getFullYear();
+    const month = (manilaDate.getMonth() + 1).toString().padStart(2, '0');
     
-    const parsedPrices = Object.fromEntries(Object.entries(extractedPrices).filter(([_, v]) => v != null));
-
-    if (Object.keys(parsedPrices).length === 0) {
-        // Instead of throwing an error, return the raw text for debugging
-        console.log("Could not extract any prices. Returning raw text for debugging.");
-        return { pdfPath: pdfPath, rawText: rawText, error: "Could not extract any prices from the PDF text." };
-    }
-
-    console.log("Successfully parsed data from DA PDF.");
-    return { pdfPath: pdfPath, prices: parsedPrices };
-
-  } catch (error: any) {
-    console.error("Error in fetchAndParseDA:", error);
-    // Include pdfPath in the return if it was found before the error
-    return { pdfPath: pdfPath, error: error.message };
-  }
+    // Format: "Month-Day-Year" e.g., "August-14-2025"
+    const monthName = manilaDate.toLocaleString('en-US', { month: 'long' });
+    const day = manilaDate.getDate().toString().padStart(2, '0');
+    const formattedDateForUrl = `${monthName}-${day}-${year}`;
+    
+    // Example URL: https://www.da.gov.ph/wp-content/uploads/2025/08/Daily-Price-Index-August-14-2025.pdf
+    return `https://www.da.gov.ph/wp-content/uploads/${year}/${month}/Daily-Price-Index-${formattedDateForUrl}.pdf`;
 }
 
 // --- The Main Orchestrator Function ---
-export const masterPriceAggregator = functions
+export const dailyPriceExtractor = functions
   .region("asia-southeast1")
   .runWith({ timeoutSeconds: 300, memory: "512MB" })
   .pubsub.topic("fetch-latest-prices")
-  .onPublish(async (message: functions.pubsub.Message) => {
-    console.log("Master price aggregator function triggered.");
+  .onPublish(async (message) => {
+    console.log("Daily Price Extractor function triggered.");
 
     const resultsDocRef = db.collection("market_prices").doc("latest");
-    
-    // Initial log
-    let log: Record<string, any> = {
+    const log: Record<string, any> = {
         last_attempted_run: new Date().toISOString(),
         pdf_retrieval_status: 'FAILURE',
         data_extraction_status: 'PENDING',
     };
 
-    const daResult = await fetchAndParseDA();
+    try {
+        const pdfUrl = generateDailyPdfUrl();
+        log.pdf_url = pdfUrl;
+        console.log(`Attempting to fetch PDF from: ${pdfUrl}`);
 
-    // Update log based on result
-    if (daResult.pdfPath) {
+        const pdfResponse = await axios.get(pdfUrl, { responseType: 'arraybuffer' });
         log.pdf_retrieval_status = 'SUCCESS';
-        log.pdf_url = daResult.pdfPath;
-    }
+        console.log("Successfully downloaded PDF.");
 
-    if (daResult.prices && Object.keys(daResult.prices).length > 0) {
+        const pdfData = await pdf(pdfResponse.data);
+        const rawText = pdfData.text;
+        
+        if (!rawText || rawText.trim() === '') {
+            throw new Error("PDF text is empty. It might be an image-only PDF.");
+        }
+        
+        log.raw_pdf_text = rawText; // For debugging
+
+        const extractedPrices: Record<string, any> = {};
+        const findPrice = (itemName: string, text: string): number | null => {
+            // Regex to find the item and the first valid price after it on the same line.
+            // It looks for a number with two decimal places.
+            const regex = new RegExp(`${itemName}[^\\n]*?(\\d+\\.\\d{2})`, 'i');
+            const match = text.match(regex);
+            if (match && match[1]) {
+                return parseFloat(match[1].replace(',', ''));
+            }
+            return null;
+        };
+
+        // Update these keys to match the commodities in the new PDF
+        extractedPrices.porkKasim_kg = findPrice("Pork Kasim", rawText);
+        extractedPrices.tilapia_kg = findPrice("Tilapia", rawText);
+        extractedPrices.redOnion_local_kg = findPrice("Red Onion.*Local", rawText);
+        extractedPrices.importedGarlic_kg = findPrice("Imported Garlic", rawText);
+
+        const parsedPrices = Object.fromEntries(Object.entries(extractedPrices).filter(([_, v]) => v != null));
+
+        if (Object.keys(parsedPrices).length === 0) {
+            throw new Error("Could not extract any of the target prices from the PDF text.");
+        }
+
         log.data_extraction_status = 'SUCCESS';
-        log.prices = daResult.prices;
+        log.prices = parsedPrices;
         log.last_successful_update = new Date().toISOString();
-        delete log.error_message; // Clean up any previous error
-        delete log.raw_pdf_text; // Clean up debugging text
-    } else {
-        log.data_extraction_status = 'FAILURE';
-        if (daResult.error) {
-            log.error_message = daResult.error;
-        }
-        if (daResult.rawText) {
-            log.raw_pdf_text = daResult.rawText; // Save raw text for debugging
-        }
-    }
-    
-    await resultsDocRef.set(log, { merge: true });
+        delete log.error_message;
 
+    } catch (error: any) {
+        console.error("An error occurred:", error);
+        log.data_extraction_status = 'FAILURE';
+        log.error_message = error.message || 'An unknown error occurred.';
+    }
+
+    await resultsDocRef.set(log, { merge: true });
     console.log("Processing complete. Log written to Firestore.");
+
     return null;
   });
