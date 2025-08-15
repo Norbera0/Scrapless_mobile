@@ -1,3 +1,4 @@
+
 'use client';
 
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -23,8 +24,17 @@ export default function LoginPage() {
               </blockquote>
           </div>
       </div>
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+      <div className="relative flex items-center justify-center py-12">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/log_in_page/log_in_bg.png"
+            alt="Login background"
+            layout="fill"
+            objectFit="cover"
+            priority
+          />
+        </div>
+        <div className="relative z-10 mx-auto grid w-[350px] gap-6 rounded-lg bg-white/80 p-8 shadow-2xl backdrop-blur-sm">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
             <p className="text-balance text-muted-foreground">
