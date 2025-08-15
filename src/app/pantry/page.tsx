@@ -25,7 +25,9 @@ import {
   Leaf,
   Camera,
   Mic,
-  Type
+  Type,
+  CookingPot,
+  Trash
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
@@ -56,6 +58,7 @@ export default function PantryPage() {
   const { liveItems, pantryInitialized } = usePantryLogStore();
   const { recipes, setRecipes, clearRecipes } = useRecipeStore();
   
+  const [activeTab, setActiveTab] = useState('pantry');
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -270,6 +273,33 @@ export default function PantryPage() {
                 </div>
               </PopoverContent>
             </Popover>
+          </div>
+
+          <div className="flex bg-gray-200/70 p-1 rounded-xl mb-6">
+            <Button
+              onClick={() => setActiveTab('pantry')}
+              className={cn(
+                'flex-1 justify-center rounded-lg transition-all duration-300',
+                activeTab === 'pantry'
+                  ? 'bg-white text-gray-800 shadow'
+                  : 'bg-transparent text-gray-500 hover:bg-gray-200'
+              )}
+            >
+              <CookingPot className="w-4 h-4 mr-2" />
+              Pantry
+            </Button>
+            <Button
+              onClick={() => setActiveTab('scraps')}
+              className={cn(
+                'flex-1 justify-center rounded-lg transition-all duration-300',
+                activeTab === 'scraps'
+                  ? 'bg-white text-gray-800 shadow'
+                  : 'bg-transparent text-gray-500 hover:bg-gray-200'
+              )}
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              Scraps
+            </Button>
           </div>
           
           {/* Search and Filter Bar */}
