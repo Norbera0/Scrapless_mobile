@@ -1,3 +1,4 @@
+
 'use client';
 
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -29,6 +30,7 @@ export default function LoginPage() {
                     <p className="text-balance text-muted-foreground font-medium">
                         Transform food waste into savings.
                     </p>
+                    <h1 className="text-3xl font-bold">Log in</h1>
                 </div>
                 <LoginForm />
             </div>
