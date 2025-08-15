@@ -11,11 +11,19 @@ export default function LoginPage() {
     <div className="min-h-screen w-full flex flex-col bg-[#F4F4F4]">
         {/* Top Section with Image */}
         <div className="relative w-full h-[40vh] bg-[#003726] flex items-center justify-center overflow-hidden">
+             {/* Mobile Image */}
             <Image
                 src="/log_in_page/log_in_bg_2.png"
-                alt="A bowl of healthy food"
+                alt="A bowl of healthy food on mobile"
                 layout="fill"
-                className="object-cover"
+                className="object-cover md:hidden"
+            />
+             {/* Desktop Image */}
+            <Image
+                src="/log_in_page/log_in_bg_desktop.png"
+                alt="A bowl of healthy food on desktop"
+                layout="fill"
+                className="hidden md:block object-cover"
             />
         </div>
 
