@@ -80,6 +80,8 @@ export default function AddToPantryPage() {
     const methodFromQuery = searchParams.get('method');
     if (methodFromQuery && ['camera', 'voice', 'text'].includes(methodFromQuery)) {
         setSelectedMethod(methodFromQuery);
+    } else {
+        setSelectedMethod('camera');
     }
   }, [resetStore, searchParams]);
 
@@ -307,9 +309,9 @@ export default function AddToPantryPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
             <div className="max-w-4xl mx-auto">
-                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-2 -ml-4">
+                <Button variant="ghost" onClick={() => router.push('/pantry')} className="mb-2 -ml-4">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
+                    Back to Pantry
                 </Button>
 
                 {selectedMethod === 'camera' && (
@@ -472,145 +474,7 @@ export default function AddToPantryPage() {
     );
   }
 
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Add to Pantry ✨</h1>
-          <p className="text-lg text-gray-500">Choose your preferred way to add groceries</p>
-        </div>
-
-        {/* Quick Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <Card className="bg-gradient-to-br from-rose-50 to-pink-50 border-pink-200">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-                  <Package className="w-6 h-6 text-pink-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-pink-900">12</p>
-                  <p className="text-sm font-medium text-pink-700">Added Today</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-green-900">85%</p>
-                  <p className="text-sm font-medium text-green-700">Waste Reduced</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-yellow-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-yellow-900">3</p>
-                  <p className="text-sm font-medium text-yellow-700">Expiring Soon</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Input Method Cards */}
-        <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-700">How would you like to add items?</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-            
-            {/* Camera Card - Primary */}
-            <Card className="border border-gray-200 transform hover:scale-[1.02] transition-transform duration-300 flex flex-col hover:shadow-md hover:-translate-y-1">
-              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mb-4">
-                  <span className="text-4xl">📷</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Scan with Camera</h3>
-                <p className="text-gray-500 mb-6">Point at items for instant recognition.</p>
-                <Button className="w-full mt-auto bg-blue-500 hover:bg-blue-600" onClick={() => setSelectedMethod('camera')}>Start Scanning</Button>
-              </CardContent>
-            </Card>
-
-            {/* Voice Card - Secondary */}
-            <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
-              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl flex items-center justify-center mb-4">
-                  <span className="text-3xl">🎤</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Voice Entry</h3>
-                <p className="text-gray-500 mb-6 text-sm">Say item names naturally.</p>
-                <Button className="w-full mt-auto bg-purple-500 hover:bg-purple-600" onClick={() => setSelectedMethod('voice')}>Start Recording</Button>
-              </CardContent>
-            </Card>
-
-            {/* Text Card - Tertiary */}
-            <Card className="border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col">
-              <CardContent className="p-6 text-center flex-1 flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl flex items-center justify-center mb-4">
-                  <span className="text-3xl">⌨️</span>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Manual Entry</h3>
-                <p className="text-gray-500 mb-6 text-sm">Add items by typing.</p>
-                <Button className="w-full mt-auto bg-orange-500 hover:bg-orange-600" onClick={() => setSelectedMethod('text')}>Start Typing</Button>
-              </CardContent>
-            </Card>
-            </div>
-        </div>
-
-        {/* Bottom Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          <Card className="bg-primary text-white shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="text-yellow-300" />
-                AI Insights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-200 mb-4">Based on your patterns, you typically add fresh produce on weekends. Consider bulk buying to reduce packaging waste.</p>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-gray-300">Sustainability tip applied</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-gray-800">This Month's Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Items Added</span>
-                    <span className="font-semibold text-gray-800">156/200</span>
-                  </div>
-                  <Progress value={78} className="h-2 [&>div]:bg-blue-500" />
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Waste Reduction</span>
-                    <span className="font-semibold text-green-600">85%</span>
-                  </div>
-                  <Progress value={85} className="h-2 [&>div]:bg-green-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }
+
+    
