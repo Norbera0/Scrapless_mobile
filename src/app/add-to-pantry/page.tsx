@@ -27,7 +27,8 @@ import {
   Square,
   BarChart3,
   Lightbulb,
-  Receipt
+  Receipt,
+  RefreshCw
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
@@ -56,6 +57,7 @@ export default function AddToPantryPage() {
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,7 +71,6 @@ export default function AddToPantryPage() {
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const [waveform, setWaveform] = useState<number[]>(Array(NUM_WAVEFORM_BARS).fill(0));
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 
@@ -83,11 +84,13 @@ export default function AddToPantryPage() {
 
   // Camera Permission Effect
   useEffect(() => {
-    if (selectedMethod !== 'camera') return;
+    if (selectedMethod !== 'camera' || photoPreview) return;
 
-    const checkCameraPermission = async () => {
+    let stream: MediaStream | null = null;
+    
+    const getCameraPermission = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -97,15 +100,16 @@ export default function AddToPantryPage() {
       }
     };
 
-    checkCameraPermission();
+    getCameraPermission();
 
     return () => {
+        // Stop all tracks of the stream
         if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
+            const currentStream = videoRef.current.srcObject as MediaStream;
+            currentStream.getTracks().forEach(track => track.stop());
         }
     }
-  }, [selectedMethod]);
+  }, [selectedMethod, photoPreview, facingMode]);
 
    useEffect(() => {
      if (selectedMethod !== 'voice') return;
@@ -189,6 +193,10 @@ export default function AddToPantryPage() {
       };
       reader.readAsDataURL(file);
     }
+  };
+  
+  const handleFlipCamera = () => {
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
   };
 
   const visualize = useCallback(() => {
@@ -344,7 +352,15 @@ export default function AddToPantryPage() {
                                                 <div className="w-full h-full bg-white rounded-full ring-2 ring-inset ring-black"></div>
                                             </Button>
                                             
-                                             <div className="w-14 h-14" />
+                                             <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="w-14 h-14 rounded-full bg-black/50 hover:bg-black/70"
+                                                onClick={handleFlipCamera}
+                                                disabled={isLoading}
+                                            >
+                                                <RefreshCw className="w-6 h-6 text-white" />
+                                            </Button>
                                         </div>
                                     )}
                                 </>
@@ -597,5 +613,3 @@ export default function AddToPantryPage() {
     </div>
   );
 }
-
-    
