@@ -50,7 +50,7 @@ import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { differenceInDays, startOfToday, format, parseISO, isSameDay, addDays, subDays, isAfter } from 'date-fns';
+import { differenceInDays, startOfToday, format, parseISO, isSameDay, addDays, subDays, isAfter, startOfDay } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { useWasteLogStore } from '@/stores/waste-log-store';
@@ -729,4 +729,3 @@ export default function PantryPage() {
     </div>
   );
 }
-
