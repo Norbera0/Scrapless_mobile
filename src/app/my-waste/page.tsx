@@ -174,7 +174,10 @@ export default function MyWastePage() {
     <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50">
        <div className="flex flex-row flex-wrap items-center justify-between gap-4">
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">My Waste Impact</h1>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                  <BarChart2 className="w-8 h-8 text-primary" />
+                  My Waste Impact
+                </h1>
                 <p className="text-muted-foreground text-sm md:text-base">
                     Track your patterns, reduce waste, spend less
                 </p>
