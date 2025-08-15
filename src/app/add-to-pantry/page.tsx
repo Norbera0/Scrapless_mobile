@@ -297,18 +297,14 @@ export default function AddToPantryPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
             <div className="max-w-4xl mx-auto">
-                <Button variant="ghost" onClick={() => router.push('/pantry')} className="mb-4 text-muted-foreground hover:text-foreground">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to pantry
-                </Button>
                 {selectedMethod === 'camera' && (
                     <div className="w-full">
                         <div className="text-center mb-4">
-                            <h2 className="text-base font-semibold text-slate-700 tracking-tight">Capture Your Groceries</h2>
-                            <p className="text-slate-500 text-sm">Point your camera at your items, or upload a photo of your receipt.</p>
+                            <h2 className="text-sm font-semibold text-slate-700 tracking-tight">Capture Your Groceries</h2>
+                            <p className="text-slate-500 text-xs">Point your camera at your items, or upload a photo of your receipt.</p>
                         </div>
 
-                        <div className="w-full aspect-[9/16] sm:aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
+                        <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
                             {photoPreview ? (
                                 <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" />
                             ) : hasCameraPermission === false ? (
