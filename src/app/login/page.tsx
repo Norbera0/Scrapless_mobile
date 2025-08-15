@@ -1,4 +1,3 @@
-
 'use client';
 
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -12,7 +11,7 @@ export default function LoginPage() {
         {/* Top Section with Image */}
         <div className="relative w-full h-[40vh] bg-[#003726] flex items-center justify-center overflow-hidden">
             <Image
-                src="/log_in_page/log_in_bg.png"
+                src="/log_in_page/log_in_bg_2.png"
                 alt="A bowl of healthy food"
                 layout="fill"
                 className="object-cover"
