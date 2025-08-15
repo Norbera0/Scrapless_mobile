@@ -278,10 +278,12 @@ export default function PantryPage() {
           <div className="flex bg-gray-200/70 p-1 rounded-xl mb-6">
             <Button
               onClick={() => setActiveTab('pantry')}
+              variant="ghost"
               className={cn(
                 'flex-1 justify-center rounded-lg transition-all duration-300',
+                'focus-visible:ring-0 focus-visible:ring-offset-0', // Disable focus ring
                 activeTab === 'pantry'
-                  ? 'bg-white text-gray-800 shadow'
+                  ? 'bg-white text-gray-800 shadow hover:bg-white'
                   : 'bg-transparent text-gray-500 hover:bg-gray-200'
               )}
             >
@@ -290,10 +292,12 @@ export default function PantryPage() {
             </Button>
             <Button
               onClick={() => setActiveTab('scraps')}
+              variant="ghost"
               className={cn(
                 'flex-1 justify-center rounded-lg transition-all duration-300',
+                'focus-visible:ring-0 focus-visible:ring-offset-0', // Disable focus ring
                 activeTab === 'scraps'
-                  ? 'bg-white text-gray-800 shadow'
+                  ? 'bg-white text-gray-800 shadow hover:bg-white'
                   : 'bg-transparent text-gray-500 hover:bg-gray-200'
               )}
             >
