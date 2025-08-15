@@ -58,6 +58,7 @@ export default function AddToPantryPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
+  const [waveform, setWaveform] = useState<number[]>(Array(NUM_WAVEFORM_BARS).fill(0));
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
