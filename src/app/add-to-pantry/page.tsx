@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const NUM_WAVEFORM_BARS = 30;
 
@@ -86,7 +87,7 @@ export default function AddToPantryPage() {
 
     const checkCameraPermission = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
@@ -297,14 +298,14 @@ export default function AddToPantryPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
             <div className="max-w-4xl mx-auto">
+                <Button variant="ghost" onClick={() => setSelectedMethod(null)} className="mb-2 -ml-4">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                </Button>
+
                 {selectedMethod === 'camera' && (
                     <div className="w-full">
-                        <div className="text-center mb-4">
-                            <h2 className="text-sm font-semibold text-slate-700 tracking-tight">Capture Your Groceries</h2>
-                            <p className="text-slate-500 text-xs">Point your camera at your items, or upload a photo of your receipt.</p>
-                        </div>
-
-                        <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
+                        <div className="w-full aspect-[9/16] sm:aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
                             {photoPreview ? (
                                 <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" />
                             ) : hasCameraPermission === false ? (
@@ -314,39 +315,54 @@ export default function AddToPantryPage() {
                                     <p className="text-red-300">Please allow camera access in your browser settings to use this feature.</p>
                                 </div>
                             ) : (
-                                <video 
-                                    ref={videoRef} 
-                                    className="w-full h-full object-cover"
-                                    autoPlay
-                                    playsInline
-                                    muted
-                                />
+                                <>
+                                    <video 
+                                        ref={videoRef} 
+                                        className="w-full h-full object-cover"
+                                        autoPlay
+                                        playsInline
+                                        muted
+                                    />
+                                    {!photoPreview && (
+                                        <div className="absolute inset-x-0 bottom-6 flex justify-center items-center gap-8">
+                                             <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="w-14 h-14 rounded-full bg-black/50 hover:bg-black/70"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={isLoading}
+                                            >
+                                                <Upload className="w-6 h-6 text-white" />
+                                            </Button>
+
+                                            <Button 
+                                                className="w-20 h-20 bg-white rounded-full p-2 border-4 border-white/50 hover:bg-gray-200"
+                                                onClick={capturePhoto}
+                                                disabled={!hasCameraPermission || isLoading}
+                                                aria-label="Capture photo"
+                                            >
+                                                <div className="w-full h-full bg-white rounded-full ring-2 ring-inset ring-black"></div>
+                                            </Button>
+                                            
+                                             <div className="w-14 h-14" />
+                                        </div>
+                                    )}
+                                </>
                             )}
                             <canvas ref={canvasRef} className="hidden" />
+                            <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                         </div>
                         
-                        <div className="mt-6">
-                            {photoPreview ? (
+                        <div className="mt-4">
+                            {photoPreview && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Button size="sm" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
-                                        {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ArrowRight className="w-4 h-4 mr-2" />}
+                                    <Button size="lg" onClick={() => photoDataUri && handleAnalyze('camera', photoDataUri)} disabled={isLoading}>
+                                        {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
                                         Analyze Photo
                                     </Button>
-                                    <Button size="sm" variant="outline" className="bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
+                                    <Button size="lg" variant="outline" className="bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
                                         Retake
                                     </Button>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={capturePhoto} disabled={!hasCameraPermission || isLoading}>
-                                        <Camera className="w-4 h-4 mr-2" />
-                                        Capture Photo
-                                    </Button>
-                                    <Button size="sm" variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                                        <Upload className="w-4 h-4 mr-2" />
-                                        Upload
-                                    </Button>
-                                    <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                                 </div>
                             )}
                         </div>
@@ -581,3 +597,5 @@ export default function AddToPantryPage() {
     </div>
   );
 }
+
+    
