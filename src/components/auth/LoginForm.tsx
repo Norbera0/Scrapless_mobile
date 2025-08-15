@@ -27,7 +27,7 @@ export function LoginForm() {
       await signInWithEmailAndPassword(auth, email, password);
       toast({ title: 'Login Successful', description: 'Welcome back!' });
       router.push('/dashboard');
-    } catch (error: any) => {
+    } catch (error: any) {
       console.error('Login failed:', error);
       toast({
         variant: 'destructive',
