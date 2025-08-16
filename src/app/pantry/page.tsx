@@ -693,7 +693,7 @@ export default function PantryPage() {
                 <Carousel opts={{ align: "start" }} className="w-full">
                 <CarouselContent className="-ml-4">
                     {recipes.map((recipe) => (
-                    <CarouselItem key={recipe.id} className="sm:basis-1/2 lg:basis-1/3 pl-4">
+                    <CarouselItem key={recipe.id} className="basis-4/5 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 pl-4">
                         <RecipeCard
                         recipe={recipe}
                         isSaved={savedRecipeIds.has(recipe.id)}
