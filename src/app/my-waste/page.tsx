@@ -65,7 +65,7 @@ const CustomizedXAxisTick = ({ x, y, payload }: any) => {
             <g transform={`translate(${x},${y})`}>
               <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12px" fontWeight="bold">
                 <tspan x="0" dy="0em">{line1}</tspan>
-                <tspan x="0" dy="1.2em">{line2}</tspan>
+                <tspan x="0" dy="1.4em">{line2}</tspan>
               </text>
             </g>
         );
@@ -430,7 +430,7 @@ export default function MyWastePage() {
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
                             <BarChart
                                 data={reasonCategoryData}
-                                margin={{ top: 20, right: 10, left: -20, bottom: 20 }}
+                                margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
                                 barCategoryGap="20%"
                             >
                                 <CartesianGrid vertical={false} />
@@ -442,6 +442,7 @@ export default function MyWastePage() {
                                     tick={<CustomizedXAxisTick />}
                                     interval={0}
                                 />
+                                <YAxis hide={true} />
                                 <Tooltip
                                     cursor={{ fill: 'hsl(var(--muted))' }}
                                     content={<ChartTooltipContent />}
