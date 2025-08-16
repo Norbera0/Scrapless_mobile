@@ -332,4 +332,18 @@ export const AnalyzeWastePatternsOutputSchema = z.object({
     preventionSolutions: z.array(z.string()).length(2).describe("A list of exactly two creative solutions to prevent future waste."),
 });
 export type AnalyzeWastePatternsOutput = z.infer<typeof AnalyzeWastePatternsOutputSchema>;
+
+// Disposal Tip Schemas
+export const GetDisposalTipInputSchema = z.object({
+  items: z.array(z.object({
+    name: z.string(),
+    estimatedAmount: z.string(),
+  })).describe("A list of wasted food items."),
+});
+export type GetDisposalTipInput = z.infer<typeof GetDisposalTipInputSchema>;
+
+export const GetDisposalTipOutputSchema = z.object({
+  tip: z.string().describe("A single, actionable disposal tip."),
+});
+export type GetDisposalTipOutput = z.infer<typeof GetDisposalTipOutputSchema>;
     

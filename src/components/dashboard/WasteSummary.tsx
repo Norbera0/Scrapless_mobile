@@ -6,20 +6,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { saveWasteLog } from '@/lib/data';
 import type { FoodItem, User, WasteLog } from '@/types';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, Lightbulb } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import { FOOD_DATA_MAP } from '@/lib/food-data';
+import { getDisposalTip } from '@/ai/flows/get-disposal-tip';
 
 export function WasteSummary() {
   const router = useRouter();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [isSaving, setIsSaving] = useState(false);
   const { items, photoDataUri, reset } = useWasteLogStore();
+  const [isFetchingTip, setIsFetchingTip] = useState(true);
+  const [disposalTip, setDisposalTip] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((fbUser) => {
@@ -28,6 +30,19 @@ export function WasteSummary() {
 
     if (items.length === 0) {
         router.replace('/log-waste?method=camera');
+    } else {
+        const fetchTip = async () => {
+            try {
+                const result = await getDisposalTip({ items });
+                setDisposalTip(result.tip);
+            } catch (error) {
+                console.error("Failed to get disposal tip:", error);
+                setDisposalTip("Properly segregate your waste. Check with your local barangay for composting programs.");
+            } finally {
+                setIsFetchingTip(false);
+            }
+        };
+        fetchTip();
     }
 
     return () => unsubscribe();
@@ -93,6 +108,24 @@ export function WasteSummary() {
                 ))}
             </ul>
         </div>
+
+        <Card>
+            <CardHeader className="flex flex-row items-center gap-2 pb-2">
+                <Lightbulb className="w-5 h-5 text-amber-500" />
+                <h3 className="font-semibold">Disposal Tip</h3>
+            </CardHeader>
+            <CardContent>
+                {isFetchingTip ? (
+                    <div className="flex items-center text-muted-foreground">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating a smart tip for you...
+                    </div>
+                ) : (
+                    <p className="text-sm">{disposalTip}</p>
+                )}
+            </CardContent>
+        </Card>
+
       </CardContent>
       <CardFooter>
         <Button onClick={handleFinish} className="w-full">
