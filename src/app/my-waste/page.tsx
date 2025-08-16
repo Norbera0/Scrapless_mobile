@@ -13,6 +13,7 @@ import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
 import { useWasteLogStore } from '@/stores/waste-log-store';
+import { useSavingsStore } from '@/stores/savings-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -52,6 +53,7 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 export default function MyWastePage() {
   const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
+  const { savingsEvents } = useSavingsStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
@@ -74,10 +76,11 @@ export default function MyWastePage() {
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
     const dailyData = dateRange.map(date => ({
-      date: format(date, 'E'), // Use abbreviated day name
+      date: format(date, 'E'),
       fullDate: date,
       totalPesoValue: 0,
       totalCarbonFootprint: 0,
+      totalSavings: 0,
     }));
 
     logs.forEach(log => {
@@ -91,14 +94,23 @@ export default function MyWastePage() {
       }
     });
 
+    savingsEvents.forEach(event => {
+        const eventDate = parseISO(event.date);
+        if (isAfter(eventDate, startDate) || format(eventDate, 'yyyy-MM-dd') === format(startDate, 'yyyy-MM-dd')) {
+            const dayData = dailyData.find(d => isSameDay(d.fullDate, eventDate));
+            if (dayData) {
+                dayData.totalSavings += event.amount;
+            }
+        }
+    });
+
     return dailyData;
-  }, [logs, timeframe]);
+  }, [logs, savingsEvents, timeframe]);
   
   const tickFormatter = (value: string, index: number) => {
     const dataLength = chartData.length;
-    // For mobile on long timeframes, show fewer labels to prevent overlap
     if (isMobile && dataLength > 14) {
-       if (index % 3 === 0) { // Show roughly every 3rd day
+       if (index % 3 === 0) {
            return value;
        }
        return "";
@@ -136,7 +148,6 @@ export default function MyWastePage() {
         setInsight(result);
     } catch(e) {
         console.error("Failed to analyze waste patterns", e);
-        // Optionally show a toast error
     } finally {
         setIsLoadingInsight(false);
     }
@@ -156,6 +167,10 @@ export default function MyWastePage() {
     totalCarbonFootprint: {
         label: "CO₂e (kg)",
         color: "hsl(var(--primary))",
+    },
+    totalSavings: {
+        label: "Savings (₱)",
+        color: "hsl(var(--chart-1))",
     }
   }
   
@@ -212,11 +227,9 @@ export default function MyWastePage() {
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                   <div className="flex-grow">
-                    <CardTitle className="text-base sm:text-lg">Waste Impact Over Time</CardTitle>
+                    <CardTitle className="text-base sm:text-lg">Waste & Savings Over Time</CardTitle>
                     <CardDescription className="text-xs sm:text-sm">
-                      {chartMetric === 'totalPesoValue'
-                        ? 'Daily peso value of wasted food'
-                        : 'Daily carbon footprint of wasted food'}
+                      Daily impact of your actions
                     </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
@@ -291,14 +304,24 @@ export default function MyWastePage() {
                         }
                       />
                       <Tooltip content={<ChartTooltipContent indicator="dot" />} />
+                      <Legend />
                       <Line
                         dataKey={chartMetric}
                         type="monotone"
                         stroke={`var(--color-${chartMetric})`}
                         strokeWidth={3}
                         dot={false}
-                        activeDot={{ r: 6, fill: `var(--color-${chartMetric})` }}
-                        fill={`var(--color-${chartMetric})`}
+                        activeDot={{ r: 6 }}
+                      />
+                       <Line
+                        name="Savings (₱)"
+                        dataKey="totalSavings"
+                        type="monotone"
+                        stroke="var(--color-totalSavings)"
+                        strokeWidth={3}
+                        dot={false}
+                        activeDot={{ r: 6 }}
+                        strokeDasharray="5 5"
                       />
                     </LineChart>
                   </ChartContainer>
