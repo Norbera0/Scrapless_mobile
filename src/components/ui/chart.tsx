@@ -168,6 +168,10 @@ const ChartTooltipContent = React.forwardRef<
       config,
       labelKey,
     ])
+    
+    const total = React.useMemo(() => {
+        return payload?.reduce((acc, item) => acc + (item.value as number || 0), 0)
+    }, [payload]);
 
     if (!active || !payload?.length) {
       return null
@@ -249,6 +253,15 @@ const ChartTooltipContent = React.forwardRef<
               </div>
             )
           })}
+           {payload.length > 1 && total !== undefined && (
+             <>
+                <div className="my-1 h-px w-full shrink-0 bg-border" />
+                <div className="flex w-full justify-between font-medium">
+                    <span>Total</span>
+                    <span className="font-mono tabular-nums">{total.toLocaleString()}</span>
+                </div>
+            </>
+          )}
         </div>
       </div>
     )
