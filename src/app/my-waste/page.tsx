@@ -215,7 +215,7 @@ export default function MyWastePage() {
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
           
-            <Card>
+            <Card className="hidden">
               <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-y-4">
                   <div className="flex-grow">
                       <CardTitle>Waste Impact Over Time</CardTitle>
