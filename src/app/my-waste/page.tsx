@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Tooltip, Pie, PieChart, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Pie, PieChart, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -181,7 +181,7 @@ export default function MyWastePage() {
 
   const chartConfig = {
     totalPesoValue: {
-      label: "Waste Value (₱)",
+      label: "Waste (₱)",
       color: "hsl(var(--destructive))",
     },
     totalCarbonFootprint: {
@@ -192,7 +192,7 @@ export default function MyWastePage() {
         label: "Savings (₱)",
         color: "hsl(var(--chart-1))",
     }
-  }
+  } satisfies ChartConfig
   
   const categoryChartConfig = {
       value: { label: 'Value' },
@@ -334,44 +334,53 @@ export default function MyWastePage() {
                   </div>
 
                   <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
-                    <LineChart accessibilityLayer data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                      <CartesianGrid vertical={false} />
-                      <XAxis
-                        dataKey="date"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        tickFormatter={tickFormatter}
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis
-                        tickFormatter={(value) =>
-                          chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`
-                        }
-                      />
-                      <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-                      <Legend />
-                      <Line
-                        dataKey={chartMetric}
-                        type="monotone"
-                        stroke={`var(--color-${chartMetric})`}
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={{ r: 6 }}
-                      />
-                      {chartMetric === 'totalPesoValue' && (
-                        <Line
-                          name="Savings (₱)"
-                          dataKey="totalSavings"
-                          type="monotone"
-                          stroke="var(--color-totalSavings)"
-                          strokeWidth={3}
-                          dot={false}
-                          activeDot={{ r: 6 }}
-                          strokeDasharray="5 5"
+                    <AreaChart accessibilityLayer data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                            dataKey="date"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={tickFormatter}
+                            interval="preserveStartEnd"
                         />
-                      )}
-                    </LineChart>
+                        <YAxis
+                            tickFormatter={(value) =>
+                            chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`
+                            }
+                        />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                        <defs>
+                            <linearGradient id="fillWaste" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={chartConfig[chartMetric].color} stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor={chartConfig[chartMetric].color} stopOpacity={0.1}/>
+                            </linearGradient>
+                            <linearGradient id="fillSavings" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={chartConfig.totalSavings.color} stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor={chartConfig.totalSavings.color} stopOpacity={0.1}/>
+                            </linearGradient>
+                        </defs>
+                        <Area
+                            dataKey={chartMetric}
+                            name={chartConfig[chartMetric].label}
+                            type="natural"
+                            fill="url(#fillWaste)"
+                            fillOpacity={0.4}
+                            stroke={chartConfig[chartMetric].color}
+                            stackId={chartMetric === 'totalPesoValue' ? "a" : chartMetric}
+                        />
+                        {chartMetric === 'totalPesoValue' && (
+                            <Area
+                                dataKey="totalSavings"
+                                name={chartConfig.totalSavings.label}
+                                type="natural"
+                                fill="url(#fillSavings)"
+                                fillOpacity={0.4}
+                                stroke={chartConfig.totalSavings.color}
+                                stackId="a"
+                            />
+                        )}
+                    </AreaChart>
                   </ChartContainer>
                 </CardContent>
               </Card>
