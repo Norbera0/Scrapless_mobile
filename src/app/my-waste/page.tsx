@@ -399,37 +399,35 @@ export default function MyWastePage() {
                 <CardContent className="pl-0">
                     {reasonCategoryData.length > 0 ? (
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={reasonCategoryData}
-                                    margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                                    barCategoryGap="20%"
-                                >
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickMargin={10}
-                                        tickFormatter={(value) => value.slice(0, 15) + (value.length > 15 ? '...' : '')}
+                            <BarChart
+                                data={reasonCategoryData}
+                                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                                barCategoryGap="80%"
+                            >
+                                <CartesianGrid vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickMargin={10}
+                                    tickFormatter={(value) => value.slice(0, 15) + (value.length > 15 ? '...' : '')}
+                                />
+                                <YAxis tickFormatter={(value) => `₱${value}`} />
+                                <Tooltip
+                                    cursor={{ fill: 'hsl(var(--muted))' }}
+                                    content={<ChartTooltipContent />}
+                                />
+                                <Legend />
+                                {allCategories.map((category, index) => (
+                                    <Bar 
+                                        key={category} 
+                                        dataKey={category} 
+                                        stackId="a" 
+                                        fill={COLORS[index % COLORS.length]} 
+                                        radius={[4, 4, 0, 0]}
                                     />
-                                    <YAxis tickFormatter={(value) => `₱${value}`} />
-                                    <Tooltip
-                                        cursor={{ fill: 'hsl(var(--muted))' }}
-                                        content={<ChartTooltipContent />}
-                                    />
-                                    <Legend />
-                                    {allCategories.map((category, index) => (
-                                        <Bar 
-                                            key={category} 
-                                            dataKey={category} 
-                                            stackId="a" 
-                                            fill={COLORS[index % COLORS.length]} 
-                                            radius={[4, 4, 0, 0]}
-                                        />
-                                    ))}
-                                </BarChart>
-                            </ResponsiveContainer>
+                                ))}
+                            </BarChart>
                         </ChartContainer>
                     ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
