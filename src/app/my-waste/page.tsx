@@ -78,7 +78,7 @@ export default function MyWastePage() {
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
     let dailyData = dateRange.map(date => ({
-      date: format(date, 'E'),
+      date: format(date, 'EEE'),
       fullDate: date,
       totalPesoValue: 0,
       totalCarbonFootprint: 0,
@@ -308,7 +308,7 @@ export default function MyWastePage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 px-2 sm:px-4 pb-4">
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
@@ -344,11 +344,7 @@ export default function MyWastePage() {
                             tickFormatter={tickFormatter}
                             interval="preserveStartEnd"
                         />
-                        <YAxis
-                            tickFormatter={(value) =>
-                            chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`
-                            }
-                        />
+
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                         <defs>
                             <linearGradient id="fillWaste" x1="0" y1="0" x2="0" y2="1">
