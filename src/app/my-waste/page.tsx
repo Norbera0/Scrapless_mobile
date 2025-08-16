@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -49,6 +48,36 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
   "Bought too much": ShoppingCart, 
   "Plans changed": MessageCircleQuestion,
   "Other reason": Lightbulb,
+};
+
+
+const CustomizedXAxisTick = ({ x, y, payload }: any) => {
+    if (!payload || !payload.value) {
+      return null;
+    }
+    const words = payload.value.split(' ');
+    
+    // Simple wrap for longer labels
+    if (words.length > 2) {
+        const line1 = words.slice(0, 2).join(' ');
+        const line2 = words.slice(2).join(' ');
+        return (
+            <g transform={`translate(${x},${y})`}>
+              <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12px" fontWeight="bold">
+                <tspan x="0" dy="0em">{line1}</tspan>
+                <tspan x="0" dy="1.2em">{line2}</tspan>
+              </text>
+            </g>
+        );
+    }
+  
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12px" fontWeight="bold">
+          {payload.value}
+        </text>
+      </g>
+    );
 };
 
 
@@ -401,8 +430,8 @@ export default function MyWastePage() {
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
                             <BarChart
                                 data={reasonCategoryData}
-                                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                                barCategoryGap="80%"
+                                margin={{ top: 5, right: 30, left: 0, bottom: 20 }}
+                                barCategoryGap="20%"
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
@@ -410,7 +439,8 @@ export default function MyWastePage() {
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={10}
-                                    tickFormatter={(value) => value.slice(0, 15) + (value.length > 15 ? '...' : '')}
+                                    tick={<CustomizedXAxisTick />}
+                                    interval={0}
                                 />
                                 <YAxis tickFormatter={(value) => `₱${value}`} />
                                 <Tooltip
@@ -486,3 +516,5 @@ export default function MyWastePage() {
     </div>
   );
 }
+
+    
