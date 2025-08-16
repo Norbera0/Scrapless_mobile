@@ -159,7 +159,7 @@ export default function MyWastePage() {
 
     const sortedData = Object.entries(reasonData)
         .map(([name, values]) => ({ name, ...values }))
-        .sort((a, b) => a.total - b.total); // Sort ascending for better chart display
+        .sort((a, b) => b.total - a.total); 
 
     return { reasonCategoryData: sortedData, allCategories: Array.from(categories) };
   }, [logs]);
@@ -398,23 +398,21 @@ export default function MyWastePage() {
                 </CardHeader>
                 <CardContent className="pl-0">
                     {reasonCategoryData.length > 0 ? (
-                        <ChartContainer config={reasonChartConfig} className="h-[300px] w-full">
+                        <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
-                                    layout="vertical"
                                     data={reasonCategoryData}
-                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                    margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
                                 >
-                                    <CartesianGrid horizontal={false} />
-                                    <XAxis type="number" hide />
-                                    <YAxis 
-                                        dataKey="name" 
-                                        type="category" 
-                                        tickLine={false} 
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis
+                                        dataKey="name"
+                                        tickLine={false}
                                         axisLine={false}
-                                        tick={{ fontSize: 12 }}
-                                        width={isMobile ? 80 : 120}
-                                        />
+                                        tickMargin={10}
+                                        tickFormatter={(value) => value.slice(0, 15) + (value.length > 15 ? '...' : '')}
+                                    />
+                                    <YAxis tickFormatter={(value) => `₱${value}`} />
                                     <Tooltip
                                         cursor={{ fill: 'hsl(var(--muted))' }}
                                         content={<ChartTooltipContent />}
@@ -426,7 +424,7 @@ export default function MyWastePage() {
                                             dataKey={category} 
                                             stackId="a" 
                                             fill={COLORS[index % COLORS.length]} 
-                                            radius={[0, 4, 4, 0]}
+                                            radius={[4, 4, 0, 0]}
                                         />
                                     ))}
                                 </BarChart>
