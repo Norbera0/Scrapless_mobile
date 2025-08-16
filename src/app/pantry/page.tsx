@@ -509,7 +509,11 @@ export default function PantryPage() {
 
   const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
     setIsAddMethodOpen(false);
-    router.push(`/add-to-pantry?method=${method}`);
+    if (activeTab === 'pantry') {
+      router.push(`/add-to-pantry?method=${method}`);
+    } else {
+      router.push(`/log-waste?method=${method}`);
+    }
   };
 
   if (!isClient) {
@@ -526,8 +530,17 @@ export default function PantryPage() {
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
                 <Button className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base">
-                  <span>Add Items</span>
-                  <Plus className="w-5 h-5 ml-2" />
+                  {activeTab === 'pantry' ? (
+                    <>
+                      <span>Add Items</span>
+                      <Plus className="w-5 h-5 ml-2" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Log Waste</span>
+                      <Trash className="w-5 h-5 ml-2" />
+                    </>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-primary">
