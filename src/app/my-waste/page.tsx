@@ -313,16 +313,18 @@ export default function MyWastePage() {
                         dot={false}
                         activeDot={{ r: 6 }}
                       />
-                       <Line
-                        name="Savings (₱)"
-                        dataKey="totalSavings"
-                        type="monotone"
-                        stroke="var(--color-totalSavings)"
-                        strokeWidth={3}
-                        dot={false}
-                        activeDot={{ r: 6 }}
-                        strokeDasharray="5 5"
-                      />
+                      {chartMetric === 'totalPesoValue' && (
+                        <Line
+                          name="Savings (₱)"
+                          dataKey="totalSavings"
+                          type="monotone"
+                          stroke="var(--color-totalSavings)"
+                          strokeWidth={3}
+                          dot={false}
+                          activeDot={{ r: 6 }}
+                          strokeDasharray="5 5"
+                        />
+                      )}
                     </LineChart>
                   </ChartContainer>
                 </CardContent>
