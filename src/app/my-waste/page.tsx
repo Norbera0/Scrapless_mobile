@@ -74,7 +74,7 @@ export default function MyWastePage() {
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
     const dailyData = dateRange.map(date => ({
-      date: format(date, 'MMM d'),
+      date: format(date, 'E'), // Use abbreviated day name
       fullDate: date,
       totalPesoValue: 0,
       totalCarbonFootprint: 0,
@@ -83,8 +83,7 @@ export default function MyWastePage() {
     logs.forEach(log => {
       const logDate = parseISO(log.date);
       if (isAfter(logDate, startDate) || format(logDate, 'yyyy-MM-dd') === format(startDate, 'yyyy-MM-dd')) {
-        const formattedDate = format(logDate, 'MMM d');
-        const dayData = dailyData.find(d => d.date === formattedDate);
+        const dayData = dailyData.find(d => isSameDay(d.fullDate, logDate));
         if (dayData) {
           dayData.totalPesoValue += log.totalPesoValue;
           dayData.totalCarbonFootprint += log.totalCarbonFootprint;
@@ -97,19 +96,14 @@ export default function MyWastePage() {
   
   const tickFormatter = (value: string, index: number) => {
     const dataLength = chartData.length;
-    if (dataLength <= 7) return value;
+    // For mobile on long timeframes, show fewer labels to prevent overlap
     if (isMobile && dataLength > 14) {
-       if (index === 0 || index === dataLength - 1 || index % 7 === 0) {
+       if (index % 3 === 0) { // Show roughly every 3rd day
            return value;
        }
        return "";
     }
-    const date = parseISO(chartData[index].fullDate.toISOString());
-    // Show full date for first, last, and roughly weekly intervals
-    if (index === 0 || index === dataLength - 1 || (index + 1) % Math.floor(dataLength / 4) === 0) {
-        return format(date, 'MMM d');
-    }
-    return ""; // Hide other labels to prevent crowding
+    return value;
   }
 
   const { categoryData, reasonData } = useMemo(() => {
@@ -214,58 +208,102 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
-          
-            <Card className="hidden">
-              <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-y-4">
+            
+              <Card>
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                   <div className="flex-grow">
-                      <CardTitle>Waste Impact Over Time</CardTitle>
-                      <CardDescription>
-                          {chartMetric === 'totalPesoValue' ? 'Daily peso value of wasted food' : 'Daily carbon footprint of wasted food'}
-                      </CardDescription>
+                    <CardTitle className="text-base sm:text-lg">Waste Impact Over Time</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      {chartMetric === 'totalPesoValue'
+                        ? 'Daily peso value of wasted food'
+                        : 'Daily carbon footprint of wasted food'}
+                    </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                      <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
-                          <Button
-                              size="sm"
-                              onClick={() => setChartMetric('totalPesoValue')}
-                              className={cn('h-auto px-2 py-1 text-xs', chartMetric === 'totalPesoValue' ? 'bg-background text-destructive shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-                          >
-                              ₱ Value
-                          </Button>
-                          <Button
-                              size="sm"
-                              onClick={() => setChartMetric('totalCarbonFootprint')}
-                              className={cn('h-auto px-2 py-1 text-xs', chartMetric === 'totalCarbonFootprint' ? 'bg-background text-primary shadow' : 'bg-transparent text-muted-foreground hover:bg-background/50')}
-                          >
-                              CO₂e
-                          </Button>
-                      </div>
+                    <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
+                      <Button
+                        size="sm"
+                        onClick={() => setChartMetric('totalPesoValue')}
+                        className={cn(
+                          'h-auto px-2 py-1 text-xs',
+                          chartMetric === 'totalPesoValue'
+                            ? 'bg-background text-destructive shadow'
+                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                        )}
+                      >
+                        ₱ Value
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setChartMetric('totalCarbonFootprint')}
+                        className={cn(
+                          'h-auto px-2 py-1 text-xs',
+                          chartMetric === 'totalCarbonFootprint'
+                            ? 'bg-background text-primary shadow'
+                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                        )}
+                      >
+                        CO₂e
+                      </Button>
+                    </div>
                   </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                  <div className='flex gap-2'>
-                       <Button size="sm" variant={timeframe === '7d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('7d')}>7d</Button>
-                       <Button size="sm" variant={timeframe === '15d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('15d')}>15d</Button>
-                       <Button size="sm" variant={timeframe === '30d' ? 'destructive' : 'outline'} onClick={() => setTimeframe('30d')}>30d</Button>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant={timeframe === '7d' ? 'destructive' : 'outline'}
+                      onClick={() => setTimeframe('7d')}
+                    >
+                      7d
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={timeframe === '15d' ? 'destructive' : 'outline'}
+                      onClick={() => setTimeframe('15d')}
+                    >
+                      15d
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={timeframe === '30d' ? 'destructive' : 'outline'}
+                      onClick={() => setTimeframe('30d')}
+                    >
+                      30d
+                    </Button>
                   </div>
-                  <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                      <LineChart accessibilityLayer data={chartData}>
-                          <CartesianGrid vertical={false} />
-                          <XAxis 
-                              dataKey="date" 
-                              tickLine={false} 
-                              tickMargin={10} 
-                              axisLine={false} 
-                              tickFormatter={tickFormatter}
-                              interval="preserveStartEnd"
-                          />
-                          <YAxis tickFormatter={(value) => chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`} />
-                          <Tooltip content={<ChartTooltipContent indicator="dot" />} />
-                          <Line dataKey={chartMetric} type="monotone" stroke={`var(--color-${chartMetric})`} strokeWidth={3} dot={false} activeDot={{r: 6, fill: `var(--color-${chartMetric})`}} fill={`var(--color-${chartMetric})`} />
-                      </LineChart>
+
+                  <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
+                    <LineChart accessibilityLayer data={chartData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                        tickFormatter={tickFormatter}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          chartMetric === 'totalPesoValue' ? `₱${value}` : `${value}kg`
+                        }
+                      />
+                      <Tooltip content={<ChartTooltipContent indicator="dot" />} />
+                      <Line
+                        dataKey={chartMetric}
+                        type="monotone"
+                        stroke={`var(--color-${chartMetric})`}
+                        strokeWidth={3}
+                        dot={false}
+                        activeDot={{ r: 6, fill: `var(--color-${chartMetric})` }}
+                        fill={`var(--color-${chartMetric})`}
+                      />
+                    </LineChart>
                   </ChartContainer>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="flex flex-col">
