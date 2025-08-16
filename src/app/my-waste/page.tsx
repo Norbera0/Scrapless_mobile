@@ -26,6 +26,7 @@ import { Separator } from '@/components/ui/separator';
 
 type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
+type ChartView = 'daily' | 'aggregate';
 
 const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899'];
 
@@ -56,6 +57,7 @@ export default function MyWastePage() {
   const { savingsEvents } = useSavingsStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
+  const [viewType, setViewType] = useState<ChartView>('daily');
   const [isLoadingInsight, setIsLoadingInsight] = useState(false);
   const { insight, setInsight } = useWasteInsightStore();
   const isMobile = useIsMobile();
@@ -75,7 +77,7 @@ export default function MyWastePage() {
     const endDate = endOfDay(new Date());
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
-    const dailyData = dateRange.map(date => ({
+    let dailyData = dateRange.map(date => ({
       date: format(date, 'E'),
       fullDate: date,
       totalPesoValue: 0,
@@ -103,9 +105,27 @@ export default function MyWastePage() {
             }
         }
     });
+    
+    if (viewType === 'aggregate') {
+        let cumulativeWasteValue = 0;
+        let cumulativeCO2 = 0;
+        let cumulativeSavings = 0;
+        
+        return dailyData.map(d => {
+            cumulativeWasteValue += d.totalPesoValue;
+            cumulativeCO2 += d.totalCarbonFootprint;
+            cumulativeSavings += d.totalSavings;
+            return {
+                ...d,
+                totalPesoValue: cumulativeWasteValue,
+                totalCarbonFootprint: cumulativeCO2,
+                totalSavings: cumulativeSavings,
+            }
+        });
+    }
 
     return dailyData;
-  }, [logs, savingsEvents, timeframe]);
+  }, [logs, savingsEvents, timeframe, viewType]);
   
   const tickFormatter = (value: string, index: number) => {
     const dataLength = chartData.length;
@@ -232,7 +252,33 @@ export default function MyWastePage() {
                       Daily impact of your actions
                     </CardDescription>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
+                      <Button
+                        size="sm"
+                        onClick={() => setViewType('daily')}
+                        className={cn(
+                          'h-auto px-2 py-1 text-xs',
+                          viewType === 'daily'
+                            ? 'bg-background text-foreground shadow'
+                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                        )}
+                      >
+                        Daily
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setViewType('aggregate')}
+                        className={cn(
+                          'h-auto px-2 py-1 text-xs',
+                          viewType === 'aggregate'
+                            ? 'bg-background text-foreground shadow'
+                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                        )}
+                      >
+                        Aggregate
+                      </Button>
+                    </div>
                     <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
                       <Button
                         size="sm"
