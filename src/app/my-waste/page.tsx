@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Pie, PieChart, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,8 @@ type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
 type ChartView = 'daily' | 'aggregate';
 
-const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899'];
+const COLORS = ['#16a34a', '#f59e0b', '#3b82f6', '#8b5cf6', '#dc2626', '#ec4899', '#f472b6', '#6366f1'];
+
 
 const getCategory = (itemName: string): string => {
     const lowerItem = itemName.toLowerCase();
@@ -137,29 +138,33 @@ export default function MyWastePage() {
     }
     return value;
   }
-
-  const { categoryData, reasonData } = useMemo(() => {
-    const categoryTotals: Record<string, number> = {};
-    const reasonTotals: Record<string, number> = {};
-    let totalWasteValue = 0;
+  
+  const { reasonCategoryData, allCategories } = useMemo(() => {
+    const reasonData: Record<string, Record<string, number> & { total: number }> = {};
+    const categories = new Set<string>();
 
     logs.forEach(log => {
-        totalWasteValue += log.totalPesoValue;
-        if(log.sessionWasteReason) {
-            reasonTotals[log.sessionWasteReason] = (reasonTotals[log.sessionWasteReason] || 0) + log.totalPesoValue;
+        const reason = log.sessionWasteReason || 'Other';
+        if (!reasonData[reason]) {
+            reasonData[reason] = { total: 0 };
         }
+        
         log.items.forEach(item => {
             const category = getCategory(item.name);
-            categoryTotals[category] = (categoryTotals[category] || 0) + item.pesoValue;
+            categories.add(category);
+            reasonData[reason][category] = (reasonData[reason][category] || 0) + item.pesoValue;
+            reasonData[reason].total += item.pesoValue;
         });
     });
 
-    const categoryData = Object.entries(categoryTotals).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
-    const reasonData = Object.entries(reasonTotals).map(([name, value, percentage]) => ({ name, value, percentage: totalWasteValue > 0 ? ((value / totalWasteValue) * 100).toFixed(0) : 0 })).sort((a,b) => b.value - a.value);
-    
-    return { categoryData, reasonData };
+    const sortedData = Object.entries(reasonData)
+        .map(([name, values]) => ({ name, ...values }))
+        .sort((a, b) => a.total - b.total); // Sort ascending for better chart display
+
+    return { reasonCategoryData: sortedData, allCategories: Array.from(categories) };
   }, [logs]);
-  
+
+
   const handleFetchPattern = async () => {
     setIsLoadingInsight(true);
     setInsight(null);
@@ -194,10 +199,12 @@ export default function MyWastePage() {
     }
   } satisfies ChartConfig
   
-  const categoryChartConfig = {
-      value: { label: 'Value' },
-      ...categoryData.reduce((acc, cur) => ({...acc, [cur.name]: { label: cur.name, color: COLORS[categoryData.indexOf(cur) % COLORS.length] } }), {}),
-  }
+  const reasonChartConfig = {
+      ...allCategories.reduce((acc, cat, i) => ({
+          ...acc,
+          [cat]: { label: cat, color: COLORS[i % COLORS.length] }
+      }), {}),
+  } satisfies ChartConfig
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50">
@@ -359,7 +366,7 @@ export default function MyWastePage() {
                         <Area
                             dataKey={chartMetric}
                             name={chartConfig[chartMetric].label}
-                            type="natural"
+                            type="monotone"
                             fill="url(#fillWaste)"
                             fillOpacity={0.4}
                             stroke={chartConfig[chartMetric].color}
@@ -369,7 +376,7 @@ export default function MyWastePage() {
                             <Area
                                 dataKey="totalSavings"
                                 name={chartConfig.totalSavings.label}
-                                type="natural"
+                                type="monotone"
                                 fill="url(#fillSavings)"
                                 fillOpacity={0.4}
                                 stroke={chartConfig.totalSavings.color}
@@ -381,64 +388,54 @@ export default function MyWastePage() {
                 </CardContent>
               </Card>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="flex flex-col">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <BarChart2 className="h-5 w-5" />
-                            Waste by Food Category
-                        </CardTitle>
-                        <CardDescription>What you're wasting most</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex items-center justify-center">
-                        <ChartContainer config={categoryChartConfig} className="h-[250px] w-full">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Brain className="h-5 w-5" />
+                        Why Food Gets Wasted
+                    </CardTitle>
+                    <CardDescription>Root causes and the types of food involved.</CardDescription>
+                </CardHeader>
+                <CardContent className="pl-0">
+                    {reasonCategoryData.length > 0 ? (
+                        <ChartContainer config={reasonChartConfig} className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Tooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
-                                    <Pie data={categoryData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={isMobile ? 60 : 80} fill="#8884d8" label={false} labelLine={false}>
-                                        {categoryData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Legend
-                                      layout={isMobile ? 'horizontal' : 'vertical'}
-                                      verticalAlign={isMobile ? 'bottom' : 'middle'}
-                                      align={isMobile ? 'center' : 'right'}
-                                      iconSize={10}
-                                      wrapperStyle={isMobile ? { fontSize: '12px' } : { paddingLeft: '20px', fontSize: '14px' }}
+                                <BarChart
+                                    layout="vertical"
+                                    data={reasonCategoryData}
+                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                >
+                                    <CartesianGrid horizontal={false} />
+                                    <XAxis type="number" hide />
+                                    <YAxis 
+                                        dataKey="name" 
+                                        type="category" 
+                                        tickLine={false} 
+                                        axisLine={false}
+                                        tick={{ fontSize: 12 }}
+                                        width={isMobile ? 80 : 120}
+                                        />
+                                    <Tooltip
+                                        cursor={{ fill: 'hsl(var(--muted))' }}
+                                        content={<ChartTooltipContent />}
                                     />
-                                </PieChart>
+                                    <Legend />
+                                    {allCategories.map((category, index) => (
+                                        <Bar 
+                                            key={category} 
+                                            dataKey={category} 
+                                            stackId="a" 
+                                            fill={COLORS[index % COLORS.length]} 
+                                            radius={[0, 4, 4, 0]}
+                                        />
+                                    ))}
+                                </BarChart>
                             </ResponsiveContainer>
                         </ChartContainer>
-                    </CardContent>
-                </Card>
+                    ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
+                </CardContent>
+            </Card>
 
-                  <Card className="flex flex-col min-h-[400px]">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Brain className="h-5 w-5" />
-                            Why Food Gets Wasted
-                          </CardTitle>
-                          <CardDescription>Root cause breakdown</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-2 flex-1">
-                          {reasonData.length > 0 ? reasonData.map(reason => {
-                               const Icon = reasonIconMap[reason.name] || Lightbulb;
-                               return (
-                                  <div key={reason.name} className="flex items-center text-sm py-2 border-b last:border-b-0">
-                                      <Icon className="h-5 w-5 mr-3 text-muted-foreground" />
-                                      <span className="flex-1">{reason.name}</span>
-                                      <div className='text-right'>
-                                          <span className='font-semibold text-destructive'>₱{reason.value.toFixed(0)}</span>
-                                          <p className='text-xs text-muted-foreground'>{reason.percentage}% of waste</p>
-                                      </div>
-                                  </div>
-                               );
-                          }) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
-                      </CardContent>
-                  </Card>
-              </div>
-            
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div>
