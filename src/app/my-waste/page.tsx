@@ -275,7 +275,7 @@ export default function MyWastePage() {
                   </div>
 
                   <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
-                    <LineChart accessibilityLayer data={chartData}>
+                    <LineChart accessibilityLayer data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                       <CartesianGrid vertical={false} />
                       <XAxis
                         dataKey="date"
