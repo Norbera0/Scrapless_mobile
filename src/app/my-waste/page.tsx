@@ -430,7 +430,7 @@ export default function MyWastePage() {
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
                             <BarChart
                                 data={reasonCategoryData}
-                                margin={{ top: 5, right: 30, left: 0, bottom: 20 }}
+                                margin={{ top: 20, right: 10, left: -20, bottom: 20 }}
                                 barCategoryGap="20%"
                             >
                                 <CartesianGrid vertical={false} />
@@ -442,12 +442,11 @@ export default function MyWastePage() {
                                     tick={<CustomizedXAxisTick />}
                                     interval={0}
                                 />
-                                <YAxis tickFormatter={(value) => `₱${value}`} />
                                 <Tooltip
                                     cursor={{ fill: 'hsl(var(--muted))' }}
                                     content={<ChartTooltipContent />}
                                 />
-                                <Legend />
+                                <Legend verticalAlign="top" />
                                 {allCategories.map((category, index) => (
                                     <Bar 
                                         key={category} 
@@ -516,5 +515,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
-    
