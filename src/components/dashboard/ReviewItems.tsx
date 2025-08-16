@@ -40,9 +40,8 @@ const safelyResetThenNavigate = async (
     router: NextRouter,
     path: string
 ) => {
-    resetFn();
-    // Use a small timeout to let the state reset render and avoid race conditions
-    await new Promise((res) => setTimeout(res, 20));
+    // We don't reset the store immediately, so the summary page can access it.
+    // The summary page or the next action will be responsible for the reset.
     router.replace(path);
 };
 
@@ -127,24 +126,10 @@ export function ReviewItems() {
         logData.photoDataUri = photoDataUri;
       }
       
-      try {
-        await Promise.race([
-          saveWasteLog(logData),
-          new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000))
-        ]);
-      } catch (err) {
-        console.error('Firestore ACK timeout – proceeding optimistically', err);
-      }
+      await saveWasteLog(logData);
 
-      toast({
-          title: 'Success!',
-          description: 'Your waste log has been saved.',
-          duration: 3000,
-      });
-      
-      setTimeout(() => {
-        safelyResetThenNavigate(reset, router, "/my-waste");
-      }, 2500);
+      // Don't show toast, navigate to summary page instead
+      router.push('/summary');
       
     } catch (error) {
       console.error('Failed to save waste log items:', error);
@@ -153,9 +138,9 @@ export function ReviewItems() {
         description: 'Failed to save items. Please try again.',
         variant: 'destructive',
       });
-    } finally {
-        setIsSaving(false);
+      setIsSaving(false);
     }
+    // No setIsSaving(false) here because we navigate away
   };
   
   if (items.length === 0 && !isSaving) {

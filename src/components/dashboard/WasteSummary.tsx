@@ -55,51 +55,15 @@ export function WasteSummary() {
     );
   }, [items]);
 
-  const handleSaveLog = async () => {
-    if (!user) {
-      toast({ variant: 'destructive', title: 'Error', description: 'You must be logged in to save.' });
-      return;
-    }
-    setIsSaving(true);
-    
-    const finalItems: FoodItem[] = items.map(item => {
-        const { peso, co2e } = getImpact(item.name);
-        return {
-            ...item,
-            pesoValue: peso,
-            carbonFootprint: co2e,
-        }
-    });
-
-    const logData: Omit<WasteLog, 'id'> = {
-      date: new Date().toISOString(),
-      userId: user.uid,
-      items: finalItems,
-      totalPesoValue: impactData.totalPesoValue,
-      totalCarbonFootprint: impactData.totalCarbonFootprint,
-    };
-
-    if (photoDataUri) {
-      logData.photoDataUri = photoDataUri;
-    }
-    
-    try {
-        await saveWasteLog(user.uid, logData);
-        toast({ title: 'Log saved!', description: 'Your food waste has been successfully logged.' });
-        reset(); // Clear the store for the next log
-        router.push('/dashboard');
-    } catch(e) {
-        console.error(e);
-        toast({ variant: 'destructive', title: 'Save failed', description: 'Could not save your log. Please try again.' });
-    } finally {
-        setIsSaving(false);
-    }
+  const handleFinish = () => {
+    reset();
+    router.push('/my-waste');
   }
 
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Your Impact</CardTitle>
+        <CardTitle>Log Saved!</CardTitle>
         <CardDescription>Based on the items you logged, here is the estimated impact.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -131,9 +95,8 @@ export function WasteSummary() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleSaveLog} className="w-full" disabled={isSaving}>
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            {isSaving ? "Saving..." : "Save Log & Finish"}
+        <Button onClick={handleFinish} className="w-full">
+            Done
         </Button>
       </CardFooter>
     </Card>
