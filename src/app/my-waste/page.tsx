@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps } from 'recharts';
+import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps, RadialBarChart, RadialBar, PolarGrid, Label } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -250,6 +250,15 @@ export default function MyWastePage() {
           [cat]: { label: cat, color: COLORS[i % COLORS.length] }
       }), {}),
   } satisfies ChartConfig
+  
+  const offsetChartData = [{
+    name: 'data',
+    savings: totalSavings,
+    waste: totalWaste,
+    fill: 'var(--color-savings)'
+  }];
+
+  const netOffset = totalSavings - totalWaste;
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
@@ -435,25 +444,47 @@ export default function MyWastePage() {
 
             <Card>
                 <CardHeader className="pb-2 pt-4">
-                    <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset</CardTitle>
+                    <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center gap-2 text-center pb-4">
-                    <div className="text-center">
-                        <p className="text-base font-semibold text-gray-700 flex items-center justify-center gap-1"><Gem className="w-3 h-3" /> ₱{totalSavings.toFixed(2)}</p>
-                        <p className="text-xs text-gray-500">Savings</p>
-                    </div>
-                    <p className="text-base font-semibold text-gray-500">-</p>
-                    <div className="text-center">
-                        <p className="text-base font-semibold text-gray-700 flex items-center justify-center gap-1"><Trash className="w-3 h-3" /> ₱{totalWaste.toFixed(2)}</p>
-                        <p className="text-xs text-gray-500">Waste</p>
-                    </div>
-                    <p className="text-base font-semibold text-gray-500">=</p>
-                    <div className="text-center">
-                        <p className={cn("text-lg font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
-                           ₱{(totalSavings - totalWaste).toFixed(2)}
-                        </p>
-                        <p className="text-xs text-gray-500">Net Offset</p>
-                    </div>
+                <CardContent className="flex items-center justify-center gap-2 text-center pb-4 h-[150px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                         <RadialBarChart
+                            data={offsetChartData}
+                            startAngle={180}
+                            endAngle={0}
+                            innerRadius="70%"
+                            outerRadius="100%"
+                            barSize={30}
+                         >
+                            <PolarGrid gridType='polygon' polarRadius={[30, 40, 50, 60, 70]} stroke="none"/>
+                            <RadialBar dataKey="savings" background={{ fill: 'hsl(var(--destructive)/0.2)' }} cornerRadius={10} className="fill-green-500" />
+                             <Label 
+                                content={({ viewBox }) => {
+                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                        return (
+                                        <text x={viewBox.cx} y={viewBox.cy! - 10} textAnchor="middle">
+                                            <tspan
+                                                x={viewBox.cx}
+                                                y={viewBox.cy}
+                                                className={cn("text-2xl font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                            >
+                                            ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                            </tspan>
+                                             <tspan
+                                                x={viewBox.cx}
+                                                y={(viewBox.cy || 0) + 20}
+                                                className="fill-muted-foreground text-sm"
+                                            >
+                                            Net Offset
+                                            </tspan>
+                                        </text>
+                                        )
+                                    }
+                                    return null;
+                                }}
+                            />
+                         </RadialBarChart>
+                    </ResponsiveContainer>
                 </CardContent>
             </Card>
 
