@@ -314,7 +314,73 @@ export default function MyWastePage() {
           </div>
         ) : (
           <div className="grid gap-4">
-              <TrendsKPI logs={logs} />
+              <div className="grid grid-cols-2 gap-4">
+                <TrendsKPI logs={logs} />
+                 <Card>
+                    <CardHeader className="p-2 pt-2 pb-0">
+                        <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-1 items-center justify-center p-0">
+                        <ChartContainer
+                            config={offsetChartConfig}
+                            className="mx-auto aspect-square w-full max-w-[200px]"
+                        >
+                            <RadialBarChart
+                                data={offsetChartData}
+                                startAngle={180}
+                                endAngle={0}
+                                innerRadius={50}
+                                outerRadius={80}
+                            >
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent hideLabel />}
+                            />
+                            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                                <Label
+                                    content={({ viewBox }) => {
+                                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                            return (
+                                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) - 8}
+                                                    className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                                >
+                                                    ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                                                </tspan>
+                                                <tspan
+                                                    x={viewBox.cx}
+                                                    y={(viewBox.cy || 0) + 10}
+                                                    className="fill-muted-foreground text-xs"
+                                                >
+                                                    Net Offset
+                                                </tspan>
+                                            </text>
+                                            )
+                                        }
+                                    }}
+                                />
+                            </PolarRadiusAxis>
+                            <RadialBar
+                                dataKey="savings"
+                                stackId="a"
+                                cornerRadius={5}
+                                fill="var(--color-savings)"
+                                className="stroke-transparent stroke-2"
+                            />
+                            <RadialBar
+                                dataKey="waste"
+                                fill="var(--color-waste)"
+                                stackId="a"
+                                cornerRadius={5}
+                                className="stroke-transparent stroke-2"
+                            />
+                            </RadialBarChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+              </div>
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
@@ -453,73 +519,7 @@ export default function MyWastePage() {
                 </CardContent>
               </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-                <Card>
-                    <CardHeader className="p-2 pt-2 pb-0">
-                        <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-1 items-center p-0">
-                        <ChartContainer
-                            config={offsetChartConfig}
-                            className="mx-auto aspect-square w-full max-w-[200px]"
-                        >
-                            <RadialBarChart
-                                data={offsetChartData}
-                                startAngle={180}
-                                endAngle={0}
-                                innerRadius={50}
-                                outerRadius={80}
-                            >
-                            <ChartTooltip
-                                cursor={false}
-                                content={<ChartTooltipContent hideLabel />}
-                            />
-                            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                                <Label
-                                    content={({ viewBox }) => {
-                                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                            return (
-                                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) - 8}
-                                                    className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
-                                                >
-                                                    ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                                                </tspan>
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) + 10}
-                                                    className="fill-muted-foreground text-xs"
-                                                >
-                                                    Net Offset
-                                                </tspan>
-                                            </text>
-                                            )
-                                        }
-                                    }}
-                                />
-                            </PolarRadiusAxis>
-                            <RadialBar
-                                dataKey="savings"
-                                stackId="a"
-                                cornerRadius={5}
-                                fill="var(--color-savings)"
-                                className="stroke-transparent stroke-2"
-                            />
-                            <RadialBar
-                                dataKey="waste"
-                                fill="var(--color-waste)"
-                                stackId="a"
-                                cornerRadius={5}
-                                className="stroke-transparent stroke-2"
-                            />
-                            </RadialBarChart>
-                        </ChartContainer>
-                    </CardContent>
-                </Card>
-                <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
-            </div>
+            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
 
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
