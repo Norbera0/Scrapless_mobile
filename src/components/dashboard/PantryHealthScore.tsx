@@ -98,34 +98,22 @@ export function PantryHealthScore({ wasteLogs, archivedItems }: PantryHealthScor
             </CardHeader>
             <CardContent className="p-4 pt-0">
                 <Progress segments={healthData.segments} className="h-3 mb-3 rounded-full" />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#10B981] rounded-full"></div>
-                        <div>
-                            <p className="font-bold text-base text-gray-800">{healthData.fresh}</p>
-                            <p className="text-gray-500">Fresh</p>
-                        </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-1 text-xs">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-[#10B981] rounded-full flex-shrink-0"></div>
+                        <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.fresh}</span> Fresh</p>
                     </div>
-                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#3B82F6] rounded-full"></div>
-                        <div>
-                            <p className="font-bold text-base text-gray-800">{healthData.used}</p>
-                            <p className="text-gray-500">Used</p>
-                        </div>
+                     <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-[#3B82F6] rounded-full flex-shrink-0"></div>
+                        <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.used}</span> Used</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-[#F59E0B] rounded-full"></div>
-                         <div>
-                            <p className="font-bold text-base text-gray-800">{healthData.expiring}</p>
-                            <p className="text-gray-500">Expiring</p>
-                        </div>
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 bg-[#F59E0B] rounded-full flex-shrink-0"></div>
+                        <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.expiring}</span> Expiring</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                       <div className="w-2 h-2 bg-[#EF4444] rounded-full"></div>
-                         <div>
-                            <p className="font-bold text-base text-gray-800">{healthData.expired}</p>
-                            <p className="text-gray-500">Expired</p>
-                        </div>
+                    <div className="flex items-center gap-1.5">
+                       <div className="w-2 h-2 bg-[#EF4444] rounded-full flex-shrink-0"></div>
+                       <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.expired}</span> Expired</p>
                     </div>
                 </div>
             </CardContent>
