@@ -7,7 +7,7 @@ import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem, ArrowRight } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -18,9 +18,6 @@ import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
-import { analyzeWastePatterns } from '../actions';
-import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
-import { useWasteInsightStore } from '@/stores/waste-insight-store';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { PantryHealthScore } from '@/components/dashboard/PantryHealthScore';
@@ -91,8 +88,6 @@ export default function MyWastePage() {
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
   const [viewType, setViewType] = useState<ChartView>('daily');
-  const [isLoadingInsight, setIsLoadingInsight] = useState(false);
-  const { insight, setInsight } = useWasteInsightStore();
   const isMobile = useIsMobile();
   const [isLogMethodOpen, setIsLogMethodOpen] = useState(false);
 
@@ -210,19 +205,6 @@ export default function MyWastePage() {
     return { reasonCategoryData: sortedData, allCategories: Array.from(categories) };
   }, [logs]);
 
-
-  const handleFetchPattern = async () => {
-    setIsLoadingInsight(true);
-    setInsight(null);
-    try {
-        const result = await analyzeWastePatterns({ wasteLogs: logs });
-        setInsight(result);
-    } catch(e) {
-        console.error("Failed to analyze waste patterns", e);
-    } finally {
-        setIsLoadingInsight(false);
-    }
-  }
 
   const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
     setIsLogMethodOpen(false);
@@ -514,8 +496,8 @@ export default function MyWastePage() {
                 </CardContent>
               </Card>
 
-            <WeeklyPerformancePanel />
-
+            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
+            
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -558,54 +540,23 @@ export default function MyWastePage() {
                 </CardContent>
             </Card>
 
-            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
+            <WeeklyPerformancePanel />
 
             <Card>
-              <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                        <Lightbulb className="h-5 w-5" />
-                        Waste Pattern
-                    </CardTitle>
-                    <CardDescription className="text-xs">Smart patterns & predictions from your data</CardDescription>
-                  </div>
-                   {insight && (
-                        <Button variant="outline" size="sm" onClick={handleFetchPattern} disabled={isLoadingInsight}>
-                           <RefreshCw className="mr-2 h-4 w-4" />
-                           Refresh
-                       </Button>
-                   )}
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Lightbulb className="h-5 w-5 text-amber-500" />
+                  Want deeper insights?
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  See a full AI analysis of your patterns and get personalized solutions.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3 p-4 pt-0">
-                  {isLoadingInsight ? (
-                     <div className="flex justify-center items-center h-24">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                     </div>
-                  ) : insight ? (
-                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
-                        <div className="border-l-4 border-amber-500 bg-amber-50 p-3 rounded-r-lg">
-                           <h3 className="font-semibold text-amber-800 text-sm">Hidden Pattern Detected</h3>
-                           <p className="text-xs text-amber-700">{insight.hiddenPattern}</p>
-                        </div>
-                         <div className="border-l-4 border-blue-500 bg-blue-50 p-3 rounded-r-lg">
-                           <h3 className="font-semibold text-blue-800 text-sm">Smart Disposal Tip</h3>
-                           <p className="text-xs text-blue-700">{insight.disposalTip}</p>
-                        </div>
-                         <div className="space-y-2">
-                             <h3 className="font-semibold text-green-800 text-sm">Prevention Solutions</h3>
-                             {insight.preventionSolutions.map((solution, i) => (
-                                <p key={i} className="text-xs text-green-700 p-2 bg-green-50 border border-green-200 rounded-lg">
-                                    {solution}
-                                </p>
-                             ))}
-                         </div>
-                     </motion.div>
-                  ) : (
-                     <Button className="w-full" onClick={handleFetchPattern} disabled={isLoadingInsight}>
-                        <Brain className="mr-2 h-4 w-4" />
-                        Reveal Waste Pattern
-                     </Button>
-                  )}
+              <CardContent>
+                <Button className="w-full" onClick={() => router.push('/kitchen-coach')}>
+                  Go to Kitchen Coach
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </CardContent>
             </Card>
 
