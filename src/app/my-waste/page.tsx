@@ -314,7 +314,7 @@ export default function MyWastePage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
                  <div>
                     <p className="text-xs font-medium text-center text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
                     <ChartContainer
@@ -376,8 +376,6 @@ export default function MyWastePage() {
                 </div>
                 <TrendsKPI logs={logs} />
             </div>
-
-            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
@@ -564,6 +562,8 @@ export default function MyWastePage() {
                   )}
               </CardContent>
             </Card>
+
+            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
           </div>
       )}
     </div>
