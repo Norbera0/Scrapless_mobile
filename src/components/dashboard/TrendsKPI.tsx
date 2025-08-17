@@ -110,10 +110,10 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
     if (isMobile) {
         return (
-            <Carousel opts={{ align: "start" }} className="w-full">
+            <Carousel opts={{ align: "start", dragFree: false }} className="w-full">
                 <CarouselContent className="-ml-2">
                     {kpiCards.map((card, index) => (
-                        <CarouselItem key={index} className="basis-1/4 max-w-32 pl-2">
+                        <CarouselItem key={index} className="basis-1/2 pl-2">
                            {card}
                         </CarouselItem>
                     ))}
