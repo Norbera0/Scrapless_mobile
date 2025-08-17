@@ -14,7 +14,7 @@ const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | 
     const isUp = percentage > 0;
     const colorClass = (isUp && !inverse) || (!isUp && inverse) ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
     return (
-        <div className={`text-xs mt-1.5 py-0.5 px-1.5 rounded-md inline-block font-medium ${colorClass}`}>
+        <div className={`text-xs mt-1 py-0.5 px-1.5 rounded-md inline-block font-medium ${colorClass}`}>
             {isUp ? '↑' : '↓'} {Math.abs(percentage).toFixed(0)}%
         </div>
     );
@@ -56,40 +56,52 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="shadow-md">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">This Week's Waste</CardTitle>
+            <Card className="shadow-md h-32 flex flex-col justify-between">
+                <CardHeader className="pb-2 pt-4 px-4">
+                    <CardTitle className="text-xs font-medium text-muted-foreground">This Week's Waste</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">₱{stats.thisWeekWaste.toFixed(0)}</div>
+                <CardContent className="px-4 pb-4">
+                    <div className="text-xl font-bold">
+                        {stats.thisWeekWaste.toFixed(0)}
+                        <span className="text-sm font-medium text-muted-foreground ml-1">Peso</span>
+                    </div>
                     <TrendIndicator percentage={stats.wasteTrend} />
                 </CardContent>
             </Card>
-            <Card className="shadow-md">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">CO₂e Impact</CardTitle>
+            <Card className="shadow-md h-32 flex flex-col justify-between">
+                <CardHeader className="pb-2 pt-4 px-4">
+                    <CardTitle className="text-xs font-medium text-muted-foreground">CO₂e Impact</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{stats.thisWeekCO2.toFixed(1)}kg</div>
-                     <p className="text-xs text-muted-foreground">this week</p>
+                <CardContent className="px-4 pb-4">
+                    <div className="text-xl font-bold">
+                        {stats.thisWeekCO2.toFixed(1)}
+                        <span className="text-sm font-medium text-muted-foreground ml-1">kg</span>
+                    </div>
+                     <p className="text-xs text-muted-foreground mt-1.5">this week</p>
                 </CardContent>
             </Card>
-             <Card className="shadow-md">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
+             <Card className="shadow-md h-32 flex flex-col justify-between">
+                <CardHeader className="pb-2 pt-4 px-4">
+                    <CardTitle className="text-xs font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}</div>
-                    <p className="text-xs text-muted-foreground">{stats.daysSinceLastWaste !== -1 ? 'days' : 'Log waste to start'}</p>
+                <CardContent className="px-4 pb-4">
+                    <div className="text-xl font-bold">
+                        {stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}
+                        {stats.daysSinceLastWaste !== -1 && <span className="text-sm font-medium text-muted-foreground ml-1">days</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1.5">{stats.daysSinceLastWaste === -1 ? 'Log waste to start' : 'since last log'}</p>
                 </CardContent>
             </Card>
-            <Card className="shadow-md">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Food Success Rate</CardTitle>
+            <Card className="shadow-md h-32 flex flex-col justify-between">
+                <CardHeader className="pb-2 pt-4 px-4">
+                    <CardTitle className="text-xs font-medium text-muted-foreground">Food Success Rate</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{stats.useRate.toFixed(0)}%</div>
-                    <p className="text-xs text-muted-foreground">of items used</p>
+                <CardContent className="px-4 pb-4">
+                    <div className="text-xl font-bold">
+                        {stats.useRate.toFixed(0)}
+                        <span className="text-sm font-medium text-muted-foreground ml-1">%</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1.5">of items used</p>
                 </CardContent>
             </Card>
         </div>
