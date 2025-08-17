@@ -408,6 +408,7 @@ export const saveUserSettings = async (userId: string, settings: UserSettings) =
 export const saveSavingsEvent = async (userId: string, event: Omit<SavingsEvent, 'id'>): Promise<string> => {
     const savingsCollection = collection(db, `users/${userId}/savingsEvents`);
     const docRef = await addDoc(savingsCollection, event);
+    useSavingsStore.getState().setSavingsEvents([...useSavingsStore.getState().savingsEvents, { ...event, id: docRef.id }]);
     return docRef.id;
 };
 

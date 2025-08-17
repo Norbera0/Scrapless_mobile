@@ -60,6 +60,7 @@ import { useGreenScoreStore } from '@/stores/greenScoreStore';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
+import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformancePanel';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -248,6 +249,8 @@ export default function DashboardPage() {
             </Popover>
         </div>
         
+        <WeeklyPerformancePanel />
+
         <Card>
             <CardHeader>
                 <CardTitle className="text-lg md:text-xl flex items-center gap-2">
