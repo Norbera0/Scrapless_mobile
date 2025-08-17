@@ -297,9 +297,9 @@ export default function MyWastePage() {
               <TrendsKPI logs={logs} />
             
               <Card>
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4">
                   <div className="flex-grow">
-                    <CardTitle className="text-base font-semibold">Waste & Savings Over Time</CardTitle>
+                    <CardTitle className="text-base font-semibold">Waste & Savings</CardTitle>
                     <CardDescription className="text-xs">
                       Daily impact of your actions
                     </CardDescription>
@@ -434,22 +434,22 @@ export default function MyWastePage() {
               </Card>
 
             <Card>
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-semibold text-center">Savings Offset</CardTitle>
+                <CardHeader className="pb-2 pt-4">
+                    <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset</CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center gap-2 sm:gap-3 text-center">
+                <CardContent className="flex items-center justify-center gap-2 text-center pb-4">
                     <div className="text-center">
-                        <p className="text-base sm:text-lg font-semibold text-gray-700 flex items-center justify-center gap-1"><Gem className="w-3.5 h-3.5" /> ₱{totalSavings.toFixed(2)}</p>
+                        <p className="text-base font-semibold text-gray-700 flex items-center justify-center gap-1"><Gem className="w-3 h-3" /> ₱{totalSavings.toFixed(2)}</p>
                         <p className="text-xs text-gray-500">Savings</p>
                     </div>
-                    <p className="text-base sm:text-lg font-semibold text-gray-500">-</p>
+                    <p className="text-base font-semibold text-gray-500">-</p>
                     <div className="text-center">
-                        <p className="text-base sm:text-lg font-semibold text-gray-700 flex items-center justify-center gap-1"><Trash className="w-3.5 h-3.5" /> ₱{totalWaste.toFixed(2)}</p>
+                        <p className="text-base font-semibold text-gray-700 flex items-center justify-center gap-1"><Trash className="w-3 h-3" /> ₱{totalWaste.toFixed(2)}</p>
                         <p className="text-xs text-gray-500">Waste</p>
                     </div>
-                    <p className="text-base sm:text-lg font-semibold text-gray-500">=</p>
+                    <p className="text-base font-semibold text-gray-500">=</p>
                     <div className="text-center">
-                        <p className={cn("text-xl sm:text-2xl font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
+                        <p className={cn("text-lg font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
                            ₱{(totalSavings - totalWaste).toFixed(2)}
                         </p>
                         <p className="text-xs text-gray-500">Net Offset</p>
@@ -457,8 +457,59 @@ export default function MyWastePage() {
                 </CardContent>
             </Card>
 
-            {/* <Card>
-                <CardHeader>
+            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
+
+            <Card>
+              <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                        <Lightbulb className="h-5 w-5" />
+                        Waste Pattern
+                    </CardTitle>
+                    <CardDescription className="text-xs">Smart patterns & predictions from your data</CardDescription>
+                  </div>
+                   {insight && (
+                        <Button variant="outline" size="sm" onClick={handleFetchPattern} disabled={isLoadingInsight}>
+                           <RefreshCw className="mr-2 h-4 w-4" />
+                           Refresh
+                       </Button>
+                   )}
+              </CardHeader>
+              <CardContent className="space-y-3 p-4 pt-0">
+                  {isLoadingInsight ? (
+                     <div className="flex justify-center items-center h-24">
+                        <Loader2 className="h-8 w-8 animate-spin" />
+                     </div>
+                  ) : insight ? (
+                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                        <div className="border-l-4 border-amber-500 bg-amber-50 p-3 rounded-r-lg">
+                           <h3 className="font-semibold text-amber-800 text-sm">Hidden Pattern Detected</h3>
+                           <p className="text-xs text-amber-700">{insight.hiddenPattern}</p>
+                        </div>
+                         <div className="border-l-4 border-blue-500 bg-blue-50 p-3 rounded-r-lg">
+                           <h3 className="font-semibold text-blue-800 text-sm">Smart Disposal Tip</h3>
+                           <p className="text-xs text-blue-700">{insight.disposalTip}</p>
+                        </div>
+                         <div className="space-y-2">
+                             <h3 className="font-semibold text-green-800 text-sm">Prevention Solutions</h3>
+                             {insight.preventionSolutions.map((solution, i) => (
+                                <p key={i} className="text-xs text-green-700 p-2 bg-green-50 border border-green-200 rounded-lg">
+                                    {solution}
+                                </p>
+                             ))}
+                         </div>
+                     </motion.div>
+                  ) : (
+                     <Button className="w-full" onClick={handleFetchPattern} disabled={isLoadingInsight}>
+                        <Brain className="mr-2 h-4 w-4" />
+                        Reveal Waste Pattern
+                     </Button>
+                  )}
+              </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader className="p-4">
                     <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
@@ -503,57 +554,6 @@ export default function MyWastePage() {
                         </ChartContainer>
                     ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
-            </Card> */}
-
-            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
-
-            <Card>
-              <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                        <Lightbulb className="h-5 w-5" />
-                        Waste Pattern
-                    </CardTitle>
-                    <CardDescription className="text-xs">Smart patterns & predictions from your data</CardDescription>
-                  </div>
-                   {insight && (
-                        <Button variant="outline" size="sm" onClick={handleFetchPattern} disabled={isLoadingInsight}>
-                           <RefreshCw className="mr-2 h-4 w-4" />
-                           Refresh Pattern
-                       </Button>
-                   )}
-              </CardHeader>
-              <CardContent className="space-y-4">
-                  {isLoadingInsight ? (
-                     <div className="flex justify-center items-center h-24">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                     </div>
-                  ) : insight ? (
-                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                        <div className="border-l-4 border-amber-500 bg-amber-50 p-4 rounded-r-lg">
-                           <h3 className="font-semibold text-amber-800">Hidden Pattern Detected</h3>
-                           <p className="text-sm text-amber-700">{insight.hiddenPattern}</p>
-                        </div>
-                         <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
-                           <h3 className="font-semibold text-blue-800">Smart Disposal Tip</h3>
-                           <p className="text-sm text-blue-700">{insight.disposalTip}</p>
-                        </div>
-                         <div className="space-y-2">
-                             <h3 className="font-semibold text-green-800">Prevention Solutions</h3>
-                             {insight.preventionSolutions.map((solution, i) => (
-                                <p key={i} className="text-sm text-green-700 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                    {solution}
-                                </p>
-                             ))}
-                         </div>
-                     </motion.div>
-                  ) : (
-                     <Button className="w-full" onClick={handleFetchPattern} disabled={isLoadingInsight}>
-                        <Brain className="mr-2 h-4 w-4" />
-                        Reveal Waste Pattern
-                     </Button>
-                  )}
-              </CardContent>
             </Card>
           </div>
       )}

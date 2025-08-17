@@ -59,10 +59,10 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
     const kpiCards = [
         <Card key="waste" className="shadow-md h-32 flex flex-col justify-between">
-            <CardHeader className="pb-2 pt-4 px-4">
+            <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground">This Week's Waste</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
                     {stats.thisWeekWaste.toFixed(0)}
                     <span className="text-sm font-medium text-muted-foreground ml-1">Peso</span>
@@ -71,10 +71,10 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             </CardContent>
         </Card>,
         <Card key="co2" className="shadow-md h-32 flex flex-col justify-between">
-            <CardHeader className="pb-2 pt-4 px-4">
+            <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground">CO₂e Impact</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
                     {stats.thisWeekCO2.toFixed(1)}
                     <span className="text-sm font-medium text-muted-foreground ml-1">kg</span>
@@ -83,10 +83,10 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             </CardContent>
         </Card>,
         <Card key="streak" className="shadow-md h-32 flex flex-col justify-between">
-            <CardHeader className="pb-2 pt-4 px-4">
+            <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
                     {stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}
                     {stats.daysSinceLastWaste !== -1 && <span className="text-sm font-medium text-muted-foreground ml-1">days</span>}
@@ -95,10 +95,10 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             </CardContent>
         </Card>,
         <Card key="rate" className="shadow-md h-32 flex flex-col justify-between">
-            <CardHeader className="pb-2 pt-4 px-4">
+            <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground">Food Success Rate</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
+            <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
                     {stats.useRate.toFixed(0)}
                     <span className="text-sm font-medium text-muted-foreground ml-1">%</span>

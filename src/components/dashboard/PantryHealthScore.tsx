@@ -90,8 +90,8 @@ export function PantryHealthScore({ wasteLogs, archivedItems }: PantryHealthScor
     
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          <Card className="rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md mb-8">
-            <CardHeader>
+          <Card className="rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md">
+            <CardHeader className="p-4">
                 <CardTitle className="text-base font-semibold text-gray-800 flex items-center gap-2">
                 📊 Pantry Status
                 </CardTitle>
