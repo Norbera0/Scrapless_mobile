@@ -248,8 +248,6 @@ export default function DashboardPage() {
                 </PopoverContent>
             </Popover>
         </div>
-        
-        <WeeklyPerformancePanel />
 
         <Card>
             <CardHeader>

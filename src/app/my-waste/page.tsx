@@ -24,6 +24,7 @@ import { useWasteInsightStore } from '@/stores/waste-insight-store';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { PantryHealthScore } from '@/components/dashboard/PantryHealthScore';
+import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformancePanel';
 
 type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -512,6 +513,8 @@ export default function MyWastePage() {
                   </ChartContainer>
                 </CardContent>
               </Card>
+
+              <WeeklyPerformancePanel />
 
             <Card>
                 <CardHeader>
