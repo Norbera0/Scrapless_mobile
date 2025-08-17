@@ -545,7 +545,7 @@ export default function MyWastePage() {
                                         key={category}
                                         dataKey={category}
                                         stackId="a"
-                                        fill={`var(--color-${category})`}
+                                        fill={reasonChartConfig[category]?.color || '#8884d8'}
                                         radius={index === allCategories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                                     />
                                 ))}
