@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
@@ -315,8 +314,8 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-2">
-                 <div>
-                    <p className="text-xs font-medium text-center text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
+                <div className="grid grid-cols-1 gap-2 text-center">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
                     <ChartContainer
                         config={offsetChartConfig}
                         className="mx-auto aspect-square w-full max-w-[200px]"
@@ -377,7 +376,7 @@ export default function MyWastePage() {
                 <TrendsKPI logs={logs} />
             </div>
             
-              <Card>
+              <Card className="-mt-20">
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
                   <div className="flex-grow">
                     <CardTitle className="text-sm font-semibold">Waste & Savings</CardTitle>
@@ -569,3 +568,5 @@ export default function MyWastePage() {
     </div>
   );
 }
+
+    
