@@ -91,27 +91,27 @@ export function PantryHealthScore({ wasteLogs, archivedItems }: PantryHealthScor
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <Card className="rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md">
-            <CardHeader className="p-4">
+            <CardHeader className="p-4 pt-3 pb-2">
                 <CardTitle className="text-base font-semibold text-gray-800 flex items-center gap-2">
                 📊 Pantry Status
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0">
                 <Progress segments={healthData.segments} className="h-3 mb-3 rounded-full" />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-1 text-xs">
-                    <div className="flex items-center gap-1.5">
+                <div className="grid grid-cols-4 gap-x-2 text-xs">
+                    <div className="flex items-center gap-1.5 whitespace-nowrap">
                         <div className="w-2 h-2 bg-[#10B981] rounded-full flex-shrink-0"></div>
                         <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.fresh}</span> Fresh</p>
                     </div>
-                     <div className="flex items-center gap-1.5">
+                     <div className="flex items-center gap-1.5 whitespace-nowrap">
                         <div className="w-2 h-2 bg-[#3B82F6] rounded-full flex-shrink-0"></div>
                         <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.used}</span> Used</p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 whitespace-nowrap">
                         <div className="w-2 h-2 bg-[#F59E0B] rounded-full flex-shrink-0"></div>
                         <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.expiring}</span> Expiring</p>
                     </div>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 whitespace-nowrap">
                        <div className="w-2 h-2 bg-[#EF4444] rounded-full flex-shrink-0"></div>
                        <p className="text-gray-600"><span className="font-bold text-gray-800">{healthData.expired}</span> Expired</p>
                     </div>
