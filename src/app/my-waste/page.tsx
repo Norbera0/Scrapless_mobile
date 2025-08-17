@@ -457,7 +457,7 @@ export default function MyWastePage() {
                 </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Brain className="h-5 w-5" />
@@ -472,7 +472,7 @@ export default function MyWastePage() {
                                 data={reasonCategoryData}
                                 layout="vertical"
                                 margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
-                                barCategoryGap="10%"
+                                barSize={12}
                             >
                                 <CartesianGrid horizontal={false} />
                                 <YAxis
@@ -503,7 +503,7 @@ export default function MyWastePage() {
                         </ChartContainer>
                     ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
-            </Card>
+            </Card> */}
 
             <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
 
