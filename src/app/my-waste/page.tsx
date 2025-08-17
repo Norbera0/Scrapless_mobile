@@ -314,73 +314,71 @@ export default function MyWastePage() {
           </div>
         ) : (
           <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <TrendsKPI logs={logs} />
-                 <Card>
-                    <CardHeader className="p-2 pt-2 pb-0">
-                        <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-1 items-center justify-center p-0">
-                        <ChartContainer
-                            config={offsetChartConfig}
-                            className="mx-auto aspect-square w-full max-w-[200px]"
+            <Card>
+                <CardHeader className="p-2 pt-2 pb-0">
+                    <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-1 items-center justify-center p-0">
+                    <ChartContainer
+                        config={offsetChartConfig}
+                        className="mx-auto aspect-square w-full max-w-[200px]"
+                    >
+                        <RadialBarChart
+                            data={offsetChartData}
+                            startAngle={180}
+                            endAngle={0}
+                            innerRadius={50}
+                            outerRadius={80}
                         >
-                            <RadialBarChart
-                                data={offsetChartData}
-                                startAngle={180}
-                                endAngle={0}
-                                innerRadius={50}
-                                outerRadius={80}
-                            >
-                            <ChartTooltip
-                                cursor={false}
-                                content={<ChartTooltipContent hideLabel />}
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                            <Label
+                                content={({ viewBox }) => {
+                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                        return (
+                                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                            <tspan
+                                                x={viewBox.cx}
+                                                y={(viewBox.cy || 0) - 8}
+                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                            >
+                                                ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                                            </tspan>
+                                            <tspan
+                                                x={viewBox.cx}
+                                                y={(viewBox.cy || 0) + 10}
+                                                className="fill-muted-foreground text-xs"
+                                            >
+                                                Net Offset
+                                            </tspan>
+                                        </text>
+                                        )
+                                    }
+                                }}
                             />
-                            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                                <Label
-                                    content={({ viewBox }) => {
-                                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                            return (
-                                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) - 8}
-                                                    className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
-                                                >
-                                                    ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                                                </tspan>
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) + 10}
-                                                    className="fill-muted-foreground text-xs"
-                                                >
-                                                    Net Offset
-                                                </tspan>
-                                            </text>
-                                            )
-                                        }
-                                    }}
-                                />
-                            </PolarRadiusAxis>
-                            <RadialBar
-                                dataKey="savings"
-                                stackId="a"
-                                cornerRadius={5}
-                                fill="var(--color-savings)"
-                                className="stroke-transparent stroke-2"
-                            />
-                            <RadialBar
-                                dataKey="waste"
-                                fill="var(--color-waste)"
-                                stackId="a"
-                                cornerRadius={5}
-                                className="stroke-transparent stroke-2"
-                            />
-                            </RadialBarChart>
-                        </ChartContainer>
-                    </CardContent>
-                </Card>
-              </div>
+                        </PolarRadiusAxis>
+                        <RadialBar
+                            dataKey="savings"
+                            stackId="a"
+                            cornerRadius={5}
+                            fill="var(--color-savings)"
+                            className="stroke-transparent stroke-2"
+                        />
+                        <RadialBar
+                            dataKey="waste"
+                            fill="var(--color-waste)"
+                            stackId="a"
+                            cornerRadius={5}
+                            className="stroke-transparent stroke-2"
+                        />
+                        </RadialBarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+            <TrendsKPI logs={logs} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
@@ -569,57 +567,10 @@ export default function MyWastePage() {
                   )}
               </CardContent>
             </Card>
-
-             <Card>
-                <CardHeader className="p-4">
-                    <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                        <Brain className="h-5 w-5" />
-                        Why Food Gets Wasted
-                    </CardTitle>
-                    <CardDescription className="text-xs">Root causes and the types of food involved.</CardDescription>
-                </CardHeader>
-                <CardContent className="pl-0">
-                    {reasonCategoryData.length > 0 ? (
-                        <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
-                            <BarChart
-                                data={reasonCategoryData}
-                                layout="vertical"
-                                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
-                                barSize={12}
-                            >
-                                <CartesianGrid horizontal={false} />
-                                <YAxis
-                                    dataKey="name"
-                                    type="category"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={10}
-                                    tick={{fontSize: 12}}
-                                />
-                                <XAxis type="number" hide={true} />
-                                <Tooltip
-                                    cursor={{ fill: 'hsl(var(--muted))' }}
-                                    content={<ChartTooltipContent />}
-                                />
-                                <Legend verticalAlign="top" />
-                                {allCategories.map((category, index) => (
-                                    <Bar 
-                                        key={category} 
-                                        dataKey={category} 
-                                        stackId="a" 
-                                        fill={COLORS[index % COLORS.length]} 
-                                        radius={[4, 4, 0, 0]}
-                                        barSize={12}
-                                    />
-                                ))}
-                            </BarChart>
-                        </ChartContainer>
-                    ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
-                </CardContent>
-            </Card>
           </div>
       )}
     </div>
   );
 }
+
 
