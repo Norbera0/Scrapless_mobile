@@ -118,11 +118,11 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
                 }} 
                 className="w-full"
             >
-                <CarouselContent className="-ml-3">
+                <CarouselContent className="-ml-2">
                     {kpiCards.map((card, index) => (
                         <CarouselItem 
                             key={index} 
-                            className="basis-[60%] pl-3"
+                            className="basis-[60%] pl-2"
                         >
                            {card}
                         </CarouselItem>
