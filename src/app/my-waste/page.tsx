@@ -58,14 +58,13 @@ const CustomizedXAxisTick = ({ x, y, payload }: any) => {
     const words = payload.value.split(' ');
     
     // Simple wrap for longer labels
-    if (words.length > 2) {
-        const line1 = words.slice(0, 2).join(' ');
-        const line2 = words.slice(2).join(' ');
+    if (words.length > 1) {
         return (
             <g transform={`translate(${x},${y})`}>
-              <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12px" fontWeight="bold">
-                <tspan x="0" dy="0em">{line1}</tspan>
-                <tspan x="0" dy="1.4em">{line2}</tspan>
+              <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="10px" fontWeight="bold">
+                {words.map((word, i) => (
+                    <tspan x="0" dy="1.2em" key={i}>{word}</tspan>
+                ))}
               </text>
             </g>
         );
@@ -73,7 +72,7 @@ const CustomizedXAxisTick = ({ x, y, payload }: any) => {
   
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="12px" fontWeight="bold">
+        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="10px" fontWeight="bold">
           {payload.value}
         </text>
       </g>
@@ -172,8 +171,17 @@ export default function MyWastePage() {
     const reasonData: Record<string, Record<string, number> & { total: number }> = {};
     const categories = new Set<string>();
 
+    const shortenedNames: Record<string, string> = {
+        "Got spoiled/rotten": "Spoiled",
+        "Past expiry date": "Expired",
+        "Cooked too much": "Too Big",
+        "Portion too big / Couldn’t finish": "Too Big"
+    };
+
     logs.forEach(log => {
-        const reason = log.sessionWasteReason || 'Other';
+        let reason = log.sessionWasteReason || 'Other';
+        reason = shortenedNames[reason] || reason;
+
         if (!reasonData[reason]) {
             reasonData[reason] = { total: 0 };
         }
@@ -431,7 +439,7 @@ export default function MyWastePage() {
                             <BarChart
                                 data={reasonCategoryData}
                                 margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                barCategoryGap="20%"
+                                barCategoryGap="10"
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
