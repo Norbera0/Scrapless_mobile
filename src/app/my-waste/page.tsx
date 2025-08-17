@@ -4,7 +4,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps, RadialBarChart, RadialBar, PolarGrid, Label, PolarRadiusAxis } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem } from 'lucide-react';
@@ -514,6 +514,48 @@ export default function MyWastePage() {
               </Card>
 
             <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Brain className="h-5 w-5" />
+                        Why Food Gets Wasted
+                    </CardTitle>
+                    <CardDescription>Root causes and the types of food involved.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {reasonCategoryData.length > 0 ? (
+                        <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
+                            <BarChart 
+                                accessibilityLayer
+                                data={reasonCategoryData}
+                                barCategoryGap="5%"
+                            >
+                                <CartesianGrid vertical={false} />
+                                <XAxis
+                                    dataKey="name"
+                                    tickLine={false}
+                                    tickMargin={10}
+                                    axisLine={false}
+                                    tick={<CustomizedXAxisTick />}
+                                    interval={0}
+                                />
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <ChartLegend content={<ChartLegendContent />} />
+                                {allCategories.map((category, index) => (
+                                    <Bar
+                                        key={category}
+                                        dataKey={category}
+                                        stackId="a"
+                                        fill={`var(--color-${category})`}
+                                        radius={index === allCategories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                                    />
+                                ))}
+                            </BarChart>
+                        </ChartContainer>
+                    ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
+                </CardContent>
+            </Card>
+
+            <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
                   <div>
                     <CardTitle className="flex items-center gap-2 text-sm font-semibold">
@@ -568,5 +610,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
-    
