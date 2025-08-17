@@ -295,7 +295,6 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
-              <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
@@ -472,7 +471,7 @@ export default function MyWastePage() {
                             <BarChart
                                 data={reasonCategoryData}
                                 margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                barCategoryGap={10}
+                                barSize={12}
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
@@ -496,7 +495,6 @@ export default function MyWastePage() {
                                         stackId="a" 
                                         fill={COLORS[index % COLORS.length]} 
                                         radius={[4, 4, 0, 0]}
-                                        barSize={12}
                                     />
                                 ))}
                             </BarChart>
@@ -505,6 +503,7 @@ export default function MyWastePage() {
                 </CardContent>
             </Card>
 
+            <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div>
