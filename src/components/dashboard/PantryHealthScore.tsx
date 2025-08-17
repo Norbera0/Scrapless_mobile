@@ -92,38 +92,38 @@ export function PantryHealthScore({ wasteLogs, archivedItems }: PantryHealthScor
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <Card className="rounded-2xl shadow-sm border-gray-200 transition-shadow hover:shadow-md mb-8">
             <CardHeader>
-                <CardTitle className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                <CardTitle className="text-base font-semibold text-gray-800 flex items-center gap-2">
                 📊 Pantry Status
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
-                <Progress segments={healthData.segments} className="h-3 mb-4 rounded-full" />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <CardContent className="p-4 pt-0">
+                <Progress segments={healthData.segments} className="h-3 mb-3 rounded-full" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-[#10B981] rounded-full"></div>
+                        <div className="w-2 h-2 bg-[#10B981] rounded-full"></div>
                         <div>
-                            <p className="font-bold text-lg text-gray-800">{healthData.fresh}</p>
+                            <p className="font-bold text-base text-gray-800">{healthData.fresh}</p>
                             <p className="text-gray-500">Fresh</p>
                         </div>
                     </div>
                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-[#3B82F6] rounded-full"></div>
+                        <div className="w-2 h-2 bg-[#3B82F6] rounded-full"></div>
                         <div>
-                            <p className="font-bold text-lg text-gray-800">{healthData.used}</p>
+                            <p className="font-bold text-base text-gray-800">{healthData.used}</p>
                             <p className="text-gray-500">Used</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-[#F59E0B] rounded-full"></div>
+                        <div className="w-2 h-2 bg-[#F59E0B] rounded-full"></div>
                          <div>
-                            <p className="font-bold text-lg text-gray-800">{healthData.expiring}</p>
+                            <p className="font-bold text-base text-gray-800">{healthData.expiring}</p>
                             <p className="text-gray-500">Expiring</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                       <div className="w-3 h-3 bg-[#EF4444] rounded-full"></div>
+                       <div className="w-2 h-2 bg-[#EF4444] rounded-full"></div>
                          <div>
-                            <p className="font-bold text-lg text-gray-800">{healthData.expired}</p>
+                            <p className="font-bold text-base text-gray-800">{healthData.expired}</p>
                             <p className="text-gray-500">Expired</p>
                         </div>
                     </div>

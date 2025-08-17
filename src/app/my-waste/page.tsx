@@ -252,14 +252,14 @@ export default function MyWastePage() {
   } satisfies ChartConfig
 
   return (
-    <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50">
+    <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
        <div className="flex flex-row flex-wrap items-center justify-between gap-4">
             <div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-                  <BarChart2 className="w-8 h-8 text-primary" />
+                <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
+                  <BarChart2 className="w-7 h-7 text-primary" />
                   My Waste Impact
                 </h1>
-                <p className="text-muted-foreground text-sm md:text-base">
+                <p className="text-muted-foreground text-sm">
                     Track your patterns, reduce waste, spend less
                 </p>
             </div>
@@ -293,14 +293,14 @@ export default function MyWastePage() {
               <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4">
               <TrendsKPI logs={logs} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                   <div className="flex-grow">
-                    <CardTitle className="text-base sm:text-lg">Waste & Savings Over Time</CardTitle>
-                    <CardDescription className="text-xs sm:text-sm">
+                    <CardTitle className="text-base font-semibold">Waste & Savings Over Time</CardTitle>
+                    <CardDescription className="text-xs">
                       Daily impact of your actions
                     </CardDescription>
                   </div>
@@ -434,23 +434,23 @@ export default function MyWastePage() {
               </Card>
 
             <Card>
-                <CardHeader>
-                    <CardTitle>Savings Offset</CardTitle>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold text-center">Savings Offset</CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center gap-2 sm:gap-4 text-center">
-                    <div className="flex-1">
-                        <p className="text-xl sm:text-2xl font-semibold text-gray-700">💰 ₱{totalSavings.toFixed(2)}</p>
+                <CardContent className="flex items-center justify-center gap-2 sm:gap-3 text-center">
+                    <div className="text-center">
+                        <p className="text-base sm:text-lg font-semibold text-gray-700 flex items-center justify-center gap-1"><Gem className="w-3.5 h-3.5" /> ₱{totalSavings.toFixed(2)}</p>
                         <p className="text-xs text-gray-500">Savings</p>
                     </div>
-                    <p className="text-xl sm:text-2xl font-semibold text-gray-500">-</p>
-                    <div className="flex-1">
-                        <p className="text-xl sm:text-2xl font-semibold text-gray-700">🗑️ ₱{totalWaste.toFixed(2)}</p>
+                    <p className="text-base sm:text-lg font-semibold text-gray-500">-</p>
+                    <div className="text-center">
+                        <p className="text-base sm:text-lg font-semibold text-gray-700 flex items-center justify-center gap-1"><Trash className="w-3.5 h-3.5" /> ₱{totalWaste.toFixed(2)}</p>
                         <p className="text-xs text-gray-500">Waste</p>
                     </div>
-                    <p className="text-xl sm:text-2xl font-semibold text-gray-500">=</p>
-                    <div className="flex-1">
-                        <p className={cn("text-2xl sm:text-4xl font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
-                           💎 ₱{(totalSavings - totalWaste).toFixed(2)}
+                    <p className="text-base sm:text-lg font-semibold text-gray-500">=</p>
+                    <div className="text-center">
+                        <p className={cn("text-xl sm:text-2xl font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
+                           ₱{(totalSavings - totalWaste).toFixed(2)}
                         </p>
                         <p className="text-xs text-gray-500">Net Offset</p>
                     </div>
@@ -459,30 +459,31 @@ export default function MyWastePage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
                     </CardTitle>
-                    <CardDescription>Root causes and the types of food involved.</CardDescription>
+                    <CardDescription className="text-xs">Root causes and the types of food involved.</CardDescription>
                 </CardHeader>
                 <CardContent className="pl-0">
                     {reasonCategoryData.length > 0 ? (
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
                             <BarChart
                                 data={reasonCategoryData}
-                                margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                barSize={12}
+                                layout="vertical"
+                                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                                barCategoryGap="10%"
                             >
-                                <CartesianGrid vertical={false} />
-                                <XAxis
+                                <CartesianGrid horizontal={false} />
+                                <YAxis
                                     dataKey="name"
+                                    type="category"
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={10}
-                                    tick={<CustomizedXAxisTick />}
-                                    interval={0}
+                                    tick={{fontSize: 12}}
                                 />
-                                <YAxis hide={true} />
+                                <XAxis type="number" hide={true} />
                                 <Tooltip
                                     cursor={{ fill: 'hsl(var(--muted))' }}
                                     content={<ChartTooltipContent />}
@@ -495,6 +496,7 @@ export default function MyWastePage() {
                                         stackId="a" 
                                         fill={COLORS[index % COLORS.length]} 
                                         radius={[4, 4, 0, 0]}
+                                        barSize={12}
                                     />
                                 ))}
                             </BarChart>
@@ -504,14 +506,15 @@ export default function MyWastePage() {
             </Card>
 
             <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
+
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Lightbulb className="h-5 w-5" />
                         Waste Pattern
                     </CardTitle>
-                    <CardDescription>Smart patterns & predictions from your data</CardDescription>
+                    <CardDescription className="text-xs">Smart patterns & predictions from your data</CardDescription>
                   </div>
                    {insight && (
                         <Button variant="outline" size="sm" onClick={handleFetchPattern} disabled={isLoadingInsight}>
