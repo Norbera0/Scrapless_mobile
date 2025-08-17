@@ -7,7 +7,7 @@ import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -100,11 +100,14 @@ export default function MyWastePage() {
       }
   }
 
-  const chartData = useMemo(() => {
+  const { chartData, totalWaste, totalSavings } = useMemo(() => {
     const days = getDaysFromTimeframe(timeframe);
     const startDate = startOfDay(subDays(new Date(), days - 1));
     const endDate = endOfDay(new Date());
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
+
+    let calculatedTotalWaste = 0;
+    let calculatedTotalSavings = 0;
 
     let dailyData = dateRange.map(date => ({
       date: format(date, 'EEE'),
@@ -122,6 +125,7 @@ export default function MyWastePage() {
           dayData.totalPesoValue += log.totalPesoValue;
           dayData.totalCarbonFootprint += log.totalCarbonFootprint;
         }
+        calculatedTotalWaste += log.totalPesoValue;
       }
     });
 
@@ -132,6 +136,7 @@ export default function MyWastePage() {
             if (dayData) {
                 dayData.totalSavings += event.amount;
             }
+            calculatedTotalSavings += event.amount;
         }
     });
     
@@ -140,7 +145,7 @@ export default function MyWastePage() {
         let cumulativeCO2 = 0;
         let cumulativeSavings = 0;
         
-        return dailyData.map(d => {
+        dailyData = dailyData.map(d => {
             cumulativeWasteValue += d.totalPesoValue;
             cumulativeCO2 += d.totalCarbonFootprint;
             cumulativeSavings += d.totalSavings;
@@ -153,7 +158,7 @@ export default function MyWastePage() {
         });
     }
 
-    return dailyData;
+    return { chartData: dailyData, totalWaste: calculatedTotalWaste, totalSavings: calculatedTotalSavings };
   }, [logs, savingsEvents, timeframe, viewType]);
   
   const tickFormatter = (value: string, index: number) => {
@@ -427,6 +432,30 @@ export default function MyWastePage() {
 
             <Card>
                 <CardHeader>
+                    <CardTitle>Savings Offset</CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center gap-2 sm:gap-4 text-center">
+                    <div className="flex-1">
+                        <p className="text-xl sm:text-2xl font-semibold text-gray-700">💰 ₱{totalSavings.toFixed(2)}</p>
+                        <p className="text-xs text-gray-500">Savings</p>
+                    </div>
+                    <p className="text-xl sm:text-2xl font-semibold text-gray-500">-</p>
+                    <div className="flex-1">
+                        <p className="text-xl sm:text-2xl font-semibold text-gray-700">🗑️ ₱{totalWaste.toFixed(2)}</p>
+                        <p className="text-xs text-gray-500">Waste</p>
+                    </div>
+                    <p className="text-xl sm:text-2xl font-semibold text-gray-500">=</p>
+                    <div className="flex-1">
+                        <p className={cn("text-2xl sm:text-4xl font-bold", totalSavings - totalWaste >= 0 ? "text-green-600" : "text-red-600")}>
+                           💎 ₱{(totalSavings - totalWaste).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-500">Net Offset</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
@@ -439,7 +468,7 @@ export default function MyWastePage() {
                             <BarChart
                                 data={reasonCategoryData}
                                 margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                barCategoryGap="20%"
+                                barCategoryGap={10}
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
