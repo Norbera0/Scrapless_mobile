@@ -6,6 +6,8 @@ import type { WasteLog } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { subDays, isAfter, startOfDay, differenceInDays, parseISO } from 'date-fns';
 import { useAnalytics } from '@/hooks/use-analytics';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | null, inverse?: boolean }) => {
     if (percentage === null || isNaN(percentage) || !isFinite(percentage)) {
@@ -23,6 +25,7 @@ const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | 
 export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
     const analytics = useAnalytics();
+    const isMobile = useIsMobile();
 
     const stats = useMemo(() => {
         const now = new Date();
@@ -54,56 +57,74 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
         };
     }, [logs, analytics]);
 
+    const kpiCards = [
+        <Card key="waste" className="shadow-md h-32 flex flex-col justify-between">
+            <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-xs font-medium text-muted-foreground">This Week's Waste</CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+                <div className="text-xl font-bold">
+                    {stats.thisWeekWaste.toFixed(0)}
+                    <span className="text-sm font-medium text-muted-foreground ml-1">Peso</span>
+                </div>
+                <TrendIndicator percentage={stats.wasteTrend} />
+            </CardContent>
+        </Card>,
+        <Card key="co2" className="shadow-md h-32 flex flex-col justify-between">
+            <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-xs font-medium text-muted-foreground">CO₂e Impact</CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+                <div className="text-xl font-bold">
+                    {stats.thisWeekCO2.toFixed(1)}
+                    <span className="text-sm font-medium text-muted-foreground ml-1">kg</span>
+                </div>
+                 <p className="text-xs text-muted-foreground mt-1.5">this week</p>
+            </CardContent>
+        </Card>,
+        <Card key="streak" className="shadow-md h-32 flex flex-col justify-between">
+            <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-xs font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+                <div className="text-xl font-bold">
+                    {stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}
+                    {stats.daysSinceLastWaste !== -1 && <span className="text-sm font-medium text-muted-foreground ml-1">days</span>}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5">{stats.daysSinceLastWaste === -1 ? 'Log waste to start' : 'since last log'}</p>
+            </CardContent>
+        </Card>,
+        <Card key="rate" className="shadow-md h-32 flex flex-col justify-between">
+            <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-xs font-medium text-muted-foreground">Food Success Rate</CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+                <div className="text-xl font-bold">
+                    {stats.useRate.toFixed(0)}
+                    <span className="text-sm font-medium text-muted-foreground ml-1">%</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1.5">of items used</p>
+            </CardContent>
+        </Card>
+    ];
+
+    if (isMobile) {
+        return (
+            <Carousel opts={{ align: "start" }} className="w-full">
+                <CarouselContent className="-ml-2">
+                    {kpiCards.map((card, index) => (
+                        <CarouselItem key={index} className="basis-1/2 pl-2">
+                           {card}
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
+        );
+    }
+
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="shadow-md h-32 flex flex-col justify-between">
-                <CardHeader className="pb-2 pt-4 px-4">
-                    <CardTitle className="text-xs font-medium text-muted-foreground">This Week's Waste</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                    <div className="text-xl font-bold">
-                        {stats.thisWeekWaste.toFixed(0)}
-                        <span className="text-sm font-medium text-muted-foreground ml-1">Peso</span>
-                    </div>
-                    <TrendIndicator percentage={stats.wasteTrend} />
-                </CardContent>
-            </Card>
-            <Card className="shadow-md h-32 flex flex-col justify-between">
-                <CardHeader className="pb-2 pt-4 px-4">
-                    <CardTitle className="text-xs font-medium text-muted-foreground">CO₂e Impact</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                    <div className="text-xl font-bold">
-                        {stats.thisWeekCO2.toFixed(1)}
-                        <span className="text-sm font-medium text-muted-foreground ml-1">kg</span>
-                    </div>
-                     <p className="text-xs text-muted-foreground mt-1.5">this week</p>
-                </CardContent>
-            </Card>
-             <Card className="shadow-md h-32 flex flex-col justify-between">
-                <CardHeader className="pb-2 pt-4 px-4">
-                    <CardTitle className="text-xs font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                    <div className="text-xl font-bold">
-                        {stats.daysSinceLastWaste !== -1 ? stats.daysSinceLastWaste : 'N/A'}
-                        {stats.daysSinceLastWaste !== -1 && <span className="text-sm font-medium text-muted-foreground ml-1">days</span>}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1.5">{stats.daysSinceLastWaste === -1 ? 'Log waste to start' : 'since last log'}</p>
-                </CardContent>
-            </Card>
-            <Card className="shadow-md h-32 flex flex-col justify-between">
-                <CardHeader className="pb-2 pt-4 px-4">
-                    <CardTitle className="text-xs font-medium text-muted-foreground">Food Success Rate</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                    <div className="text-xl font-bold">
-                        {stats.useRate.toFixed(0)}
-                        <span className="text-sm font-medium text-muted-foreground ml-1">%</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1.5">of items used</p>
-                </CardContent>
-            </Card>
+           {kpiCards}
         </div>
     );
 }
