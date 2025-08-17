@@ -22,6 +22,7 @@ import type { AnalyzeWastePatternsOutput } from '@/ai/schemas';
 import { useWasteInsightStore } from '@/stores/waste-insight-store';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { PantryHealthScore } from '@/components/dashboard/PantryHealthScore';
 
 type ChartTimeframe = '7d' | '15d' | '30d';
 type ChartMetric = 'totalPesoValue' | 'totalCarbonFootprint';
@@ -292,6 +293,7 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
+              <PantryHealthScore />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
