@@ -293,7 +293,7 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
-              <PantryHealthScore />
+              <PantryHealthScore wasteLogs={logs} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">

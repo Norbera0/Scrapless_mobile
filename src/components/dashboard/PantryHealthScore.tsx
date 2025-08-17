@@ -10,6 +10,11 @@ import { motion } from 'framer-motion';
 import { TrendingUp, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Progress, type ProgressSegment } from '@/components/ui/progress';
+import type { WasteLog } from '@/types';
+
+interface PantryHealthScoreProps {
+    wasteLogs: WasteLog[];
+}
 
 const getFreshness = (expirationDate: string) => {
     const today = startOfToday();
@@ -51,18 +56,11 @@ const itemVariants = {
   }
 };
 
-export function PantryHealthScore() {
+export function PantryHealthScore({ wasteLogs }: PantryHealthScoreProps) {
     const { liveItems } = usePantryLogStore();
 
     const healthData = useMemo(() => {
-        if (liveItems.length === 0) {
-            return {
-                score: 100, fresh: 0, expiring: 0, expired: 0,
-                expiringThisWeek: [], segments: [], pieChartData: []
-            };
-        }
-
-        let fresh = 0, expiring = 0, expired = 0;
+        let fresh = 0, expiring = 0, expiredInPantry = 0;
         const expiringThisWeek: { name: string; days: number }[] = [];
 
         liveItems.forEach(item => {
@@ -73,17 +71,20 @@ export function PantryHealthScore() {
                     expiring++;
                     if (days >= 0 && days <= 7) expiringThisWeek.push({ name: item.name, days });
                     break;
-                case 'expired': expired++; break;
+                case 'expired': expiredInPantry++; break;
             }
         });
-        
+
+        const expiredInLogs = wasteLogs.filter(log => log.sessionWasteReason === 'Past expiry date').reduce((acc, log) => acc + log.items.length, 0);
+        const totalExpired = expiredInPantry + expiredInLogs;
+
         const totalItems = liveItems.length;
         const score = totalItems > 0 ? Math.round(((fresh * 100) + (expiring * 50)) / totalItems) : 100;
 
         const segments: ProgressSegment[] = totalItems > 0 ? [
             { value: fresh, color: '#10B981', label: 'Fresh' },
             { value: expiring, color: '#F59E0B', label: 'Expiring' },
-            { value: expired, color: '#EF4444', label: 'Expired' },
+            { value: totalExpired, color: '#EF4444', label: 'Expired' },
         ] : [];
         
         const pieChartData = [
@@ -91,9 +92,9 @@ export function PantryHealthScore() {
             { name: 'Remainder', value: 100 - score, color: '#F3F4F6' },
         ];
 
-        return { score, fresh, expiring, expired, expiringThisWeek, segments, pieChartData };
+        return { score, fresh, expiring, expired: totalExpired, expiringThisWeek, segments, pieChartData };
 
-    }, [liveItems]);
+    }, [liveItems, wasteLogs]);
     
     const getEmoji = (name: string) => {
         const lowerName = name.toLowerCase();
