@@ -514,8 +514,6 @@ export default function MyWastePage() {
                 </CardContent>
               </Card>
 
-              <WeeklyPerformancePanel />
-
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -557,6 +555,8 @@ export default function MyWastePage() {
                     ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
             </Card>
+
+            <WeeklyPerformancePanel />
 
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
