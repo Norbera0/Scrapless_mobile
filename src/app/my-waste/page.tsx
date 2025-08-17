@@ -12,6 +12,7 @@ import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
 import { useWasteLogStore } from '@/stores/waste-log-store';
+import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { TrendsKPI } from '@/components/dashboard/TrendsKPI';
 import { cn } from '@/lib/utils';
@@ -84,6 +85,7 @@ const CustomizedXAxisTick = ({ x, y, payload }: any) => {
 export default function MyWastePage() {
   const router = useRouter();
   const { logs, logsInitialized } = useWasteLogStore();
+  const { archivedItems } = usePantryLogStore();
   const { savingsEvents } = useSavingsStore();
   const [timeframe, setTimeframe] = useState<ChartTimeframe>('7d');
   const [chartMetric, setChartMetric] = useState<ChartMetric>('totalPesoValue');
@@ -293,7 +295,7 @@ export default function MyWastePage() {
         ) : (
           <div className="grid gap-6">
               <TrendsKPI logs={logs} />
-              <PantryHealthScore wasteLogs={logs} />
+              <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
             
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
