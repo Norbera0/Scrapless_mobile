@@ -439,7 +439,7 @@ export default function MyWastePage() {
                             <BarChart
                                 data={reasonCategoryData}
                                 margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                                barCategoryGap="10"
+                                barCategoryGap="20%"
                             >
                                 <CartesianGrid vertical={false} />
                                 <XAxis
@@ -463,6 +463,7 @@ export default function MyWastePage() {
                                         stackId="a" 
                                         fill={COLORS[index % COLORS.length]} 
                                         radius={[4, 4, 0, 0]}
+                                        barSize={12}
                                     />
                                 ))}
                             </BarChart>
