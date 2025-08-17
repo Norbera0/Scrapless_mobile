@@ -1,9 +1,10 @@
 
+
 'use client';
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps, RadialBarChart, RadialBar, PolarGrid, Label } from 'recharts';
+import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, TooltipProps, RadialBarChart, RadialBar, PolarGrid, Label, PolarRadiusAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -252,11 +253,21 @@ export default function MyWastePage() {
   } satisfies ChartConfig
   
   const offsetChartData = [{
-    name: 'data',
+    month: "current",
     savings: totalSavings,
     waste: totalWaste,
-    fill: 'var(--color-savings)'
   }];
+  
+  const offsetChartConfig = {
+      savings: {
+          label: "Virtual Savings",
+          color: "hsl(var(--chart-1))",
+      },
+      waste: {
+          label: "Waste Cost",
+          color: "hsl(var(--destructive))",
+      }
+  } satisfies ChartConfig
 
   const netOffset = totalSavings - totalWaste;
 
@@ -308,7 +319,7 @@ export default function MyWastePage() {
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4">
                   <div className="flex-grow">
-                    <CardTitle className="text-base font-semibold">Waste & Savings</CardTitle>
+                    <CardTitle className="text-sm font-semibold">Waste & Savings</CardTitle>
                     <CardDescription className="text-xs">
                       Daily impact of your actions
                     </CardDescription>
@@ -446,45 +457,64 @@ export default function MyWastePage() {
                 <CardHeader className="pb-2 pt-4">
                     <CardTitle className="text-xs font-medium text-center text-muted-foreground">Savings Offset ({timeframe})</CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center justify-center gap-2 text-center pb-4 h-[150px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                         <RadialBarChart
+                <CardContent className="flex flex-1 items-center pb-0">
+                    <ChartContainer
+                        config={offsetChartConfig}
+                        className="mx-auto aspect-square w-full max-w-[200px]"
+                    >
+                        <RadialBarChart
                             data={offsetChartData}
                             startAngle={180}
                             endAngle={0}
-                            innerRadius="70%"
-                            outerRadius="100%"
-                            barSize={30}
-                         >
-                            <PolarGrid gridType='polygon' polarRadius={[30, 40, 50, 60, 70]} stroke="none"/>
-                            <RadialBar dataKey="savings" background={{ fill: 'hsl(var(--destructive)/0.2)' }} cornerRadius={10} className="fill-green-500" />
-                             <Label 
+                            innerRadius={70}
+                            outerRadius={95}
+                        >
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                        />
+                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                            <Label
                                 content={({ viewBox }) => {
-                                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                                         return (
-                                        <text x={viewBox.cx} y={viewBox.cy! - 10} textAnchor="middle">
+                                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
                                             <tspan
                                                 x={viewBox.cx}
-                                                y={viewBox.cy}
-                                                className={cn("text-2xl font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                                y={(viewBox.cy || 0) - 8}
+                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
                                             >
-                                            ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                                ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                                             </tspan>
-                                             <tspan
+                                            <tspan
                                                 x={viewBox.cx}
-                                                y={(viewBox.cy || 0) + 20}
-                                                className="fill-muted-foreground text-sm"
+                                                y={(viewBox.cy || 0) + 12}
+                                                className="fill-muted-foreground text-xs"
                                             >
-                                            Net Offset
+                                                Net Offset
                                             </tspan>
                                         </text>
                                         )
                                     }
-                                    return null;
                                 }}
                             />
-                         </RadialBarChart>
-                    </ResponsiveContainer>
+                        </PolarRadiusAxis>
+                        <RadialBar
+                            dataKey="savings"
+                            stackId="a"
+                            cornerRadius={5}
+                            fill="var(--color-savings)"
+                            className="stroke-transparent stroke-2"
+                        />
+                        <RadialBar
+                            dataKey="waste"
+                            fill="var(--color-waste)"
+                            stackId="a"
+                            cornerRadius={5}
+                            className="stroke-transparent stroke-2"
+                        />
+                        </RadialBarChart>
+                    </ChartContainer>
                 </CardContent>
             </Card>
 
@@ -493,7 +523,7 @@ export default function MyWastePage() {
             <Card>
               <CardHeader className="flex-col sm:flex-row sm:items-center sm:justify-between p-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                         <Lightbulb className="h-5 w-5" />
                         Waste Pattern
                     </CardTitle>
@@ -539,9 +569,9 @@ export default function MyWastePage() {
               </CardContent>
             </Card>
 
-            <Card>
+             <Card>
                 <CardHeader className="p-4">
-                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
                     </CardTitle>
