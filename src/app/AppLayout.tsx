@@ -57,6 +57,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
     else setGreeting("Good evening");
   }, []);
 
+  useEffect(() => {
+    if (sessionStorage.getItem('hasOpenedNotifications') === 'true') {
+        setHasOpenedNotifications(true);
+    }
+  }, []);
+  
+  const handleNotificationOpenChange = (open: boolean) => {
+      if(open) {
+          setHasOpenedNotifications(true);
+          sessionStorage.setItem('hasOpenedNotifications', 'true');
+      }
+  }
+
   const totalGreenPoints = useMemo(() => {
     return greenPointsEvents.reduce((acc, event) => acc + event.points, 0);
   }, [greenPointsEvents]);
@@ -150,11 +163,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                     <div className="text-sm font-semibold">{format(currentDate, 'eeee, MMMM d')}</div>
                     <div className="text-xs text-white/80">{format(currentDate, 'h:mm a')}</div>
                     </div>
-                    <Popover onOpenChange={(open) => {
-                    if(open) {
-                        setHasOpenedNotifications(true);
-                    }
-                    }}>
+                    <Popover onOpenChange={handleNotificationOpenChange}>
                     <PopoverTrigger asChild>
                         <Button variant="ghost" size="icon" className="relative hover:bg-white/20">
                         <Bell className="h-5 w-5" />
