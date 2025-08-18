@@ -65,15 +65,16 @@ const isIngredientMatch = (pantryItemName: string, recipeIngredientName: string)
         return true;
     }
     
-    // Handle cases like "leftover rice" vs "rice"
+    // Handle cases like "leftover rice" vs "rice" or "canned corned beef" vs "corned beef"
     const recipeWords = new Set(recipeLower.split(' '));
     const pantryWords = new Set(pantryLower.split(' '));
     
-    for (const word of pantryWords) {
-        if (recipeWords.has(word)) {
-            return true;
-        }
-    }
+    // Find the core noun
+    const coreRecipeWord = recipeLower.split(' ').pop();
+    const corePantryWord = pantryLower.split(' ').pop();
+
+    if (corePantryWord && recipeWords.has(corePantryWord)) return true;
+    if (coreRecipeWord && pantryWords.has(coreRecipeWord)) return true;
 
     return false;
 }

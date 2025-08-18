@@ -45,7 +45,6 @@ const conversions: Record<string, ConversionConfig> = {
         'pcs': 1,
         'piece': 1,
         'dozen': 12,
-        'egg': 1, // Treat 'egg' as a unit of 1 piece
         'potato': 1, // Treat 'potato' as a unit of 1 piece
     }
   },
@@ -70,6 +69,15 @@ const conversions: Record<string, ConversionConfig> = {
     factors: {
         'cup': 185, // Approx. 185g for 1 cup of uncooked rice
     }
+  },
+  egg: {
+      baseUnit: 'pcs',
+      factors: {
+          'pcs': 1,
+          'piece': 1,
+          'egg': 1,
+          'dozen': 12,
+      }
   }
 };
 
@@ -84,6 +92,7 @@ const getConversionConfig = (itemName: string, unit: string): ConversionConfig =
     const lowerUnit = unit.toLowerCase().replace(/s$/, '');
 
     // Specific ingredient matches first
+    if (lowerItem.includes('egg')) return conversions.egg;
     if (lowerItem.includes('garlic')) return conversions.garlic;
     if (lowerItem.includes('rice')) return conversions.rice;
 
