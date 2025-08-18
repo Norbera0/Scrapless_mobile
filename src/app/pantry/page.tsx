@@ -47,7 +47,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { getRecipeSuggestions } from '@/app/actions';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday, format, parseISO, isSameDay, addDays, subDays, isAfter, startOfDay } from 'date-fns';
@@ -349,11 +349,25 @@ export default function PantryPage() {
     filipinoDishes: true,
   });
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
-
+  
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  useEffect(() => {
+    if (!carouselApi) return;
+    setCurrentSlide(carouselApi.selectedScrollSnap());
+    carouselApi.on("select", () => {
+      setCurrentSlide(carouselApi.selectedScrollSnap());
+    });
+  }, [carouselApi]);
+
+  const scrollTo = useCallback((index: number) => {
+    carouselApi?.scrollTo(index);
+  }, [carouselApi]);
 
   const getStatus = useCallback((expirationDate: string) => {
     const today = startOfToday();
@@ -690,27 +704,33 @@ export default function PantryPage() {
                         <p className="mt-2 text-gray-500">Finding delicious recipes...</p>
                     </div>
                 ) : recipes.length > 0 ? (
-                    <Carousel 
-                        opts={{ 
-                            align: "start",
-                            loop: true,
-                         }} 
-                        className="w-full"
-                    >
-                        <CarouselContent className="-ml-4">
-                            {recipes.map((recipe) => (
-                            <CarouselItem key={recipe.id} className="basis-full md:basis-1/2 lg:basis-1/3 pl-4">
-                                <RecipeCard
-                                    recipe={recipe}
-                                    isSaved={savedRecipeIds.has(recipe.id)}
-                                    onToggleSave={handleToggleSave}
+                    <div>
+                        <Carousel setApi={setCarouselApi} opts={{ align: "start" }} className="w-full">
+                            <CarouselContent className="-ml-4">
+                                {recipes.map((recipe) => (
+                                <CarouselItem key={recipe.id} className="basis-full md:basis-1/2 lg:basis-1/3 pl-4">
+                                    <RecipeCard
+                                        recipe={recipe}
+                                        isSaved={savedRecipeIds.has(recipe.id)}
+                                        onToggleSave={handleToggleSave}
+                                    />
+                                </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                        </Carousel>
+                        <div className="flex justify-center gap-2 mt-4">
+                            {recipes.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => scrollTo(index)}
+                                    className={cn(
+                                        "w-2 h-2 rounded-full transition-colors",
+                                        index === currentSlide ? "bg-primary" : "bg-muted"
+                                    )}
                                 />
-                            </CarouselItem>
                             ))}
-                        </CarouselContent>
-                        <CarouselPrevious className="ml-12" />
-                        <CarouselNext className="mr-12"/>
-                    </Carousel>
+                        </div>
+                    </div>
                 ) : (
                     <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
                         <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
