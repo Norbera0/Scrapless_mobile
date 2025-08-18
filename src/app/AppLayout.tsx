@@ -11,7 +11,7 @@ import { Sidebar, SidebarInset, SidebarRail, SidebarTrigger } from '@/components
 import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 import { Button } from '@/components/ui/button';
-import { PanelLeft, Bell, Leaf } from 'lucide-react';
+import { PanelLeft, Bell, Leaf, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNotifications } from '@/hooks/use-notifications';
