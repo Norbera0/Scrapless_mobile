@@ -17,34 +17,14 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
     return (
         <Card 
             className={cn(
-                "cursor-pointer bg-background flex flex-col shadow-md hover:shadow-lg transition-shadow duration-300 h-full", 
-                isSelected && "ring-2 ring-primary",
+                "bg-background flex flex-col justify-center items-center shadow-md h-full text-center p-4", 
                 isBpiSolution && "bg-blue-50 border-blue-200"
             )}
-            onClick={onSelect}
         >
-            <CardHeader>
-                <CardTitle className='text-base flex items-center gap-2'>
-                    {isBpiSolution && <Landmark className="w-5 h-5 text-blue-600" />}
-                    {solution.title}
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                    <p className="text-sm text-muted-foreground mb-3">{solution.description}</p>
-                    {solution.estimatedSavings > 0 && (
-                         <p className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}/mo</p>
-                    )}
-                </div>
-                 <div className="text-sm font-medium flex items-center justify-center pt-2 text-primary">
-                    {isUpdating && isSelected ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : isSelected ? (
-                        <CheckCircle className="mr-2 h-4 w-4 text-primary" />
-                    ) : null}
-                    {isSelected ? "I'll try this!" : `I'll try this`}
-                 </div>
-            </CardContent>
+            <CardTitle className='text-base font-semibold flex items-center gap-2'>
+                {isBpiSolution && <Landmark className="w-5 h-5 text-blue-600" />}
+                {solution.title}
+            </CardTitle>
         </Card>
     )
 }
@@ -95,7 +75,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 title: "What's Happening", 
                 content: (
                     <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
-                        {analysis.story.situation.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{s.split(':')[0] || ''}</strong></li>)}
+                        {analysis.story.situation.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{s.split(':')[0]}</strong></li>)}
                     </ul>
                 )
             },
@@ -105,7 +85,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 title: 'The Root Cause', 
                 content: (
                      <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
-                        {analysis.story.rootCause.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}</strong></li>)}
+                        {analysis.story.rootCause.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{s.split(':')[0]}</strong></li>)}
                     </ul>
                 )
             },
