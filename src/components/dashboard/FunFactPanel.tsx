@@ -86,6 +86,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                 category: 'Achievement',
                 text: `You've avoided ₱${totalSavings.toFixed(0)} in waste so far. That's like saving ${riceSaved.toFixed(1)}kg of rice!`,
                 source: 'Your Savings History',
+                lottieUrl: 'https://lottie.host/04cc021a-3197-4b84-8942-d6b076aa7dd0/4jUleWNpSN.lottie'
             });
         }
     }
