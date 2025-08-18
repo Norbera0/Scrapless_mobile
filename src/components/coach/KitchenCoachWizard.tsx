@@ -120,7 +120,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="max-w-[90vw] sm:max-w-lg p-0 border-0 gap-0 flex flex-col max-h-[95vh]">
-                <DialogHeader className="p-6 pb-2">
+                <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
                     <DialogDescription>
                         A step-by-step guide to understanding and improving your kitchen habits.
@@ -131,15 +131,15 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                     <Carousel setApi={setApi} className="w-full h-full">
                         <CarouselContent className="h-full">
                             {steps.map((step, index) => (
-                                <CarouselItem key={step.id} className="flex items-center justify-center">
+                                <CarouselItem key={step.id} className="flex flex-col justify-center">
                                     <div className="p-1 h-full w-full">
                                         {step.id === 'solutions' ? (
                                             <div className="w-full h-full flex flex-col items-center text-center">
-                                                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                                                 <div className="shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                                                     <Check className="w-8 h-8 text-primary" />
                                                  </div>
-                                                <h2 className="text-xl md:text-2xl font-bold mb-1">Your Action Plan</h2>
-                                                <p className="text-muted-foreground mb-4">Choose one or more solutions to work on.</p>
+                                                <h2 className="text-xl md:text-2xl font-bold mb-1 shrink-0">Your Action Plan</h2>
+                                                <p className="text-muted-foreground mb-4 shrink-0">Choose one or more solutions to work on.</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full flex-1 overflow-y-auto p-1">
                                                     {solutions.solutions.filter(s => !s.title.toLowerCase().includes('bpi')).map((s, i) => (
                                                          <SolutionCard 
@@ -166,7 +166,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                     </Carousel>
                 </div>
 
-                <div className="p-6 bg-secondary/50 border-t flex flex-col items-center gap-4">
+                <div className="p-6 bg-secondary/50 border-t flex flex-col items-center gap-4 shrink-0">
                      <div className="w-full flex justify-center items-center gap-2">
                         {Array.from({ length: totalSteps }).map((_, i) => (
                             <div
