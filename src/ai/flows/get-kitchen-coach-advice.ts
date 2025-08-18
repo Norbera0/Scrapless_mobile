@@ -54,6 +54,7 @@ Generate exactly ONE analysis focusing on the most impactful pattern. Structure 
 The output must be tailored and dynamic based on the user's context:
 1.  **Narrative Storytelling**: For \`story.situation\`, you MUST use the "smoking gun" evidence found in Step 3. Tell a short, personal story. For example, for the "situation" field, provide an array with 2-3 strings. Each string should be a bullet point describing what's happening. The first bullet should state the purchase, the second should state what was wasted, and the third should state the insight (e.g., the time lag).
 2.  **Personalized Root Cause**: For \`story.rootCause\`, you MUST explicitly reference the "User Persona" diagnosed in Step 1. For example: "This is a classic sign of the 'Weekend Impulse Buyer' habit..."
+3.  **Title Specificity**: The 'title' must be clear and specific, like 'Weekend Vegetable Overbuying' or 'Aspirational Ingredient Lag', reflecting your analysis.
 
 {
   "insightType": "pattern_detected|getting_started|first_steps|re_engagement|connect_the_dots",
