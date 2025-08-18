@@ -292,8 +292,8 @@ export default function DashboardPage() {
                         src="/dashboard/recipe_generator_home.png"
                         alt="Recipe suggestions illustration"
                         layout="fill"
-                        objectFit="contain"
-                        className="pointer-events-none opacity-50 object-bottom"
+                        objectFit="cover"
+                        className="pointer-events-none opacity-50"
                     />
                 </div>
             </CardContent>
