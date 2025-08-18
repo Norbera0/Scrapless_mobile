@@ -196,7 +196,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-3">
                         <Progress value={goalProgress} className="h-2 flex-1" style={{
                             // @ts-ignore
-                            '--indicator-bg': '#FFD700'
+                            '--indicator-bg': '#D97706'
                         }} />
                         <p className="text-sm font-bold">{goalProgress}%</p>
                     </div>
