@@ -21,6 +21,7 @@ const conversions: Record<string, ConversionConfig> = {
     factors: {
       'kg': 1000,
       'g': 1,
+      'gram': 1,
       'mg': 0.001,
       'oz': 28.35,
       'lb': 453.592,
@@ -30,10 +31,12 @@ const conversions: Record<string, ConversionConfig> = {
     baseUnit: 'ml',
     factors: {
       'l': 1000,
+      'liter': 1000,
       'ml': 1,
       'cup': 240, // US cup
       'tbsp': 15,
       'tsp': 5,
+      'fl oz': 29.5735,
     }
   },
   quantity: {
@@ -42,6 +45,8 @@ const conversions: Record<string, ConversionConfig> = {
         'pcs': 1,
         'piece': 1,
         'dozen': 12,
+        'egg': 1, // Treat 'egg' as a unit of 1 piece
+        'potato': 1, // Treat 'potato' as a unit of 1 piece
     }
   },
   // --- Specific Ingredient Conversions ---
@@ -59,28 +64,37 @@ const conversions: Record<string, ConversionConfig> = {
           'bunch': 50,
           'leaf': 1,
       }
+  },
+  rice: {
+    baseUnit: 'g',
+    factors: {
+        'cup': 185, // Approx. 185g for 1 cup of uncooked rice
+    }
   }
 };
 
 /**
- * Finds the appropriate conversion configuration for a given ingredient.
+ * Finds the appropriate conversion configuration for a given ingredient or unit.
  * @param itemName The name of the ingredient (e.g., "garlic", "flour").
- * @returns The matching ConversionConfig or a generic one.
+ * @param unit The unit being converted, to help with fallback matching.
+ * @returns The matching ConversionConfig.
  */
-const getConversionConfig = (itemName: string): ConversionConfig => {
+const getConversionConfig = (itemName: string, unit: string): ConversionConfig => {
     const lowerItem = itemName.toLowerCase();
+    const lowerUnit = unit.toLowerCase().replace(/s$/, '');
+
+    // Specific ingredient matches first
     if (lowerItem.includes('garlic')) return conversions.garlic;
+    if (lowerItem.includes('rice')) return conversions.rice;
 
     // Add more specific ingredient checks here...
 
-    // Fallback to generic types
-    const weightUnits = Object.keys(conversions.weight.factors);
-    if (weightUnits.some(unit => lowerItem.includes(unit))) return conversions.weight;
+    // Fallback to generic types based on unit
+    if (conversions.weight.factors[lowerUnit]) return conversions.weight;
+    if (conversions.volume.factors[lowerUnit]) return conversions.volume;
     
-    const volumeUnits = Object.keys(conversions.volume.factors);
-    if (volumeUnits.some(unit => lowerItem.includes(unit))) return conversions.volume;
-
-    return conversions.quantity; // Default fallback
+    // Default fallback is quantity-based
+    return conversions.quantity; 
 }
 
 /**
@@ -92,12 +106,13 @@ const getConversionConfig = (itemName: string): ConversionConfig => {
  * @throws An error if the unit is not recognized.
  */
 export const convertToBaseUnit = (quantity: number, unit: string, itemName: string): { quantity: number, unit: BaseUnit } => {
-    const config = getConversionConfig(itemName);
     const normalizedUnit = unit.toLowerCase().replace(/s$/, ''); // Handle plurals
+    const config = getConversionConfig(itemName, normalizedUnit);
 
     const factor = config.factors[normalizedUnit];
+    
     if (factor === undefined) {
-        // If not found in specific config, try generic configs
+        // If not found in its specific config, try a final check in generics.
         if (conversions.weight.factors[normalizedUnit]) {
             return { quantity: quantity * conversions.weight.factors[normalizedUnit], unit: 'g' };
         }
@@ -123,25 +138,32 @@ export const convertToBaseUnit = (quantity: number, unit: string, itemName: stri
  * @throws An error if the conversion is not possible.
  */
 export const convertFromBaseUnit = (quantity: number, baseUnit: BaseUnit, targetUnit: string, itemName: string): { quantity: number, unit: string } => {
-    const config = getConversionConfig(itemName);
-     const normalizedTargetUnit = targetUnit.toLowerCase().replace(/s$/, '');
+    const normalizedTargetUnit = targetUnit.toLowerCase().replace(/s$/, '');
+    const config = getConversionConfig(itemName, normalizedTargetUnit);
 
     if (config.baseUnit !== baseUnit) {
-        // This case indicates a mismatch in logic, e.g. trying to convert grams from a 'pcs' base.
-        // A more advanced system could handle density conversions (e.g., grams of flour to cups).
-        // For now, we throw an error if the base units don't align.
+        // Attempt to find a suitable converter if base units don't match
+        const allConfigs = Object.values(conversions);
+        const targetConfig = allConfigs.find(c => c.factors[normalizedTargetUnit] && c.baseUnit === baseUnit);
         
-        // Attempt to find the target unit in ANY config
-        const allConfigs = [conversions.weight, conversions.volume, conversions.quantity, conversions.garlic, conversions.herbs];
-        const targetConfig = allConfigs.find(c => c.factors[normalizedTargetUnit]);
-
-        if (!targetConfig || targetConfig.baseUnit !== baseUnit) {
-           throw new Error(`Cannot convert from base unit "${baseUnit}" to "${targetUnit}" for item "${itemName}". Mismatched types.`);
+        if (!targetConfig) {
+             throw new Error(`Cannot convert from base unit "${baseUnit}" to "${targetUnit}" for item "${itemName}". Mismatched types.`);
         }
     }
 
     const factor = config.factors[normalizedTargetUnit];
+
     if (factor === undefined) {
+         // Final fallback check on generic converters
+        if (conversions.weight.factors[normalizedTargetUnit] && baseUnit === 'g') {
+             return { quantity: quantity / conversions.weight.factors[normalizedTargetUnit], unit: targetUnit };
+        }
+        if (conversions.volume.factors[normalizedTargetUnit] && baseUnit === 'ml') {
+             return { quantity: quantity / conversions.volume.factors[normalizedTargetUnit], unit: targetUnit };
+        }
+        if (conversions.quantity.factors[normalizedTargetUnit] && baseUnit === 'pcs') {
+             return { quantity: quantity / conversions.quantity.factors[normalizedTargetUnit], unit: targetUnit };
+        }
         throw new Error(`Unrecognized target unit "${targetUnit}" for item "${itemName}".`);
     }
 

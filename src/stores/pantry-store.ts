@@ -55,6 +55,29 @@ const initialState = {
     pantryInitialized: false,
 };
 
+// Helper for smarter name matching
+const isIngredientMatch = (pantryItemName: string, recipeIngredientName: string): boolean => {
+    const pantryLower = pantryItemName.toLowerCase();
+    const recipeLower = recipeIngredientName.toLowerCase();
+    
+    // Direct inclusion check (e.g., "potatoes" in "1kg potatoes")
+    if (pantryLower.includes(recipeLower) || recipeLower.includes(pantryLower)) {
+        return true;
+    }
+    
+    // Handle cases like "leftover rice" vs "rice"
+    const recipeWords = new Set(recipeLower.split(' '));
+    const pantryWords = new Set(pantryLower.split(' '));
+    
+    for (const word of pantryWords) {
+        if (recipeWords.has(word)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   ...initialState,
   setPhotoDataUri: (uri) => set({ photoDataUri: uri }),
@@ -93,7 +116,8 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
                 item.id === itemId ? { ...item, quantity: newQuantity } : item
             );
              // Fire-and-forget the backend update for quantity change
-            savePantryItems(itemToUpdate.userId, [{...itemToUpdate, quantity: newQuantity, id: itemId}]).catch(console.error);
+            const itemToSave: PantryLogItem = { ...itemToUpdate, quantity: newQuantity, estimatedExpirationDate: itemToUpdate.estimatedExpirationDate };
+            savePantryItems(itemToUpdate.userId, [itemToSave]).catch(console.error);
             return { liveItems: updatedLiveItems };
         }
     });
@@ -106,7 +130,7 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
     for (const ingredient of ingredients) {
         if (ingredient.status !== 'Have') continue;
 
-        const pantryItem = liveItems.find(p => p.name.toLowerCase().includes(ingredient.name.toLowerCase()));
+        const pantryItem = liveItems.find(p => isIngredientMatch(p.name, ingredient.name));
 
         if (pantryItem) {
             try {
