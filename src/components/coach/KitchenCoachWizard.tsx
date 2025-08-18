@@ -95,7 +95,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 title: "What's Happening", 
                 content: (
                     <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
-                        {analysis.story.situation.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}:</strong> {s.split(':')[1] || s}</li>)}
+                        {analysis.story.situation.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{s.split(':')[0] || ''}</strong></li>)}
                     </ul>
                 )
             },
@@ -162,18 +162,18 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 
                 <div className="flex-1 overflow-y-auto px-2 min-h-0">
                     <Carousel setApi={setApi} className="w-full">
-                        <CarouselContent>
+                        <CarouselContent className="h-full">
                             {steps.map((step, index) => (
-                                <CarouselItem key={step.id} className="flex flex-col justify-center">
-                                    <div className="p-1 w-full">
+                                <CarouselItem key={step.id} className="flex flex-col justify-center h-full">
+                                    <div className="p-1 w-full h-full flex-1">
                                         {step.id === 'solutions' ? (
-                                            <div className="w-full flex flex-col items-center text-center">
+                                            <div className="w-full h-full flex flex-col items-center text-center">
                                                  <div className="shrink-0 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                                                     <Check className="w-8 h-8 text-primary" />
                                                  </div>
                                                 <h2 className="text-xl md:text-2xl font-bold mb-1 shrink-0">Your Action Plan</h2>
                                                 <p className="text-muted-foreground mb-4 shrink-0">Choose one or more solutions to work on.</p>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full p-1">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full p-1 flex-1 overflow-y-auto">
                                                     {solutions.solutions.filter(s => !s.title.toLowerCase().includes('bpi')).map((s, i) => (
                                                          <SolutionCard 
                                                             key={i} 
