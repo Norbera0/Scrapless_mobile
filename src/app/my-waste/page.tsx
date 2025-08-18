@@ -306,65 +306,67 @@ export default function MyWastePage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            <TrendsKPI logs={logs} />
-            <div className="text-center">
-                <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
-                <ChartContainer
-                    config={offsetChartConfig}
-                    className="mx-auto aspect-square w-full max-w-[200px]"
-                >
-                    <RadialBarChart
-                        data={offsetChartData}
-                        endAngle={180}
-                        innerRadius={50}
-                        outerRadius={80}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TrendsKPI logs={logs} />
+                <div className="flex flex-col items-center justify-center">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
+                    <ChartContainer
+                        config={offsetChartConfig}
+                        className="mx-auto aspect-square w-full max-w-[200px]"
                     >
-                    <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                    />
-                    <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                        <Label
-                            content={({ viewBox }) => {
-                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                    return (
-                                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                                        <tspan
-                                            x={viewBox.cx}
-                                            y={(viewBox.cy || 0) - 8}
-                                            className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
-                                        >
-                                            ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                                        </tspan>
-                                        <tspan
-                                            x={viewBox.cx}
-                                            y={(viewBox.cy || 0) + 10}
-                                            className="fill-muted-foreground text-xs"
-                                        >
-                                            Net Offset
-                                        </tspan>
-                                    </text>
-                                    )
-                                }
-                            }}
+                        <RadialBarChart
+                            data={offsetChartData}
+                            endAngle={180}
+                            innerRadius={50}
+                            outerRadius={80}
+                        >
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
                         />
-                    </PolarRadiusAxis>
-                    <RadialBar
-                        dataKey="savings"
-                        stackId="a"
-                        cornerRadius={5}
-                        fill="var(--color-savings)"
-                        className="stroke-transparent stroke-2"
-                    />
-                    <RadialBar
-                        dataKey="waste"
-                        fill="var(--color-waste)"
-                        stackId="a"
-                        cornerRadius={5}
-                        className="stroke-transparent stroke-2"
-                    />
-                    </RadialBarChart>
-                </ChartContainer>
+                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                            <Label
+                                content={({ viewBox }) => {
+                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                        return (
+                                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                            <tspan
+                                                x={viewBox.cx}
+                                                y={(viewBox.cy || 0) - 8}
+                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                            >
+                                                ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                                            </tspan>
+                                            <tspan
+                                                x={viewBox.cx}
+                                                y={(viewBox.cy || 0) + 10}
+                                                className="fill-muted-foreground text-xs"
+                                            >
+                                                Net Offset
+                                            </tspan>
+                                        </text>
+                                        )
+                                    }
+                                }}
+                            />
+                        </PolarRadiusAxis>
+                        <RadialBar
+                            dataKey="savings"
+                            stackId="a"
+                            cornerRadius={5}
+                            fill="var(--color-savings)"
+                            className="stroke-transparent stroke-2"
+                        />
+                        <RadialBar
+                            dataKey="waste"
+                            fill="var(--color-waste)"
+                            stackId="a"
+                            cornerRadius={5}
+                            className="stroke-transparent stroke-2"
+                        />
+                        </RadialBarChart>
+                    </ChartContainer>
+                </div>
             </div>
             
               <Card>
