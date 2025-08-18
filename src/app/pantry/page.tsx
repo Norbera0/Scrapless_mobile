@@ -455,9 +455,14 @@ export default function PantryPage() {
 
     setIsLoadingRecipes(true);
     try {
-      const pantryItemNames = liveItems.map((item) => item.name);
+      const pantryItemData = liveItems.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+      }));
+
       const result = await getRecipeSuggestions({
-        pantryItems: pantryItemNames,
+        pantryItems: pantryItemData,
         preferences: {
             quickMeals: recipeFilters.quickMeals,
             filipinoDishes: recipeFilters.filipinoDishes,

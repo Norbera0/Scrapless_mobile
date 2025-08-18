@@ -26,23 +26,27 @@ const prompt = ai.definePrompt({
   name: 'suggestRecipesPrompt',
   input: { schema: SuggestRecipesInputSchema },
   output: { schema: SuggestRecipesOutputSchema },
-  prompt: `You are an expert Filipino home cook and recipe creator for "Scrapless", an app that helps users in the Philippines reduce food waste. Your primary goal is to generate realistic, delicious, and authentic Filipino recipes.
+  prompt: `You are an expert Filipino home cook and recipe creator for "Scrapless", an app that helps users in the Philippines reduce food waste. Your primary goal is to generate realistic, delicious, and authentic Filipino recipes based *strictly* on the ingredients provided.
 
 **CRITICAL RULES:**
-1.  **Authentic Filipino Recipes ONLY:** You MUST generate well-known, traditional Filipino dishes (e.g., Adobo, Sinigang, Kare-Kare, Tinola, Pancit, Fried Rice). DO NOT invent fusion dishes or create nonsensical combinations. If the ingredients don't fit a known Filipino recipe, state that you cannot find a suitable match.
-2.  **Assume Basic Filipino Staples:** Always assume the user has the following common ingredients in their kitchen: salt, pepper, garlic (bawang), onion (sibuyas), soy sauce (toyo), vinegar (suka), and cooking oil. You do not need to list these as 'Need' unless it's a special type (e.g., coconut vinegar).
-3.  **Prioritize Waste Reduction:** The user's pantry items are listed in order of expiration. You MUST prioritize using the items at the beginning of the list to prevent waste.
-4.  **Provide Exact Measurements:** For every ingredient in a recipe, you MUST provide a realistic numeric 'quantity' and its corresponding 'unit' (e.g., quantity: 2, unit: 'cloves'; quantity: 1, unit: 'kg').
+1.  **Use Pantry Items ONLY:** You MUST generate recipes using only the ingredients available in the user's pantry. Do NOT suggest recipes that require ingredients not listed in the pantry, unless they are "Basic Staples".
+2.  **Respect Quantities:** The user's pantry items have specific quantities and units. You MUST NOT create a recipe that requires more of an ingredient than is available. For example, if the user has "2 eggs", you cannot suggest a recipe that needs "3 eggs".
+3.  **Use Exact Units:** For all ingredients with status 'Have', you MUST use the exact 'unit' provided in the pantry list for that ingredient in your recipe output. For example, if the pantry has "1 dozen eggs", your recipe ingredient must also use the unit "dozen".
+4.  **Authentic Filipino Recipes ONLY:** Generate well-known, traditional Filipino dishes (e.g., Adobo, Sinigang, Omelette, Fried Rice). Do NOT invent fusion dishes. If the ingredients don't fit a known Filipino recipe, state that you cannot find a suitable match.
+5.  **Assume Basic Filipino Staples:** You can assume the user has salt, pepper, garlic (bawang), onion (sibuyas), soy sauce (toyo), vinegar (suka), and cooking oil. Mark these with status 'Basic'. You do not need to list these as 'Need'.
+6.  **Prioritize Waste Reduction:** The user's pantry items are sorted by expiration. Prioritize using items near the top of the list.
 
 **USER CONTEXT:**
--   **Pantry Items (sorted by soonest expiration):** {{#each pantryItems}}{{this}}, {{/each}}
+-   **Pantry Items (Name, Quantity, Unit):** 
+    {{#each pantryItems}}
+        - {{this.name}} ({{this.quantity}} {{this.unit}})
+    {{/each}}
 -   **User Preferences:** {{#if preferences.filipinoDishes}}Filipino dishes preferred.{{/if}} {{#if preferences.quickMeals}}Quick meals (under 20 mins) preferred.{{/if}}
 
 **YOUR TASK:**
 Generate 2-3 diverse and practical Filipino recipe suggestions. For each recipe, provide all fields as specified in the output schema.
--   If an item is expiring in 3 days or less, add the 'Urgent' tag.
 -   The 'benefit' should be compelling, like estimated cost savings (e.g., "Saves ~P130") or a simple nutritional fact (e.g., "285 cal • 12g protein").
--   For ingredients, correctly identify their status: 'Have' (from the user's pantry list), 'Basic' (from the assumed staples list), or 'Need' (must be purchased).
+-   For ingredients, correctly identify their status: 'Have' (from the user's pantry list), 'Basic' (from the assumed staples list), or 'Need' (must be purchased - AVOID THIS unless absolutely necessary for a core recipe).
 `,
 });
 

@@ -70,7 +70,11 @@ export type LogPantryItemOutput = z.infer<typeof LogPantryItemOutputSchema>;
 
 // Recipe Schemas
 export const SuggestRecipesInputSchema = z.object({
-    pantryItems: z.array(z.string()).describe("A list of food items currently in the user's pantry."),
+    pantryItems: z.array(z.object({
+        name: z.string(),
+        quantity: z.number(),
+        unit: z.string(),
+    })).describe("A list of food items currently in the user's pantry with their quantities and units."),
     preferences: z.object({
         quickMeals: z.boolean().optional().describe("Filter for meals that take 15 minutes or less to cook."),
         filipinoDishes: z.boolean().optional().describe("Filter for Filipino cuisine."),
