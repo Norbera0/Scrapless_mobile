@@ -311,15 +311,6 @@ export default function DashboardPage() {
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
-                <div className="relative w-1/3 flex-shrink-0">
-                    <Image
-                        src="/dashboard/shopping_guide_dashboard_image.png"
-                        alt="Shopping guide illustration"
-                        layout="fill"
-                        objectFit="contain"
-                        className="pointer-events-none opacity-50 object-bottom"
-                    />
-                </div>
             </CardContent>
         </Card>
         
