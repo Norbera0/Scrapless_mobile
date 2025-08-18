@@ -23,6 +23,7 @@ export interface PantryLogItem {
   useByTimeline?: string;
   purchaseSource?: string;
   otherPurchaseSourceText?: string;
+  userId?: string;
 }
 
 interface PantryLogState {
@@ -77,7 +78,7 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   updatePantryItemQuantity: (itemId, newQuantity) => {
     set(state => {
         const itemToUpdate = state.liveItems.find(item => item.id === itemId);
-        if (!itemToUpdate) return state;
+        if (!itemToUpdate || !itemToUpdate.userId) return state;
 
         if (newQuantity <= 0) {
             const updatedItem = { ...itemToUpdate, status: 'used' as 'used' | 'wasted', usedDate: new Date().toISOString(), quantity: 0 };

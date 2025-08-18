@@ -226,6 +226,7 @@ export function ReviewPantryItems() {
       storageLocation: 'counter', // Default
       carbonFootprint: 0,
       estimatedCost: 0,
+      userId: user?.uid,
     };
     setItems([newItem, ...items]);
   };
@@ -245,6 +246,7 @@ export function ReviewPantryItems() {
 
         return {
             ...item,
+            userId: user.uid,
             estimatedExpirationDate: expirationDate.toISOString(),
             purchaseSource: finalPurchaseSource,
         }
