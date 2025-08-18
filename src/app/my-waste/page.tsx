@@ -496,7 +496,7 @@ export default function MyWastePage() {
                 </CardContent>
                  <CardFooter className="px-4 py-3 border-t bg-secondary/50">
                     <p className="text-xs text-muted-foreground">
-                        Insight: In the last {getDaysFromTimeframe(timeframe)} days, you've wasted <strong className="text-destructive-foreground">₱{totalWaste.toFixed(2)}</strong> and saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong>.
+                        Insight: In the last {getDaysFromTimeframe(timeframe)} days, you've wasted <strong className="text-destructive">₱{totalWaste.toFixed(2)}</strong> and saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong>.
                     </p>
                 </CardFooter>
               </Card>
