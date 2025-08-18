@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { calculateAndSaveRecipeSavings } from '@/lib/savings';
 import { useAuth } from '@/hooks/use-auth';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -22,14 +23,32 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
     const { toast } = useToast();
     const { user } = useAuth();
+    const deductRecipeIngredients = usePantryLogStore((state) => state.deductRecipeIngredients);
 
     const handleMarkAsCooked = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!user) return;
-        await calculateAndSaveRecipeSavings(user, recipe);
+
+        // 1. Optimistically update the UI by deducting ingredients from the pantry store
+        const { deductedItems, missingItems } = deductRecipeIngredients(recipe.ingredients);
+
+        // 2. Trigger the backend calculation for savings
+        calculateAndSaveRecipeSavings(user, recipe).catch(err => {
+            console.error("Failed to save recipe savings event:", err);
+            // Here you might want to add logic to revert the optimistic update if the backend fails
+        });
+        
+        let description = `You've earned savings for cooking "${recipe.name}".`;
+        if (deductedItems.length > 0) {
+            description += ` Your pantry has been updated.`
+        }
+        if (missingItems.length > 0) {
+             description += ` Could not find or deduct: ${missingItems.map(i => i.name).join(', ')}.`;
+        }
+
         toast({
             title: "Nice one!",
-            description: `You've earned savings for cooking "${recipe.name}". Your pantry has been updated.`,
+            description,
         });
     };
 

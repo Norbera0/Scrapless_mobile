@@ -279,14 +279,19 @@ export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem
         const docRef = doc(pantryCollection, item.id);
         const { id, ...itemData } = item;
 
-        const newItemData: Omit<PantryItem, 'id'> = {
+        const newItemData: Omit<PantryItem, 'id' | 'userId'> = {
             ...itemData,
             addedDate: new Date().toISOString(),
             status: 'live', // New items are always live
         };
         
-        batch.set(docRef, newItemData);
-        savedItems.push({ ...newItemData, id: item.id });
+        const fullItemData: Omit<PantryItem, 'id'> = {
+            ...newItemData,
+            userId,
+        }
+
+        batch.set(docRef, fullItemData);
+        savedItems.push({ ...fullItemData, id: item.id });
 
         // Award Green Points for logging an item
         const pointsConfig = GREEN_POINTS_CONFIG.log_pantry_item;

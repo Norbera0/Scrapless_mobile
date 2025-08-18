@@ -34,6 +34,7 @@ export interface WasteLog {
 
 export interface PantryItem {
     id: string;
+    userId: string;
     name: string;
     quantity: number; 
     unit: string; 

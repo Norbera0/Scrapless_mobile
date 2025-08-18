@@ -3,7 +3,7 @@
 'use client';
 
 import { differenceInDays, startOfToday, parseISO } from 'date-fns';
-import type { User, PantryItem, Recipe, SavingsEvent, GreenPointsEvent } from '@/types';
+import type { User, PantryItem, Recipe, SavingsEvent, GreenPointsEvent, RecipeIngredient } from '@/types';
 import { saveSavingsEvent, getUserWasteStats, updatePantryItemStatus, saveGreenPointsEvent } from './data';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { FOOD_DATA_MAP } from './food-data';
@@ -121,49 +121,6 @@ export const calculateAndSaveRecipeSavings = async (user: User, recipe: Recipe) 
         relatedRecipeId: recipe.id,
     };
     saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);
-
-    const liveItems = usePantryLogStore.getState().liveItems;
-    const batchUpdates: Array<{itemId: string, newQuantity: number}> = [];
-    const savingsFromItems: Array<{name: string, savedAmount: number}> = [];
-
-    // --- Part 1: Deduct ingredients from pantry ---
-    for (const ingredient of recipe.ingredients) {
-        if (ingredient.status === 'Need' || ingredient.status === 'Basic') continue;
-        
-        const pantryItem = liveItems.find(p => p.name.toLowerCase() === ingredient.name.toLowerCase());
-        
-        if (pantryItem) {
-            const basePantryUnit = getBaseUnit(pantryItem.unit);
-            const baseIngredientUnit = getBaseUnit(ingredient.unit);
-
-            // Simple unit compatibility check
-            if (basePantryUnit === baseIngredientUnit && pantryItem.quantity >= ingredient.quantity) {
-                const newQuantity = pantryItem.quantity - ingredient.quantity;
-                batchUpdates.push({ itemId: pantryItem.id, newQuantity });
-                
-                // Calculate savings for this specific item if possible
-                if (pantryItem.estimatedCost) {
-                    const savedAmount = (pantryItem.estimatedCost / pantryItem.quantity) * ingredient.quantity;
-                    savingsFromItems.push({ name: pantryItem.name, savedAmount });
-                }
-            } else {
-                // If units don't match or not enough quantity, skip deduction for now.
-                // A more advanced system would have unit conversion.
-                console.warn(`Could not deduct ${ingredient.name}: unit mismatch or insufficient quantity.`);
-            }
-        }
-    }
-    
-    // Execute batch update to Firestore
-    if (batchUpdates.length > 0) {
-        const { updatePantryItemQuantity } = usePantryLogStore.getState();
-        for (const update of batchUpdates) {
-             // Optimistic UI update
-            updatePantryItemQuantity(update.itemId, update.newQuantity);
-            // In a real app, you might want to batch these Firestore updates.
-            await updatePantryItemStatus(user.uid, update.itemId, 'used', update.newQuantity);
-        }
-    }
 
     // --- Part 2: Calculate and save the financial event ---
     const neededIngredientsCost = recipe.ingredients
