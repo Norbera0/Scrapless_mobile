@@ -132,7 +132,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-lg w-[90vw] p-0 border-0 gap-0 flex flex-col h-auto max-h-[85vh] min-h-[500px]">
+            <DialogContent className="max-w-lg w-[90vw] p-0 border-0 gap-0 flex flex-col h-auto max-h-[85vh]">
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
                     <DialogDescription>
