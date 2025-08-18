@@ -208,18 +208,18 @@ export default function KitchenCoachPage() {
                 
                 <div className="text-center">
                      <Button
-                        size="lg"
+                        size="sm"
                         onClick={handleAskCoach} 
                         disabled={isLoading || isFetchingSolutions}
                     >
                         {isLoading || isFetchingSolutions ? (
                             <>
-                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 {loadingMessage}
                             </>
                         ) : (
                             <>
-                                <Sparkles className="mr-2 h-5 w-5" />
+                                <Sparkles className="mr-2 h-4 w-4" />
                                 Ask Your Coach for Advice
                             </>
                         )}
