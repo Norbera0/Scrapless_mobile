@@ -207,9 +207,8 @@ export default function KitchenCoachPage() {
                 </div>
                 
                 <div className="text-center">
-                     <Button 
-                        size="lg" 
-                        className="h-14 text-lg"
+                     <Button
+                        size="lg"
                         onClick={handleAskCoach} 
                         disabled={isLoading || isFetchingSolutions}
                     >
