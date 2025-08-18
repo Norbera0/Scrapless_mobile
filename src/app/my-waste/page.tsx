@@ -436,7 +436,7 @@ export default function MyWastePage() {
                             <BarChart
                                 layout="vertical"
                                 data={reasonCategoryData}
-                                margin={{ top: 5, right: 10, left: 10, bottom: 80 }}
+                                margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
                             >
                                 <CartesianGrid horizontal={false} />
                                 <XAxis type="number" hide />
