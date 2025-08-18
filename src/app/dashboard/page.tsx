@@ -311,6 +311,14 @@ export default function DashboardPage() {
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
+                 <div className="relative w-1/3 flex-shrink-0">
+                    <Image
+                        src="/dashboard/shopping_hub_home_2.png"
+                        alt="Shopping hub illustration"
+                        layout="fill"
+                        objectFit="cover"
+                    />
+                </div>
             </CardContent>
         </Card>
         
