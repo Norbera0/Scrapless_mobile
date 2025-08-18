@@ -64,7 +64,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                 </CardHeader>
                 <CardContent className="p-3 flex-1">
                      <DialogTrigger asChild>
-                        <h3 className="font-bold text-base leading-tight cursor-pointer hover:underline">{recipe.name}</h3>
+                        <h3 className="font-bold text-sm leading-tight cursor-pointer hover:underline md:text-base">{recipe.name}</h3>
                     </DialogTrigger>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
