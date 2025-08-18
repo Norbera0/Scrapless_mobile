@@ -372,7 +372,7 @@ export default function MyWastePage() {
               <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
                   <div className="flex-grow">
-                    <CardTitle className="text-sm font-semibold">Waste & Savings</CardTitle>
+                    <CardTitle className="text-base font-semibold">Waste & Savings</CardTitle>
                     <CardDescription className="text-xs">
                       This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
                     </CardDescription>
@@ -515,11 +515,11 @@ export default function MyWastePage() {
             
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
                     </CardTitle>
-                    <CardDescription>Root causes and the types of food involved.</CardDescription>
+                    <CardDescription className="text-xs">Root causes and the types of food involved.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {reasonCategoryData.length > 0 ? (
@@ -564,7 +564,7 @@ export default function MyWastePage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Lightbulb className="h-5 w-5 text-amber-500" />
                   Want deeper insights?
                 </CardTitle>
