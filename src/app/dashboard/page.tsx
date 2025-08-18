@@ -162,6 +162,46 @@ export default function DashboardPage() {
     return `Don't let them go to waste! ${count} of your food in the pantry including ${namesString} are expiring soon.`;
   }, [expiringSoonItems]);
 
+  const lowStockEssentialsMessage = useMemo(() => {
+    const essentials: { [key: string]: { threshold: number, unit?: string } } = {
+        'onion': { threshold: 3 },
+        'garlic': { threshold: 3 },
+        'egg': { threshold: 4 },
+        'rice': { threshold: 1, unit: 'kg' },
+        'cooking oil': { threshold: 0.5, unit: 'l' },
+    };
+
+    const lowStockItems = Object.keys(essentials).map(key => {
+        const itemInPantry = liveItems.find(pItem => pItem.name.toLowerCase().includes(key));
+        if (!itemInPantry) return { name: key.charAt(0).toUpperCase() + key.slice(1), isLow: true };
+
+        const config = essentials[key];
+        // If unit is specified (like kg), check for that unit. Otherwise, check quantity.
+        if (config.unit) {
+            if (itemInPantry.unit.toLowerCase().includes(config.unit) && itemInPantry.quantity < config.threshold) {
+                return { name: itemInPantry.name, isLow: true };
+            }
+        } else {
+            if (itemInPantry.quantity < config.threshold) {
+                return { name: itemInPantry.name, isLow: true };
+            }
+        }
+        return { name: key.charAt(0).toUpperCase() + key.slice(1), isLow: false };
+    }).filter(item => item.isLow);
+
+    if (lowStockItems.length === 0) {
+        return "Your kitchen essentials are well-stocked.";
+    }
+
+    const itemNames = lowStockItems.map(item => item.name);
+    let namesString = itemNames[0];
+    if (itemNames.length === 2) namesString = `${itemNames[0]} and ${itemNames[1]}`;
+    if (itemNames.length > 2) namesString = `${itemNames.slice(0, 2).join(', ')}, and ${itemNames[2]}`;
+    
+    return `Your ${namesString} ${lowStockItems.length > 1 ? 'are' : 'is'} low in stock.`;
+  }, [liveItems]);
+
+
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const savingsGoal = settings.savingsGoal || 5000;
   const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
@@ -306,7 +346,7 @@ export default function DashboardPage() {
                         <ShoppingCart className="w-8 h-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Running low on essentials?</h3>
-                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Onions, Garlic, and Eggs</span> are low in stock.</p>
+                    <p className="text-muted-foreground mb-4"><span className="font-semibold text-primary">{lowStockEssentialsMessage}</span></p>
                     <Button variant="default" onClick={() => router.push('/shopping')}>
                         Go Shopping
                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -333,5 +373,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
