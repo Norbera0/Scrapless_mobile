@@ -32,7 +32,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
             <CardContent className="p-4 pt-0 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
                     <p className="text-sm text-muted-foreground mb-3">{solution.description}</p>
-                    {solution.estimatedSavings && (
+                    {solution.estimatedSavings > 0 && (
                          <p className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}/mo</p>
                     )}
                 </div>
@@ -52,14 +52,14 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
 const WizardStepCard = ({ icon, title, children }: { icon: React.ElementType, title: string, children: React.ReactNode }) => {
     const Icon = icon;
     return (
-        <Card className="h-full border-0 shadow-none">
+        <Card className="h-full border-0 shadow-none bg-transparent">
             <CardHeader className="items-center text-center">
-                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                     <Icon className="w-8 h-8 text-primary" />
                  </div>
-                <CardTitle className="text-2xl">{title}</CardTitle>
+                <CardTitle className="text-xl md:text-2xl">{title}</CardTitle>
             </CardHeader>
-            <CardContent className="text-center text-muted-foreground leading-relaxed">
+            <CardContent className="text-center text-muted-foreground text-sm md:text-base leading-relaxed px-2">
                 {children}
             </CardContent>
         </Card>
@@ -83,11 +83,11 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     const steps = useMemo(() => {
         const baseSteps = [
-            { id: 'title', icon: Brain, title: "Your New Focus", content: <h3 className="text-xl font-semibold text-foreground">{analysis.title}</h3> },
-            { id: 'situation', icon: Target, title: "What's Happening", content: <ul>{analysis.story.situation.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
-            { id: 'root-cause', icon: Lightbulb, title: 'The Root Cause', content: <ul>{analysis.story.rootCause.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
-            { id: 'impact', icon: Wallet, title: 'The Impact', content: <p>{analysis.story.impact}</p> },
-            { id: 'prediction', icon: AlertTriangle, title: 'The Prediction', content: <p>{analysis.prediction}</p> },
+            { id: 'title', icon: Brain, title: "Your New Focus", content: <h3 className="text-lg md:text-xl font-semibold text-foreground">{analysis.title}</h3> },
+            { id: 'situation', icon: Target, title: "What's Happening", content: <ul className="list-disc list-inside text-left mx-auto max-w-sm">{analysis.story.situation.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
+            { id: 'root-cause', icon: Lightbulb, title: 'The Root Cause', content: <ul className="list-disc list-inside text-left mx-auto max-w-sm">{analysis.story.rootCause.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
+            { id: 'impact', icon: Wallet, title: 'The Impact', content: <p className="font-semibold text-foreground">{analysis.story.impact}</p> },
+            { id: 'prediction', icon: AlertTriangle, title: 'The Prediction', content: <p className="font-semibold text-foreground">{analysis.prediction}</p> },
         ];
         
         const bpiSolution = solutions.solutions.find(s => s.title.toLowerCase().includes('bpi'));
@@ -109,37 +109,38 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     useEffect(() => {
         if (!api) return;
-        setCurrent(api.selectedScrollSnap() + 1);
+        setCurrent(api.selectedScrollSnap());
         api.on("select", () => {
-            setCurrent(api.selectedScrollSnap() + 1);
+            setCurrent(api.selectedScrollSnap());
         });
     }, [api]);
 
-    const isLastStep = current === totalSteps;
+    const isLastStep = current === totalSteps - 1;
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-lg p-0 border-0 gap-0">
-                <DialogHeader className="p-6 pb-0">
+            <DialogContent className="max-w-[90vw] sm:max-w-lg p-0 border-0 gap-0 flex flex-col max-h-[95vh]">
+                <DialogHeader className="p-6 pb-2">
                     <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
                     <DialogDescription>
                         A step-by-step guide to understanding and improving your kitchen habits.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="p-6 pt-0">
-                    <Carousel setApi={setApi} className="w-full">
-                        <CarouselContent>
-                            {steps.map((step) => (
-                                <CarouselItem key={step.id}>
-                                    <div className="p-1 h-[55vh] flex items-center justify-center">
+                
+                <div className="flex-1 overflow-hidden px-2">
+                    <Carousel setApi={setApi} className="w-full h-full">
+                        <CarouselContent className="h-full">
+                            {steps.map((step, index) => (
+                                <CarouselItem key={step.id} className="flex items-center justify-center">
+                                    <div className="p-1 h-full w-full">
                                         {step.id === 'solutions' ? (
                                             <div className="w-full h-full flex flex-col items-center text-center">
-                                                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                                                 <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
                                                     <Check className="w-8 h-8 text-primary" />
                                                  </div>
-                                                <h2 className="text-2xl font-bold mb-1">Your Action Plan</h2>
+                                                <h2 className="text-xl md:text-2xl font-bold mb-1">Your Action Plan</h2>
                                                 <p className="text-muted-foreground mb-4">Choose one or more solutions to work on.</p>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full flex-1">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full flex-1 overflow-y-auto p-1">
                                                     {solutions.solutions.filter(s => !s.title.toLowerCase().includes('bpi')).map((s, i) => (
                                                          <SolutionCard 
                                                             key={i} 
@@ -160,15 +161,27 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="left-[-1rem] sm:left-2" />
-                        <CarouselNext className="right-[-1rem] sm:right-2"/>
+                        <CarouselPrevious className="left-[-0.5rem] sm:left-2" />
+                        <CarouselNext className="right-[-0.5rem] sm:right-2"/>
                     </Carousel>
                 </div>
+
                 <div className="p-6 bg-secondary/50 border-t flex flex-col items-center gap-4">
-                     <Progress value={(current / totalSteps) * 100} className="w-full" />
-                     <p className="text-sm text-muted-foreground">Step {current} of {totalSteps}</p>
-                     <Button onClick={onClose} className="w-full" size="lg">
+                     <div className="w-full flex justify-center items-center gap-2">
+                        {Array.from({ length: totalSteps }).map((_, i) => (
+                            <div
+                                key={i}
+                                className={cn(
+                                    "h-1.5 rounded-full transition-all duration-300",
+                                    i === current ? "w-6 bg-primary" : "w-1.5 bg-muted"
+                                )}
+                            />
+                        ))}
+                     </div>
+                     <p className="text-xs text-muted-foreground font-medium">STEP {current + 1} OF {totalSteps}</p>
+                     <Button onClick={() => isLastStep ? onClose() : api?.scrollNext()} className="w-full" size="lg">
                         {isLastStep ? 'I Understand, Let\'s Do This!' : 'Next'}
+                        {!isLastStep && <ArrowRight className="w-4 h-4 ml-2" />}
                      </Button>
                 </div>
             </DialogContent>
