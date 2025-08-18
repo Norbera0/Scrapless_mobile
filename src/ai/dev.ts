@@ -15,4 +15,5 @@ import '@/ai/flows/get-kitchen-coach-advice.ts';
 import '@/ai/flows/get-coach-solutions.ts';
 import '@/ai/flows/analyze-waste-patterns.ts';
 import '@/ai/flows/get-disposal-tip.ts';
+import '@/ai/flows/get-waste-breakdown-insight.ts';
     

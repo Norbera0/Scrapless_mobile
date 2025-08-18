@@ -61,6 +61,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformancePanel';
+import { WasteBreakdownCard } from '@/components/dashboard/WasteBreakdownCard';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -249,30 +250,7 @@ export default function DashboardPage() {
             </Popover>
         </div>
 
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg md:text-xl flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" /> Explore More
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-auto py-3" onClick={() => router.push('/bpi')}>
-                        <Landmark className="w-5 h-5 mr-2" />
-                        <span className="font-semibold">BPI Hub</span>
-                    </Button>
-                    <Button variant="outline" className="h-auto py-3" onClick={() => {
-                           const chatButton = document.querySelector('[aria-label="Open Chat"]');
-                            if (chatButton instanceof HTMLElement) {
-                                chatButton.click();
-                            }
-                        }}>
-                        <Bot className="w-5 h-5 mr-2" />
-                        <span className="font-semibold">AI Chatbot</span>
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
+        <WasteBreakdownCard wasteLogs={logs} />
 
         <Card className="shadow-sm overflow-hidden">
             <CardContent className="p-0 flex">

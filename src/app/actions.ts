@@ -7,6 +7,7 @@ import type { Insight, User } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
 import { analyzeWastePatterns as analyzeWastePatternsFlow, type AnalyzeWastePatternsInput, type AnalyzeWastePatternsOutput } from '@/ai/flows/analyze-waste-patterns';
+import { getWasteBreakdownInsight as getWasteBreakdownInsightFlow, type GetWasteBreakdownInsightInput, type GetWasteBreakdownInsightOutput } from '@/ai/flows/get-waste-breakdown-insight';
 
 /**
  * Server Action to get recipe suggestions.
@@ -54,5 +55,14 @@ export async function analyzeWastePatterns(input: AnalyzeWastePatternsInput): Pr
     } catch (error) {
         console.error("Error analyzing waste patterns in server action:", error);
         throw new Error("Failed to analyze waste patterns.");
+    }
+}
+
+export async function getWasteBreakdownInsight(input: GetWasteBreakdownInsightInput): Promise<GetWasteBreakdownInsightOutput> {
+    try {
+        return await getWasteBreakdownInsightFlow(input);
+    } catch (error) {
+        console.error("Error getting waste breakdown insight in server action:", error);
+        throw new Error("Failed to get waste breakdown insight.");
     }
 }

@@ -346,4 +346,16 @@ export const GetDisposalTipOutputSchema = z.object({
   tip: z.string().describe("A single, actionable disposal tip."),
 });
 export type GetDisposalTipOutput = z.infer<typeof GetDisposalTipOutputSchema>;
+
+// Waste Breakdown Card Insight Schema
+export const GetWasteBreakdownInsightInputSchema = z.object({
+    topCategory: z.string().describe("The food category with the highest percentage of waste."),
+    percentage: z.number().describe("The percentage of total waste contributed by the top category."),
+});
+export type GetWasteBreakdownInsightInput = z.infer<typeof GetWasteBreakdownInsightInputSchema>;
+
+export const GetWasteBreakdownInsightOutputSchema = z.object({
+    insight: z.string().describe("A short, actionable tip to help the user reduce waste in their top category."),
+});
+export type GetWasteBreakdownInsightOutput = z.infer<typeof GetWasteBreakdownInsightOutputSchema>;
     
