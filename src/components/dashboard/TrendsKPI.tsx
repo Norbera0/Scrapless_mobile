@@ -69,7 +69,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
                             <TooltipTrigger>
                                 <Info className="w-3 h-3 cursor-pointer" />
                             </TooltipTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="w-56 text-center">
                                 <p>Total estimated peso value of all food logged as waste in the last 7 days.</p>
                             </TooltipContent>
                         </Tooltip>
@@ -93,7 +93,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
                             <TooltipTrigger>
                                 <Info className="w-3 h-3 cursor-pointer" />
                             </TooltipTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="w-56 text-center">
                                 <p>Total carbon dioxide equivalent emitted from this week's food waste.</p>
                             </TooltipContent>
                         </Tooltip>
@@ -117,7 +117,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
                             <TooltipTrigger>
                                 <Info className="w-3 h-3 cursor-pointer" />
                             </TooltipTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="w-56 text-center">
                                 <p>The number of full days that have passed since your last recorded food waste.</p>
                             </TooltipContent>
                         </Tooltip>
@@ -141,7 +141,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
                             <TooltipTrigger>
                                 <Info className="w-3 h-3 cursor-pointer" />
                             </TooltipTrigger>
-                            <TooltipContent>
+                            <TooltipContent className="w-56 text-center">
                                 <p>The percentage of items you have successfully used versus those that were wasted.</p>
                             </TooltipContent>
                         </Tooltip>
