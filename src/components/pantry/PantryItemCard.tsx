@@ -98,13 +98,17 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                <Package className="w-4 h-4" />
-                <span>{item.quantity} {item.unit}</span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 mb-4">
+                <div className="flex items-center gap-1">
+                    <Package className="w-4 h-4" />
+                    <span>{item.quantity} {item.unit}</span>
+                </div>
                 {item.estimatedCost && (
                     <>
-                        <span className="text-gray-300">•</span>
-                        <span>₱{item.estimatedCost.toFixed(2)}</span>
+                        <span className="text-gray-300 hidden sm:inline">•</span>
+                        <div className="flex items-center gap-1">
+                            <span>₱{item.estimatedCost.toFixed(2)}</span>
+                        </div>
                     </>
                 )}
             </div>
