@@ -364,7 +364,7 @@ export default function MyWastePage() {
                   <div className="flex-grow">
                     <CardTitle className="text-sm font-semibold">Waste & Savings</CardTitle>
                     <CardDescription className="text-xs">
-                      Daily impact of your actions
+                      This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
                     </CardDescription>
                   </div>
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2">
@@ -494,6 +494,11 @@ export default function MyWastePage() {
                     </AreaChart>
                   </ChartContainer>
                 </CardContent>
+                 <CardFooter className="px-4 py-3 border-t bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">
+                        Insight: In the last {getDaysFromTimeframe(timeframe)} days, you've wasted <strong className="text-destructive-foreground">₱{totalWaste.toFixed(2)}</strong> and saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong>.
+                    </p>
+                </CardFooter>
               </Card>
 
             <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
@@ -565,5 +570,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
-    
