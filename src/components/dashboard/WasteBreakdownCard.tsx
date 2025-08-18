@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import type { WasteLog } from '@/types';
 import { getWasteBreakdownInsight } from '@/app/actions';
-import { Lightbulb, Loader2 } from 'lucide-react';
+import { Lightbulb, Loader2, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -102,7 +102,10 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle>Waste Breakdown</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5 text-primary" />
+                    Waste Breakdown
+                </CardTitle>
                 <CardDescription>By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
