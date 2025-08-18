@@ -312,13 +312,13 @@ export default function MyWastePage() {
                     <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
                     <ChartContainer
                         config={offsetChartConfig}
-                        className="mx-auto aspect-square w-full max-w-[200px]"
+                        className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[180px]" : "max-w-[220px]")}
                     >
                         <RadialBarChart
                             data={offsetChartData}
                             endAngle={180}
-                            innerRadius={50}
-                            outerRadius={80}
+                            innerRadius={isMobile ? 45 : 60}
+                            outerRadius={isMobile ? 70 : 90}
                         >
                         <ChartTooltip
                             cursor={false}
