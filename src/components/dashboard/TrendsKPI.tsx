@@ -113,7 +113,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             <Carousel 
                 opts={{ 
                     align: "start", 
-                    dragFree: false,
+                    dragFree: true,
                     containScroll: "trimSnaps"
                 }} 
                 className="w-full"
