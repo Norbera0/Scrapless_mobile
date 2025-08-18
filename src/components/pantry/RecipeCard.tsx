@@ -52,7 +52,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                     </DialogTrigger>
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                         {recipe.tags?.map(tag => (
-                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg">
+                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg text-xs">
                                 {tag === 'Urgent' ? <Zap className="h-3 w-3 mr-1" /> : <Leaf className="h-3 w-3 mr-1" />}
                                 {tag}
                             </Badge>
@@ -62,22 +62,22 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         <Bookmark className={cn("h-4 w-4 text-white", isSaved && "fill-white")} />
                      </Button>
                 </CardHeader>
-                <CardContent className="p-4 flex-1">
+                <CardContent className="p-3 flex-1">
                      <DialogTrigger asChild>
-                        <h3 className="font-bold text-lg leading-tight cursor-pointer hover:underline">{recipe.name}</h3>
+                        <h3 className="font-bold text-base leading-tight cursor-pointer hover:underline">{recipe.name}</h3>
                     </DialogTrigger>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
-                        <div className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> {recipe.cookingTime}</div>
-                        <div className="flex items-center gap-1.5"><ChefHat className="h-4 w-4" /> {recipe.difficulty}</div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
+                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
+                        <div className="flex items-center gap-1"><ChefHat className="h-3 w-3" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
-                <CardFooter className="p-4 bg-secondary/30 flex justify-between items-center">
+                <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center">
                      <div className="flex items-center text-xs text-primary font-semibold">
                        <Globe className="h-3 w-3 mr-1.5" />
                        <p>{recipe.benefit}</p>
                     </div>
                     <Button size="sm" variant="ghost" className="h-auto px-2 py-1 text-xs" onClick={handleMarkAsCooked}>
-                        <CookingPot className="h-4 w-4 mr-1.5" /> Mark as Cooked
+                        <CookingPot className="h-4 w-4 mr-1" /> Cooked
                     </Button>
                 </CardFooter>
             </Card>
