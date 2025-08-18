@@ -105,7 +105,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 title: 'The Root Cause', 
                 content: (
                      <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
-                        {analysis.story.rootCause.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}:</strong> {s.split(':')[1] || s}</li>)}
+                        {analysis.story.rootCause.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}</strong></li>)}
                     </ul>
                 )
             },
@@ -152,7 +152,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-lg w-[90vw] p-0 border-0 gap-0 flex flex-col h-auto max-h-[85vh]">
+            <DialogContent className="max-w-lg w-[90vw] p-0 border-0 gap-0 flex flex-col h-auto max-h-[85vh] min-h-[500px]">
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
                     <DialogDescription>
@@ -161,7 +161,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 </DialogHeader>
                 
                 <div className="flex-1 overflow-y-auto px-2 min-h-0">
-                    <Carousel setApi={setApi} className="w-full">
+                    <Carousel setApi={setApi} className="w-full h-full">
                         <CarouselContent className="h-full">
                             {steps.map((step, index) => (
                                 <CarouselItem key={step.id} className="flex flex-col justify-center h-full">
