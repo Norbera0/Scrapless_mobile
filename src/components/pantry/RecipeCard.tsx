@@ -20,7 +20,6 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
-    const isUrgent = recipe.tags?.includes('Urgent');
     const { toast } = useToast();
     const { user } = useAuth();
 
