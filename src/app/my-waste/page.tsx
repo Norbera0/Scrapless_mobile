@@ -51,29 +51,17 @@ const reasonIconMap: { [key: string]: React.ElementType } = {
 };
 
 
-const CustomizedXAxisTick = ({ x, y, payload }: any) => {
+const CustomizedYAxisTick = ({ x, y, payload }: any) => {
     if (!payload || !payload.value) {
       return null;
     }
     const words = payload.value.split(' ');
-    
-    // Simple wrap for longer labels
-    if (words.length > 1) {
-        return (
-            <g transform={`translate(${x},${y})`}>
-              <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="10px" fontWeight="bold">
-                {words.map((word, i) => (
-                    <tspan x="0" dy="1.2em" key={i}>{word}</tspan>
-                ))}
-              </text>
-            </g>
-        );
-    }
   
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize="10px" fontWeight="bold">
-          {payload.value}
+        <text x={0} y={0} dy={4} textAnchor="end" fill="#666" fontSize="10px" fontWeight="bold">
+          {words[0]}
+          {words.length > 1 && <tspan x="0" dy="1.2em">{words.slice(1).join(' ')}</tspan>}
         </text>
       </g>
     );
@@ -524,29 +512,34 @@ export default function MyWastePage() {
                 <CardContent>
                     {reasonCategoryData.length > 0 ? (
                         <ChartContainer config={reasonChartConfig} className="h-[350px] w-full">
-                            <BarChart 
-                                accessibilityLayer
+                            <BarChart
+                                layout="vertical"
                                 data={reasonCategoryData}
-                                barCategoryGap="5%"
+                                margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
                             >
-                                <CartesianGrid vertical={false} />
-                                <XAxis
-                                    dataKey="name"
-                                    tickLine={false}
-                                    tickMargin={10}
-                                    axisLine={false}
-                                    tick={<CustomizedXAxisTick />}
-                                    interval={0}
+                                <CartesianGrid horizontal={false} />
+                                <XAxis type="number" hide />
+                                <YAxis 
+                                    type="category" 
+                                    dataKey="name" 
+                                    tickLine={false} 
+                                    axisLine={false} 
+                                    tickMargin={10} 
+                                    width={isMobile ? 60 : 80}
+                                    tick={<CustomizedYAxisTick />}
                                 />
-                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <ChartTooltip 
+                                    cursor={{fill: 'hsl(var(--muted))'}} 
+                                    content={<ChartTooltipContent />} 
+                                />
                                 <ChartLegend content={<ChartLegendContent />} />
-                                {allCategories.map((category, index) => (
+                                {allCategories.map((category) => (
                                     <Bar
                                         key={category}
                                         dataKey={category}
                                         stackId="a"
                                         fill={reasonChartConfig[category]?.color || '#8884d8'}
-                                        radius={index === allCategories.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                                        radius={[0, 4, 4, 0]}
                                     />
                                 ))}
                             </BarChart>
