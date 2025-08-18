@@ -6,7 +6,7 @@ import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -116,6 +116,12 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         </ol>
                     </div>
                 </div>
+                <DialogFooter>
+                    <Button onClick={handleMarkAsCooked} className="w-full">
+                        <CookingPot className="mr-2 h-4 w-4" />
+                        Mark as Cooked
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
