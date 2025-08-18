@@ -188,10 +188,10 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
 
     useEffect(() => {
         const calculateVisibleDays = () => {
-            let numDays = 7;
+            let numDays = 5; // Default for mobile
             if (containerRef.current) {
                 const containerWidth = containerRef.current.offsetWidth;
-                const buttonWidth = 72; // Approx width of a date button including gap (w-16 + gap-2)
+                const buttonWidth = 60; // Approx width of a date button including gap (w-12 + gap-2)
                 numDays = Math.max(1, Math.floor(containerWidth / buttonWidth));
             }
             return numDays;
@@ -255,7 +255,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                             <motion.button
                                 key={date.toISOString()}
                                 className={cn(
-                                    "flex-shrink-0 w-16 text-center rounded-lg p-2 transition-all border",
+                                    "flex-shrink-0 w-12 text-center rounded-lg p-1.5 transition-all border",
                                     isSameDay(date, selectedDate)
                                         ? 'bg-primary text-white border-primary shadow-md'
                                         : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
@@ -264,7 +264,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
-                                <p className={cn("text-lg font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
+                                <p className={cn("text-base font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
                             </motion.button>
                         ))}
                     </div>
@@ -548,16 +548,16 @@ export default function PantryPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2"><CookingPot className="w-8 h-8" />My Pantry</h1>
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base w-full sm:w-auto">
+                 <Button className="bg-primary hover:bg-primary/90 h-10 px-4 md:h-11 rounded-lg text-sm w-full sm:w-auto">
                   {activeTab === 'pantry' ? (
                     <>
                       <span>Add Items</span>
-                      <Plus className="w-5 h-5 ml-2" />
+                      <Plus className="w-4 h-4 ml-2" />
                     </>
                   ) : (
                     <>
                       <span>Log Waste</span>
-                      <Trash className="w-5 h-5 ml-2" />
+                      <Trash className="w-4 h-4 ml-2" />
                     </>
                   )}
                 </Button>
