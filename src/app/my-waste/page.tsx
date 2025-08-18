@@ -232,23 +232,6 @@ export default function MyWastePage() {
       }), {}),
   } satisfies ChartConfig
   
-  const offsetChartData = [{
-    month: "current",
-    savings: totalSavings,
-    waste: totalWaste,
-  }];
-  
-  const offsetChartConfig = {
-      savings: {
-          label: "Virtual Savings",
-          color: "hsl(var(--chart-1))",
-      },
-      waste: {
-          label: "Waste Cost",
-          color: "hsl(var(--destructive))",
-      }
-  } satisfies ChartConfig
-
   const netOffset = totalSavings - totalWaste;
 
   return (
@@ -295,69 +278,6 @@ export default function MyWastePage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <TrendsKPI logs={logs} />
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base font-semibold">Savings Offset ({timeframe})</CardTitle>
-                </CardHeader>
-                <CardContent className="flex items-center justify-center">
-                    <ChartContainer
-                        config={offsetChartConfig}
-                        className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[200px]" : "max-w-[250px]")}
-                    >
-                        <RadialBarChart
-                            data={offsetChartData}
-                            endAngle={180}
-                            innerRadius={isMobile ? 60 : 80}
-                            outerRadius={isMobile ? 80 : 110}
-                        >
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                        />
-                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                            <Label
-                                content={({ viewBox }) => {
-                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                        return (
-                                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                                            <tspan
-                                                x={viewBox.cx}
-                                                y={(viewBox.cy || 0) - 8}
-                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "text-destructive")}
-                                            >
-                                                ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                                            </tspan>
-                                            <tspan
-                                                x={viewBox.cx}
-                                                y={(viewBox.cy || 0) + 10}
-                                                className="fill-muted-foreground text-xs"
-                                            >
-                                                Net Offset
-                                            </tspan>
-                                        </text>
-                                        )
-                                    }
-                                }}
-                            />
-                        </PolarRadiusAxis>
-                        <RadialBar
-                            dataKey="savings"
-                            stackId="a"
-                            cornerRadius={5}
-                            fill="var(--color-savings)"
-                            className="stroke-transparent stroke-2"
-                        />
-                        <RadialBar
-                            dataKey="waste"
-                            fill="var(--color-waste)"
-                            stackId="a"
-                            cornerRadius={5}
-                            className="stroke-transparent stroke-2"
-                        />
-                        </RadialBarChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
             
               <Card className="lg:col-span-2">
                 <CardHeader>
@@ -494,7 +414,8 @@ export default function MyWastePage() {
                 </CardContent>
                  <CardFooter className="px-4 py-3 border-t bg-secondary/50">
                     <p className="text-xs text-muted-foreground">
-                        Insight: In the last {getDaysFromTimeframe(timeframe)} days, you've wasted <strong className="text-destructive">₱{totalWaste.toFixed(2)}</strong> and saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong>.
+                        Insight: You've saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong> and wasted <strong className="text-destructive">₱{totalWaste.toFixed(2)}</strong>. 
+                        Your net offset is <strong className={cn(netOffset >= 0 ? "text-green-600" : "text-destructive")}>₱{netOffset.toFixed(2)}</strong>.
                     </p>
                 </CardFooter>
               </Card>
