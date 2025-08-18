@@ -116,13 +116,15 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
     for (const ingredient of ingredients) {
         if (ingredient.status !== 'Have') continue;
 
-        const pantryItem = liveItems.find(p => p.name.toLowerCase() === ingredient.name.toLowerCase());
+        // Use a more flexible find method. Check if pantry item name includes the ingredient name.
+        const pantryItem = liveItems.find(p => p.name.toLowerCase().includes(ingredient.name.toLowerCase()));
 
         if (pantryItem) {
             const basePantryUnit = getBaseUnit(pantryItem.unit);
             const baseIngredientUnit = getBaseUnit(ingredient.unit);
 
-            if (basePantryUnit === baseIngredientUnit && pantryItem.quantity >= ingredient.quantity) {
+            // Also check if units are compatible or if one is just a plural of the other.
+            if ((basePantryUnit === baseIngredientUnit || `${basePantryUnit}s` === baseIngredientUnit || `${baseIngredientUnit}s` === basePantryUnit) && pantryItem.quantity >= ingredient.quantity) {
                 const newQuantity = pantryItem.quantity - ingredient.quantity;
                 updatePantryItemQuantity(pantryItem.id, newQuantity);
                 deductedItems.push(pantryItem);

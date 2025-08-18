@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { calculateAndSaveRecipeSavings } from '@/lib/savings';
 import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
+import { useRecipeStore } from '@/stores/recipe-store';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -24,6 +25,8 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
     const { toast } = useToast();
     const { user } = useAuth();
     const deductRecipeIngredients = usePantryLogStore((state) => state.deductRecipeIngredients);
+    const { setRecipes } = useRecipeStore();
+    const currentRecipes = useRecipeStore((state) => state.recipes);
 
     const handleMarkAsCooked = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -50,6 +53,9 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
             title: "Nice one!",
             description,
         });
+
+        // 3. Remove the recipe from the suggestion list
+        setRecipes(currentRecipes.filter(r => r.id !== recipe.id));
     };
 
     return (
