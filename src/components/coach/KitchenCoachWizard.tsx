@@ -174,8 +174,8 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
-                        <CarouselPrevious className="left-2 sm:left-4 top-1/3 -translate-y-1/2" />
-                        <CarouselNext className="right-2 sm:right-4 top-1/3 -translate-y-1/2" />
+                        <CarouselPrevious className="left-2 sm:left-4 top-[30%] -translate-y-1/2" />
+                        <CarouselNext className="right-2 sm:right-4 top-[30%] -translate-y-1/2" />
                     </Carousel>
                 </div>
 
