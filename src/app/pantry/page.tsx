@@ -544,11 +544,11 @@ export default function PantryPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-6 md:mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2"><CookingPot className="w-8 h-8" />My Pantry</h1>
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
-                 <Button className="bg-primary hover:bg-primary/90 h-10 px-4 md:h-11 rounded-lg text-sm w-full sm:w-auto">
+                 <Button className="bg-primary hover:bg-primary/90 h-10 px-4 rounded-lg text-sm">
                   {activeTab === 'pantry' ? (
                     <>
                       <span>Add Items</span>
