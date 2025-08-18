@@ -302,13 +302,13 @@ export default function MyWastePage() {
                 <CardContent className="flex items-center justify-center">
                     <ChartContainer
                         config={offsetChartConfig}
-                        className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[150px]" : "max-w-[180px]")}
+                        className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[200px]" : "max-w-[250px]")}
                     >
                         <RadialBarChart
                             data={offsetChartData}
                             endAngle={180}
-                            innerRadius={isMobile ? 44 : 56}
-                            outerRadius={isMobile ? 56 : 70}
+                            innerRadius={isMobile ? 60 : 80}
+                            outerRadius={isMobile ? 80 : 110}
                         >
                         <ChartTooltip
                             cursor={false}
