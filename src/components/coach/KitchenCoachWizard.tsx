@@ -83,11 +83,44 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     const steps = useMemo(() => {
         const baseSteps = [
-            { id: 'title', icon: Brain, title: "Your New Focus", content: <h3 className="text-lg md:text-xl font-semibold text-foreground">{analysis.title}</h3> },
-            { id: 'situation', icon: Target, title: "What's Happening", content: <ul className="list-disc list-inside text-left mx-auto max-w-sm">{analysis.story.situation.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
-            { id: 'root-cause', icon: Lightbulb, title: 'The Root Cause', content: <ul className="list-disc list-inside text-left mx-auto max-w-sm">{analysis.story.rootCause.map((s,i) => <li key={i} className="mb-1">{s}</li>)}</ul> },
-            { id: 'impact', icon: Wallet, title: 'The Impact', content: <p className="font-semibold text-foreground">{analysis.story.impact}</p> },
-            { id: 'prediction', icon: AlertTriangle, title: 'The Prediction', content: <p className="font-semibold text-foreground">{analysis.prediction}</p> },
+            { 
+                id: 'title', 
+                icon: Brain, 
+                title: "Your New Focus", 
+                content: <h3 className="text-lg md:text-xl font-semibold text-foreground">{analysis.title}</h3> 
+            },
+            { 
+                id: 'situation', 
+                icon: Target, 
+                title: "What's Happening", 
+                content: (
+                    <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
+                        {analysis.story.situation.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}:</strong> {s.split(':')[1] || s}</li>)}
+                    </ul>
+                )
+            },
+            { 
+                id: 'root-cause', 
+                icon: Lightbulb, 
+                title: 'The Root Cause', 
+                content: (
+                     <ul className="list-disc list-inside text-left mx-auto max-w-md space-y-2">
+                        {analysis.story.rootCause.map((s,i) => <li key={i}><strong className="font-semibold text-foreground">{(s.split(':')[0] || '')}:</strong> {s.split(':')[1] || s}</li>)}
+                    </ul>
+                )
+            },
+            { 
+                id: 'impact', 
+                icon: Wallet, 
+                title: 'The Impact', 
+                content: <p className="font-semibold text-foreground">{analysis.story.impact}</p> 
+            },
+            { 
+                id: 'prediction', 
+                icon: AlertTriangle, 
+                title: 'The Prediction', 
+                content: <p className="font-semibold text-foreground">{analysis.prediction}</p> 
+            },
         ];
         
         const bpiSolution = solutions.solutions.find(s => s.title.toLowerCase().includes('bpi'));
@@ -119,7 +152,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-[90vw] sm:max-w-lg p-0 border-0 gap-0 flex flex-col max-h-[95vh]">
+            <DialogContent className="max-w-lg w-[90vw] p-0 border-0 gap-0 flex flex-col max-h-[90vh] h-auto">
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle>Your Kitchen Coach Plan</DialogTitle>
                     <DialogDescription>
@@ -127,7 +160,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                     </DialogDescription>
                 </DialogHeader>
                 
-                <div className="flex-1 overflow-hidden px-2">
+                <div className="flex-1 overflow-hidden px-2 min-h-0">
                     <Carousel setApi={setApi} className="w-full h-full">
                         <CarouselContent className="h-full">
                             {steps.map((step, index) => (
