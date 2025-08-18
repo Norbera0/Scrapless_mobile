@@ -478,7 +478,7 @@ export default function MyWastePage() {
                             fill="url(#fillWaste)"
                             fillOpacity={0.4}
                             stroke={chartConfig[chartMetric].color}
-                            stackId={chartMetric === 'totalPesoValue' ? "a" : chartMetric}
+                            stackId={chartMetric === 'totalPesoValue' ? "value" : "co2"}
                         />
                         {chartMetric === 'totalPesoValue' && (
                             <Area
@@ -488,7 +488,7 @@ export default function MyWastePage() {
                                 fill="url(#fillSavings)"
                                 fillOpacity={0.4}
                                 stroke={chartConfig.totalSavings.color}
-                                stackId="a"
+                                stackId="value"
                             />
                         )}
                     </AreaChart>
