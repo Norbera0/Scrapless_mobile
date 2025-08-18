@@ -236,40 +236,41 @@ export default function MyWastePage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
-       <div className="flex items-center justify-between gap-2">
-            <div className="space-y-1">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-                  <BarChart2 className="w-8 h-8 text-primary" />
-                  My Waste Impact
-                </h1>
-                <p className="text-muted-foreground text-sm">
-                    Track your patterns, reduce waste, spend less
-                </p>
-            </div>
-            <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
-              <PopoverTrigger asChild>
-                <Button className="whitespace-nowrap bg-primary hover:bg-primary/90 h-10 text-sm">
-                    <Trash className="w-4 h-4 mr-2" />
-                    <span>Log Waste</span>
+       <div className="space-y-1">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <BarChart2 className="w-8 h-8 text-primary" />
+            My Waste Impact
+          </h1>
+          <p className="text-muted-foreground text-sm">
+              Track your patterns, reduce waste, spend less
+          </p>
+      </div>
+      <div className="flex justify-end">
+          <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
+            <PopoverTrigger asChild>
+              <Button className="whitespace-nowrap bg-primary hover:bg-primary/90 h-10 text-sm">
+                  <Trash className="w-4 h-4 mr-2" />
+                  <span>Log Waste</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-primary">
+              <div className="flex flex-col">
+                <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
+                  <Camera className="w-4 h-4 mr-2" /> Scan with Camera
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-primary">
-                <div className="flex flex-col">
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('camera')}>
-                    <Camera className="w-4 h-4 mr-2" /> Scan with Camera
-                  </Button>
-                  <Separator className="my-1 bg-white/20" />
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
-                    <Mic className="w-4 h-4 mr-2" /> Use Voice Log
-                  </Button>
-                  <Separator className="my-1 bg-white/20" />
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
-                    <Type className="w-4 h-4 mr-2" /> Type Manually
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-        </div>
+                <Separator className="my-1 bg-white/20" />
+                <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('voice')}>
+                  <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                </Button>
+                <Separator className="my-1 bg-white/20" />
+                <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('text')}>
+                  <Type className="w-4 h-4 mr-2" /> Type Manually
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+      </div>
+
 
       {!logsInitialized ? (
           <div className="flex h-64 w-full items-center justify-center p-4">
@@ -502,4 +503,3 @@ export default function MyWastePage() {
     </div>
   );
 }
-
