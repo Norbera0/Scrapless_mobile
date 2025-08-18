@@ -15,7 +15,7 @@ export interface ProgressSegment {
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { segments?: ProgressSegment[] }
->(({ className, value, segments, ...props }, ref) => {
+>(({ className, value, segments, style, ...props }, ref) => {
   const total = segments ? segments.reduce((acc, segment) => acc + segment.value, 0) : 100;
   
   return (
@@ -25,6 +25,7 @@ const Progress = React.forwardRef<
         "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
         className
       )}
+      style={style}
       {...props}
     >
       {segments && segments.length > 0 ? (
@@ -44,7 +45,11 @@ const Progress = React.forwardRef<
       ) : (
         <ProgressPrimitive.Indicator
           className="h-full w-full flex-1 bg-primary transition-all"
-          style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+          style={{ 
+            transform: `translateX(-${100 - (value || 0)}%)`,
+            // @ts-ignore
+            background: style?.['--indicator-bg'] || 'hsl(var(--primary))'
+          }}
         />
       )}
     </ProgressPrimitive.Root>
