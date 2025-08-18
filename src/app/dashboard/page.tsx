@@ -194,7 +194,7 @@ export default function DashboardPage() {
                       <p className="text-xs text-green-200 font-semibold">{formatPeso(monthSavings)} / {formatPeso(savingsGoal)}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Progress value={goalProgress} className="h-2 flex-1 [&>div]:bg-accent" />
+                        <Progress value={goalProgress} className="h-2 flex-1 [&>div]:bg-yellow-400" />
                         <p className="text-sm font-bold">{goalProgress}%</p>
                     </div>
                 </div>
