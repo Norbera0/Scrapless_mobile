@@ -39,7 +39,7 @@ You have been given the following analysis about a user's food waste pattern:
 Based *only* on the provided analysis and user context, generate a complete solutions package.
 
 **OUTPUT REQUIREMENTS**
-1.  **Generate Solutions**: Create a list of 2-3 tailored solutions.
+1.  **Generate Solutions**: Create a list of 2-3 tailored solutions. For the titles, use creative and engaging names like "Plan your meals", "FIFO Fridge Organization", or "The Kangkong Challenge" where appropriate for the context.
 2.  **Dynamic Difficulty**: The solutions MUST be tailored based on \`userContext.userStage\` and \`userContext.previouslyAttemptedSolutions\`.
     -   If a solution has been previously attempted, DO NOT suggest it again.
     -   For 'advanced_user', provide "Level Up" challenges instead of basic tips.
