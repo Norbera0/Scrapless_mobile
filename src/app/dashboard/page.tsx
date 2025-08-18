@@ -250,8 +250,6 @@ export default function DashboardPage() {
             </Popover>
         </div>
 
-        <WasteBreakdownCard wasteLogs={logs} />
-
         <Card className="shadow-sm overflow-hidden">
             <CardContent className="p-0 flex">
                 <div className="p-6 flex-1">
@@ -302,10 +300,8 @@ export default function DashboardPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <KitchenCoachPanel />
+            <WasteBreakdownCard wasteLogs={logs} />
+            <KitchenCoachPanel />
         </div>
         
       </div>
