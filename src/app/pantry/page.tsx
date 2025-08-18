@@ -191,7 +191,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
             let numDays = 7;
             if (containerRef.current) {
                 const containerWidth = containerRef.current.offsetWidth;
-                const buttonWidth = 92; // Approx width of a date button including gap
+                const buttonWidth = 72; // Approx width of a date button including gap (w-16 + gap-2)
                 numDays = Math.max(1, Math.floor(containerWidth / buttonWidth));
             }
             return numDays;
@@ -255,7 +255,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                             <motion.button
                                 key={date.toISOString()}
                                 className={cn(
-                                    "flex-shrink-0 w-20 text-center rounded-lg p-2.5 transition-all border",
+                                    "flex-shrink-0 w-16 text-center rounded-lg p-2 transition-all border",
                                     isSameDay(date, selectedDate)
                                         ? 'bg-primary text-white border-primary shadow-md'
                                         : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:bg-green-50'
@@ -264,7 +264,7 @@ const RecentWasteHistory = ({ logs }: { logs: WasteLog[] }) => {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <p className={cn("text-xs uppercase", isSameDay(date, selectedDate) ? 'text-green-200' : 'text-gray-400')}>{format(date, 'MMM')}</p>
-                                <p className={cn("text-xl font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
+                                <p className={cn("text-lg font-bold", isSameDay(date, selectedDate) ? 'text-white' : 'text-gray-800')}>{format(date, 'd')}</p>
                             </motion.button>
                         ))}
                     </div>
