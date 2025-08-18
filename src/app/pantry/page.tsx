@@ -47,7 +47,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { getRecipeSuggestions } from '@/app/actions';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { differenceInDays, startOfToday, format, parseISO, isSameDay, addDays, subDays, isAfter, startOfDay } from 'date-fns';
@@ -668,54 +668,62 @@ export default function PantryPage() {
 
             {/* Recipe Suggestions */}
             <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-gray-800">Recipe Suggestions</h2>
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                </div>
-                <Button
-                onClick={() => fetchRecipes(true)}
-                disabled={isLoadingRecipes}
-                variant="outline"
-                size="sm"
-                className="h-9"
-                >
-                <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
-                New Ideas
-                </Button>
-            </div>
-            {isLoadingRecipes && recipes.length === 0 ? (
-                <div className="text-center py-10">
-                    <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
-                    <p className="mt-2 text-gray-500">Finding delicious recipes...</p>
-                </div>
-            ) : recipes.length > 0 ? (
-                <Carousel opts={{ align: "start" }} className="w-full">
-                <CarouselContent className="-ml-4">
-                    {recipes.map((recipe) => (
-                    <CarouselItem key={recipe.id} className="basis-full sm:basis-1/2 lg:basis-1/3 pl-4">
-                        <RecipeCard
-                        recipe={recipe}
-                        isSaved={savedRecipeIds.has(recipe.id)}
-                        onToggleSave={handleToggleSave}
-                        />
-                    </CarouselItem>
-                    ))}
-                </CarouselContent>
-                </Carousel>
-            ) : (
-                <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
-                    <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No Recipes Found</h3>
-                    <p className="text-gray-500 mb-4 px-4">
-                        We couldn't find any recipes. Try adding more items to your pantry or refreshing.
-                    </p>
-                    <Button onClick={() => fetchRecipes(true)} className="h-11 text-base">
-                        <RefreshCw className="w-4 h-4 mr-2" />
-                        Try Again
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-gray-800">Recipe Suggestions</h2>
+                        <Sparkles className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <Button
+                        onClick={() => fetchRecipes(true)}
+                        disabled={isLoadingRecipes}
+                        variant="outline"
+                        size="sm"
+                        className="h-9"
+                    >
+                        <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
+                        New Ideas
                     </Button>
                 </div>
-            )}
+                {isLoadingRecipes && recipes.length === 0 ? (
+                    <div className="text-center py-10">
+                        <Loader2 className="w-8 h-8 mx-auto animate-spin text-primary" />
+                        <p className="mt-2 text-gray-500">Finding delicious recipes...</p>
+                    </div>
+                ) : recipes.length > 0 ? (
+                    <Carousel 
+                        opts={{ 
+                            align: "start",
+                            loop: true,
+                         }} 
+                        className="w-full"
+                    >
+                        <CarouselContent className="-ml-4">
+                            {recipes.map((recipe) => (
+                            <CarouselItem key={recipe.id} className="basis-full md:basis-1/2 lg:basis-1/3 pl-4">
+                                <RecipeCard
+                                    recipe={recipe}
+                                    isSaved={savedRecipeIds.has(recipe.id)}
+                                    onToggleSave={handleToggleSave}
+                                />
+                            </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="ml-12" />
+                        <CarouselNext className="mr-12"/>
+                    </Carousel>
+                ) : (
+                    <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
+                        <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No Recipes Found</h3>
+                        <p className="text-gray-500 mb-4 px-4">
+                            We couldn't find any recipes. Try adding more items to your pantry or refreshing.
+                        </p>
+                        <Button onClick={() => fetchRecipes(true)} className="h-11 text-base">
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Try Again
+                        </Button>
+                    </div>
+                )}
             </div>
         </>
         ) : (
