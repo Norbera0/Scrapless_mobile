@@ -8,6 +8,8 @@ import { subDays, isAfter, startOfDay, differenceInDays, parseISO } from 'date-f
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | null, inverse?: boolean }) => {
     if (percentage === null || isNaN(percentage) || !isFinite(percentage)) {
@@ -60,7 +62,19 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
     const kpiCards = [
         <Card key="waste" className="shadow-md h-32 flex flex-col justify-between">
             <CardHeader className="pb-2 pt-3 px-3">
-                <CardTitle className="text-xs font-medium text-muted-foreground">This Week's Waste</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                    <span>This Week's Waste</span>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Info className="w-3 h-3 cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Total estimated peso value of all food logged as waste in the last 7 days.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
@@ -72,7 +86,19 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
         </Card>,
         <Card key="co2" className="shadow-md h-32 flex flex-col justify-between">
             <CardHeader className="pb-2 pt-3 px-3">
-                <CardTitle className="text-xs font-medium text-muted-foreground">CO₂e Impact</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                   <span>CO₂e Impact</span>
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Info className="w-3 h-3 cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Total carbon dioxide equivalent emitted from this week's food waste.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
@@ -84,7 +110,19 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
         </Card>,
         <Card key="streak" className="shadow-md h-32 flex flex-col justify-between">
             <CardHeader className="pb-2 pt-3 px-3">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Waste-Free Streak</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                    <span>Waste-Free Streak</span>
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Info className="w-3 h-3 cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>The number of full days that have passed since your last recorded food waste.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
@@ -96,7 +134,19 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
         </Card>,
         <Card key="rate" className="shadow-md h-32 flex flex-col justify-between">
             <CardHeader className="pb-2 pt-3 px-3">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Food Success Rate</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
+                    <span>Food Success Rate</span>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Info className="w-3 h-3 cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>The percentage of items you have successfully used versus those that were wasted.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
