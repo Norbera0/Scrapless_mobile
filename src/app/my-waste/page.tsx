@@ -359,7 +359,7 @@ export default function MyWastePage() {
                 <TrendsKPI logs={logs} />
             </div>
             
-              <Card className="-mt-20">
+              <Card>
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
                   <div className="flex-grow">
                     <CardTitle className="text-sm font-semibold">Waste & Savings</CardTitle>
