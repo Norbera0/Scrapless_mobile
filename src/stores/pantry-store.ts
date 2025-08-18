@@ -1,7 +1,8 @@
 
 import { create } from 'zustand';
 import type { PantryItem, RecipeIngredient } from '@/types';
-import { updatePantryItemStatus } from '@/lib/data';
+import { updatePantryItemStatus, savePantryItems } from '@/lib/data';
+import { convertToBaseUnit, convertFromBaseUnit } from '@/lib/conversions';
 
 export interface PantryLogItem {
   id: string;
@@ -53,15 +54,6 @@ const initialState = {
     pantryInitialized: false,
 };
 
-// A very simple singular/plural unit converter for comparison.
-const getBaseUnit = (unit: string): string => {
-    const s = unit.toLowerCase().trim();
-    if (s.endsWith('s')) {
-        return s.slice(0, -1);
-    }
-    return s;
-};
-
 export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   ...initialState,
   setPhotoDataUri: (uri) => set({ photoDataUri: uri }),
@@ -84,27 +76,24 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
   },
   updatePantryItemQuantity: (itemId, newQuantity) => {
     set(state => {
-        if (newQuantity <= 0) {
-            // If quantity is zero or less, archive the item as 'used'
-            const itemToArchive = state.liveItems.find(item => item.id === itemId);
-            if (itemToArchive) {
-                const updatedItem = { ...itemToArchive, status: 'used' as 'used' | 'wasted', usedDate: new Date().toISOString(), quantity: 0 };
-                 // Fire-and-forget the backend update
-                updatePantryItemStatus(itemToArchive.userId, itemId, 'used').catch(console.error);
+        const itemToUpdate = state.liveItems.find(item => item.id === itemId);
+        if (!itemToUpdate) return state;
 
-                return {
-                    liveItems: state.liveItems.filter(item => item.id !== itemId),
-                    archivedItems: [updatedItem, ...state.archivedItems],
-                };
-            }
-            return state;
-        } else {
-            // Otherwise, just update the quantity
+        if (newQuantity <= 0) {
+            const updatedItem = { ...itemToUpdate, status: 'used' as 'used' | 'wasted', usedDate: new Date().toISOString(), quantity: 0 };
+            updatePantryItemStatus(itemToUpdate.userId, itemId, 'used').catch(console.error);
+
             return {
-                liveItems: state.liveItems.map(item =>
-                    item.id === itemId ? { ...item, quantity: newQuantity } : item
-                ),
+                liveItems: state.liveItems.filter(item => item.id !== itemId),
+                archivedItems: [updatedItem, ...state.archivedItems],
             };
+        } else {
+            const updatedLiveItems = state.liveItems.map(item =>
+                item.id === itemId ? { ...item, quantity: newQuantity } : item
+            );
+             // Fire-and-forget the backend update for quantity change
+            savePantryItems(itemToUpdate.userId, [{...itemToUpdate, quantity: newQuantity, id: itemId}]).catch(console.error);
+            return { liveItems: updatedLiveItems };
         }
     });
   },
@@ -116,19 +105,24 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
     for (const ingredient of ingredients) {
         if (ingredient.status !== 'Have') continue;
 
-        // Use a more flexible find method. Check if pantry item name includes the ingredient name.
         const pantryItem = liveItems.find(p => p.name.toLowerCase().includes(ingredient.name.toLowerCase()));
 
         if (pantryItem) {
-            const basePantryUnit = getBaseUnit(pantryItem.unit);
-            const baseIngredientUnit = getBaseUnit(ingredient.unit);
+            try {
+                const pantryBase = convertToBaseUnit(pantryItem.quantity, pantryItem.unit, pantryItem.name);
+                const recipeBase = convertToBaseUnit(ingredient.quantity, ingredient.unit, ingredient.name);
 
-            // Also check if units are compatible or if one is just a plural of the other.
-            if ((basePantryUnit === baseIngredientUnit || `${basePantryUnit}s` === baseIngredientUnit || `${baseIngredientUnit}s` === basePantryUnit) && pantryItem.quantity >= ingredient.quantity) {
-                const newQuantity = pantryItem.quantity - ingredient.quantity;
-                updatePantryItemQuantity(pantryItem.id, newQuantity);
-                deductedItems.push(pantryItem);
-            } else {
+                if (pantryBase.unit === recipeBase.unit && pantryBase.quantity >= recipeBase.quantity) {
+                    const remainingBaseQuantity = pantryBase.quantity - recipeBase.quantity;
+                    const remainingOriginalUnit = convertFromBaseUnit(remainingBaseQuantity, pantryBase.unit, pantryItem.unit, pantryItem.name);
+
+                    updatePantryItemQuantity(pantryItem.id, remainingOriginalUnit.quantity);
+                    deductedItems.push(pantryItem);
+                } else {
+                    missingItems.push(ingredient);
+                }
+            } catch (error) {
+                console.warn(`Conversion/deduction failed for "${ingredient.name}":`, error);
                 missingItems.push(ingredient);
             }
         } else {
