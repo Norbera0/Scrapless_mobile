@@ -108,30 +108,6 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
         </Card>
     ];
 
-    if (isMobile) {
-        return (
-            <Carousel 
-                opts={{ 
-                    align: "start", 
-                    dragFree: true,
-                    containScroll: "trimSnaps"
-                }} 
-                className="w-full"
-            >
-                <CarouselContent className="-ml-2">
-                    {kpiCards.map((card, index) => (
-                        <CarouselItem 
-                            key={index} 
-                            className="basis-[60%] pl-2"
-                        >
-                           {card}
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-            </Carousel>
-        );
-    }
-
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
            {kpiCards}
