@@ -64,6 +64,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                 </CardHeader>
                 <CardContent className="p-3 flex-1">
                     <h3 className="font-bold text-sm leading-tight md:text-base">{recipe.name}</h3>
+                     <p className="text-xs font-semibold text-green-600 mt-1">{recipe.benefit}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
                         <div className="flex items-center gap-1"><ChefHat className="h-3 w-3" /> {recipe.difficulty}</div>
@@ -71,11 +72,11 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                 </CardContent>
                 <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2">
                     <DialogTrigger asChild>
-                         <Button size="sm" variant="outline" className="h-auto px-3 py-1 text-xs flex-1 bg-white">
-                            View
+                         <Button size="sm" className="h-auto px-3 py-1 text-xs flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+                            View Recipe
                         </Button>
                     </DialogTrigger>
-                    <Button size="sm" variant="outline" className="h-auto px-3 py-1 text-xs flex-1 bg-white" onClick={handleMarkAsCooked}>
+                    <Button size="sm" variant="secondary" className="h-auto px-3 py-1 text-xs flex-1" onClick={handleMarkAsCooked}>
                         Cooked
                     </Button>
                 </CardFooter>
