@@ -236,7 +236,7 @@ export default function MyWastePage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
-       <div className="flex flex-row flex-wrap items-center justify-between gap-2">
+       <div className="flex items-center justify-between gap-2">
             <div className="space-y-1">
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
                   <BarChart2 className="w-8 h-8 text-primary" />
@@ -502,3 +502,4 @@ export default function MyWastePage() {
     </div>
   );
 }
+
