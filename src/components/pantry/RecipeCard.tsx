@@ -36,7 +36,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
 
     return (
         <Dialog>
-            <Card className={cn("overflow-hidden h-full flex flex-col group", isUrgent ? "border-amber-500/30" : "bg-card" )}>
+            <Card className="overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors">
                 <CardHeader className="p-0 relative">
                     <DialogTrigger asChild>
                         <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
@@ -63,21 +63,20 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                      </Button>
                 </CardHeader>
                 <CardContent className="p-3 flex-1">
-                     <DialogTrigger asChild>
-                        <h3 className="font-bold text-sm leading-tight cursor-pointer hover:underline md:text-base">{recipe.name}</h3>
-                    </DialogTrigger>
+                    <h3 className="font-bold text-sm leading-tight md:text-base">{recipe.name}</h3>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
                         <div className="flex items-center gap-1"><ChefHat className="h-3 w-3" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
-                <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center">
-                     <div className="flex items-center text-xs text-primary font-semibold">
-                       <Globe className="h-3 w-3 mr-1.5" />
-                       <p>{recipe.benefit}</p>
-                    </div>
-                    <Button size="sm" variant="ghost" className="h-auto px-2 py-1 text-xs" onClick={handleMarkAsCooked}>
-                        <CookingPot className="h-4 w-4 mr-1" /> Cooked
+                <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2">
+                    <DialogTrigger asChild>
+                         <Button size="sm" variant="outline" className="h-auto px-3 py-1 text-xs flex-1 bg-white">
+                            View
+                        </Button>
+                    </DialogTrigger>
+                    <Button size="sm" variant="outline" className="h-auto px-3 py-1 text-xs flex-1 bg-white" onClick={handleMarkAsCooked}>
+                        Cooked
                     </Button>
                 </CardFooter>
             </Card>
