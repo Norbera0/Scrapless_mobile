@@ -52,7 +52,7 @@ The input will be a single JSON object with two keys: "summaryMetrics" and "rawD
 Generate exactly ONE analysis focusing on the most impactful pattern. Structure the entire output as a single JSON object that strictly follows this schema. DO NOT INCLUDE solutions, quick wins, or encouragement.
 
 The output must be tailored and dynamic based on the user's context:
-1.  **Narrative Storytelling**: For \`story.situation\`, you MUST use the "smoking gun" evidence found in Step 3. Tell a short, personal story. For example: "Last Saturday you bought fresh Kangkong, but it was logged as 'wasted' on Friday..."
+1.  **Narrative Storytelling**: For \`story.situation\`, you MUST use the "smoking gun" evidence found in Step 3. Tell a short, personal story. For example, for the "situation" field, provide an array with ONE string like: "Last Saturday you bought fresh Kangkong, but it was logged as 'wasted' on Friday..." DO NOT repeat the sentence or add extra text.
 2.  **Personalized Root Cause**: For \`story.rootCause\`, you MUST explicitly reference the "User Persona" diagnosed in Step 1. For example: "This is a classic sign of the 'Weekend Impulse Buyer' habit..."
 
 {
@@ -60,7 +60,7 @@ The output must be tailored and dynamic based on the user's context:
   "confidence": "high|medium|low",
   "title": "Clear, specific pattern name (e.g., 'Weekend Vegetable Overbuying')",
   "story": {
-    "situation": ["What's happening (2-3 bullets, specific to user data, citing the 'smoking gun' example)"],
+    "situation": ["A single, concise bullet point describing what's happening, citing the 'smoking gun' example. E.g., 'Last Saturday you bought fresh Kangkong, but it was logged as 'wasted' on Friday after not being used.'"],
     "impact": "Financial + environmental cost (specific numbers)",
     "rootCause": ["Why this happens (psychological/cultural reasons, referencing the user persona, 2-3 bullets)"]
   },
