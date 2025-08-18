@@ -544,11 +544,11 @@ export default function PantryPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2"><CookingPot className="w-8 h-8" />My Pantry</h1>
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base">
+                <Button className="bg-primary hover:bg-primary/90 h-11 px-4 md:h-12 md:px-6 rounded-lg text-sm md:text-base w-full sm:w-auto">
                   {activeTab === 'pantry' ? (
                     <>
                       <span>Add Items</span>
@@ -608,15 +608,15 @@ export default function PantryPage() {
           </div>
           
           {activeTab === 'pantry' && (
-            <div className="space-y-4">
-                <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                    placeholder="Search your pantry..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-11 h-12 text-base bg-white border-gray-200 focus:border-primary focus:ring-primary/20"
-                />
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                        placeholder="Search your pantry..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-11 h-12 text-base bg-white border-gray-200 focus:border-primary focus:ring-primary/20"
+                    />
                 </div>
                 <div className="flex gap-2 items-center overflow-x-auto pb-2 scrollbar-hide">
                     {filterOptions.map(opt => (
@@ -671,7 +671,7 @@ export default function PantryPage() {
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                 {filteredItems.map((item) => (
                     <PantryItemCard
                     key={item.id}
