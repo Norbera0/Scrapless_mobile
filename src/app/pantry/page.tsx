@@ -706,9 +706,9 @@ export default function PantryPage() {
                 ) : recipes.length > 0 ? (
                     <div>
                         <Carousel setApi={setCarouselApi} opts={{ align: "start" }} className="w-full">
-                            <CarouselContent className="-ml-4">
+                            <CarouselContent>
                                 {recipes.map((recipe) => (
-                                <CarouselItem key={recipe.id} className="pl-4 basis-full md:basis-1/2 lg:basis-1/3">
+                                <CarouselItem key={recipe.id} className="basis-full md:basis-1/2 lg:basis-1/3">
                                     <RecipeCard
                                         recipe={recipe}
                                         isSaved={savedRecipeIds.has(recipe.id)}
