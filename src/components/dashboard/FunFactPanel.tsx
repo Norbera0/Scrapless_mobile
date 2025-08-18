@@ -138,7 +138,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
   return (
      <Card className="shadow-sm">
         <CardHeader>
-             <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
+             <CardTitle className="flex items-center gap-2 text-base">
                 <Icon className="w-5 h-5" />
                 Did You Know?
             </CardTitle>
@@ -178,7 +178,7 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
                              <div className="flex-1">
                                 {currentFact.mainFact ? (
                                     <div className="mb-4">
-                                        <p className="text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
+                                        <p className="text-3xl md:text-4xl font-bold text-primary">{currentFact.mainFact.value}</p>
                                         <p className="text-sm text-gray-600">{currentFact.mainFact.description}</p>
                                     </div>
                                 ) : (

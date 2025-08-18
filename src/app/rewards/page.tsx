@@ -60,8 +60,8 @@ export default function GreenPointsPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">✨ Green Points</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">✨ Green Points</h1>
+                <p className="text-muted-foreground text-sm">
                     Earn points for your sustainable actions.
                 </p>
             </div>
@@ -72,7 +72,7 @@ export default function GreenPointsPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-5xl font-bold tracking-tighter">{totalPoints.toLocaleString()}</p>
-                    <p className="text-green-200 mt-1">Ready to be converted.</p>
+                    <p className="text-green-200 mt-1 text-sm">Ready to be converted.</p>
                 </CardContent>
                 <CardFooter>
                      <Button 
@@ -93,8 +93,8 @@ export default function GreenPointsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription>See how you've earned your points.</CardDescription>
+                    <CardTitle className="text-lg">Recent Activity</CardTitle>
+                    <CardDescription className="text-sm">See how you've earned your points.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      {events.length > 0 ? (

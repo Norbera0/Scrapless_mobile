@@ -102,11 +102,11 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                     <BarChart2 className="w-5 h-5 text-primary" />
                     Waste Breakdown
                 </CardTitle>
-                <CardDescription>By food category based on cost.</CardDescription>
+                <CardDescription className="text-xs">By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">

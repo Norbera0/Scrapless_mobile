@@ -144,18 +144,18 @@ export default function ShoppingHubPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
             <ShoppingCart className="w-8 h-8" />
             Shopping Hub
         </h1>
-        <p className="text-muted-foreground">AI-powered suggestions to help you buy smarter and save more with BPI.</p>
+        <p className="text-muted-foreground text-sm">AI-powered suggestions to help you buy smarter and save more with BPI.</p>
       </div>
       
       {!generatedList ? (
         <Card>
             <CardHeader>
-                <CardTitle>Create This Week's List</CardTitle>
-                <CardDescription>Analyze pantry gaps and waste to buy just what you need.</CardDescription>
+                <CardTitle className="text-lg">Create This Week's List</CardTitle>
+                <CardDescription className="text-sm">Analyze pantry gaps and waste to buy just what you need.</CardDescription>
             </CardHeader>
             <CardContent>
                 <Button className="w-full" onClick={handleGenerateList} disabled={isLoading}>
@@ -177,8 +177,8 @@ export default function ShoppingHubPage() {
         <>
             <Card>
                 <CardHeader>
-                    <CardTitle>Your Smart Shopping List</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-lg">Your Smart Shopping List</CardTitle>
+                    <CardDescription className="text-sm">
                         Check off items as you shop to see your total.
                     </CardDescription>
                 </CardHeader>

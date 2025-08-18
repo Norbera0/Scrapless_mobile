@@ -90,7 +90,7 @@ export function KitchenCoachPanel() {
     return (
         <Card className="shadow-sm">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-base">
                     <DotLottieReact
                       src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
                       loop
@@ -99,7 +99,7 @@ export function KitchenCoachPanel() {
                     />
                     Your Kitchen Coach
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs">
                     Quick tips to reduce waste today.
                     {lastGenerated && (
                         <span className="block text-xs mt-1">
@@ -117,7 +117,7 @@ export function KitchenCoachPanel() {
                 ) : lastTip ? (
                     <div className="space-y-4">
                         <div className="bg-secondary/50 rounded-xl p-4 border">
-                            <h3 className="font-bold text-lg mb-1">{lastTip.title}</h3>
+                            <h3 className="font-bold text-base mb-1">{lastTip.title}</h3>
                             <ul className="text-muted-foreground text-sm list-disc list-inside space-y-1">
                                 {lastTip.story.situation.map((sit, i) => <li key={i}>{sit}</li>)}
                             </ul>

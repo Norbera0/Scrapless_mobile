@@ -117,7 +117,7 @@ export function WeeklyPerformancePanel() {
       <CardContent className="text-center space-y-3">
         <div className="flex items-center justify-center gap-2">
             <span className="text-lg font-medium text-muted-foreground">{formatPeso(weeklyData.lastWeekWaste)}</span>
-            <span className="text-lg font-bold">▶▶▶</span>
+            <span className="text-lg font-bold">▶</span>
             <span className="text-2xl font-bold">{formatPeso(weeklyData.thisWeekWaste)}</span>
         </div>
         <div className={cn(

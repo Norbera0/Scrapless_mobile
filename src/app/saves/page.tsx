@@ -75,8 +75,8 @@ export default function SavedItemsPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">🔖 My Saves</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">🔖 My Saves</h1>
+        <p className="text-muted-foreground text-sm">
           Your personal collection of recipes, insights, and tips.
         </p>
       </div>
@@ -85,8 +85,8 @@ export default function SavedItemsPage() {
         {/* Saved Recipes Section */}
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">🍴 Saved Recipes ({savedRecipes.length})</CardTitle>
-                <CardDescription>Recipes you've bookmarked to try.</CardDescription>
+                <CardTitle className="flex items-center gap-2 text-lg">🍴 Saved Recipes ({savedRecipes.length})</CardTitle>
+                <CardDescription className="text-sm">Recipes you've bookmarked to try.</CardDescription>
             </CardHeader>
             <CardContent>
                 {savedRecipes.length > 0 ? (
@@ -112,8 +112,8 @@ export default function SavedItemsPage() {
         {/* Used Food History */}
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">✅ Recently Used Items ({usedItems.length})</CardTitle>
-                <CardDescription>A log of food you successfully used.</CardDescription>
+                <CardTitle className="flex items-center gap-2 text-lg">✅ Recently Used Items ({usedItems.length})</CardTitle>
+                <CardDescription className="text-sm">A log of food you successfully used.</CardDescription>
             </CardHeader>
             <CardContent>
                 {usedItems.length > 0 ? (
@@ -150,8 +150,8 @@ export default function SavedItemsPage() {
         <Card>
             <CardHeader className="flex-row items-center justify-between">
                 <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2 text-muted-foreground">🛒 Shopping Tips I'm Trying</CardTitle>
-                    <CardDescription>Shopping recommendations you are actively implementing.</CardDescription>
+                    <CardTitle className="flex items-center gap-2 text-lg text-muted-foreground">🛒 Shopping Tips I'm Trying</CardTitle>
+                    <CardDescription className="text-sm">Shopping recommendations you are actively implementing.</CardDescription>
                 </div>
                  <Button variant="outline" disabled>Coming Soon</Button>
             </CardHeader>

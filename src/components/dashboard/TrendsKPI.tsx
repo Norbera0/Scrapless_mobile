@@ -78,7 +78,7 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             </CardHeader>
             <CardContent className="px-3 pb-3">
                 <div className="text-xl font-bold">
-                    <span className="text-muted-foreground">₱</span>{stats.thisWeekWaste.toFixed(0)}
+                    ₱{stats.thisWeekWaste.toFixed(0)}
                 </div>
                 <TrendIndicator percentage={stats.wasteTrend} />
             </CardContent>

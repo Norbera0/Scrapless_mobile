@@ -52,8 +52,8 @@ export default function MySavingsPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Savings</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Savings</h1>
+                <p className="text-muted-foreground text-sm">
                     Your virtual savings from reducing food waste.
                 </p>
             </div>
@@ -64,7 +64,7 @@ export default function MySavingsPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-5xl font-bold tracking-tighter">₱{totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    <p className="text-green-200 mt-1">Earned from your sustainable actions.</p>
+                    <p className="text-green-200 mt-1 text-sm">Earned from your sustainable actions.</p>
                 </CardContent>
                 <CardFooter>
                      <Button 
@@ -80,8 +80,8 @@ export default function MySavingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Savings History</CardTitle>
-                    <CardDescription>See how your smart habits are adding up.</CardDescription>
+                    <CardTitle className="text-lg">Savings History</CardTitle>
+                    <CardDescription className="text-sm">See how your smart habits are adding up.</CardDescription>
                 </CardHeader>
                 <CardContent>
                      {savingsEvents.length > 0 ? (

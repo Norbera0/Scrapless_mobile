@@ -540,10 +540,10 @@ export default function PantryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
+    <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2"><CookingPot className="w-8 h-8" />My Pantry</h1>
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
@@ -650,7 +650,7 @@ export default function PantryPage() {
             </div>
 
             {!pantryInitialized ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
                     ))}
@@ -671,7 +671,7 @@ export default function PantryPage() {
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                 {filteredItems.map((item) => (
                     <PantryItemCard
                     key={item.id}
@@ -711,9 +711,9 @@ export default function PantryPage() {
                 ) : recipes.length > 0 ? (
                     <div>
                         <Carousel setApi={setCarouselApi} opts={{ align: "start" }} className="w-full">
-                            <CarouselContent>
+                            <CarouselContent className="-ml-2 md:-ml-4">
                                 {recipes.map((recipe) => (
-                                <CarouselItem key={recipe.id} className="basis-full md:basis-1/2 lg:basis-1/3">
+                                <CarouselItem key={recipe.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                                     <RecipeCard
                                         recipe={recipe}
                                         isSaved={savedRecipeIds.has(recipe.id)}

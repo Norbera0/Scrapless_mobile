@@ -192,7 +192,7 @@ export default function KitchenCoachPage() {
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
                 <div className="space-y-1 text-center">
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center justify-center gap-2">
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center justify-center gap-2">
                         <DotLottieReact
                           src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
                           style={{width: '40px', height: '40px'}}
@@ -201,7 +201,7 @@ export default function KitchenCoachPage() {
                         />
                         Kitchen Coach
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                         Your AI partner for a smarter, less wasteful kitchen.
                     </p>
                 </div>
@@ -231,7 +231,7 @@ export default function KitchenCoachPage() {
                         {/* Analysis Section */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-base"><Brain className="text-primary" /> The Analysis</CardTitle>
+                                <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
                                 <CardDescription>{analysis.title}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">

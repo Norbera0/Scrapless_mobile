@@ -235,19 +235,19 @@ export default function DashboardPage() {
             <div className="absolute inset-0 bg-black/40 z-0"></div>
             <div className="relative z-10 p-6 space-y-4">
               <CardHeader className="p-0">
-                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl text-white">{user?.name}'s Impact</CardTitle>
+                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl">{user?.name}'s Impact</CardTitle>
               </CardHeader>
               <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
                   <div>
                       <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
                       <div className="flex items-center justify-center gap-2">
-                          <p className="text-2xl sm:text-3xl md:text-4xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
                       </div>
                   </div>
                   <div>
                       <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
-                      <p className="text-2xl sm:text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-base md:text-lg font-medium text-green-200">kg</span></p>
+                      <p className="text-2xl sm:text-3xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-base font-medium text-green-200">kg</span></p>
                   </div>
               </CardContent>
                <div className="pt-4 border-t border-white/20">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-3">
                         <Progress value={goalProgress} className="h-2 flex-1" style={{
                             // @ts-ignore
-                            '--indicator-bg': '#D97706'
+                            '--indicator-bg': '#FBBF24'
                         }} />
                         <p className="text-sm font-bold">{goalProgress}%</p>
                     </div>

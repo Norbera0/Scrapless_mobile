@@ -11,9 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['var(--font-inter)', 'sans-serif'],
-        playfair: ['var(--font-playfair-display)', 'serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -47,10 +45,6 @@ export default {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
         },
-        'bpi-brand': {
-          DEFAULT: 'hsl(var(--bpi-brand))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
@@ -70,7 +64,6 @@ export default {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
-          input: 'hsl(var(--sidebar-input))'
         },
       },
       borderRadius: {

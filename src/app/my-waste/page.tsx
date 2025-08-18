@@ -238,8 +238,8 @@ export default function MyWastePage() {
     <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
        <div className="flex flex-row flex-wrap items-center justify-between gap-2">
             <div className="space-y-1">
-                <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-                  <BarChart2 className="w-6 h-6 text-primary" />
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                  <BarChart2 className="w-8 h-8 text-primary" />
                   My Waste Impact
                 </h1>
                 <p className="text-muted-foreground text-sm">
@@ -281,7 +281,10 @@ export default function MyWastePage() {
             
               <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle className="text-base md:text-lg font-semibold">Waste & Savings</CardTitle>
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5"/>
+                    Waste & Savings
+                  </CardTitle>
                   <CardDescription className="text-xs">
                     This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
                   </CardDescription>
@@ -424,7 +427,7 @@ export default function MyWastePage() {
             
             <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base md:text-lg font-semibold">
+                    <CardTitle className="flex items-center gap-2 text-lg font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
                     </CardTitle>

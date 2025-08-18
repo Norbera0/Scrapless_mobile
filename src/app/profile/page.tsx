@@ -48,11 +48,11 @@ const SavingsGoalSection = () => {
     return (
          <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
                     <PiggyBank className="text-primary" />
                     Monthly Savings Goal
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                     Set a target for your virtual savings each month.
                 </CardDescription>
             </CardHeader>
@@ -118,8 +118,8 @@ export default function ProfilePage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
             <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">Account Information</h1>
-                <p className="text-muted-foreground">Manage your account details and app preferences.</p>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Account Information</h1>
+                <p className="text-muted-foreground text-sm">Manage your account details and app preferences.</p>
             </div>
 
             {/* User Info Card */}
@@ -130,7 +130,7 @@ export default function ProfilePage() {
                             <AvatarFallback className="text-2xl">{getInitials(user?.name)}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <CardTitle className="text-2xl">{user?.name || 'Scrapless User'}</CardTitle>
+                            <CardTitle className="text-xl">{user?.name || 'Scrapless User'}</CardTitle>
                             <CardDescription>{user?.email}</CardDescription>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
             {/* Main Settings */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Settings</CardTitle>
+                    <CardTitle className="text-lg">Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                     <div 
