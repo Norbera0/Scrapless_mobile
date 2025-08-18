@@ -305,10 +305,10 @@ export default function MyWastePage() {
               <Loader2 className="h-8 w-8 animate-spin" />
           </div>
         ) : (
-          <div className="grid gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TrendsKPI logs={logs} />
-                <div className="flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center md:order-first lg:order-last">
                     <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
                     <ChartContainer
                         config={offsetChartConfig}
@@ -333,7 +333,7 @@ export default function MyWastePage() {
                                             <tspan
                                                 x={viewBox.cx}
                                                 y={(viewBox.cy || 0) - 8}
-                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "fill-red-600")}
+                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "text-destructive")}
                                             >
                                                 ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
                                             </tspan>
@@ -369,7 +369,7 @@ export default function MyWastePage() {
                 </div>
             </div>
             
-              <Card>
+              <Card className="lg:col-span-2">
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
                   <div className="flex-grow">
                     <CardTitle className="text-base font-semibold">Waste & Savings</CardTitle>
@@ -513,7 +513,7 @@ export default function MyWastePage() {
 
             <PantryHealthScore wasteLogs={logs} archivedItems={archivedItems} />
             
-            <Card>
+            <Card className="lg:col-span-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base font-semibold">
                         <Brain className="h-5 w-5" />
@@ -562,7 +562,7 @@ export default function MyWastePage() {
 
             <WeeklyPerformancePanel />
 
-            <Card>
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Lightbulb className="h-5 w-5 text-amber-500" />
