@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +17,7 @@ export default function BpiRewardsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">BPI Rewards (Mock)</h1>
+      <h1 className="text-2xl font-bold">BPI Rewards</h1>
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -50,5 +51,3 @@ export default function BpiRewardsPage() {
     </div>
   );
 }
-
-

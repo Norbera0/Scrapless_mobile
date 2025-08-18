@@ -21,7 +21,7 @@ export default function BpiHubPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">BPI Integration Hub (Mock)</h1>
+      <h1 className="text-2xl font-bold">BPI Integration Hub</h1>
       <p className="text-muted-foreground">Link your BPI account, view eco-linked savings, and explore green products.</p>
 
       <div className="grid gap-4 md:grid-cols-2">

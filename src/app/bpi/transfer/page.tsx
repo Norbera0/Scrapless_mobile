@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -28,7 +29,7 @@ export default function BpiTransferPage() {
     <Card>
       <CardHeader>
         <CardTitle>Suggest transfer to Green Saver</CardTitle>
-        <CardDescription>Move eco-savings into your BPI Green Saver Time Deposit (mock)</CardDescription>
+        <CardDescription>Move eco-savings into your BPI Green Saver Time Deposit</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-3">
         <div>
@@ -59,5 +60,3 @@ export default function BpiTransferPage() {
     </Card>
   );
 }
-
-

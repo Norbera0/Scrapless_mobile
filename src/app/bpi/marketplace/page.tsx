@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +12,7 @@ const partners = [
 export default function BpiMarketplacePage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Green Product Marketplace (Mock)</h1>
+      <h1 className="text-2xl font-bold">Green Product Marketplace</h1>
       <Card>
         <CardHeader>
           <CardTitle>Featured partners</CardTitle>
@@ -30,5 +31,3 @@ export default function BpiMarketplacePage() {
     </div>
   );
 }
-
-

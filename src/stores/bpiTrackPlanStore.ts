@@ -14,7 +14,7 @@ interface BpiTrackPlanState {
   trackPlanData: TrackPlanData | null;
   syncCount: number; // Simulate "learning" over time (e.g., more details after 3 syncs)
   linkAccount: () => void;
-  fetchMockData: () => void; // Simulate sync, evolving data
+  fetchSampleData: () => void; // Simulate sync, evolving data
   unlinkAccount: () => void;
 }
 
@@ -28,12 +28,12 @@ export const useBpiTrackPlanStore = create(
       trackPlanData: null,
       syncCount: 0,
       linkAccount: () => set({ isLinked: true }),
-      fetchMockData: () => {
+      fetchSampleData: () => {
         const currentCount = get().syncCount + 1;
         set({ syncCount: currentCount });
 
-        // Base mock data
-        let mockData: TrackPlanData = {
+        // Base sample data
+        let sampleData: TrackPlanData = {
           spendingCategories: [
             { category: 'Groceries', amount: 2500, trend: 'Up 10% from last month' },
             { category: 'Utilities', amount: 1500, trend: 'Stable' },
@@ -44,14 +44,14 @@ export const useBpiTrackPlanStore = create(
 
         // Simulate "learning": Add more details after 3 syncs (per BPI FAQ)
         if (currentCount >= 3) {
-          mockData = {
-            ...mockData,
+          sampleData = {
+            ...sampleData,
             cashFlowAlert: 'Your consistent saving has paid off! You have ₱1,200 in extra cash flow this month. Consider a BPI Green Saver Time Deposit.',
-            unusualTransactions: [...mockData.unusualTransactions, 'Your Friday grocery spending pattern is consistent. Planning meals for the weekend could reduce this cost.'],
+            unusualTransactions: [...sampleData.unusualTransactions, 'Your Friday grocery spending pattern is consistent. Planning meals for the weekend could reduce this cost.'],
           };
         }
 
-        set({ trackPlanData: mockData });
+        set({ trackPlanData: sampleData });
       },
       unlinkAccount: () => set({ isLinked: false, trackPlanData: null, syncCount: 0 }),
     }),

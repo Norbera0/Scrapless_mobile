@@ -174,7 +174,7 @@ export default function BpiSustainabilityDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>BPI accounts</CardTitle>
-            <CardDescription>Mock balances</CardDescription>
+            <CardDescription>Balances</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             {accounts.map((a) => (

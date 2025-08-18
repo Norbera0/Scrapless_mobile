@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -15,7 +16,7 @@ export default function BpiGoalsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Goal-based Savings (Mock)</h1>
+      <h1 className="text-2xl font-bold">Goal-based Savings</h1>
       <Card>
         <CardHeader>
           <CardTitle>Set a goal</CardTitle>
@@ -49,5 +50,3 @@ export default function BpiGoalsPage() {
     </div>
   );
 }
-
-

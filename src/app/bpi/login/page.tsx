@@ -29,12 +29,12 @@ export default function BpiLoginPage() {
     if (!consent) return;
     // Link main BPI account
     link(scopes);
-    // Link mock Track & Plan
+    // Link Track & Plan
     linkAccount();
     fetchMockData();
 
     toast({
-        title: "Mock BPI Account Linked!",
+        title: "BPI Account Linked!",
         description: `Sample Track & Plan data fetched. Sync ${syncCount + 1} time(s) for evolving insights.`,
     });
     router.push('/bpi/dashboard');
@@ -44,7 +44,7 @@ export default function BpiLoginPage() {
     unlink();
     unlinkAccount();
     toast({
-        title: "Mock BPI Account Unlinked",
+        title: "BPI Account Unlinked",
         description: "Sample data has been cleared.",
     });
   }
@@ -52,15 +52,15 @@ export default function BpiLoginPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mock BPI Login & Permissions</CardTitle>
+        <CardTitle>BPI Login & Permissions</CardTitle>
         <CardDescription>Authenticate and grant read access to accounts, balances, and Track & Plan spending data. This is a non-production demo.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
           <Info className="h-4 w-4" />
-          <AlertTitle>Hackathon Demo</AlertTitle>
+          <AlertTitle>Developer Demo</AlertTitle>
           <AlertDescription>
-            This is a simulated login. No real data is used or shared. The mock data will "evolve" with more syncs to mimic BPI's learning feature.
+            This is a simulated login. No real data is used or shared. The sample data will "evolve" with more syncs to mimic BPI's learning feature.
           </AlertDescription>
         </Alert>
 
@@ -81,7 +81,7 @@ export default function BpiLoginPage() {
         </div>
          {(state.isLinked || isTrackPlanLinked) && (
             <div className="flex gap-2">
-                 <Button variant="outline" onClick={fetchMockData}>Sync Track & Plan (Mock)</Button>
+                 <Button variant="outline" onClick={fetchMockData}>Sync Track & Plan Data</Button>
                  <p className="text-sm text-muted-foreground self-center">Syncs: {syncCount} (More details after 3)</p>
             </div>
          )}
