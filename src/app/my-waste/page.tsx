@@ -171,7 +171,7 @@ export default function MyWastePage() {
     return value;
   }
   
-  const { reasonCategoryData, allCategories } = useMemo(() => {
+  const { reasonCategoryData, allCategories, topReasonInsight } = useMemo(() => {
     const reasonData: Record<string, Record<string, number> & { total: number }> = {};
     const categories = new Set<string>();
 
@@ -200,9 +200,19 @@ export default function MyWastePage() {
 
     const sortedData = Object.entries(reasonData)
         .map(([name, values]) => ({ name, ...values }))
-        .sort((a, b) => b.total - a.total); 
+        .sort((a, b) => b.total - a.total);
+        
+    let insight = "Log more waste to get personalized insights.";
+    if (sortedData.length > 0) {
+        const topReason = sortedData[0];
+        const topCategoryForReason = Object.entries(topReason)
+            .filter(([key]) => key !== 'name' && key !== 'total')
+            .sort((a, b) => b[1] - a[1])[0];
+            
+        insight = `Your top reason for waste is "${topReason.name}", primarily from ${topCategoryForReason?.[0] || 'various foods'}.`;
+    }
 
-    return { reasonCategoryData: sortedData, allCategories: Array.from(categories) };
+    return { reasonCategoryData: sortedData, allCategories: Array.from(categories), topReasonInsight: insight };
   }, [logs]);
 
 
@@ -543,6 +553,11 @@ export default function MyWastePage() {
                         </ChartContainer>
                     ) : <p className="text-center text-muted-foreground py-10">No reasons logged yet.</p>}
                 </CardContent>
+                 <CardFooter className="px-4 py-3 border-t bg-secondary/50">
+                    <p className="text-xs text-muted-foreground">
+                        Insight: {topReasonInsight}
+                    </p>
+                </CardFooter>
             </Card>
 
             <WeeklyPerformancePanel />
