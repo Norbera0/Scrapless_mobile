@@ -179,13 +179,13 @@ export default function DashboardPage() {
                   <div>
                       <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
                       <div className="flex items-center justify-center gap-2">
-                          <p className="text-3xl md:text-4xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                          <p className="text-2xl sm:text-3xl md:text-4xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
                       </div>
                   </div>
                   <div>
                       <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
-                      <p className="text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-lg font-medium text-green-200">kg</span></p>
+                      <p className="text-2xl sm:text-3xl md:text-4xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-base md:text-lg font-medium text-green-200">kg</span></p>
                   </div>
               </CardContent>
                <div className="pt-4 border-t border-white/20">
