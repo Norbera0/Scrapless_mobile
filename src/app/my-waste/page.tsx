@@ -254,7 +254,7 @@ export default function MyWastePage() {
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 bg-gray-50">
        <div className="flex flex-row flex-wrap items-center justify-between gap-2">
-            <div>
+            <div className="space-y-1">
                 <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
                   <BarChart2 className="w-6 h-6 text-primary" />
                   My Waste Impact
@@ -294,78 +294,74 @@ export default function MyWastePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TrendsKPI logs={logs} />
-                <div className="flex flex-col items-center justify-center md:order-first lg:order-last">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
-                    <ChartContainer
-                        config={offsetChartConfig}
-                        className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[180px]" : "max-w-[220px]")}
+            <TrendsKPI logs={logs} />
+            <div className="flex flex-col items-center justify-center">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Savings Offset ({timeframe})</p>
+                <ChartContainer
+                    config={offsetChartConfig}
+                    className={cn("mx-auto aspect-square w-full", isMobile ? "max-w-[180px]" : "max-w-[200px]")}
+                >
+                    <RadialBarChart
+                        data={offsetChartData}
+                        endAngle={180}
+                        innerRadius={isMobile ? 45 : 60}
+                        outerRadius={isMobile ? 70 : 80}
                     >
-                        <RadialBarChart
-                            data={offsetChartData}
-                            endAngle={180}
-                            innerRadius={isMobile ? 45 : 60}
-                            outerRadius={isMobile ? 70 : 90}
-                        >
-                        <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
+                    <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel />}
+                    />
+                    <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
+                        <Label
+                            content={({ viewBox }) => {
+                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                    return (
+                                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                                        <tspan
+                                            x={viewBox.cx}
+                                            y={(viewBox.cy || 0) - 8}
+                                            className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "text-destructive")}
+                                        >
+                                            ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+                                        </tspan>
+                                        <tspan
+                                            x={viewBox.cx}
+                                            y={(viewBox.cy || 0) + 10}
+                                            className="fill-muted-foreground text-xs"
+                                        >
+                                            Net Offset
+                                        </tspan>
+                                    </text>
+                                    )
+                                }
+                            }}
                         />
-                        <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                            <Label
-                                content={({ viewBox }) => {
-                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                        return (
-                                        <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                                            <tspan
-                                                x={viewBox.cx}
-                                                y={(viewBox.cy || 0) - 8}
-                                                className={cn("fill-foreground text-lg font-bold", netOffset >= 0 ? "fill-green-600" : "text-destructive")}
-                                            >
-                                                ₱{netOffset.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
-                                            </tspan>
-                                            <tspan
-                                                x={viewBox.cx}
-                                                y={(viewBox.cy || 0) + 10}
-                                                className="fill-muted-foreground text-xs"
-                                            >
-                                                Net Offset
-                                            </tspan>
-                                        </text>
-                                        )
-                                    }
-                                }}
-                            />
-                        </PolarRadiusAxis>
-                        <RadialBar
-                            dataKey="savings"
-                            stackId="a"
-                            cornerRadius={5}
-                            fill="var(--color-savings)"
-                            className="stroke-transparent stroke-2"
-                        />
-                        <RadialBar
-                            dataKey="waste"
-                            fill="var(--color-waste)"
-                            stackId="a"
-                            cornerRadius={5}
-                            className="stroke-transparent stroke-2"
-                        />
-                        </RadialBarChart>
-                    </ChartContainer>
-                </div>
+                    </PolarRadiusAxis>
+                    <RadialBar
+                        dataKey="savings"
+                        stackId="a"
+                        cornerRadius={5}
+                        fill="var(--color-savings)"
+                        className="stroke-transparent stroke-2"
+                    />
+                    <RadialBar
+                        dataKey="waste"
+                        fill="var(--color-waste)"
+                        stackId="a"
+                        cornerRadius={5}
+                        className="stroke-transparent stroke-2"
+                    />
+                    </RadialBarChart>
+                </ChartContainer>
             </div>
             
               <Card className="lg:col-span-2">
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-4">
-                  <div className="flex-grow">
-                    <CardTitle className="text-base font-semibold">Waste & Savings</CardTitle>
-                    <CardDescription className="text-xs">
-                      This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
-                    </CardDescription>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                <CardHeader>
+                  <CardTitle className="text-base md:text-lg font-semibold">Waste & Savings</CardTitle>
+                  <CardDescription className="text-xs">
+                    This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
+                  </CardDescription>
+                  <div className="flex flex-wrap items-center gap-1 pt-2 sm:gap-2">
                     <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
                       <Button
                         size="sm"
@@ -503,7 +499,7 @@ export default function MyWastePage() {
             
             <Card className="lg:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <CardTitle className="flex items-center gap-2 text-base md:text-lg font-semibold">
                         <Brain className="h-5 w-5" />
                         Why Food Gets Wasted
                     </CardTitle>
@@ -515,7 +511,7 @@ export default function MyWastePage() {
                             <BarChart
                                 layout="vertical"
                                 data={reasonCategoryData}
-                                margin={{ top: 5, right: 10, left: 10, bottom: 20 }}
+                                margin={{ top: 5, right: 10, left: 10, bottom: 80 }}
                             >
                                 <CartesianGrid horizontal={false} />
                                 <XAxis type="number" hide />
