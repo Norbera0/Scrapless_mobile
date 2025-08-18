@@ -139,6 +139,28 @@ export default function DashboardPage() {
         daysUntilExpiration: differenceInDays(parseISO(item.estimatedExpirationDate), startOfToday())
     }));
   }, [liveItems, pantryInitialized]);
+  
+  const expiringSoonMessage = useMemo(() => {
+    const count = expiringSoonItems.length;
+    if (count === 0) {
+      return "Your pantry is looking fresh! No items expiring soon.";
+    }
+
+    const itemNames = expiringSoonItems
+      .slice(0, 3)
+      .map(item => item.name);
+
+    let namesString = "";
+    if (itemNames.length === 1) {
+      namesString = itemNames[0];
+    } else if (itemNames.length === 2) {
+      namesString = `${itemNames[0]} and ${itemNames[1]}`;
+    } else {
+      namesString = `${itemNames[0]}, ${itemNames[1]}, and ${itemNames[2]}`;
+    }
+
+    return `Don't let them go to waste! ${count} of your food in the pantry including ${namesString} are expiring soon.`;
+  }, [expiringSoonItems]);
 
   const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const savingsGoal = settings.savingsGoal || 5000;
@@ -260,7 +282,7 @@ export default function DashboardPage() {
                         <ChefHat className="w-8 h-8 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
-                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
+                    <p className="text-muted-foreground mb-4 text-sm">{expiringSoonMessage}</p>
                     <Button variant="default" onClick={() => router.push('/pantry')}>
                         Explore Recipes
                         <ArrowRight className="w-4 h-4 ml-2" />
@@ -311,3 +333,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
