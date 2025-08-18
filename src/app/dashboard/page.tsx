@@ -289,7 +289,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="relative w-1/3 flex-shrink-0">
                     <Image
-                        src="/dashboard/recipe_generator_home_2.png"
+                        src="/dashboard/recipe_generator_home_3.png"
                         alt="Recipe suggestions illustration"
                         layout="fill"
                         objectFit="cover"
