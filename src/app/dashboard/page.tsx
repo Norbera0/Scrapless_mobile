@@ -275,16 +275,27 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="shadow-sm overflow-hidden">
-            <CardContent className="p-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                    <ChefHat className="w-8 h-8 text-primary" />
+            <CardContent className="p-0 flex">
+                <div className="p-6 flex-1">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                        <ChefHat className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
+                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
+                    <Button variant="default" onClick={() => router.push('/pantry')}>
+                        Explore Recipes
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
-                <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
-                <Button variant="default" onClick={() => router.push('/pantry')}>
-                    Explore Recipes
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="relative w-1/3 flex-shrink-0">
+                    <Image
+                        src="/dashboard/recipe_generator_home.png"
+                        alt="Recipe suggestions illustration"
+                        layout="fill"
+                        objectFit="contain"
+                        className="pointer-events-none opacity-50 object-bottom"
+                    />
+                </div>
             </CardContent>
         </Card>
 
