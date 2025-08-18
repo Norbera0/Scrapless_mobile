@@ -274,29 +274,17 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
-        <Card className="shadow-sm overflow-hidden relative">
-            <div className="absolute inset-0">
-                 <Image 
-                    src="/dashboard/recipe_generator_dashboard_2.png"
-                    alt="Fresh vegetables illustration"
-                    layout="fill"
-                    objectFit="cover"
-                    className="pointer-events-none"
-                />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-white from-20% via-white/80 to-transparent"></div>
-            <CardContent className="p-0">
-                <div className="relative z-10 p-6">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                        <ChefHat className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
-                    <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
-                    <Button variant="default" onClick={() => router.push('/pantry')}>
-                        Explore Recipes
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
+        <Card className="shadow-sm overflow-hidden">
+            <CardContent className="p-6">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
+                    <ChefHat className="w-8 h-8 text-primary" />
                 </div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
+                <p className="text-muted-foreground mb-4">Your <span className="font-semibold text-primary">Tomatoes, Chicken, and Lettuce</span> are expiring soon.</p>
+                <Button variant="default" onClick={() => router.push('/pantry')}>
+                    Explore Recipes
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
             </CardContent>
         </Card>
 
