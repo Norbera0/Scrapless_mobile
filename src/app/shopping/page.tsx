@@ -226,6 +226,7 @@ export default function ShoppingHubPage() {
                   )}
                   <div className="grid grid-cols-2 gap-2 mt-2">
                      <Button>
+                        <Image src="/bpi-logo-2.png" alt="BPI Logo" width={20} height={20} className="mr-2" />
                         Pay with BPI
                     </Button>
                     <Button variant="secondary">
