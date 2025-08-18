@@ -293,7 +293,6 @@ export default function DashboardPage() {
                         alt="Recipe suggestions illustration"
                         layout="fill"
                         objectFit="cover"
-                        className="pointer-events-none opacity-50"
                     />
                 </div>
             </CardContent>
