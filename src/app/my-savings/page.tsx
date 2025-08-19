@@ -21,6 +21,8 @@ import { useAnalytics } from '@/hooks/use-analytics';
 import { useSavingsSummary } from '@/lib/bpi';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { BpiTransferForm } from '@/app/bpi/transfer/page';
+import { useUserSettingsStore } from '@/stores/user-settings-store';
+import { saveUserSettings } from '@/lib/data';
 
 export default function MySavingsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -32,15 +34,25 @@ export default function MySavingsPage() {
     const { total, available } = useSavingsSummary(savingsEvents);
     const transferred = total - available;
     const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
-
-
+    
+    // Settings store
+    const { settings, setSavingsGoal } = useUserSettingsStore();
+    
     // State for goal editing
     const [isEditingGoal, setIsEditingGoal] = useState(false);
-    const [goalName, setGoalName] = useState('New Air Fryer');
-    const [goalAmount, setGoalAmount] = useState(3000);
-    const [currentGoalProgress, setCurrentGoalProgress] = useState(1200);
+    const [goalName, setGoalName] = useState('New Air Fryer'); // We'll keep the name client-side for now
+    const [goalAmount, setGoalAmount] = useState(settings.savingsGoal);
 
-    const goalProgressPercent = (currentGoalProgress / goalAmount) * 100;
+    useEffect(() => {
+        setGoalAmount(settings.savingsGoal);
+    }, [settings.savingsGoal]);
+    
+    // This is a proxy for now. In a real app, you'd track how much of 'available' is allocated to the goal
+    const currentGoalProgress = useMemo(() => {
+        return Math.min(goalAmount, transferred + (available / 2)); 
+    }, [goalAmount, transferred, available]);
+
+    const goalProgressPercent = goalAmount > 0 ? (currentGoalProgress / goalAmount) * 100 : 0;
 
     useEffect(() => {
         if (!isAuthLoading && savingsInitialized) {
@@ -48,28 +60,17 @@ export default function MySavingsPage() {
         }
     }, [isAuthLoading, savingsInitialized]);
     
-    useEffect(() => {
-        // In a real app, this would be based on actual savings allocated to the goal
-        setCurrentGoalProgress(Math.min(goalAmount, total / 2));
-    }, [total, goalAmount]);
-
-    
-    const handleSetGoal = () => {
+    const handleSetGoal = async () => {
         if(isEditingGoal) {
-            // Save logic here
-            toast({ title: "Goal Updated!", description: `Your new goal is to save ₱${goalAmount.toLocaleString()} for a ${goalName}.`});
+            if (!user) return;
+            setSavingsGoal(goalAmount);
+            await saveUserSettings(user.uid, { ...settings, savingsGoal: goalAmount });
+            toast({ title: "Goal Updated!", description: `Your new monthly goal is ₱${goalAmount.toLocaleString()}.`});
         }
         setIsEditingGoal(!isEditingGoal);
     }
     
-    const totalWasteKg = useMemo(() => {
-        if (!analytics || !analytics.waste) return 0;
-        // This is a proxy. A more accurate measure would need item weights.
-        // Assuming average 0.2kg per wasted item for this calculation.
-        const totalItemsWasted = analytics.waste.topWastedCategoryByFrequency?.count || 0;
-        return totalItemsWasted * 0.2;
-    }, [analytics]);
-
+    const totalWasteKg = analytics?.totalWasteCO2e || 0; // Using CO2e as a proxy for waste kg for now
 
     if (isLoading || !analytics) {
         return (
@@ -164,7 +165,7 @@ export default function MySavingsPage() {
                      ) : (
                         <>
                             <div className="flex justify-between items-center text-sm text-muted-foreground mb-1">
-                                <span className="font-medium text-primary">₱{currentGoalProgress.toLocaleString()}</span>
+                                <span className="font-medium text-primary">₱{currentGoalProgress.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
                                 <span>₱{goalAmount.toLocaleString()}</span>
                             </div>
                             <Progress value={goalProgressPercent} />
@@ -184,13 +185,30 @@ export default function MySavingsPage() {
                 </CardFooter>
             </Card>
 
-             <Card className="cursor-pointer hover:bg-secondary/50" onClick={() => { /* Navigate to history page */ }}>
-                <CardContent className="p-4 flex items-center justify-between">
-                     <div>
-                        <p className="font-semibold">Savings History</p>
-                        <p className="text-sm text-muted-foreground">See how your smart habits are adding up.</p>
-                     </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+             <Card className="cursor-pointer hover:bg-secondary/50">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                        <span className="flex items-center gap-2 text-base">
+                            <History /> Savings History
+                        </span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </CardTitle>
+                    <CardDescription>See how your smart habits are adding up.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ScrollArea className="h-48">
+                        <div className="space-y-3 pr-4">
+                            {savingsEvents.map(event => (
+                                <div key={event.id} className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-medium text-sm">{event.description}</p>
+                                        <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMM d, h:mm a')}</p>
+                                    </div>
+                                    <p className="font-semibold text-green-600 text-sm whitespace-nowrap">+ ₱{event.amount.toFixed(2)}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
                 </CardContent>
             </Card>
 
@@ -201,7 +219,7 @@ export default function MySavingsPage() {
                 <CardContent className="space-y-4">
                      <div className="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
                         <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-lg">✅</div>
-                        <p className="font-medium">{totalWasteKg.toFixed(1)}kg food waste prevented</p>
+                        <p className="font-medium">{analytics.totalWasteValue.toFixed(1)}kg food waste prevented</p>
                      </div>
                      <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-lg">
                         <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-lg">🌍</div>
