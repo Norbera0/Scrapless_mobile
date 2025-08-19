@@ -1,9 +1,10 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
+import Link from 'next/link';
 
 const savingsHistory = [
     { date: 'Aug 19', description: '₱120 saved (rice waste reduced)', amount: '+ ₱120' },
@@ -55,6 +56,12 @@ export default function GCashConfirmMockupPage() {
                         <p className="text-2xl font-bold text-green-600">₱2,530</p>
                     </CardContent>
                 </Card>
+
+                <Button asChild className="w-full">
+                    <Link href="/my-savings">
+                        Confirm
+                    </Link>
+                </Button>
             </div>
         </div>
     );
