@@ -16,6 +16,7 @@ import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
+import Image from 'next/image';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -161,8 +162,8 @@ export default function ProfilePage() {
                         onClick={() => router.push('/bpi')}
                     >
                         <div className="flex items-center gap-3">
-                            <Landmark className="w-5 h-5 text-primary" />
-                            <p className="font-medium">BPI Hub & Integrations</p>
+                            <Image src="/gcash-logo.png" alt="GCash Logo" width={20} height={20} />
+                            <p className="font-medium">GCash #MySaveUp</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
