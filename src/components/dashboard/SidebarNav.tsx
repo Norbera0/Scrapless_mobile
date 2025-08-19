@@ -64,11 +64,10 @@ export function SidebarNav({ user }: { user: UserType }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-    { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
+    { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items', '/saves'] },
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
-    { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
   
   const getInitials = (name?: string | null) => {

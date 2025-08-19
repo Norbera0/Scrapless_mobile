@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight, Archive } from 'lucide-react';
+import { Loader2, Bookmark, Utensils, Lightbulb, ShoppingCart, History, ArrowRight, Archive, ArrowLeft, CookingPot } from 'lucide-react';
 import { getSavedRecipes } from '@/lib/data';
 import type { Recipe, User, PantryItem } from '@/types';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
@@ -74,6 +74,10 @@ export default function SavedItemsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
+        <Button variant="ghost" onClick={() => router.push('/pantry')} className="self-start text-muted-foreground hover:text-foreground -ml-4">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Pantry
+        </Button>
       <div className="space-y-1">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">🔖 My Saves</h1>
         <p className="text-muted-foreground text-sm">
