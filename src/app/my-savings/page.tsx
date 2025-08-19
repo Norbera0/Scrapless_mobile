@@ -103,8 +103,10 @@ export default function MySavingsPage() {
                  <div className="absolute top-0 right-0 text-8xl opacity-10 pointer-events-none -mr-4 -mt-4">💰</div>
                 <CardHeader>
                     <div className="flex items-center gap-2 text-sm font-semibold text-green-200">
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">₱</div>
-                        #MySaveUp
+                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
+                          <PiggyBank className="w-4 h-4" />
+                        </div>
+                        Virtual Savings
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -131,7 +133,7 @@ export default function MySavingsPage() {
                                 className="bg-white/20 text-white hover:bg-white/30 w-full h-12 text-base"
                             >
                                 <Banknote className="mr-2" />
-                                Transfer to BPI #MySaveUp
+                                Transfer to BPI
                             </Button>
                         </DialogTrigger>
                         <DialogContent>

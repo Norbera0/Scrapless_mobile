@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark, ShieldCheck, TrendingUp, ThumbsDown, CheckCircle, BarChart, Info, Leaf, Star, ExternalLink, RefreshCw, Edit, Save, PiggyBank } from 'lucide-react';
+import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark, ShieldCheck, TrendingUp, ThumbsDown, CheckCircle, BarChart, Info, Leaf, Star, ExternalLink, RefreshCw, Edit, Save, PiggyBank, Sparkles } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
@@ -137,6 +137,27 @@ export default function ProfilePage() {
                     </div>
                 </CardHeader>
             </Card>
+
+            <div className="grid md:grid-cols-2 gap-4">
+                <Card className="flex flex-col cursor-pointer hover:bg-secondary/50" onClick={() => router.push('/my-savings')}>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg"><PiggyBank className="w-5 h-5 text-primary" />Virtual Savings</CardTitle>
+                        <CardDescription className="text-sm">Review your savings from reducing waste.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex items-end">
+                        <Button variant="outline" className="w-full" asChild><Link href="/my-savings">View Savings</Link></Button>
+                    </CardContent>
+                </Card>
+                <Card className="flex flex-col cursor-pointer hover:bg-secondary/50" onClick={() => router.push('/rewards')}>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg"><Sparkles className="w-5 h-5 text-amber-500" />Green Points</CardTitle>
+                        <CardDescription className="text-sm">Convert your points to BPI Rewards.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-grow flex items-end">
+                        <Button variant="outline" className="w-full" asChild><Link href="/rewards">View Points</Link></Button>
+                    </CardContent>
+                </Card>
+            </div>
 
             <SavingsGoalSection />
 
