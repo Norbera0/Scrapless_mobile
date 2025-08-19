@@ -296,10 +296,14 @@ export default function DashboardPage() {
             </Popover>
             <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
                 <PopoverTrigger asChild>
-                     <QuickActionButton 
-                        icon={Trash2} 
-                        label="Log Food Waste" 
-                    />
+                    <button className="relative aspect-[2/1] w-full h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
+                        <Image
+                        src="/dashboard/log_food_waste_button.png"
+                        alt="Log Food Waste"
+                        layout="fill"
+                        objectFit="contain"
+                        />
+                    </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-primary">
                     <div className="flex flex-col">
@@ -377,5 +381,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
