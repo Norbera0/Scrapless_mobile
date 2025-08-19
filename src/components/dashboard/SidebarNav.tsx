@@ -68,6 +68,7 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
     { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
+    { href: '/saves', label: 'My Saves', icon: Bookmark },
   ];
   
   const getInitials = (name?: string | null) => {

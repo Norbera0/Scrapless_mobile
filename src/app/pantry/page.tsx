@@ -36,7 +36,8 @@ import {
   ShoppingCart,
   MessageCircleQuestion,
   Lightbulb,
-  CalendarClock
+  CalendarClock,
+  Heart
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights, WasteLog } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
@@ -692,16 +693,27 @@ export default function PantryPage() {
                         <h2 className="text-xl font-bold text-gray-800">Recipe Suggestions</h2>
                         <Sparkles className="w-5 h-5 text-amber-400" />
                     </div>
-                    <Button
-                        onClick={() => fetchRecipes(true)}
-                        disabled={isLoadingRecipes}
-                        variant="outline"
-                        size="sm"
-                        className="h-9"
-                    >
-                        <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
-                        New Ideas
-                    </Button>
+                    <div className='flex items-center gap-2'>
+                        <Button
+                            onClick={() => router.push('/saves')}
+                            variant="outline"
+                            size="sm"
+                            className="h-9"
+                        >
+                            <Heart className="w-4 h-4 mr-2" />
+                            Saved Recipes
+                        </Button>
+                        <Button
+                            onClick={() => fetchRecipes(true)}
+                            disabled={isLoadingRecipes}
+                            variant="outline"
+                            size="sm"
+                            className="h-9"
+                        >
+                            <RefreshCw className={cn("w-4 h-4 mr-2", isLoadingRecipes && 'animate-spin')} />
+                            New Ideas
+                        </Button>
+                    </div>
                 </div>
                 {isLoadingRecipes && recipes.length === 0 ? (
                     <div className="text-center py-10">

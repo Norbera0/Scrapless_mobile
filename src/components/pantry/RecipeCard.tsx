@@ -83,7 +83,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         ))}
                     </div>
                      <Button size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm" onClick={() => onToggleSave(recipe)}>
-                        <Bookmark className={cn("h-4 w-4 text-white", isSaved && "fill-white")} />
+                        <Heart className={cn("h-4 w-4 text-white transition-colors", isSaved && "fill-red-500 text-red-500")} />
                      </Button>
                 </CardHeader>
                 <CardContent className="p-3 flex-1">
