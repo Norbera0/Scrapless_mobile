@@ -18,8 +18,6 @@ function GCashConfirmContent() {
     const amount = Number(searchParams.get('amount') || '120');
     // #MySaveUp balance is the total amount of savings events (which are all "transferred" at this point in the mock)
     const newBalance = total; 
-    const goalAmount = 3000;
-    const progress = (newBalance / goalAmount) * 100;
     
 
     return (
@@ -50,8 +48,8 @@ function GCashConfirmContent() {
                 
                 <Card className="text-center">
                     <CardContent className="p-4">
-                        <p className="text-sm text-muted-foreground">Total Saved in Scrapless</p>
-                        <p className="text-2xl font-bold text-green-600">₱{total.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">Total Saved in #MySaveUp</p>
+                        <p className="text-2xl font-bold text-green-600">₱{newBalance.toLocaleString()}</p>
                     </CardContent>
                 </Card>
 
