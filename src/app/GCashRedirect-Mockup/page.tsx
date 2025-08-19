@@ -9,7 +9,7 @@ export default function GCashRedirectMockupPage() {
     const router = useRouter();
 
     const showSuccessFlow = () => {
-        alert('✅ Transfer successful!\\n\\n₱120 has been moved to your #MySaveUp account.');
+        alert('✅ Transfer successful!\n\n₱120 has been moved to your #MySaveUp account.');
         // In a real app, you'd navigate somewhere after success
     };
 
@@ -58,7 +58,7 @@ export default function GCashRedirectMockupPage() {
                  <CardFooter className="flex flex-col gap-3">
                     <Button className="w-full h-12 text-base bg-blue-500 hover:bg-blue-600" onClick={showSuccessFlow}>
                         Confirm
-                    </button>
+                    </Button>
                     <Button variant="ghost" className="w-full text-gray-600 h-12 text-base" onClick={closeModal}>
                         Cancel
                     </Button>
