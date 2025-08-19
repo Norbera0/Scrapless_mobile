@@ -2,6 +2,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 
 export default function GCashRedirectMockupPage() {
     const router = useRouter();
@@ -17,111 +19,51 @@ export default function GCashRedirectMockupPage() {
     };
 
     return (
-        <div className="bg-gray-100 p-4 sm:p-8 flex justify-center items-start min-h-screen">
-            <div className="phone-frame" style={{
-                background: '#000',
-                borderRadius: '30px',
-                padding: '8px',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                position: 'relative',
-                maxWidth: '350px',
-                margin: '0 auto',
-            }}>
-                <div className="phone-screen" style={{
-                    background: 'white',
-                    borderRadius: '22px',
-                    overflow: 'hidden',
-                    minHeight: '600px',
-                    position: 'relative',
-                }}>
-
-                    {/* Mock GCash Header */}
-                    <div style={{
-                        backgroundColor: '#0077FF',
-                        color: 'white',
-                        padding: '14px',
-                        textAlign: 'center',
-                        fontWeight: 600,
-                    }}>
-                        GCash Transfer (Mockup)
+        <div className="bg-blue-600 p-4 sm:p-8 flex justify-center items-center min-h-screen">
+            <Card className="w-full max-w-sm">
+                 <CardHeader className="bg-blue-500 text-center text-white">
+                    <h2 className="font-semibold text-lg">GCash Transfer</h2>
+                </CardHeader>
+                <CardContent className="p-6">
+                    <div className="text-center mb-6">
+                        <div className="text-4xl font-bold text-gray-800">₱120.00</div>
+                        <div className="text-sm text-gray-500">Amount to be transferred</div>
                     </div>
 
-                    {/* Main Content */}
-                    <div className="screen-content" style={{ padding: '20px' }}>
-
-                        {/* Amount */}
-                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                            <div style={{ fontSize: '32px', fontWeight: 700, color: '#111827' }}>₱120</div>
-                            <div style={{ fontSize: '14px', color: '#6b7280' }}>Amount to be transferred</div>
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-sm space-y-3">
+                        <div className="flex justify-between">
+                            <span className="text-gray-500">From</span>
+                            <span className="font-semibold text-gray-700">GCash Wallet (₱1,560)</span>
                         </div>
-
-                        {/* Transaction Details Card */}
-                        <div style={{
-                            background: '#F9FAFB',
-                            border: '1px solid #E5E7EB',
-                            borderRadius: '12px',
-                            padding: '16px',
-                            marginBottom: '24px',
-                        }}>
-                            <div className="transfer-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6b7280' }}>From</span>
-                                <span style={{ fontWeight: 600 }}>GCash Wallet (₱1,560)</span>
-                            </div>
-                            <div className="transfer-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                <span style={{ color: '#6b7280' }}>To</span>
-                                <span style={{ fontWeight: 600 }}>Scrapless #MySaveUp</span>
-                            </div>
-                            <div className="transfer-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#6b7280' }}>Fee</span>
-                                <span style={{ fontWeight: 600, color: '#059669' }}>FREE</span>
-                            </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-500">To</span>
+                            <span className="font-semibold text-gray-700">Scrapless #MySaveUp</span>
                         </div>
-
-                        {/* Impact Box */}
-                        <div style={{
-                            background: '#ECFDF5',
-                            border: '1px solid #BBF7D0',
-                            borderRadius: '10px',
-                            padding: '14px',
-                            marginBottom: '24px',
-                        }}>
-                            <div style={{ fontWeight: 600, color: '#166534', marginBottom: '6px' }}>🌱 This Week's Impact</div>
-                            <div style={{ fontSize: '14px', color: '#15803D', lineHeight: 1.5 }}>
-                                • 2kg rice waste prevented<br />
-                                • 1.5kg CO₂ emissions avoided<br />
-                                • Equivalent to ₱120 saved
-                            </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-500">Fee</span>
+                            <span className="font-semibold text-green-600">FREE</span>
                         </div>
-
-                        {/* Buttons (Mock GCash style) */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <button style={{
-                                background: '#0077FF',
-                                color: 'white',
-                                padding: '14px',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                border: 'none',
-                                cursor: 'pointer',
-                            }} onClick={showSuccessFlow}>
-                                Confirm
-                            </button>
-                            <button style={{
-                                background: '#F3F4F6',
-                                color: '#374151',
-                                padding: '14px',
-                                borderRadius: '8px',
-                                fontWeight: 600,
-                                border: 'none',
-                                cursor: 'pointer',
-                            }} onClick={closeModal}>
-                                Cancel
-                            </button>
-                        </div>
-
                     </div>
-                </div>
-            </div>
+
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <div className="font-semibold text-green-800 text-sm mb-2">🌱 This Week's Impact</div>
+                        <div className="text-sm text-green-700 space-y-1">
+                            <div>• 2kg rice waste prevented</div>
+                            <div>• 1.5kg CO₂ emissions avoided</div>
+                            <div>• Equivalent to ₱120 saved</div>
+                        </div>
+                    </div>
+
+                </CardContent>
+                 <CardFooter className="flex flex-col gap-3">
+                    <Button className="w-full h-12 text-base bg-blue-500 hover:bg-blue-600" onClick={showSuccessFlow}>
+                        Confirm
+                    </button>
+                    <Button variant="ghost" className="w-full text-gray-600 h-12 text-base" onClick={closeModal}>
+                        Cancel
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

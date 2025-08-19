@@ -58,7 +58,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (sessionStorage.getItem('hasOpenedNotifications') === 'true') {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('hasOpenedNotifications') === 'true') {
         setHasOpenedNotifications(true);
     }
   }, []);
@@ -86,7 +86,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/login') {
+    if (!isLoading && !user && pathname !== '/login' && pathname !== '/signup' && pathname !== '/') {
       router.replace('/login');
     }
     if (user) {
@@ -94,7 +94,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [user, isLoading, router, pathname]);
   
-  const isAuthPage = pathname === '/login';
+  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/';
 
   if (isLoading) {
     return (
@@ -104,7 +104,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     );
   }
   
-  if (isAuthPage) {
+  if (isSpecialPage) {
     return <>{children}</>;
   }
 
