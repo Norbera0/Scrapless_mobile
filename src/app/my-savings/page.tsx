@@ -19,6 +19,8 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAnalytics } from '@/hooks/use-analytics';
 import { useSavingsSummary } from '@/lib/bpi';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { BpiTransferForm } from '@/app/bpi/transfer/page';
 
 export default function MySavingsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -29,6 +31,8 @@ export default function MySavingsPage() {
     const analytics = useAnalytics();
     const { total, available } = useSavingsSummary(savingsEvents);
     const transferred = total - available;
+    const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+
 
     // State for goal editing
     const [isEditingGoal, setIsEditingGoal] = useState(false);
@@ -49,10 +53,6 @@ export default function MySavingsPage() {
         setCurrentGoalProgress(Math.min(goalAmount, total / 2));
     }, [total, goalAmount]);
 
-
-    const handleTransfer = () => {
-        router.push('/bpi/transfer');
-    };
     
     const handleSetGoal = () => {
         if(isEditingGoal) {
@@ -77,6 +77,14 @@ export default function MySavingsPage() {
                 <Loader2 className="h-10 w-10 animate-spin text-primary" />
             </div>
         )
+    }
+    
+    const handleTransferComplete = () => {
+        setIsTransferDialogOpen(false);
+        toast({
+            title: "Transfer Planned!",
+            description: "Your transfer suggestion has been created. Check your BPI app to approve.",
+        });
     }
 
     return (
@@ -116,14 +124,24 @@ export default function MySavingsPage() {
                     </div>
                 </CardContent>
                 <CardFooter>
-                     <Button 
-                        variant="secondary" 
-                        className="bg-white/20 text-white hover:bg-white/30 w-full h-12 text-base"
-                        onClick={handleTransfer}
-                    >
-                        <Banknote className="mr-2" />
-                        Transfer to BPI #MySaveUp
-                    </Button>
+                    <Dialog open={isTransferDialogOpen} onOpenChange={setIsTransferDialogOpen}>
+                        <DialogTrigger asChild>
+                             <Button 
+                                variant="secondary" 
+                                className="bg-white/20 text-white hover:bg-white/30 w-full h-12 text-base"
+                            >
+                                <Banknote className="mr-2" />
+                                Transfer to BPI #MySaveUp
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Suggest a Transfer</DialogTitle>
+                                <DialogDescription>Move your eco-savings to your BPI account.</DialogDescription>
+                            </DialogHeader>
+                            <BpiTransferForm onTransferComplete={handleTransferComplete} />
+                        </DialogContent>
+                    </Dialog>
                 </CardFooter>
             </Card>
 
@@ -195,4 +213,3 @@ export default function MySavingsPage() {
         </div>
     );
 }
-
