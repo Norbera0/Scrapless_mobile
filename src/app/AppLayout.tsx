@@ -94,7 +94,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [user, isLoading, router, pathname]);
   
-  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/';
+  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/GCashConfirm-Mockup' || pathname === '/';
 
   if (isLoading) {
     return (
