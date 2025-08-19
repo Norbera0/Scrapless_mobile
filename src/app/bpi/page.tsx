@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useBpiLinking, getStoredAccounts, estimateTimeDepositEarnings, useSavingsSummary } from '@/lib/bpi';
 import { PiggyBank, Sparkles } from 'lucide-react';
+import Image from 'next/image';
 
 export default function BpiHubPage() {
   const { state } = useBpiLinking();
@@ -27,12 +28,15 @@ export default function BpiHubPage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Account linking</CardTitle>
+            <CardTitle className='flex items-center gap-2'>
+              <Image src="/bpi-logo-2.png" alt="BPI Logo" width={24} height={24} />
+              Account linking
+            </CardTitle>
             <CardDescription>{state.isLinked ? 'BPI account linked' : 'No BPI account linked'}</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center gap-2">
             <Button asChild>
-              <Link href="/bpi/login">{state.isLinked ? 'Manage link' : 'Link BPI account'}</Link>
+              <Link href="/bpi/mysaveup">{state.isLinked ? 'Manage link' : 'Link BPI account'}</Link>
             </Button>
             <Button asChild variant="secondary">
               <Link href="/bpi/dashboard">Sustainability dashboard</Link>

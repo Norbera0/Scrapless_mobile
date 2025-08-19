@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useMemo } from 'react';
 
-export default function BpiLoginPage() {
+export default function BpiMySaveUpPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { link } = useBpiLinking();
@@ -25,8 +25,6 @@ export default function BpiLoginPage() {
     setIsLoading(true);
 
     setTimeout(() => {
-      // In a real app, this would be a multi-step OAuth flow.
-      // Here, we simulate the end result.
       link(['accounts.read', 'track_plan.read', 'transfers.create']);
       linkAccount();
       fetchSampleData();

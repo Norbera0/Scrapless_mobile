@@ -159,11 +159,11 @@ export default function ProfilePage() {
                     
                     <div 
                         className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-                        onClick={() => router.push('/bpi')}
+                        onClick={() => router.push('/bpi/mysaveup')}
                     >
                         <div className="flex items-center gap-3">
-                            <Image src="/gcash-logo.png" alt="GCash Logo" width={20} height={20} />
-                            <p className="font-medium">GCash #MySaveUp</p>
+                            <Image src="/bpi-logo-2.png" alt="BPI Logo" width={20} height={20} />
+                            <p className="font-medium">BPI #MySaveUp</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
