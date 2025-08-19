@@ -97,7 +97,6 @@ export default function MySavingsPage() {
                         Your virtual savings from reducing food waste.
                     </p>
                 </div>
-                 <div className="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">Connected</div>
             </div>
 
             <Card className="bg-primary text-white shadow-lg overflow-hidden relative">
