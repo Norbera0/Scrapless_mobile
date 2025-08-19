@@ -266,17 +266,10 @@ export default function DashboardPage() {
             </div>
           </Card>
         
-        <div className="flex items-center justify-around gap-4">
+        <div className="grid grid-cols-2 gap-4">
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
-                <button className="relative aspect-square w-5/12 max-w-xs h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
-                    <Image
-                      src="/dashboard/add_pantry_items_button_5.png"
-                      alt="Add Pantry Items"
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                </button>
+                <QuickActionButton icon={PackagePlus} label="Add to Pantry" />
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-primary">
                 <div className="flex flex-col">
@@ -296,14 +289,7 @@ export default function DashboardPage() {
             </Popover>
             <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
                 <PopoverTrigger asChild>
-                    <button className="relative aspect-square w-5/12 max-w-xs h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
-                        <Image
-                        src="/dashboard/add_pantry_items_button_6.png"
-                        alt="Log Food Waste"
-                        layout="fill"
-                        objectFit="contain"
-                        />
-                    </button>
+                     <QuickActionButton icon={Trash2} label="Log Food Waste" />
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-primary">
                     <div className="flex flex-col">
@@ -381,3 +367,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
