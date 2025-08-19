@@ -11,7 +11,7 @@ import { Sidebar, SidebarInset, SidebarRail, SidebarTrigger } from '@/components
 import { initializeUserCache } from '@/lib/data';
 import { FloatingChatAssistant } from '@/components/assistant/FloatingChatAssistant';
 import { Button } from '@/components/ui/button';
-import { PanelLeft, Bell, Leaf, Menu } from 'lucide-react';
+import { PanelLeft, Bell, Leaf, Menu, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNotifications } from '@/hooks/use-notifications';
@@ -73,6 +73,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const totalGreenPoints = useMemo(() => {
     return greenPointsEvents.reduce((acc, event) => acc + event.points, 0);
   }, [greenPointsEvents]);
+
+  const bpiPoints = useMemo(() => {
+      return Math.floor((totalGreenPoints / 1000) * 20);
+  }, [totalGreenPoints]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -145,10 +149,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         <PopoverContent className="w-80" align="end">
                             <div className="grid gap-4">
                                 <div className="space-y-2">
-                                    <h4 className="font-medium leading-none">Green Points</h4>
+                                    <h4 className="font-medium leading-none">Green Points Conversion</h4>
                                     <p className="text-sm text-muted-foreground">
                                         Your points can be converted to rewards in the BPI ecosystem.
                                     </p>
+                                </div>
+                                <div className='flex items-center justify-around bg-secondary p-3 rounded-lg'>
+                                    <div className="text-center">
+                                        <Leaf className="w-5 h-5 mx-auto text-green-600 mb-1" />
+                                        <p className="font-bold text-lg">{totalGreenPoints.toLocaleString()}</p>
+                                        <p className="text-xs text-muted-foreground">Green Points</p>
+                                    </div>
+                                    <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                                     <div className="text-center">
+                                        <Image src="/bpi-logo-2.png" alt="BPI Logo" width={20} height={20} className="mx-auto mb-1 rounded-sm" />
+                                        <p className="font-bold text-lg">{bpiPoints.toLocaleString()}</p>
+                                        <p className="text-xs text-muted-foreground">BPI Points</p>
+                                    </div>
                                 </div>
                                 <Button asChild>
                                     <Link href="/rewards">
