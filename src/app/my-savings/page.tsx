@@ -13,19 +13,12 @@ import { format, parseISO } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { Progress } from '@/components/ui/progress';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAnalytics } from '@/hooks/use-analytics';
-
-const eventIcons: Record<SavingsEvent['type'], React.ElementType> = {
-    avoided_expiry: CheckCircle,
-    recipe_followed: Sparkles,
-    smart_shopping: Sparkles,
-    waste_reduction: Sparkles,
-    solution_implemented: Sparkles,
-};
+import { useSavingsSummary } from '@/lib/bpi';
 
 export default function MySavingsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -34,6 +27,8 @@ export default function MySavingsPage() {
     const { toast } = useToast();
     const router = useRouter();
     const analytics = useAnalytics();
+    const { total, available } = useSavingsSummary(savingsEvents);
+    const transferred = total - available;
 
     // State for goal editing
     const [isEditingGoal, setIsEditingGoal] = useState(false);
@@ -48,15 +43,11 @@ export default function MySavingsPage() {
             setIsLoading(false);
         }
     }, [isAuthLoading, savingsInitialized]);
-
-    const totalSavings = useMemo(() => {
-        return savingsEvents.reduce((acc, event) => acc + event.amount, 0);
-    }, [savingsEvents]);
     
     useEffect(() => {
         // In a real app, this would be based on actual savings allocated to the goal
-        setCurrentGoalProgress(Math.min(goalAmount, totalSavings / 2));
-    }, [totalSavings, goalAmount]);
+        setCurrentGoalProgress(Math.min(goalAmount, total / 2));
+    }, [total, goalAmount]);
 
 
     const handleTransfer = () => {
@@ -103,31 +94,26 @@ export default function MySavingsPage() {
             <Card className="bg-primary text-white shadow-lg overflow-hidden relative">
                  <div className="absolute top-0 right-0 text-8xl opacity-10 pointer-events-none -mr-4 -mt-4">💰</div>
                 <CardHeader>
-                    <CardTitle className="text-sm font-semibold text-green-200 flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-green-200">
                         <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">₱</div>
                         #MySaveUp
-                    </CardTitle>
-                    <div className="flex items-end gap-2">
-                        <CardDescription className="text-5xl font-bold tracking-tighter text-white pt-2">₱{totalSavings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</CardDescription>
-                         <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Info className="w-4 h-4 text-green-200 mb-3 cursor-pointer" />
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-xs text-left">
-                                    <p className="font-bold">How are savings calculated?</p>
-                                    <ul className="list-disc list-inside mt-1 text-xs text-muted-foreground">
-                                        <li>Using items before they expire.</li>
-                                        <li>Cooking suggested recipes.</li>
-                                        <li>Reducing your weekly waste total.</li>
-                                    </ul>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-green-200 text-sm">Virtual savings from reducing food waste.</p>
+                <CardContent className="space-y-3">
+                     <div>
+                        <div className="text-sm text-green-200">Total Saved</div>
+                        <p className="text-4xl font-bold tracking-tighter">₱{total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                     <div className="space-y-1 text-sm">
+                        <div className="flex justify-between items-center text-green-200/80">
+                           <span>Transferred</span>
+                           <span>₱{transferred.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                         <div className="flex justify-between items-center font-semibold">
+                           <span>Available to Transfer</span>
+                           <span>₱{available.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                    </div>
                 </CardContent>
                 <CardFooter>
                      <Button 
@@ -180,42 +166,15 @@ export default function MySavingsPage() {
                 </CardFooter>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base"><History /> Savings History</CardTitle>
-                    <CardDescription>See how your smart habits are adding up.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {savingsEvents.length > 0 ? (
-                        <ScrollArea className="h-64 pr-4">
-                            <div className="space-y-3">
-                                {savingsEvents.map(event => {
-                                    const Icon = eventIcons[event.type] || Sparkles;
-                                    return (
-                                        <div key={event.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
-                                            <div className="flex items-center gap-3">
-                                                <Icon className="w-5 h-5 text-primary" />
-                                                <div>
-                                                    <p className="font-medium text-sm">{event.description}</p>
-                                                    <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMMM d, h:mm a')}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ ₱{event.amount.toFixed(2)}</p>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </ScrollArea>
-                     ) : (
-                         <div className="text-center text-muted-foreground py-10">
-                            <p>You haven't earned any savings yet.</p>
-                        </div>
-                     )}
+             <Card className="cursor-pointer hover:bg-secondary/50" onClick={() => { /* Navigate to history page */ }}>
+                <CardContent className="p-4 flex items-center justify-between">
+                     <div>
+                        <p className="font-semibold">Savings History</p>
+                        <p className="text-sm text-muted-foreground">See how your smart habits are adding up.</p>
+                     </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </CardContent>
             </Card>
-
 
             <Card>
                 <CardHeader>
@@ -236,3 +195,4 @@ export default function MySavingsPage() {
         </div>
     );
 }
+
