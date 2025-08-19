@@ -298,7 +298,7 @@ export default function DashboardPage() {
                 <PopoverTrigger asChild>
                     <button className="relative aspect-square w-5/12 max-w-xs h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
                         <Image
-                        src="/dashboard/log_food_waste_button_4.png"
+                        src="/dashboard/add_pantry_items_button_6.png"
                         alt="Log Food Waste"
                         layout="fill"
                         objectFit="contain"
