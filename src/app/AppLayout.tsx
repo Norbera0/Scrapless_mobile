@@ -185,7 +185,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         </div>
                         <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
                             <span className="text-sm font-medium text-primary">
-                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                            {user?.name?.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U'}
                             </span>
                         </div>
                     </Link>
