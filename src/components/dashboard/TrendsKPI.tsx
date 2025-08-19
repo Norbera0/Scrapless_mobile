@@ -10,6 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | null, inverse?: boolean }) => {
     if (percentage === null || isNaN(percentage) || !isFinite(percentage)) {
@@ -23,6 +24,35 @@ const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | 
         </div>
     );
 };
+
+const InfoTooltip = ({ children, content }: { children: React.ReactNode, content: React.ReactNode}) => {
+    const isMobile = useIsMobile();
+
+    if (isMobile) {
+        return (
+            <Dialog>
+                <DialogTrigger asChild>{children}</DialogTrigger>
+                <DialogContent className="sm:max-w-xs">
+                    <DialogHeader>
+                        <DialogTitle>Information</DialogTitle>
+                    </DialogHeader>
+                    <div className="p-4 pt-0">{content}</div>
+                </DialogContent>
+            </Dialog>
+        )
+    }
+
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>{children}</TooltipTrigger>
+                <TooltipContent className="w-56 text-center">
+                    {content}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
 
 export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
@@ -64,16 +94,9 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
                     <span>This Week's Waste</span>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Info className="w-3 h-3 cursor-pointer" />
-                            </TooltipTrigger>
-                            <TooltipContent className="w-56 text-center">
-                                <p>Total estimated peso value of all food logged as waste in the last 7 days.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <InfoTooltip content={<p>Total estimated peso value of all food logged as waste in the last 7 days.</p>}>
+                        <Info className="w-3 h-3 cursor-pointer" />
+                    </InfoTooltip>
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
@@ -87,16 +110,9 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
                    <span>CO₂e Impact</span>
-                     <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Info className="w-3 h-3 cursor-pointer" />
-                            </TooltipTrigger>
-                            <TooltipContent className="w-56 text-center">
-                                <p>Total carbon dioxide equivalent emitted from this week's food waste.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                     <InfoTooltip content={<p>Total carbon dioxide equivalent emitted from this week's food waste.</p>}>
+                        <Info className="w-3 h-3 cursor-pointer" />
+                    </InfoTooltip>
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
@@ -111,16 +127,9 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
                     <span>Waste-Free Streak</span>
-                     <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Info className="w-3 h-3 cursor-pointer" />
-                            </TooltipTrigger>
-                            <TooltipContent className="w-56 text-center">
-                                <p>The number of full days that have passed since your last recorded food waste.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                     <InfoTooltip content={<p>The number of full days that have passed since your last recorded food waste.</p>}>
+                        <Info className="w-3 h-3 cursor-pointer" />
+                    </InfoTooltip>
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
@@ -135,16 +144,9 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
             <CardHeader className="pb-2 pt-3 px-3">
                 <CardTitle className="text-xs font-medium text-muted-foreground flex items-center justify-between">
                     <span>Food Success Rate</span>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Info className="w-3 h-3 cursor-pointer" />
-                            </TooltipTrigger>
-                            <TooltipContent className="w-56 text-center">
-                                <p>The percentage of items you have successfully used versus those that were wasted.</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <InfoTooltip content={<p>The percentage of items you have successfully used versus those that were wasted.</p>}>
+                        <Info className="w-3 h-3 cursor-pointer" />
+                    </InfoTooltip>
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-3 pb-3">
