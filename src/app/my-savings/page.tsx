@@ -102,11 +102,23 @@ export default function MySavingsPage() {
             <Card className="bg-primary text-white shadow-lg overflow-hidden relative">
                  <div className="absolute top-0 right-0 text-8xl opacity-10 pointer-events-none -mr-4 -mt-4">💰</div>
                 <CardHeader>
-                    <div className="flex items-center gap-2 text-sm font-semibold text-green-200">
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
-                          <PiggyBank className="w-4 h-4" />
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-green-200">
+                            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
+                              <PiggyBank className="w-4 h-4" />
+                            </div>
+                            Virtual Savings
                         </div>
-                        Virtual Savings
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                     <Info className="w-4 h-4 text-green-200 cursor-pointer" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p className="max-w-xs">Savings are calculated based on using items before they expire and following recipe suggestions instead of buying more expensive alternatives.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -133,7 +145,7 @@ export default function MySavingsPage() {
                                 className="bg-white/20 text-white hover:bg-white/30 w-full h-12 text-base"
                             >
                                 <Banknote className="mr-2" />
-                                Transfer to BPI
+                                Transfer to BPI #MySaveUp via GCash
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
@@ -188,7 +200,7 @@ export default function MySavingsPage() {
 
              <Card className="cursor-pointer hover:bg-secondary/50">
                 <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
+                    <CardTitle className="flex items-center justify-between" onClick={() => router.push('/my-savings/history')}>
                         <span className="flex items-center gap-2 text-base">
                             <History /> Savings History
                         </span>
