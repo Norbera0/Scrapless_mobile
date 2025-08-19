@@ -23,14 +23,12 @@ export function BpiTransferForm({ onTransferComplete }: BpiTransferFormProps) {
   const [amount, setAmount] = useState<number>(available);
 
   const submit = () => {
-    // In a real app, from/to account IDs would be needed.
-    // For this mockup, we proceed with just the amount.
     if (!amount) return;
-    planTransfer(amount, 'mock_from_account', 'mock_to_account');
+    // In a real app, this would initiate a secure backend process.
+    // For this mockup, we navigate to the fake GCash page with the amount.
+    router.push(`/GCashRedirect-Mockup?amount=${amount}`);
     if(onTransferComplete) {
         onTransferComplete();
-    } else {
-        router.push('/bpi/dashboard');
     }
   };
 
@@ -49,7 +47,7 @@ export function BpiTransferForm({ onTransferComplete }: BpiTransferFormProps) {
           <div className="mt-1 text-xs text-muted-foreground">Available from eco-savings: ₱{available.toFixed(2)}</div>
         </div>
         <div>
-          <Button onClick={submit} disabled={!amount} className="w-full">Create transfer suggestion</Button>
+          <Button onClick={submit} disabled={!amount} className="w-full">Initiate Transfer</Button>
         </div>
     </div>
   );
