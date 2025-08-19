@@ -64,9 +64,15 @@ const suggestRecipesFlow = ai.defineFlow(
       return { recipes: [] };
     }
 
+    // Ensure all recipes have a unique ID
+    const recipesWithIds = output.recipes.map(recipe => ({
+        ...recipe,
+        id: recipe.id || crypto.randomUUID(),
+    }));
+
     // 2. Generate an image for each recipe in parallel
     const recipesWithImages = await Promise.all(
-        output.recipes.map(async (recipe) => {
+        recipesWithIds.map(async (recipe) => {
             try {
               const { imageUrl } = await generateFoodImage({ recipeName: recipe.name });
               return { ...recipe, photoDataUri: imageUrl };
