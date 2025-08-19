@@ -22,7 +22,8 @@ function GCashConfirmContent() {
     const { total } = useSavingsSummary(savingsEvents);
     
     const amount = Number(searchParams.get('amount') || '120');
-    const newBalance = total; // In a real app, this would be fetched from the bank
+    // #MySaveUp balance is the total amount of savings events (which are all "transferred" at this point in the mock)
+    const newBalance = total; 
     const goalAmount = 3000;
     const progress = (newBalance / goalAmount) * 100;
     
@@ -39,7 +40,7 @@ function GCashConfirmContent() {
                 <Card className="bg-green-50 border-green-200">
                     <CardContent className="p-4 space-y-3">
                         <div className="flex justify-between items-baseline">
-                            <span className="text-sm text-green-700">New Balance:</span>
+                            <span className="text-sm text-green-700">New #MySaveUp Balance:</span>
                             <span className="font-bold text-green-800">₱{newBalance.toLocaleString()} / ₱{goalAmount.toLocaleString()}</span>
                         </div>
                         <Progress value={progress} className="h-2 [&>div]:bg-green-600" />
@@ -48,7 +49,7 @@ function GCashConfirmContent() {
                 </Card>
 
                 <div>
-                    <h2 className="font-bold text-lg mb-2">Recent Savings</h2>
+                    <h2 className="font-bold text-lg mb-2">Recent Savings History</h2>
                     <Card>
                         <CardContent className="p-0">
                             {savingsEvents.slice(0, 3).map((item, index) => (
@@ -66,7 +67,7 @@ function GCashConfirmContent() {
                 
                 <Card className="text-center">
                     <CardContent className="p-4">
-                        <p className="text-sm text-muted-foreground">Total Saved</p>
+                        <p className="text-sm text-muted-foreground">Total Saved in Scrapless</p>
                         <p className="text-2xl font-bold text-green-600">₱{total.toLocaleString()}</p>
                     </CardContent>
                 </Card>

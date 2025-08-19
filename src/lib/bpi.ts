@@ -1,7 +1,9 @@
+
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { SavingsEvent } from '@/types';
+import { useSavingsStore } from '@/stores/savings-store';
 
 export type BpiAccount = {
   id: string;
@@ -77,6 +79,26 @@ export function setLinkState(state: BpiLinkState) {
 
 export function planTransfer(amount: number, fromAccountId: string, toAccountId: string) {
   if (typeof window === 'undefined') return;
+  
+  // Update the savings store to mark events as transferred
+  const { savingsEvents, setSavingsEvents } = useSavingsStore.getState();
+  const availableEvents = savingsEvents.filter(e => !e.transferredToBank);
+  let amountToMark = amount;
+  
+  const updatedEvents = savingsEvents.map(event => {
+    if (!event.transferredToBank && amountToMark > 0) {
+      const amountFromEvent = Math.min(amountToMark, event.amount);
+      amountToMark -= amountFromEvent;
+      // In a real app, you might split events, but here we'll just mark as transferred
+      // For simplicity, we mark the whole event as transferred if any part of it is.
+      return { ...event, transferredToBank: true, transferDate: new Date().toISOString() };
+    }
+    return event;
+  });
+
+  setSavingsEvents(updatedEvents);
+
+  // You can also persist the plan if needed, but the store update is key
   const raw = localStorage.getItem(STORAGE_KEYS.TRANSFER_PLANS);
   const plans = raw ? (JSON.parse(raw) as any[]) : [];
   plans.push({ amount, fromAccountId, toAccountId, plannedAt: new Date().toISOString() });
@@ -130,5 +152,3 @@ export function useSavingsSummary(savingsEvents: SavingsEvent[]) {
     return { total, available };
   }, [savingsEvents]);
 }
-
-
