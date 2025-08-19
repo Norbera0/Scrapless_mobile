@@ -266,10 +266,10 @@ export default function DashboardPage() {
             </div>
           </Card>
         
-        <div className="grid grid-cols-2 items-center justify-around gap-2">
+        <div className="flex flex-col sm:flex-row items-center justify-around gap-4">
             <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
               <PopoverTrigger asChild>
-                <button className="relative aspect-[2/1] w-full h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
+                <button className="relative aspect-[2/1] w-full max-w-xs h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
                     <Image
                       src="/dashboard/add_pantry_items_button.png"
                       alt="Add Pantry Items"
@@ -296,7 +296,7 @@ export default function DashboardPage() {
             </Popover>
             <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
                 <PopoverTrigger asChild>
-                    <button className="relative aspect-[2/1] w-full h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
+                    <button className="relative aspect-[2/1] w-full max-w-xs h-auto transition-transform duration-300 hover:scale-105 active:scale-100">
                         <Image
                         src="/dashboard/log_food_waste_button.png"
                         alt="Log Food Waste"
