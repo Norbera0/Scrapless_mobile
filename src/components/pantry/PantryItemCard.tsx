@@ -91,7 +91,9 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
             <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3 min-w-0">
                     <span className="text-2xl flex-shrink-0">{getItemEmoji(item.name)}</span>
-                    <h3 className="font-bold text-gray-800 text-base pr-2 leading-tight truncate">{item.name}</h3>
+                    <h3 className="font-bold text-gray-800 text-base pr-2 leading-tight">
+                        {item.name.length > 15 ? `${item.name.slice(0, 15)}...` : item.name}
+                    </h3>
                 </div>
                 <div className={cn("px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap", badgeColorClass)}>
                     {freshness.label}
