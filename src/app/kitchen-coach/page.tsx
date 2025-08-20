@@ -72,8 +72,6 @@ export default function KitchenCoachPage() {
     const { logs } = useWasteLogStore();
     const { liveItems, archivedItems } = usePantryLogStore();
     const { savingsEvents } = useSavingsStore();
-    const { isLinked: isBpiLinked, trackPlanData } = useBpiTrackPlanStore();
-
 
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingSolutions, setIsFetchingSolutions] = useState(false);
@@ -145,7 +143,6 @@ export default function KitchenCoachPage() {
                     userContext: {
                         userStage: 'regular_user',
                         previouslyAttemptedSolutions: [],
-                        bpiTrackPlanData: isBpiLinked ? trackPlanData : undefined,
                     }
                 };
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
@@ -326,7 +323,7 @@ export default function KitchenCoachPage() {
                     onSelectSolution={handleSelectSolution}
                     selectedSolutions={selectedSolutions}
                     isUpdatingSolution={isLoading}
-                    isBpiLinked={isBpiLinked}
+                    isBpiLinked={false}
                  />
             )}
         </>

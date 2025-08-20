@@ -62,7 +62,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
     const [current, setCurrent] = useState(0);
 
     const steps = useMemo(() => {
-        const baseSteps = [
+        return [
             { 
                 id: 'title', 
                 icon: Brain, 
@@ -101,22 +101,9 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                 title: 'The Prediction', 
                 content: <p className="font-semibold text-foreground">{analysis.prediction}</p> 
             },
+            { id: 'solutions', icon: Check, title: 'Your Action Plan', content: 'solutions_placeholder' },
         ];
-        
-        const bpiSolution = solutions.solutions.find(s => s.title.toLowerCase().includes('bpi'));
-        if (isBpiLinked && bpiSolution) {
-            baseSteps.push({
-                id: 'bpi-solution',
-                icon: Landmark,
-                title: bpiSolution.title,
-                content: <p>{bpiSolution.description}</p>
-            });
-        }
-        
-        baseSteps.push({ id: 'solutions', icon: Check, title: 'Your Action Plan', content: 'solutions_placeholder' });
-        
-        return baseSteps;
-    }, [analysis, solutions, isBpiLinked]);
+    }, [analysis]);
     
     const totalSteps = steps.length;
 
@@ -154,7 +141,7 @@ export function KitchenCoachWizard({ isOpen, onClose, analysis, solutions, onSel
                                                 <h2 className="text-xl md:text-2xl font-bold mb-1 shrink-0">Your Action Plan</h2>
                                                 <p className="text-muted-foreground mb-4 shrink-0">Choose one or more solutions to work on.</p>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full p-1 flex-1 overflow-y-auto">
-                                                    {solutions.solutions.filter(s => !s.title.toLowerCase().includes('bpi')).map((s, i) => (
+                                                    {solutions.solutions.map((s, i) => (
                                                          <SolutionCard 
                                                             key={i} 
                                                             solution={s} 

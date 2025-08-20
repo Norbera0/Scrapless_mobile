@@ -1,5 +1,4 @@
 
-
 /**
  * @fileOverview This file defines shared Zod schemas for Genkit flows.
  */
@@ -126,12 +125,12 @@ export const ChatWithAssistantInputSchema = z.object({
             estimatedExpirationDate: z.string(),
             estimatedAmount: z.string(),
         })
-    ).describe("A list of items currently in the user's pantry."),
-    wasteLogs: z.array(z.any()).describe("A list of recent waste log objects."),
-    totalPesoValueWasted: z.number().describe("Total peso value wasted in the last 30 days."),
-    totalCarbonFootprintWasted: z.number().describe("Total carbon footprint wasted in the last 30 days."),
-    topWastedItem: z.object({ name: z.string(), count: z.number() }).describe("The most frequently wasted item."),
-    mostCommonWasteReason: z.string().describe("The most common reason for waste."),
+    ).optional().describe("A list of items currently in the user's pantry."),
+    wasteLogs: z.array(z.any()).optional().describe("A list of recent waste log objects."),
+    totalPesoValueWasted: z.number().optional().describe("Total peso value wasted in the last 30 days."),
+    totalCarbonFootprintWasted: z.number().optional().describe("Total carbon footprint wasted in the last 30 days."),
+    topWastedItem: z.object({ name: z.string(), count: z.number() }).optional().describe("The most frequently wasted item."),
+    mostCommonWasteReason: z.string().optional().describe("The most common reason for waste."),
     preferences: z.object({
         dietaryRestrictions: z.array(z.string()).optional(),
         favoriteCuisines: z.array(z.string()).optional(),
@@ -240,25 +239,12 @@ export const KitchenCoachOutputSchema = z.object({
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
 
-const BpiTrackPlanDataSchema = z.object({
-    spendingCategories: z.array(
-      z.object({
-        category: z.string(),
-        amount: z.number(),
-        trend: z.string(),
-      })
-    ),
-    cashFlowAlert: z.string(),
-    unusualTransactions: z.array(z.string()),
-}).optional();
-
 // Schema for the solutions generation flow
 export const GetCoachSolutionsInputSchema = z.object({
     analysis: KitchenCoachOutputSchema.describe("The full analysis output from the main Kitchen Coach flow."),
     userContext: z.object({
         userStage: z.enum(['new_user', 'regular_user', 'advanced_user']),
         previouslyAttemptedSolutions: z.array(z.string()).optional(),
-        bpiTrackPlanData: BpiTrackPlanDataSchema,
     }).describe("Context about the user to tailor solutions."),
 });
 export type GetCoachSolutionsInput = z.infer<typeof GetCoachSolutionsInputSchema>;
@@ -301,7 +287,6 @@ export const AnalyzeConsumptionPatternsInputSchema = z.object({
       sessionWasteReason: z.string(),
     })
   ),
-  bpiTrackPlanData: BpiTrackPlanDataSchema,
 });
 export type AnalyzeConsumptionPatternsInput = z.infer<typeof AnalyzeConsumptionPatternsInputSchema>;
 
@@ -362,4 +347,3 @@ export const GetWasteBreakdownInsightOutputSchema = z.object({
     insight: z.string().describe("A short, actionable tip to help the user reduce waste in their top category."),
 });
 export type GetWasteBreakdownInsightOutput = z.infer<typeof GetWasteBreakdownInsightOutputSchema>;
-    

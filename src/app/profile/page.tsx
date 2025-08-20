@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Landmark, LogOut, ChevronRight, User as UserIcon, Palette, Bookmark, ShieldCheck, TrendingUp, ThumbsDown, CheckCircle, BarChart, Info, Leaf, Star, ExternalLink, RefreshCw, Edit, Save, PiggyBank, Sparkles } from 'lucide-react';
+import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
@@ -179,17 +179,6 @@ export default function ProfilePage() {
                         <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
                     
-                    <div 
-                        className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
-                        onClick={() => router.push('/bpi/mysaveup')}
-                    >
-                        <div className="flex items-center gap-3">
-                            <Image src="/bpi-logo-2.png" alt="BPI Logo" width={20} height={20} />
-                            <p className="font-medium">BPI #MySaveUp</p>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </div>
-
                     <div className="flex items-center justify-between p-3 rounded-lg">
                         <div className="flex items-center gap-3">
                             <Palette className="w-5 h-5 text-primary" />

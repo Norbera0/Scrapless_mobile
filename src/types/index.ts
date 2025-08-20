@@ -1,5 +1,4 @@
 
-
 export interface User {
   uid: string;
   name?: string | null;
@@ -227,13 +226,6 @@ export interface ShoppingList {
     daysOfDataUsed: number;
     stapleItemsIncluded: number;
   };
-}
-
-// BPI Track & Plan Mock Data
-export interface TrackPlanData {
-    spendingCategories: { category: string; amount: number; trend: string }[];
-    cashFlowAlert: string;
-    unusualTransactions: string[];
 }
 
 export interface WeatherData {

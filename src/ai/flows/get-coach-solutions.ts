@@ -31,9 +31,6 @@ You have been given the following analysis about a user's food waste pattern:
 ## USER CONTEXT
 - **User Stage:** {{userContext.userStage}} // 'new_user', 'regular_user', or 'advanced_user'
 - **Previously Attempted Solutions:** {{#if userContext.previouslyAttemptedSolutions}}{{#each userContext.previouslyAttemptedSolutions}}'{{this}}', {{/each}}{{else}}None{{/if}}
-- **BPI Financial Data:**
-  - Spending Categories: {{#if userContext.bpiTrackPlanData.spendingCategories}}Available{{else}}Not Available{{/if}}
-  - Cash Flow Alert: {{#if userContext.bpiTrackPlanData.cashFlowAlert}}'{{userContext.bpiTrackPlanData.cashFlowAlert}}'{{else}}None{{/if}}
 
 ## YOUR TASK
 Based *only* on the provided analysis and user context, generate a complete solutions package.
@@ -45,8 +42,7 @@ Based *only* on the provided analysis and user context, generate a complete solu
     -   For 'advanced_user', provide "Level Up" challenges instead of basic tips.
     -   For 'new_user', provide simple, foundational habits.
 3.  **Filipino Context**: Ensure solutions are practical and relatable for a Filipino household.
-4.  **BPI Integration**: If BPI data is available and relevant to the analysis, generate ONE BPI-specific solution. For example, if the analysis mentions overspending on groceries, suggest using BPI Track & Plan to set a budget.
-5.  **Quick Win & Encouragement**: Provide one quick win for today and a motivational message.
+4.  **Quick Win & Encouragement**: Provide one quick win for today and a motivational message.
 
 Generate the output as a single JSON object that strictly follows the output schema.
 `,
@@ -85,5 +81,3 @@ const getCoachSolutionsFlow = ai.defineFlow(
     return output;
   }
 );
-
-    
