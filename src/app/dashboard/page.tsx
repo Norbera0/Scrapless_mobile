@@ -62,6 +62,7 @@ import { Separator } from '@/components/ui/separator';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformancePanel';
 import { WasteBreakdownCard } from '@/components/dashboard/WasteBreakdownCard';
+import { useSavingsSummary } from '@/lib/bpi';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -100,6 +101,9 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState("Good morning");
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
   const [isLogWasteMethodOpen, setIsLogWasteMethodOpen] = useState(false);
+
+  const { total, available } = useSavingsSummary(savingsEvents);
+  const transferred = total - available;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -202,9 +206,8 @@ export default function DashboardPage() {
   }, [liveItems]);
 
 
-  const monthSavings = analytics?.savings.thisMonthAmount || 0;
   const savingsGoal = settings.savingsGoal || 5000;
-  const goalProgress = Math.round(Math.min(100, Math.max(0, (monthSavings / savingsGoal) * 100)));
+  const goalProgress = Math.round(Math.min(100, Math.max(0, (transferred / savingsGoal) * 100)));
 
   const handleMethodSelect = (type: 'pantry' | 'waste', method: 'camera' | 'voice' | 'text') => {
     if (type === 'pantry') {
@@ -239,9 +242,9 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
                   <div>
-                      <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
+                      <p className="text-xs text-green-200 mb-1">Available to Transfer</p>
                       <div className="flex items-center justify-center gap-2">
-                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(available)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
                       </div>
                   </div>
@@ -253,7 +256,7 @@ export default function DashboardPage() {
                <div className="pt-4 border-t border-white/20">
                     <div className="flex justify-between items-center mb-1">
                       <p className="text-xs text-green-200">Savings Goal</p>
-                      <p className="text-xs text-green-200 font-semibold">{formatPeso(monthSavings)} / {formatPeso(savingsGoal)}</p>
+                      <p className="text-xs text-green-200 font-semibold">{formatPeso(transferred)} / {formatPeso(savingsGoal)}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Progress value={goalProgress} className="h-2 flex-1" style={{
@@ -367,5 +370,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
