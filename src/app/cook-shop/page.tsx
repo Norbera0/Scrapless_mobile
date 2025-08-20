@@ -22,7 +22,9 @@ import {
   PackagePlus,
   BarChart,
   Leaf,
-  CookingPot
+  CookingPot,
+  Zap,
+  Landmark
 } from 'lucide-react';
 import type { PantryItem, Recipe, WasteLog } from '@/types';
 import { getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
@@ -41,6 +43,7 @@ import type { GenerateShoppingListOutput } from '@/ai/schemas';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useSavingsStore } from '@/stores/savings-store';
+import { Switch } from '@/components/ui/switch';
 
 const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['items'][0]['deal']> }) => {
     
@@ -96,6 +99,7 @@ export default function CookAndShopPage() {
   
   // Shopping List State
   const [isLoadingShoppingList, setIsLoadingShoppingList] = useState(false);
+  const [isAutoBuyEnabled, setIsAutoBuyEnabled] = useState(true);
 
   const [isClient, setIsClient] = useState(false);
 
@@ -336,7 +340,7 @@ export default function CookAndShopPage() {
             )}
         </CardContent>
         {generatedList && (
-            <CardFooter className="flex-col items-stretch gap-4 pt-4">
+            <CardFooter className="flex-col items-stretch gap-4 pt-4 border-t">
                  <div className="grid grid-cols-2 gap-4">
                     <Button variant="outline" onClick={() => handleGenerateList()} disabled={isLoadingShoppingList}>
                         {isLoadingShoppingList ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
@@ -350,6 +354,35 @@ export default function CookAndShopPage() {
             </CardFooter>
         )}
       </Card>
+      
+      {generatedList && (
+        <Card className="bg-gradient-to-br from-primary to-green-700 text-primary-foreground">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base"><Zap /> One-Tap Restock</CardTitle>
+                <CardDescription className="text-green-200">Automatically purchase your list via our partners.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <Button className="w-full bg-white text-primary hover:bg-white/90">
+                    <Image src="/grabmart-logo.png" alt="GrabMart" width={20} height={20} className="mr-2" />
+                     Auto-Buy with GrabMart
+                 </Button>
+                 <div className="flex items-center justify-between text-sm text-green-100">
+                    <Label htmlFor="auto-buy-toggle" className="font-semibold">Enable Auto-Buy</Label>
+                    <Switch 
+                        id="auto-buy-toggle" 
+                        checked={isAutoBuyEnabled}
+                        onCheckedChange={setIsAutoBuyEnabled}
+                        className="data-[state=checked]:bg-green-400"
+                    />
+                 </div>
+                 {isAutoBuyEnabled && (
+                    <p className="text-xs text-center text-green-200 bg-black/20 p-2 rounded-md">
+                        Next delivery: Saturday, ~₱{generatedList.totalEstimatedCost.toFixed(2)} total, paid via BPI.
+                    </p>
+                 )}
+            </CardContent>
+        </Card>
+      )}
 
     </div>
   );
