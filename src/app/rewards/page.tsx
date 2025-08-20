@@ -11,6 +11,7 @@ import { Loader2, Sparkles, Gift, CookingPot, CheckCircle, Lightbulb } from 'luc
 import type { GreenPointsEvent } from '@/types';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const eventIcons: Record<GreenPointsEvent['type'], React.ElementType> = {
     log_pantry_item: CheckCircle,
@@ -98,25 +99,27 @@ export default function GreenPointsPage() {
                 </CardHeader>
                 <CardContent>
                      {events.length > 0 ? (
-                        <div className="space-y-3">
-                            {events.map(event => {
-                                const Icon = eventIcons[event.type] || Sparkles;
-                                return (
-                                    <div key={event.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <Icon className="w-5 h-5 text-primary" />
-                                            <div>
-                                                <p className="font-medium text-sm">{event.description}</p>
-                                                <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMMM d, h:mm a')}</p>
+                        <ScrollArea className="h-96 pr-3">
+                            <div className="space-y-3">
+                                {events.map(event => {
+                                    const Icon = eventIcons[event.type] || Sparkles;
+                                    return (
+                                        <div key={event.id} className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <Icon className="w-5 h-5 text-primary" />
+                                                <div>
+                                                    <p className="font-medium text-sm">{event.description}</p>
+                                                    <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMMM d, h:mm a')}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                 <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ {event.points} pts</p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                             <p className="font-bold text-green-600 text-lg whitespace-nowrap">+ {event.points} pts</p>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
+                                    )
+                                })}
+                            </div>
+                        </ScrollArea>
                      ) : (
                          <div className="text-center text-muted-foreground py-10">
                             <p>You haven't earned any points yet.</p>
