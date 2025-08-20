@@ -133,8 +133,8 @@ export interface SavingsEvent {
     id: string;
     userId: string;
     date: string; // ISO string
-    type: 'avoided_expiry' | 'recipe_followed' | 'smart_shopping' | 'waste_reduction' | 'solution_implemented';
-    amount: number; // in PHP
+    type: 'avoided_expiry' | 'recipe_followed' | 'smart_shopping' | 'waste_reduction' | 'solution_implemented' | 'withdrawal';
+    amount: number; // in PHP. Can be negative for withdrawals.
     description: string;
     relatedPantryItemId?: string;
     relatedWasteLogId?: string;

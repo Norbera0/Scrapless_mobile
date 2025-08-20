@@ -13,13 +13,18 @@ import { useSavingsSummary } from '@/lib/bpi';
 function GCashConfirmContent() {
     const searchParams = useSearchParams();
     const { savingsEvents } = useSavingsStore();
-    const { total } = useSavingsSummary(savingsEvents);
+    const { total, available } = useSavingsSummary(savingsEvents);
     
-    const amount = Number(searchParams.get('amount') || '120');
-    // #MySaveUp balance is the total amount of savings events (which are all "transferred" at this point in the mock)
-    const newBalance = total; 
-    
-    const recentTransfers = savingsEvents.filter(e => e.transferredToBank).slice(0, 3);
+    const amount = Number(searchParams.get('amount') || '0');
+    // New available balance after this transfer
+    const newBalance = available;
+    const transferred = total - available;
+
+    // We show the most recent savings events that have been marked as transferred, which includes the one just made.
+    const recentTransfers = savingsEvents
+        .filter(e => e.transferredToBank || e.type === 'withdrawal')
+        .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 3);
 
     return (
         <div className="bg-background p-4 sm:p-6 flex justify-center items-start min-h-screen">
@@ -40,7 +45,7 @@ function GCashConfirmContent() {
                                         <p className="font-semibold">{new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                                         <p className="text-sm text-muted-foreground">{item.description}</p>
                                     </div>
-                                    <p className="font-bold text-green-600">+ ₱{item.amount.toFixed(2)}</p>
+                                    <p className="font-bold text-green-600">+ ₱{Math.abs(item.amount).toFixed(2)}</p>
                                 </div>
                             ))}
                         </CardContent>
@@ -49,8 +54,8 @@ function GCashConfirmContent() {
                 
                 <Card className="text-center">
                     <CardContent className="p-4">
-                        <p className="text-sm text-muted-foreground">Total Saved in #MySaveUp</p>
-                        <p className="text-2xl font-bold text-green-600">₱{newBalance.toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">Total Transferred to #MySaveUp</p>
+                        <p className="text-2xl font-bold text-green-600">₱{transferred.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </CardContent>
                 </Card>
 
