@@ -513,7 +513,7 @@ export default function PantryPage() {
               )}
             >
               <CookingPot className="w-4 h-4" />
-              Pantry
+              My Pantry
             </button>
             <button
               onClick={() => setActiveTab('scraps')}
@@ -525,7 +525,7 @@ export default function PantryPage() {
               )}
             >
               <Trash className="w-4 h-4" />
-              Scraps
+              Waste Bin
             </button>
           </div>
           
