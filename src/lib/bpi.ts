@@ -12,10 +12,15 @@ export async function planTransfer(userId: string, amount: number) {
   if (typeof window === 'undefined') return;
 
   const savingsEventsRef = collection(db, `users/${userId}/savingsEvents`);
-  const q = query(savingsEventsRef, where('transferredToBank', '==', false), orderBy('date', 'asc'));
+  // Query only by date to avoid composite indexes, then filter client-side.
+  const q = query(savingsEventsRef, orderBy('date', 'asc'));
   
   const querySnapshot = await getDocs(q);
-  const untransferredEvents = querySnapshot.docs.map(d => ({ ...d.data(), id: d.id } as SavingsEvent));
+  
+  // Filter for untransferred events in the application code
+  const untransferredEvents = querySnapshot.docs
+    .map(d => ({ ...d.data(), id: d.id } as SavingsEvent))
+    .filter(event => !event.transferredToBank);
 
   let amountToMark = amount;
   const batch = writeBatch(db);
@@ -33,7 +38,7 @@ export async function planTransfer(userId: string, amount: number) {
     }
   }
 
-  if (amountToMark > 0 && querySnapshot.size > 0) {
+  if (amountToMark > 0 && untransferredEvents.length > 0) {
     console.warn(`Could not mark the full amount. Short by ${amountToMark}. This might happen if event amounts are not divisible as needed.`);
   }
 
