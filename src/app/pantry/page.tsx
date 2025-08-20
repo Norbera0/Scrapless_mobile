@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -37,7 +36,8 @@ import {
   MessageCircleQuestion,
   Lightbulb,
   CalendarClock,
-  Heart
+  Heart,
+  ChevronRightIcon
 } from 'lucide-react';
 import type { PantryItem, Recipe, ItemInsights, WasteLog } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
@@ -445,88 +445,6 @@ export default function PantryPage() {
     }
   }, [itemInsights, toast]);
 
-  const fetchRecipes = useCallback(async (isNewRequest: boolean) => {
-    if (liveItems.length === 0) {
-      setRecipes([]);
-      return;
-    }
-    if(isNewRequest) {
-        clearRecipes();
-    }
-
-    setIsLoadingRecipes(true);
-    try {
-      const pantryItemData = liveItems.map(item => ({
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-      }));
-
-      const result = await getRecipeSuggestions({
-        pantryItems: pantryItemData,
-        preferences: {
-            quickMeals: recipeFilters.quickMeals,
-            filipinoDishes: recipeFilters.filipinoDishes,
-        },
-      });
-      const recipesWithIds = result.recipes.map(r => ({ ...r, id: r.id || crypto.randomUUID() }));
-      setRecipes(recipesWithIds);
-    } catch (error) {
-      console.error('Failed to fetch recipes:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Could not get recipes',
-        description: 'An error occurred while generating recipe ideas. Please try again.',
-      });
-    } finally {
-      setIsLoadingRecipes(false);
-    }
-  }, [liveItems, recipeFilters, toast, setRecipes, clearRecipes]);
-
-
-  useEffect(() => {
-    if (pantryInitialized && isClient && useRecipeStore.getState().recipes.length === 0 && liveItems.length > 0) {
-        fetchRecipes(false);
-    }
-  }, [pantryInitialized, liveItems.length, fetchRecipes, isClient]);
-
-
-  useEffect(() => {
-    const loadSaved = async () => {
-      if (user) {
-        const saved = await getSavedRecipes(user.uid);
-        setSavedRecipeIds(new Set(saved.map(r => r.id)));
-      }
-    };
-    loadSaved();
-  }, [user]);
-
-  const handleToggleSave = async (recipe: Recipe) => {
-    if (!user) return;
-    
-    try {
-      if (savedRecipeIds.has(recipe.id)) {
-        await unsaveRecipe(user.uid, recipe.id);
-        setSavedRecipeIds(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(recipe.id);
-          return newSet;
-        });
-        toast({ title: 'Recipe unsaved', description: `"${recipe.name}" removed from your saves.` });
-      } else {
-        await saveRecipe(user.uid, recipe);
-        setSavedRecipeIds(prev => new Set(prev).add(recipe.id));
-        toast({ title: 'Recipe saved', description: `"${recipe.name}" added to your saves.` });
-      }
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to save recipe. Please try again.',
-      });
-    }
-  };
-
   const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
     setIsAddMethodOpen(false);
     if (activeTab === 'pantry') {
@@ -645,49 +563,58 @@ export default function PantryPage() {
         <>
             {/* Pantry Items */}
             <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Your Items</h2>
-                <span className="text-sm text-gray-500">{filteredItems.length} items found</span>
-            </div>
-
-            {!pantryInitialized ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                        <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">Your Items</h2>
+                    <span className="text-sm text-gray-500">{filteredItems.length} items found</span>
+                </div>
+    
+                {!pantryInitialized ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
+                        ))}
+                    </div>
+                ) : filteredItems.length === 0 ? (
+                    <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
+                        <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No items found</h3>
+                        <p className="text-gray-500 mb-4 px-4">
+                        {liveItems.length === 0 
+                            ? "Your pantry is empty. Let's add some groceries!"
+                            : "Clear your search or filters to see all items."
+                        }
+                        </p>
+                        <Button onClick={() => router.push('/add-to-pantry')} className="h-11 text-base">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Groceries
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                    {filteredItems.map((item) => (
+                        <PantryItemCard
+                        key={item.id}
+                        item={item}
+                        onSelect={setSelectedItem}
+                        onDelete={handleDelete}
+                        isDeleting={isDeleting === item.id}
+                        />
                     ))}
+                    </div>
+                )}
+            </div>
+            
+            <div 
+                className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between gap-4 cursor-pointer hover:bg-green-50 transition-colors"
+                onClick={() => router.push('/cook-shop')}
+            >
+                <div>
+                    <h3 className="font-bold text-gray-800">Cook & Shop Hub</h3>
+                    <p className="text-sm text-gray-500">Get recipe ideas and build your shopping list.</p>
                 </div>
-            ) : filteredItems.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed">
-                    <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No items found</h3>
-                    <p className="text-gray-500 mb-4 px-4">
-                    {liveItems.length === 0 
-                        ? "Your pantry is empty. Let's add some groceries!"
-                        : "Clear your search or filters to see all items."
-                    }
-                    </p>
-                    <Button onClick={() => router.push('/add-to-pantry')} className="h-11 text-base">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Groceries
-                    </Button>
-                </div>
-            ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-                {filteredItems.map((item) => (
-                    <PantryItemCard
-                    key={item.id}
-                    item={item}
-                    onSelect={setSelectedItem}
-                    onDelete={handleDelete}
-                    isDeleting={isDeleting === item.id}
-                    />
-                ))}
-                </div>
-            )}
+                <ChevronRightIcon className="w-5 h-5 text-gray-400" />
             </div>
 
-            {/* Recipe Suggestions */}
-            {/* This section is temporarily hidden */}
         </>
         ) : (
             <RecentWasteHistory logs={wasteLogs} />

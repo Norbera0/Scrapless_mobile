@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { 
@@ -16,7 +15,8 @@ import {
     User,
     Bot,
     Gift,
-    Sparkles
+    Sparkles,
+    ChefHat
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -66,7 +66,7 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { href: '/pantry', label: 'Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items', '/saves'] },
     { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
-    { href: '/shopping', label: 'Shopping Hub', icon: ShoppingCart },
+    { href: '/cook-shop', label: 'Cook & Shop', icon: ChefHat },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
   ];
   
