@@ -64,10 +64,11 @@ const suggestRecipesFlow = ai.defineFlow(
       return { recipes: [] };
     }
 
-    // Ensure all recipes have a unique ID
+    // Ensure all recipes have a unique ID and clear any potentially old photo data
     const recipesWithIds = output.recipes.map(recipe => ({
         ...recipe,
         id: recipe.id || crypto.randomUUID(),
+        photoDataUri: undefined, // Explicitly clear old data
     }));
 
     // 2. Generate an image for each recipe in parallel
@@ -75,6 +76,8 @@ const suggestRecipesFlow = ai.defineFlow(
         recipesWithIds.map(async (recipe) => {
             try {
               const { imageUrl } = await generateFoodImage({ recipeName: recipe.name });
+              // This is the crucial part: we are now assigning the generated URL
+              // to the photoDataUri field, which will be saved in the store.
               return { ...recipe, photoDataUri: imageUrl };
             } catch (error) {
               console.error(`Error generating image for ${recipe.name}:`, error);
