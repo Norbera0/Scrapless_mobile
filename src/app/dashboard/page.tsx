@@ -241,7 +241,7 @@ export default function DashboardPage() {
                   <div>
                       <p className="text-xs text-green-200 mb-1">Virtual Savings</p>
                       <div className="flex items-center justify-center gap-2">
-                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.savings.thisWeekAmount)}</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
                       </div>
                   </div>
