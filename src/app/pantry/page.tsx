@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -56,6 +57,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Separator } from '@/components/ui/separator';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PantryItemEditor } from '@/components/pantry/PantryItemEditor';
 
 const filterOptions = [
     { value: 'all', label: 'All Items' },
@@ -337,6 +339,7 @@ export default function PantryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   
   const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
+  const [editingItem, setEditingItem] = useState<PantryItem | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   
@@ -596,6 +599,7 @@ export default function PantryPage() {
                         key={item.id}
                         item={item}
                         onSelect={setSelectedItem}
+                        onEdit={setEditingItem}
                         onDelete={handleDelete}
                         isDeleting={isDeleting === item.id}
                         />
@@ -630,6 +634,14 @@ export default function PantryPage() {
             onGetInsights={handleGetInsights}
             isFetchingInsights={isFetchingInsights.has(selectedItem.id)}
             insights={itemInsights.get(selectedItem.id) || null}
+          />
+        )}
+        {/* Item Editor Modal */}
+        {editingItem && (
+          <PantryItemEditor
+            item={editingItem}
+            isOpen={!!editingItem}
+            onClose={() => setEditingItem(null)}
           />
         )}
       </div>

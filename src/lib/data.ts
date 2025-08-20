@@ -270,46 +270,46 @@ export const getPantryItemsForUser = async (userId: string): Promise<PantryItem[
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as PantryItem));
 };
 
-export const savePantryItems = async (userId: string, itemsToSave: PantryLogItem[]): Promise<PantryItem[]> => {
+export const savePantryItems = async (userId: string, itemsToSave: PantryItem[]): Promise<PantryItem[]> => {
     const batch = writeBatch(db);
     const savedItems: PantryItem[] = [];
     const pantryCollection = collection(db, `users/${userId}/pantry`);
     
     itemsToSave.forEach(item => {
-        const docRef = doc(pantryCollection, item.id);
-        const { id, ...itemData } = item;
-
-        const newItemData: Omit<PantryItem, 'id' | 'userId'> = {
-            ...itemData,
-            addedDate: new Date().toISOString(),
-            status: 'live', // New items are always live
+        const docRef = doc(pantryCollection, item.id); // Use existing ID for updates or new for creation
+        
+        // If it's a new item, set the added date
+        const isNewItem = !item.addedDate;
+        const itemData: PantryItem = {
+            ...item,
+            userId,
+            addedDate: isNewItem ? new Date().toISOString() : item.addedDate,
+            status: 'live',
         };
         
-        const fullItemData: Omit<PantryItem, 'id'> = {
-            ...newItemData,
-            userId,
+        batch.set(docRef, itemData, { merge: true }); // Use merge to avoid overwriting fields if it's an update
+        savedItems.push(itemData);
+
+        if (isNewItem) {
+            // Award Green Points only for logging a new item
+            const pointsConfig = GREEN_POINTS_CONFIG.log_pantry_item;
+            const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+                userId,
+                date: new Date().toISOString(),
+                type: 'log_pantry_item',
+                points: pointsConfig.points,
+                description: pointsConfig.defaultDescription(item.name),
+                relatedPantryItemId: item.id,
+            };
+            const pointsDocRef = doc(collection(db, `users/${userId}/greenPointsEvents`));
+            batch.set(pointsDocRef, pointsEvent);
         }
-
-        batch.set(docRef, fullItemData);
-        savedItems.push({ ...fullItemData, id: item.id });
-
-        // Award Green Points for logging an item
-        const pointsConfig = GREEN_POINTS_CONFIG.log_pantry_item;
-        const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
-            userId,
-            date: new Date().toISOString(),
-            type: 'log_pantry_item',
-            points: pointsConfig.points,
-            description: pointsConfig.defaultDescription(item.name),
-            relatedPantryItemId: item.id,
-        };
-        const pointsDocRef = doc(collection(db, `users/${userId}/greenPointsEvents`));
-        batch.set(pointsDocRef, pointsEvent);
     });
 
     await batch.commit();
     return savedItems;
 };
+
 
 export const updatePantryItemStatus = async (userId: string, itemId: string, status: 'used' | 'wasted', newQuantity?: number) => {
     const itemRef = doc(db, `users/${userId}/pantry`, itemId);

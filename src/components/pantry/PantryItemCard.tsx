@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 interface PantryItemCardProps {
     item: PantryItem;
     onSelect: (item: PantryItem) => void;
+    onEdit: (item: PantryItem) => void;
     onDelete: (itemId: string) => void;
     isDeleting: boolean;
 }
@@ -54,7 +55,7 @@ const getFreshness = (expirationDate: string) => {
     return { label: 'FRESH', color: 'green', days: daysLeft };
 };
 
-export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryItemCardProps) {
+export function PantryItemCard({ item, onSelect, onEdit, onDelete, isDeleting }: PantryItemCardProps) {
     const freshness = getFreshness(item.estimatedExpirationDate);
     const archiveItem = usePantryLogStore((state) => state.archiveItem);
     const { user } = useAuth();
@@ -127,7 +128,7 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
                     </div>
                 )}
                 <div className="flex space-x-0.5">
-                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-7 w-7 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(item);}} className="h-7 w-7 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
                         <Edit className="w-3.5 h-3.5" />
                     </Button>
                      <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
