@@ -85,24 +85,24 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
 
     return (
         <div 
-            className={cn("pantry-item bg-white rounded-lg p-4 cursor-pointer shadow-sm border border-l-4 transition-all hover:shadow-md hover:-translate-y-1", borderColorClass)} 
+            className={cn("pantry-item bg-white rounded-lg p-3 cursor-pointer shadow-sm border border-l-4 transition-all hover:shadow-md hover:-translate-y-1", borderColorClass)} 
             onClick={() => onSelect(item)}
         >
             <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl flex-shrink-0">{getItemEmoji(item.name)}</span>
-                    <h3 className="font-bold text-gray-800 text-base pr-2 leading-tight">
+                <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xl flex-shrink-0">{getItemEmoji(item.name)}</span>
+                    <h3 className="font-bold text-gray-800 text-sm pr-2 leading-tight">
                         {item.name.length > 15 ? `${item.name.slice(0, 15)}...` : item.name}
                     </h3>
                 </div>
-                <div className={cn("px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap", badgeColorClass)}>
+                <div className={cn("px-1.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap", badgeColorClass)}>
                     {freshness.label}
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 mb-4">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 mb-3">
                 <div className="flex items-center gap-1">
-                    <Package className="w-4 h-4" />
+                    <Package className="w-3 h-3" />
                     <span>{item.quantity} {item.unit}</span>
                 </div>
                 {item.estimatedCost && (
@@ -117,23 +117,23 @@ export function PantryItemCard({ item, onSelect, onDelete, isDeleting }: PantryI
 
             <div className="flex items-center justify-between">
                 {freshness.color === 'red' ? (
-                     <Button size="sm" className="h-8 text-xs bg-red-600 hover:bg-red-700" onClick={handleUseNow}>
+                     <Button size="sm" className="h-7 text-xs px-2 bg-red-600 hover:bg-red-700" onClick={handleUseNow}>
                         Use Now
                     </Button>
                 ) : (
-                    <div className='flex items-center gap-1 text-sm text-gray-500'>
-                        <Clock className="w-4 h-4" />
+                    <div className='flex items-center gap-1 text-xs text-gray-500'>
+                        <Clock className="w-3 h-3" />
                         <span>{freshness.days} days left</span>
                     </div>
                 )}
-                <div className="flex space-x-1">
-                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-8 w-8 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-                        <Edit className="w-4 h-4" />
+                <div className="flex space-x-0.5">
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onSelect(item);}} className="h-7 w-7 text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+                        <Edit className="w-3.5 h-3.5" />
                     </Button>
                      <AlertDialog onOpenChange={(open) => !open && isDeleting && onDelete('')}>
                         <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-8 w-8 text-red-400 hover:bg-red-50 hover:text-red-600">
-                                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                            <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()} disabled={isDeleting} className="h-7 w-7 text-red-400 hover:bg-red-50 hover:text-red-600">
+                                {isDeleting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent onClick={(e) => e.stopPropagation()}>
