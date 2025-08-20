@@ -102,6 +102,7 @@ export default function CookAndShopPage() {
   useEffect(() => {
     setIsClient(true);
     useShoppingListStore.persist.rehydrate();
+    useRecipeStore.persist.rehydrate();
   }, []);
 
   // --- Recipe Logic ---
@@ -159,7 +160,8 @@ export default function CookAndShopPage() {
     if (!user) return;
     
     try {
-      if (savedRecipeIds.has(recipe.id)) {
+      const isCurrentlySaved = savedRecipeIds.has(recipe.id);
+      if (isCurrentlySaved) {
         await unsaveRecipe(user.uid, recipe.id);
         setSavedRecipeIds(prev => {
           const newSet = new Set(prev);
@@ -170,7 +172,7 @@ export default function CookAndShopPage() {
       } else {
         await saveRecipe(user.uid, recipe);
         setSavedRecipeIds(prev => new Set(prev).add(recipe.id));
-        toast({ title: 'Recipe saved' });
+        toast({ title: 'Recipe saved!' });
       }
     } catch (error) {
       toast({ variant: 'destructive', title: 'Error saving recipe' });

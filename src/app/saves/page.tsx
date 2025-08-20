@@ -74,9 +74,9 @@ export default function SavedItemsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
-        <Button variant="ghost" onClick={() => router.push('/pantry')} className="self-start text-muted-foreground hover:text-foreground -ml-4">
+        <Button variant="ghost" onClick={() => router.push('/profile')} className="self-start text-muted-foreground hover:text-foreground -ml-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Pantry
+            Back to Profile
         </Button>
       <div className="space-y-1">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">🔖 My Saves</h1>
@@ -107,7 +107,7 @@ export default function SavedItemsPage() {
                 ) : (
                     <div className="text-center text-muted-foreground py-10">
                         <p>You haven't saved any recipes yet.</p>
-                        <p className="text-sm">Find recipe ideas in your Pantry.</p>
+                        <p className="text-sm">Find recipe ideas in the Cook & Shop hub.</p>
                     </div>
                 )}
             </CardContent>
