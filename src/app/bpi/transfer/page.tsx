@@ -24,6 +24,10 @@ export function BpiTransferForm({ onTransferComplete }: BpiTransferFormProps) {
 
   const submit = () => {
     if (!amount) return;
+    
+    // This function updates the state in Zustand store
+    planTransfer(amount);
+
     // In a real app, this would initiate a secure backend process.
     // For this mockup, we navigate to the fake GCash page with the amount.
     router.push(`/GCashRedirect-Mockup?amount=${amount}`);
@@ -47,7 +51,7 @@ export function BpiTransferForm({ onTransferComplete }: BpiTransferFormProps) {
           <div className="mt-1 text-xs text-muted-foreground">Available from eco-savings: ₱{available.toFixed(2)}</div>
         </div>
         <div>
-          <Button onClick={submit} disabled={!amount} className="w-full">Initiate Transfer</Button>
+          <Button onClick={submit} disabled={!amount || amount <= 0 || amount > available} className="w-full">Initiate Transfer</Button>
         </div>
     </div>
   );

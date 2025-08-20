@@ -83,8 +83,8 @@ export default function MySavingsPage() {
     const handleTransferComplete = () => {
         setIsTransferDialogOpen(false);
         toast({
-            title: "Transfer Planned!",
-            description: "Your transfer suggestion has been created. Check your BPI app to approve.",
+            title: "Transfer Successful!",
+            description: "Your savings have been moved to your #MySaveUp account.",
         });
     }
 
