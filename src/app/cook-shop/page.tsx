@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -20,9 +21,10 @@ import {
   Trash2,
   PackagePlus,
   BarChart,
-  Leaf
+  Leaf,
+  CookingPot
 } from 'lucide-react';
-import type { PantryItem, Recipe, ItemInsights, WasteLog } from '@/types';
+import type { PantryItem, Recipe, WasteLog } from '@/types';
 import { getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
@@ -38,6 +40,7 @@ import { useShoppingListStore } from '@/stores/shopping-list-store';
 import type { GenerateShoppingListOutput } from '@/ai/schemas';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
+import { useSavingsStore } from '@/stores/savings-store';
 
 const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['items'][0]['deal']> }) => {
     
@@ -84,6 +87,7 @@ export default function CookAndShopPage() {
   const { liveItems, pantryInitialized } = usePantryLogStore();
   const { logs: wasteLogs } = useWasteLogStore();
   const { generatedList, setGeneratedList, toggleItemChecked } = useShoppingListStore();
+  const { savingsEvents } = useSavingsStore();
 
   // Recipe State
   const { recipes, setRecipes, clearRecipes } = useRecipeStore();
@@ -217,15 +221,12 @@ export default function CookAndShopPage() {
   }
 
   // --- Combined Logic & Memoized Values ---
-  const expiringSoonItems = useMemo(() => {
-    return liveItems.filter(item => {
-        const daysLeft = differenceInDays(parseISO(item.estimatedExpirationDate), startOfToday());
-        return daysLeft >= 0 && daysLeft <= 7;
-    });
-  }, [liveItems]);
+  const recipesCooked = useMemo(() => {
+      return savingsEvents.filter(e => e.type === 'recipe_followed').length;
+  }, [savingsEvents]);
 
-  const itemsInCart = useMemo(() => {
-    return generatedList?.items.filter(item => item.isChecked).length || 0;
+  const itemsBought = useMemo(() => {
+    return generatedList?.items.filter(item => item.isPurchased).length || 0;
   }, [generatedList]);
 
   if (!isClient) {
@@ -240,17 +241,17 @@ export default function CookAndShopPage() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <Card className="flex items-center p-4 gap-3">
-          <div className="p-2 bg-amber-100 rounded-lg"><Package className="w-5 h-5 text-amber-600" /></div>
+          <div className="p-2 bg-amber-100 rounded-lg"><CookingPot className="w-5 h-5 text-amber-600" /></div>
           <div>
-            <p className="text-lg font-bold">{expiringSoonItems.length}</p>
-            <p className="text-xs text-muted-foreground">Items Expiring Soon</p>
+            <p className="text-lg font-bold">{recipesCooked}</p>
+            <p className="text-xs text-muted-foreground">Recipes Cooked</p>
           </div>
         </Card>
         <Card className="flex items-center p-4 gap-3">
           <div className="p-2 bg-blue-100 rounded-lg"><ShoppingCart className="w-5 h-5 text-blue-600" /></div>
           <div>
-            <p className="text-lg font-bold">{itemsInCart}</p>
-            <p className="text-xs text-muted-foreground">Items in Cart</p>
+            <p className="text-lg font-bold">{itemsBought}</p>
+            <p className="text-xs text-muted-foreground">Items Bought</p>
           </div>
         </Card>
       </div>
@@ -263,9 +264,7 @@ export default function CookAndShopPage() {
               {isLoadingRecipes ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             </Button>
           </div>
-          {expiringSoonItems.length > 0 && (
-            <CardDescription className="flex items-center gap-2 text-amber-600"><AlertTriangle className="w-4 h-4" /> Using items expiring soon</CardDescription>
-          )}
+          <CardDescription className="flex items-center gap-2 text-amber-600"><AlertTriangle className="w-4 h-4" /> Using items expiring soon</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingRecipes ? (

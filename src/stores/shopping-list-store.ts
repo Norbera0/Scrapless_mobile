@@ -20,9 +20,14 @@ export const useShoppingListStore = create<ShoppingListState>()(
         const currentList = get().generatedList;
         if (!currentList) return;
 
-        const updatedItems = currentList.items.map(item =>
-          item.id === itemId ? { ...item, isChecked: !item.isChecked } : item
-        );
+        const updatedItems = currentList.items.map(item => {
+          if (item.id === itemId) {
+            const isChecked = !item.isChecked;
+            // Also mark as purchased if it's being checked off
+            return { ...item, isChecked: isChecked, isPurchased: isChecked };
+          }
+          return item;
+        });
         
         set({ generatedList: { ...currentList, items: updatedItems }});
       }
