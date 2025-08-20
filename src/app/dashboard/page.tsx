@@ -250,7 +250,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                       <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
-                      <p className="text-2xl sm:text-3xl font-bold">{analytics.waste.thisWeekValue.toFixed(2)}<span className="text-base font-medium text-green-200">kg</span></p>
+                      <p className="text-2xl sm:text-3xl font-bold">{analytics.totalWasteCO2e.toFixed(2)}<span className="text-base font-medium text-green-200">kg</span></p>
                   </div>
               </CardContent>
                <div className="pt-4 border-t border-white/20">
