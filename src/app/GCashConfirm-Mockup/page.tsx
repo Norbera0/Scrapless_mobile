@@ -19,6 +19,7 @@ function GCashConfirmContent() {
     // #MySaveUp balance is the total amount of savings events (which are all "transferred" at this point in the mock)
     const newBalance = total; 
     
+    const recentTransfers = savingsEvents.filter(e => e.transferredToBank).slice(0, 3);
 
     return (
         <div className="bg-background p-4 sm:p-6 flex justify-center items-start min-h-screen">
@@ -30,10 +31,10 @@ function GCashConfirmContent() {
                 </div>
 
                 <div>
-                    <h2 className="font-bold text-lg mb-2">Recent Transfer</h2>
+                    <h2 className="font-bold text-lg mb-2">Recent Transfers</h2>
                     <Card>
                         <CardContent className="p-0">
-                            {savingsEvents.filter(e => e.transferredToBank).slice(0, 3).map((item, index) => (
+                            {recentTransfers.map((item, index) => (
                                 <div key={item.id} className="flex justify-between items-center p-4">
                                     <div>
                                         <p className="font-semibold">{new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
