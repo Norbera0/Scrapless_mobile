@@ -1,7 +1,7 @@
 
 'use client';
 import { Button } from '../ui/button';
-import { PantryItem, ItemInsights } from '@/types';
+import { PantryItem } from '@/types';
 import { format, formatDistanceToNowStrict, parseISO } from 'date-fns';
 import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot, Check, MinusCircle, Package, DivideCircle, PackageCheck } from 'lucide-react';
 import Image from 'next/image';
@@ -38,9 +38,6 @@ interface PantryItemDetailsProps {
     isOpen: boolean;
     onClose: () => void;
     onDelete: (itemId: string) => void;
-    onGetInsights: (item: PantryItem) => void;
-    isFetchingInsights: boolean;
-    insights: ItemInsights | null;
 }
 
 function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: boolean, onOpenChange: (open: boolean) => void, onSave: (cost: number) => void, isUpdating: boolean }) {
@@ -82,7 +79,7 @@ function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: bo
 }
 
 
-export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsights, isFetchingInsights, insights }: PantryItemDetailsProps) {
+export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryItemDetailsProps) {
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUpdating, setIsUpdating] = useState(false);
@@ -190,41 +187,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onGetInsigh
                 </div>
                 
                 <div className="space-y-4">
-                    {!insights && (
-                        <Button onClick={() => onGetInsights(item)} className="w-full" disabled={isFetchingInsights}>
-                            {isFetchingInsights ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Bot className="w-5 h-5 mr-2" />}
-                            {isFetchingInsights ? 'Getting Insights...' : 'Get AI-Powered Insights'}
-                        </Button>
-                    )}
-                
-                    {insights && (
-                        <div className="space-y-3">
-                            <div>
-                                <h4 className="font-semibold mb-1 flex items-center gap-2 text-sm text-muted-foreground"><Info size={16}/>Storage Tip</h4>
-                                <p className="text-sm">{insights.storageTip}</p>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold mb-1 flex items-center gap-2 text-sm text-muted-foreground"><Info size={16}/>Waste Prevention</h4>
-                                <p className="text-sm">{insights.wastePreventionTip}</p>
-                            </div>
-                            {insights.recipes && insights.recipes.length > 0 && (
-                                <div>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2 text-sm text-muted-foreground"><CookingPot size={16}/>Recipe Ideas</h4>
-                                    <div className="space-y-2">
-                                        {insights.recipes.map(recipe => (
-                                            <div key={recipe.id} className="flex items-center justify-between bg-secondary/50 rounded-md p-2">
-                                                <div className='flex items-center gap-2'>
-                                                    {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} width={32} height={32} className='rounded-sm object-cover'/>}
-                                                    <span className="font-medium text-sm">{recipe.name}</span>
-                                                </div>
-                                                <span className="text-xs text-muted-foreground">{recipe.cookingTime}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    <p className='text-sm text-muted-foreground text-center'>For tips and recipes, visit the Kitchen Coach.</p>
                 </div>
 
                 <DialogFooter className="grid grid-cols-2 gap-2 pt-4">

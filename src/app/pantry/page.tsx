@@ -40,13 +40,12 @@ import {
   Heart,
   ChevronRightIcon
 } from 'lucide-react';
-import type { PantryItem, Recipe, ItemInsights, WasteLog } from '@/types';
+import type { PantryItem, Recipe, WasteLog } from '@/types';
 import { PantryItemCard } from '@/components/pantry/PantryItemCard';
 import { PantryItemDetails } from '@/components/pantry/PantryItemDetails';
 import { deletePantryItem, getSavedRecipes, saveRecipe, unsaveRecipe, updatePantryItemStatus } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
-import { getItemInsights } from '@/ai/flows/get-item-insights';
 import { getRecipeSuggestions } from '@/app/actions';
 import { RecipeCard } from '@/components/pantry/RecipeCard';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
@@ -331,7 +330,6 @@ export default function PantryPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { liveItems, pantryInitialized } = usePantryLogStore();
-  const { recipes, setRecipes, clearRecipes } = useRecipeStore();
   const { logs: wasteLogs } = useWasteLogStore();
   
   const [activeTab, setActiveTab] = useState('pantry');
@@ -343,36 +341,13 @@ export default function PantryPage() {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   
-  const [itemInsights, setItemInsights] = useState<Map<string, ItemInsights>>(new Map());
-  const [isFetchingInsights, setIsFetchingInsights] = useState<Set<string>>(new Set());
-
-  const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
-  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
-  const [recipeFilters, setRecipeFilters] = useState({
-    quickMeals: false,
-    filipinoDishes: true,
-  });
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
   
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
   
-  useEffect(() => {
-    if (!carouselApi) return;
-    setCurrentSlide(carouselApi.selectedScrollSnap());
-    carouselApi.on("select", () => {
-      setCurrentSlide(carouselApi.selectedScrollSnap());
-    });
-  }, [carouselApi]);
-
-  const scrollTo = useCallback((index: number) => {
-    carouselApi?.scrollTo(index);
-  }, [carouselApi]);
-
   const getStatus = useCallback((expirationDate: string) => {
     const today = startOfToday();
     const expiry = new Date(expirationDate);
@@ -419,34 +394,6 @@ export default function PantryPage() {
     }
   };
 
-  const handleGetInsights = useCallback(async (item: PantryItem) => {
-    if (itemInsights.has(item.id)) return;
-
-    setIsFetchingInsights(prev => new Set(prev).add(item.id));
-    try {
-      const result = await getItemInsights({
-        name: item.name,
-        quantity: item.quantity,
-        unit: item.unit,
-        estimatedExpirationDate: item.estimatedExpirationDate,
-        estimatedCost: item.estimatedCost,
-      });
-      setItemInsights(prev => new Map(prev).set(item.id, result));
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Failed to get insights',
-        description: 'Could not fetch insights for this item.',
-      });
-    } finally {
-      setIsFetchingInsights(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(item.id);
-        return newSet;
-      });
-    }
-  }, [itemInsights, toast]);
 
   const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
     setIsAddMethodOpen(false);
@@ -631,9 +578,6 @@ export default function PantryPage() {
             isOpen={!!selectedItem}
             onClose={() => setSelectedItem(null)}
             onDelete={handleDelete}
-            onGetInsights={handleGetInsights}
-            isFetchingInsights={isFetchingInsights.has(selectedItem.id)}
-            insights={itemInsights.get(selectedItem.id) || null}
           />
         )}
         {/* Item Editor Modal */}

@@ -8,7 +8,6 @@ import '@/ai/flows/log-food-waste-from-text.ts';
 import '@/ai/flows/log-pantry-item.ts';
 import '@/ai/flows/suggest-recipes.ts';
 import '@/ai/flows/chat-with-assistant.ts';
-import '@/ai/flows/get-item-insights.ts';
 import '@/ai/flows/food-image-generation.ts';
 import '@/ai/flows/generate-shopping-list.ts';
 import '@/ai/flows/get-kitchen-coach-advice.ts';
