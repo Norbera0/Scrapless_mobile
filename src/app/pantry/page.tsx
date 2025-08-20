@@ -651,7 +651,7 @@ export default function PantryPage() {
             </div>
 
             {!pantryInitialized ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
                     {Array.from({ length: 8 }).map((_, i) => (
                         <Card key={i} className='h-32 animate-pulse bg-gray-100'></Card>
                     ))}
@@ -672,7 +672,7 @@ export default function PantryPage() {
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                 {filteredItems.map((item) => (
                     <PantryItemCard
                     key={item.id}
