@@ -16,7 +16,8 @@ import {
     Bot,
     Gift,
     Sparkles,
-    ChefHat
+    ChefHat,
+    BarChart2
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -65,7 +66,7 @@ export function SidebarNav({ user }: { user: UserType }) {
   const menuItems = [
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
     { href: '/pantry', label: 'My Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items', '/saves'] },
-    { href: '/my-waste', label: 'My Waste', icon: Trash2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
+    { href: '/analytics', label: 'Analytics', icon: BarChart2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
     { href: '/cook-shop', label: 'Cook & Shop', icon: ChefHat },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
   ];

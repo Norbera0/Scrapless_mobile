@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for analyzing waste patterns for the "My Waste" page.
+ * @fileOverview This file defines a Genkit flow for analyzing waste patterns for the "Analytics" page.
  *
  * - analyzeWastePatterns - The main function to get waste insights.
  * - AnalyzeWastePatternsInput - The input type.

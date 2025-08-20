@@ -26,9 +26,9 @@ export default function LogWastePage() {
   if (selectedMethod) {
     return (
       <div className="flex flex-col gap-4 p-4 md:p-6 max-w-2xl mx-auto">
-         <Button variant="ghost" onClick={() => router.push('/my-waste')} className="self-start text-muted-foreground hover:text-foreground -ml-4">
+         <Button variant="ghost" onClick={() => router.push('/analytics')} className="self-start text-muted-foreground hover:text-foreground -ml-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to My Waste
+            Back to Analytics
         </Button>
         <WasteLogger method={selectedMethod} />
       </div>

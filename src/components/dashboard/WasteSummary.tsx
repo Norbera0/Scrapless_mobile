@@ -72,7 +72,7 @@ export function WasteSummary() {
 
   const handleFinish = () => {
     reset();
-    router.push('/my-waste');
+    router.push('/analytics');
   }
 
   return (
