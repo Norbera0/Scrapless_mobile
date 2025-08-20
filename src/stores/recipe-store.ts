@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Recipe } from '@/types';
 
 interface RecipeState {
@@ -8,8 +9,21 @@ interface RecipeState {
   clearRecipes: () => void;
 }
 
-export const useRecipeStore = create<RecipeState>()((set) => ({
-    recipes: [],
-    setRecipes: (recipes) => set({ recipes }),
-    clearRecipes: () => set({ recipes: [] }),
-}));
+const isBrowser = typeof window !== 'undefined';
+
+export const useRecipeStore = create<RecipeState>()(
+  persist(
+    (set) => ({
+      recipes: [],
+      setRecipes: (recipes) => set({ recipes }),
+      clearRecipes: () => set({ recipes: [] }),
+    }),
+    {
+      name: 'scrapless-recipe-storage', // The key used in localStorage
+      storage: createJSONStorage(() => 
+        isBrowser ? window.localStorage : undefined
+      ),
+      skipHydration: !isBrowser,
+    }
+  )
+);
