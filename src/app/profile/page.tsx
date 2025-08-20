@@ -17,6 +17,7 @@ import { cleanupListeners, saveUserSettings } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
