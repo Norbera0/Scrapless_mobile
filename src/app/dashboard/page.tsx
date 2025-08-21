@@ -63,6 +63,7 @@ import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformancePanel';
 import { WasteBreakdownCard } from '@/components/dashboard/WasteBreakdownCard';
 import { useSavingsSummary } from '@/lib/bpi';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -255,7 +256,19 @@ export default function DashboardPage() {
               </CardContent>
                <div className="pt-4 border-t border-white/20">
                     <div className="flex justify-between items-center mb-1">
-                      <p className="text-xs text-green-200">Savings Goal</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs text-green-200">Savings Goal</p>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <Info className="w-3 h-3 text-green-200 cursor-pointer" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>This goal is funded by transferring your virtual savings to your bank account.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                      </div>
                       <p className="text-xs text-green-200 font-semibold">{formatPeso(transferred)} / {formatPeso(savingsGoal)}</p>
                     </div>
                     <div className="flex items-center gap-3">
