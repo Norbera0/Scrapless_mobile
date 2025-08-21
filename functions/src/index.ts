@@ -9,7 +9,7 @@ admin.initializeApp();
 const db = admin.firestore();
 const vertex_ai = new VertexAI({ project: process.env.GCLOUD_PROJECT, location: 'asia-southeast1' });
 
-const model = 'gemini-2.5-flash-lite'; // Corrected to the stable, latest model name
+const model = 'gemini-2.5-pro'; // Upgraded to the stable, most powerful model
 
 /**
  * Generates the DA's daily price index PDF URL for the previous day in Manila.
@@ -55,7 +55,7 @@ export const dailyPriceExtractor = functions
         log.pdf_retrieval_status = 'SUCCESS';
         console.log("Successfully downloaded PDF.");
 
-        const generativeModel = vertex_ai.preview.getGenerativeModel({ model: model });
+        const generativeModel = vertex_ai.getGenerativeModel({ model: model });
 
         const pdfPart: Part = {
             inlineData: {
