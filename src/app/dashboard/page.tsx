@@ -245,7 +245,7 @@ export default function DashboardPage() {
                   <div>
                       <p className="text-xs text-green-200 mb-1">Available to Transfer</p>
                       <div className="flex items-center justify-center gap-2">
-                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(available)}</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
                       </div>
                   </div>
