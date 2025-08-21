@@ -243,7 +243,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
                   <div>
-                      <p className="text-xs text-green-200 mb-1">Available to Transfer</p>
+                      <p className="text-xs text-green-200 mb-1">Total Virtual Savings</p>
                       <div className="flex items-center justify-center gap-2">
                           <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
                           <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>

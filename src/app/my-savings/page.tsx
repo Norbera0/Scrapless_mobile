@@ -128,7 +128,7 @@ export default function MySavingsPage() {
                     </div>
                      <div className="space-y-1 text-sm">
                         <div className="flex justify-between items-center text-green-200/80">
-                           <span>Transferred</span>
+                           <span>Transferred to BPI #MySaveUp</span>
                            <span>₱{transferred.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                          <div className="flex justify-between items-center font-semibold">
