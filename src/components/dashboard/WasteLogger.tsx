@@ -8,7 +8,7 @@ import type { LogFoodWasteOutput } from '@/ai/schemas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type, Lightbulb, Upload } from 'lucide-react';
+import { Camera, Image as ImageIcon, Loader2, Mic, Square, Trash2, VideoOff, ArrowRight, Type, Lightbulb, Upload, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -37,6 +37,7 @@ export function WasteLogger({ method }: WasteLoggerProps) {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasAudioPermission, setHasAudioPermission] = useState<boolean | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -60,17 +61,17 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   // Camera Permission Effect
   useEffect(() => {
+    if (method !== 'camera' || photoPreview) return;
+    
+    let stream: MediaStream | null = null;
+    
     const getCameraPermission = async () => {
-      if (method !== 'camera') return;
       try {
-        const constraints = {
-            video: isMobile ? { facingMode: 'environment' } : true
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        setHasCameraPermission(true);
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
+        setHasCameraPermission(true);
       } catch (error) {
         console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
@@ -86,11 +87,11 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     
     return () => {
         if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
-            stream.getTracks().forEach(track => track.stop());
+            const currentStream = videoRef.current.srcObject as MediaStream;
+            currentStream.getTracks().forEach(track => track.stop());
         }
     }
-  }, [method, toast, isMobile]);
+  }, [method, toast, facingMode, photoPreview]);
   
   // Audio Permission Check Effect
   useEffect(() => {
@@ -116,31 +117,6 @@ export function WasteLogger({ method }: WasteLoggerProps) {
         }
     }
   }, []);
-
-  const stopCameraStream = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-    }
-  }
-  
-  const resetCapture = () => {
-    setPhotoDataUri(null);
-    setPhotoPreview(null);
-    if(method === 'camera') {
-        const getCameraPermission = async () => {
-            const constraints = {
-                video: isMobile ? { facingMode: 'environment' } : true
-            };
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-            }
-        };
-        getCameraPermission();
-    }
-  }
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -149,7 +125,6 @@ export function WasteLogger({ method }: WasteLoggerProps) {
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
         setPhotoDataUri(reader.result as string);
-        stopCameraStream();
       };
       reader.readAsDataURL(file);
     }
@@ -167,7 +142,6 @@ export function WasteLogger({ method }: WasteLoggerProps) {
         const dataUri = canvas.toDataURL('image/jpeg');
         setPhotoPreview(dataUri);
         setPhotoDataUri(dataUri);
-        stopCameraStream();
       }
   }
 
@@ -319,18 +293,17 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     const secs = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
+  
+  const handleFlipCamera = () => {
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+  };
 
   if (method === 'camera') {
     return (
-        <div className="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-slate-200">
-            <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Capture Your Waste</h2>
-                <p className="text-slate-500 mt-1">Point your camera at the food you've wasted.</p>
-            </div>
-
-            <div className="w-full aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
+        <div className="w-full">
+            <div className="w-full aspect-[9/16] sm:aspect-video border-4 border-white shadow-lg rounded-2xl flex items-center justify-center bg-slate-800 overflow-hidden relative">
                 {photoPreview ? (
-                    <Image src={photoPreview} alt="Captured waste" layout="fill" objectFit="contain" className="shadow-lg" />
+                    <Image src={photoPreview} alt="Captured" layout="fill" objectFit="contain" />
                 ) : hasCameraPermission === false ? (
                     <div className="text-center p-4 text-white">
                         <Camera className="w-16 h-16 text-red-400 mx-auto mb-4" />
@@ -338,46 +311,69 @@ export function WasteLogger({ method }: WasteLoggerProps) {
                         <p className="text-red-300">Please allow camera access in your browser settings to use this feature.</p>
                     </div>
                 ) : (
-                    <video 
-                        ref={videoRef} 
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        playsInline
-                        muted
-                    />
+                    <>
+                        <video 
+                            ref={videoRef} 
+                            className="w-full h-full object-cover"
+                            autoPlay
+                            playsInline
+                            muted
+                        />
+                        {!photoPreview && (
+                            <div className="absolute inset-x-0 bottom-6 flex justify-center items-center gap-8">
+                                 <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="w-14 h-14 rounded-full bg-black/50 hover:bg-black/70"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={isLoading}
+                                >
+                                    <Upload className="w-6 h-6 text-white" />
+                                </Button>
+
+                                <Button 
+                                    className="w-20 h-20 bg-white rounded-full p-2 border-4 border-white/50 hover:bg-gray-200"
+                                    onClick={handleCaptureClick}
+                                    disabled={!hasCameraPermission || isLoading}
+                                    aria-label="Capture photo"
+                                >
+                                    <div className="w-full h-full bg-white rounded-full ring-2 ring-inset ring-black"></div>
+                                </Button>
+                                
+                                 <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="w-14 h-14 rounded-full bg-black/50 hover:bg-black/70"
+                                    onClick={handleFlipCamera}
+                                    disabled={isLoading}
+                                >
+                                    <RefreshCw className="w-6 h-6 text-white" />
+                                </Button>
+                            </div>
+                        )}
+                    </>
                 )}
                 <canvas ref={canvasRef} className="hidden" />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
             </div>
             
-            <div className="mt-6">
-                {photoPreview ? (
+            <div className="mt-4">
+                {photoPreview && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Button size="lg" className="h-14 text-lg" onClick={handleAnalyze} disabled={isLoading}>
-                            {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin" /> : <ArrowRight className="w-6 h-6 mr-2" />}
-                            Next: Review Items
+                        <Button size="lg" onClick={handleAnalyze} disabled={isLoading}>
+                            {isLoading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <ArrowRight className="w-5 h-5 mr-2" />}
+                            Analyze Photo
                         </Button>
-                        <Button size="lg" variant="outline" className="h-14 text-lg bg-white" onClick={resetCapture}>
+                        <Button size="lg" variant="outline" className="bg-white" onClick={() => { setPhotoPreview(null); setPhotoDataUri(''); }}>
                             Retake
                         </Button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Button size="lg" className="h-14 text-lg bg-primary hover:bg-primary/90 transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg" onClick={handleCaptureClick} disabled={!hasCameraPermission || isLoading}>
-                            <Camera className="w-6 h-6 mr-2" />
-                            Capture Photo
-                        </Button>
-                        <Button size="lg" variant="secondary" className="h-14 text-lg transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg hover:bg-gray-300" onClick={() => fileInputRef.current?.click()}>
-                            <Upload className="w-6 h-6 mr-2" />
-                            Upload
-                        </Button>
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
                     </div>
                 )}
             </div>
 
-            <div className="mt-8 bg-white/60 rounded-xl p-4 border border-slate-200">
-                 <h4 className="font-semibold text-slate-700 flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Scanning Tips</h4>
-                 <ul className="text-sm text-slate-600 space-y-1 list-disc list-inside">
+            <div className="mt-6 bg-secondary/50 rounded-xl p-4 border">
+                 <h4 className="font-semibold text-foreground flex items-center mb-2"><Lightbulb className="w-4 h-4 mr-2 text-amber-500" /> Scanning Tips</h4>
+                 <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
                      <li>For best results, place items on a plain background.</li>
                      <li>Ensure good lighting to avoid shadows and reflections.</li>
                      <li>Try to capture all wasted items in a single photo.</li>
@@ -478,5 +474,3 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   return null;
 }
-
-    
