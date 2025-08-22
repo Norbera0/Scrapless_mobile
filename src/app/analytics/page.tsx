@@ -78,6 +78,8 @@ export default function AnalyticsPage() {
   const [viewType, setViewType] = useState<ChartView>('daily');
   const isMobile = useIsMobile();
   const [isLogMethodOpen, setIsLogMethodOpen] = useState(false);
+  const [showCalculation, setShowCalculation] = useState(false);
+
 
   const getDaysFromTimeframe = (tf: ChartTimeframe) => {
       switch(tf) {
@@ -273,11 +275,42 @@ export default function AnalyticsPage() {
 
       <Card className="shadow-sm">
         <CardContent className="p-0 flex items-center">
-            <div className={cn("w-3/5 flex flex-col items-center justify-center p-4", netOffset >= 0 ? "text-green-600" : "text-red-600")}>
-                <p className="text-4xl md:text-6xl font-bold tracking-tighter">
-                  {netOffset >= 0 ? `₱${netOffset.toFixed(0)}` : `-₱${Math.abs(netOffset).toFixed(0)}`}
-                </p>
-                <p className="text-xs font-semibold uppercase tracking-wider">{netOffset >= 0 ? 'Net Savings' : 'Net Loss'}</p>
+            <div 
+                className={cn(
+                    "w-3/5 flex flex-col items-center justify-center p-4 cursor-pointer",
+                     netOffset >= 0 ? "text-green-600" : "text-red-600"
+                )}
+                onClick={() => setShowCalculation(!showCalculation)}
+            >
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={showCalculation ? 'calc' : 'main'}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-center"
+                    >
+                        {showCalculation ? (
+                            <div className="text-base sm:text-xl md:text-2xl font-bold tracking-tighter">
+                                <span className="text-green-600">💰₱{totalSavings.toFixed(0)}</span>
+                                <span className="text-gray-400 mx-1">-</span>
+                                <span className="text-red-600">🗑️₱{totalWaste.toFixed(0)}</span>
+                                <br />
+                                <span className={cn("text-xl sm:text-2xl md:text-3xl", netOffset >= 0 ? "text-green-600" : "text-red-600")}>
+                                     = ₱{netOffset.toFixed(0)}
+                                </span>
+                            </div>
+                        ) : (
+                            <p className="text-4xl md:text-6xl font-bold tracking-tighter">
+                                {netOffset >= 0 ? `₱${netOffset.toFixed(0)}` : `-₱${Math.abs(netOffset).toFixed(0)}`}
+                            </p>
+                        )}
+                        <p className="text-xs font-semibold uppercase tracking-wider mt-1">
+                            {showCalculation ? 'Tap to hide' : (netOffset >= 0 ? 'Net Savings' : 'Net Loss')}
+                        </p>
+                    </motion.div>
+                </AnimatePresence>
             </div>
             <div className="w-2/5 p-4 text-sm font-medium">
                  {netOffset >= 0 ? (
@@ -520,4 +553,5 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
 
