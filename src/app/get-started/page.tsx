@@ -155,14 +155,6 @@ export default function HomePage() {
               Start Reducing Waste
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8"
-            >
-              <BarChart3 className="mr-2 h-5 w-5" />
-              See Impact Demo
-            </Button>
           </motion.div>
 
           {/* Stats */}
