@@ -41,7 +41,8 @@ import {
   ChefHat,
   Camera,
   Mic,
-  Type
+  Type,
+  CookingPot
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -329,45 +330,24 @@ export default function DashboardPage() {
             <CardContent className="p-0 flex">
                 <div className="p-6 flex-1">
                     <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                        <ChefHat className="w-8 h-8 text-primary" />
+                        <CookingPot className="w-8 h-8 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Don't let them go to waste!</h3>
-                    <p className="text-muted-foreground mb-4 text-sm">{expiringSoonMessage}</p>
-                    <Button variant="default" onClick={() => router.push('/pantry')}>
-                        Explore Recipes
+                    <h3 className="text-xl font-bold text-foreground mb-2">Cook &amp; Shop Hub</h3>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                        Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
+                    </p>
+                    <Button variant="default" onClick={() => router.push('/cook-shop')}>
+                        Plan &amp; Prepare
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>
                 <div className="relative w-1/3 flex-shrink-0">
                     <Image
                         src="/dashboard/recipe_generator_home_3.png"
-                        alt="Recipe suggestions illustration"
+                        alt="Cook and Shop Hub illustration"
                         layout="fill"
                         objectFit="cover"
-                    />
-                </div>
-            </CardContent>
-        </Card>
-
-        <Card className="shadow-sm overflow-hidden">
-            <CardContent className="p-0 flex">
-                <div className="p-6 flex-1">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                        <ShoppingCart className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Running low on essentials?</h3>
-                    <p className="text-muted-foreground mb-4"><span className="font-semibold text-primary">{lowStockEssentialsMessage}</span></p>
-                    <Button variant="default" onClick={() => router.push('/shopping')}>
-                        Go Shopping
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                </div>
-                 <div className="relative w-1/3 flex-shrink-0">
-                    <Image
-                        src="/dashboard/shopping_hub_home_2.png"
-                        alt="Shopping hub illustration"
-                        layout="fill"
-                        objectFit="cover"
+                        data-ai-hint="cooking ingredients"
                     />
                 </div>
             </CardContent>
