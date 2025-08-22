@@ -327,23 +327,23 @@ export default function DashboardPage() {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
             <WasteBreakdownCard wasteLogs={logs} />
             <KitchenCoachPanel />
+            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
             <Card className="shadow-sm overflow-hidden">
                 <CardContent className="p-0 flex">
                     <div className="p-6 flex-1">
                         <CardHeader className="p-0 mb-4">
                             <CardTitle className="flex items-center gap-2 text-base">
                                 <CookingPot className="w-5 h-5 text-primary" />
-                                Cook & Shop Hub
+                                Cook &amp; Shop Hub
                             </CardTitle>
                         </CardHeader>
                         <p className="text-muted-foreground mb-4 text-sm">
                             Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
                         </p>
                         <Button variant="default" onClick={() => router.push('/cook-shop')}>
-                            Plan & Prepare
+                            Plan &amp; Prepare
                             <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                     </div>
