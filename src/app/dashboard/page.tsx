@@ -325,40 +325,39 @@ export default function DashboardPage() {
                 </PopoverContent>
             </Popover>
         </div>
-
-        <Card className="shadow-sm overflow-hidden">
-            <CardContent className="p-0 flex">
-                <div className="p-6 flex-1">
-                    <CardHeader className="p-0 mb-4">
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <CookingPot className="w-5 h-5 text-primary" />
-                            Cook & Shop Hub
-                        </CardTitle>
-                    </CardHeader>
-                    <p className="text-muted-foreground mb-4 text-sm">
-                        Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
-                    </p>
-                    <Button variant="default" onClick={() => router.push('/cook-shop')}>
-                        Plan & Prepare
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                </div>
-                <div className="relative w-1/3 flex-shrink-0">
-                    <Image
-                        src="/dashboard/recipe_generator_home_3.png"
-                        alt="Cook and Shop Hub illustration"
-                        layout="fill"
-                        objectFit="cover"
-                        data-ai-hint="cooking ingredients"
-                    />
-                </div>
-            </CardContent>
-        </Card>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
             <WasteBreakdownCard wasteLogs={logs} />
             <KitchenCoachPanel />
+            <Card className="shadow-sm overflow-hidden">
+                <CardContent className="p-0 flex">
+                    <div className="p-6 flex-1">
+                        <CardHeader className="p-0 mb-4">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <CookingPot className="w-5 h-5 text-primary" />
+                                Cook & Shop Hub
+                            </CardTitle>
+                        </CardHeader>
+                        <p className="text-muted-foreground mb-4 text-sm">
+                            Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
+                        </p>
+                        <Button variant="default" onClick={() => router.push('/cook-shop')}>
+                            Plan & Prepare
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                    </div>
+                    <div className="relative w-1/3 flex-shrink-0">
+                        <Image
+                            src="/dashboard/recipe_generator_home_3.png"
+                            alt="Cook and Shop Hub illustration"
+                            layout="fill"
+                            objectFit="cover"
+                            data-ai-hint="cooking ingredients"
+                        />
+                    </div>
+                </CardContent>
+            </Card>
         </div>
         
       </div>
