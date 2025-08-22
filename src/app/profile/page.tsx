@@ -120,7 +120,10 @@ export default function ProfilePage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
             <div className="space-y-1">
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Account Information</h1>
+                <div className="flex items-center gap-3">
+                    <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={32} height={32} />
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Scrapless Profile</h1>
+                </div>
                 <p className="text-muted-foreground text-sm">Manage your account details and app preferences.</p>
             </div>
 
