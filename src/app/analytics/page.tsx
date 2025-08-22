@@ -306,6 +306,7 @@ export default function AnalyticsPage() {
                         <p className="text-xs font-semibold uppercase tracking-wider mt-1">
                             {showCalculation ? 'Tap to hide' : (netOffset >= 0 ? 'Net Savings' : 'Net Loss')}
                         </p>
+                        {!showCalculation && <p className="text-xs text-muted-foreground mt-1">[Tap for math]</p>}
                     </motion.div>
                 </AnimatePresence>
             </div>
