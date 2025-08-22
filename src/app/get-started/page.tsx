@@ -126,7 +126,7 @@ export default function HomePage() {
             </Badge>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
               <span className="text-black">Turn Your </span>
-              <span className="text-orange-400">SAYANG</span>
+              <span className="text-orange-600">SAYANG</span>
               <span className="text-black"> Into </span>
               <span className="text-green-600">SAVINGS</span>
             </h1>
