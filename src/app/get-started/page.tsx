@@ -126,7 +126,8 @@ export default function HomePage() {
             </Badge>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
               Turn Your{' '}
-              <span className="text-primary bg-clip-text">Sayang</span> into Savings
+              <span className="text-destructive">SAYANG</span> into{' '}
+              <span className="text-primary">SAVINGS</span>
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
               Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
