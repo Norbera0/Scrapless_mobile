@@ -84,7 +84,7 @@ function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: bo
     )
 }
 
-function AITipsSection({ item, forceRegenerate = false }: { item: PantryItem, forceRegenerate?: boolean }) {
+function AITipsSection({ item }: { item: PantryItem }) {
     const { insights, setInsight, isGenerating, setIsGenerating } = useItemInsightStore();
     const { toast } = useToast();
     
@@ -107,13 +107,6 @@ function AITipsSection({ item, forceRegenerate = false }: { item: PantryItem, fo
             setIsGenerating(item.id, false);
         }
     }
-
-    useEffect(() => {
-        if (!itemInsight || forceRegenerate) {
-            handleGenerate();
-        }
-    }, [item.id, forceRegenerate]);
-
 
     if (isGenerating[item.id]) {
         return (
