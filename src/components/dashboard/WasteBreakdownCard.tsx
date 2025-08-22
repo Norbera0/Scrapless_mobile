@@ -79,8 +79,8 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                 <CardDescription className="text-xs">By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col md:flex-row items-center gap-2">
-                    <div className="w-full md:w-1/2 h-[150px]">
+                <div className="flex flex-row items-center gap-2">
+                    <div className="w-1/2 h-[150px]">
                          <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -88,8 +88,8 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                                     cx="50%"
                                     cy="50%"
                                     labelLine={false}
-                                    outerRadius={60}
-                                    innerRadius={40}
+                                    outerRadius={50}
+                                    innerRadius={30}
                                     fill="#8884d8"
                                     dataKey="value"
                                     paddingAngle={2}
@@ -102,7 +102,7 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="w-full md:w-1/2 text-center md:text-left space-y-3">
+                    <div className="w-1/2 text-left space-y-3">
                          <p className="text-sm text-muted-foreground leading-relaxed">
                             Most of your waste came from <span className="font-semibold text-primary">{topCategory}</span>. To learn more about your waste data, go to the Analytics.
                         </p>
