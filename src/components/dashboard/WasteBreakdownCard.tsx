@@ -149,7 +149,6 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                     <div className="flex items-start gap-3">
                          <Lightbulb className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
                          <div className="flex-1">
-                            <h4 className="font-semibold text-sm mb-1">AI-Powered Tip</h4>
                              {isLoadingInsight ? (
                                 <div className="flex items-center text-muted-foreground text-xs">
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
