@@ -28,7 +28,12 @@ type Solutions = GetCoachSolutionsOutput;
 
 const loadingSteps = [
     "Analyzing your kitchen data...",
+    "Connecting to your kitchen's history...",
+    "Identifying unique consumption patterns...",
     "Formulating core hypothesis...",
+    "Evaluating financial and environmental impact...",
+    "Cross-referencing with sustainability models...",
+    "Personalizing your recommendations...",
     "Constructing your action plan...",
 ];
 
@@ -109,7 +114,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 1700);
+            }, 2500);
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
