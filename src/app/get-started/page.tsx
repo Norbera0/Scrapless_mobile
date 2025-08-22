@@ -47,13 +47,6 @@ const features = [
   }
 ];
 
-const stats = [
-  { value: "40%", label: "Food waste reduction" },
-  { value: "₱2,500", label: "Average monthly savings" },
-  { value: "15kg", label: "CO₂ saved per month" },
-  { value: "10k+", label: "Users reducing waste" }
-];
-
 export default function HomePage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -155,21 +148,6 @@ export default function HomePage() {
               Start Reducing Waste
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8"
-          >
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-primary">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
           </motion.div>
         </div>
       </section>
