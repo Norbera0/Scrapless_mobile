@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { formatDistanceToNow, isBefore } from 'date-fns';
+import { formatDistanceToNow, isBefore, parseISO } from 'date-fns';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export function KitchenCoachPanel() {
@@ -35,7 +35,6 @@ export function KitchenCoachPanel() {
         lastTip,
         lastGenerated,
         isGenerating,
-        isEligibleForRefresh,
         setLastTip,
         setIsGenerating,
     } = useCoachStore();
@@ -68,7 +67,7 @@ export function KitchenCoachPanel() {
             };
 
             const tip = await getCoachAdvice(input);
-            setLastTip(tip, new Date());
+            setLastTip(tip);
             toast({ title: "Fresh tip from your coach!", description: "A new insight has been generated." });
         } catch (error) {
             console.error("Failed to get coach advice:", error);
@@ -85,7 +84,11 @@ export function KitchenCoachPanel() {
         }
     }, [analytics, lastTip, isGenerating]);
 
-    const canRefresh = isEligibleForRefresh();
+    const canRefresh = (() => {
+        if (!lastGenerated) return true;
+        const oneHourAgo = new Date(new Date().getTime() - 60 * 60 * 1000);
+        return isBefore(parseISO(lastGenerated), oneHourAgo);
+    })();
 
     return (
         <Card className="shadow-sm">
