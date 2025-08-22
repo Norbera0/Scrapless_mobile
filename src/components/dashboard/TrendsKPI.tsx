@@ -11,6 +11,7 @@ import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carouse
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 const TrendIndicator = ({ percentage, inverse = false }: { percentage: number | null, inverse?: boolean }) => {
     if (percentage === null || isNaN(percentage) || !isFinite(percentage)) {
@@ -57,7 +58,6 @@ const InfoTooltip = ({ children, content }: { children: React.ReactNode, content
 export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
 
     const analytics = useAnalytics();
-    const isMobile = useIsMobile();
 
     const stats = useMemo(() => {
         const now = new Date();
@@ -160,8 +160,25 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
     ];
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-           {kpiCards}
+        <div className="lg:grid lg:grid-cols-4 lg:gap-4">
+             <Carousel 
+                className="lg:hidden -ml-4" // Use negative margin to offset the first item's padding
+                opts={{
+                    align: "start",
+                    slidesToScroll: 1,
+                }}
+            >
+                <CarouselContent>
+                    {kpiCards.map((card, index) => (
+                        <CarouselItem key={index} className="basis-[43.5%]">
+                            {card}
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
+            <div className="hidden lg:grid lg:grid-cols-4 lg:gap-4 lg:col-span-4">
+                {kpiCards}
+            </div>
         </div>
     );
 }
