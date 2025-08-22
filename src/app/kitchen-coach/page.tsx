@@ -254,18 +254,18 @@ export default function KitchenCoachPage() {
                         <Card>
                             <CardHeader>
                                 <div className="flex justify-between items-start">
-                                    <div>
+                                    <div className="flex-1">
                                         <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
-                                        <CardDescription>{analysis.title}</CardDescription>
                                     </div>
-                                     {lastGenerated && (
-                                        <p className="text-xs text-muted-foreground whitespace-nowrap">
-                                            {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
-                                        </p>
-                                    )}
                                 </div>
+                                {lastGenerated && (
+                                    <p className="text-xs text-muted-foreground">
+                                        {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
+                                    </p>
+                                )}
                             </CardHeader>
                             <CardContent className="space-y-4">
+                                <p className="font-semibold text-foreground">{analysis.title}</p>
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="situation">
                                         <AccordionTrigger>
