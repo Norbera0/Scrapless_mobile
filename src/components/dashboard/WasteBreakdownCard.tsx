@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import type { WasteLog } from '@/types';
-import { getWasteBreakdownInsight } from '@/app/actions';
 import { Lightbulb, Loader2, BarChart2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -47,8 +46,6 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
-    const [insight, setInsight] = useState<string | null>(null);
-    const [isLoadingInsight, setIsLoadingInsight] = useState(false);
     const { toast } = useToast();
 
     const categoryData = useMemo(() => {
@@ -73,27 +70,6 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
             }))
             .sort((a, b) => b.value - a.value);
     }, [wasteLogs]);
-
-    useEffect(() => {
-        if (categoryData.length > 0) {
-            setIsLoadingInsight(true);
-            const topCategory = categoryData[0];
-            getWasteBreakdownInsight({
-                topCategory: topCategory.name,
-                percentage: topCategory.value,
-            })
-            .then(result => setInsight(result.insight))
-            .catch(error => {
-                console.error("Failed to get insight:", error);
-                toast({ variant: 'destructive', title: 'Could not fetch AI insight.' });
-                setInsight("Try planning meals to use up items from your largest waste category.");
-            })
-            .finally(() => setIsLoadingInsight(false));
-        } else {
-            setInsight("Log some waste to see your breakdown and get personalized tips!");
-        }
-    }, [categoryData, toast]);
-
 
     if (wasteLogs.length === 0) {
         return null; // Don't render the card if there's no waste data
@@ -144,23 +120,6 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                         ))}
                     </div>
                 </div>
-
-                <div className="mt-6 bg-secondary/50 p-3 rounded-lg border">
-                    <div className="flex items-start gap-3">
-                         <Lightbulb className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-                         <div className="flex-1">
-                             {isLoadingInsight ? (
-                                <div className="flex items-center text-muted-foreground text-xs">
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Generating a smart tip for you...
-                                </div>
-                            ) : (
-                                <p className="text-xs text-muted-foreground">{insight}</p>
-                            )}
-                         </div>
-                    </div>
-                </div>
-
             </CardContent>
         </Card>
     );
