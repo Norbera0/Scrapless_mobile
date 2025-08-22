@@ -66,7 +66,7 @@ const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['item
                          <Leaf className="w-4 h-4 text-white" />
                     </div>
                 ) : dealIcon && (
-                    <Image src={dealIcon} alt={`${deal.icon} logo`} width={24} height={24} className="rounded-md bg-white p-0.5" />
+                    <Image src={dealIcon} alt={`${deal.icon} logo`} width={24} height={24} className="rounded-md" />
                 )}
                 <div className="flex-1">
                     <p className="font-bold text-sm text-green-800">{deal.title}</p>
