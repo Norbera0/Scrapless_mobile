@@ -151,20 +151,20 @@ export default function DashboardPage() {
       return "Your pantry is looking fresh! No items expiring soon.";
     }
 
-    const itemNames = expiringSoonItems
-      .slice(0, 3)
-      .map(item => item.name);
+    const itemNames = expiringSoonItems.slice(0, 3).map(item => item.name);
+    const andMoreText = expiringSoonItems.length > 3 ? ` and ${expiringSoonItems.length - 3} more` : '';
 
-    let namesString = "";
-    if (itemNames.length === 1) {
-      namesString = itemNames[0];
-    } else if (itemNames.length === 2) {
-      namesString = `${itemNames[0]} and ${itemNames[1]}`;
-    } else {
-      namesString = `${itemNames[0]}, ${itemNames[1]}, and ${itemNames[2]}`;
-    }
+    const formatNames = () => {
+        if (itemNames.length === 1) {
+            return <strong className="font-semibold text-primary">{itemNames[0]}</strong>;
+        }
+        if (itemNames.length === 2) {
+            return <><strong className="font-semibold text-primary">{itemNames[0]}</strong> and <strong className="font-semibold text-primary">{itemNames[1]}</strong></>;
+        }
+        return <><strong className="font-semibold text-primary">{itemNames[0]}</strong>, <strong className="font-semibold text-primary">{itemNames[1]}</strong>, and <strong className="font-semibold text-primary">{itemNames[2]}</strong></>;
+    };
 
-    return `${count} of your food in the pantry including ${namesString} are expiring soon.`;
+    return <>{count} of your food in the pantry including {formatNames()}{andMoreText} are expiring soon.</>;
   }, [expiringSoonItems]);
 
   const lowStockEssentialsMessage = useMemo(() => {
