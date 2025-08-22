@@ -3,25 +3,17 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import type { WasteLog } from '@/types';
-import { Lightbulb, Loader2, BarChart2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
+import { BarChart2 } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
 
 interface WasteBreakdownCardProps {
     wasteLogs: WasteLog[];
 }
 
 const COLORS = ['#059669', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-const EMOJIS: { [key: string]: string } = {
-    'Vegetables': '🥬',
-    'Fruits': '🍎',
-    'Grains': '🍞',
-    'Meat & Fish': '🥩',
-    'Dairy': '🥛',
-    'Other': '🍽️',
-};
 
 const getCategory = (itemName: string): string => {
     const lowerItem = itemName.toLowerCase();
@@ -46,7 +38,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
-    const { toast } = useToast();
+    const router = useRouter();
 
     const categoryData = useMemo(() => {
         const categoryMap = new Map<string, number>();
@@ -72,9 +64,11 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
     }, [wasteLogs]);
 
     if (wasteLogs.length === 0) {
-        return null; // Don't render the card if there's no waste data
+        return null;
     }
     
+    const topCategory = categoryData.length > 0 ? categoryData[0].name : 'various items';
+
     return (
         <Card className="shadow-sm">
             <CardHeader>
@@ -85,8 +79,8 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                 <CardDescription className="text-xs">By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex justify-center items-center">
-                    <div className="w-full h-[200px]">
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                    <div className="w-full md:w-1/2 h-[180px]">
                          <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -107,6 +101,12 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                                 <Tooltip content={<CustomTooltip />} />
                             </PieChart>
                         </ResponsiveContainer>
+                    </div>
+                    <div className="w-full md:w-1/2 text-center md:text-left space-y-3">
+                         <p className="text-sm text-muted-foreground leading-relaxed">
+                            Most of your waste came from <span className="font-semibold text-primary">{topCategory}</span>. To learn more about your waste data, go to the Analytics.
+                        </p>
+                        <Button size="sm" onClick={() => router.push('/analytics')}>Go to Analytics</Button>
                     </div>
                 </div>
             </CardContent>
