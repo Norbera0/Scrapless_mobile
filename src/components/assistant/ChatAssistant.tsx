@@ -17,12 +17,8 @@ import type { WasteLog } from '@/types';
 import { format, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useChatStore, type Message } from '@/stores/chat-store';
 
-
-interface Message {
-  role: 'user' | 'model';
-  text: string;
-}
 
 const getInitials = (name?: string | null) => {
     if (!name) return 'U';
@@ -66,7 +62,7 @@ export function ChatAssistant() {
   const { user } = useAuth();
   const { liveItems: pantryItems } = usePantryLogStore();
   const { logs: wasteLogs } = useWasteLogStore();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, addMessage, clearMessages } = useChatStore();
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -84,11 +80,9 @@ export function ChatAssistant() {
   
   useEffect(() => {
     if (user && messages.length === 0) {
-      setMessages([
-        { role: 'model', text: `Hi ${user.name?.split(' ')[0] || ''}! How can I help you be less wasteful today? You can ask me for recipe ideas, why you're wasting food, or how to manage your pantry.` }
-      ]);
+      addMessage({ role: 'model', text: `Hi ${user.name?.split(' ')[0] || ''}! How can I help you be less wasteful today? You can ask me for recipe ideas, why you're wasting food, or how to manage your pantry.` });
     }
-  }, [user, messages.length]);
+  }, [user, messages.length, addMessage]);
 
   const processAndRespond = async (inputData: { query?: string; audioDataUri?: string; }) => {
     if (!user) return;
@@ -96,8 +90,7 @@ export function ChatAssistant() {
     // If it's a text message, add it to the chat immediately.
     // For audio, we'll add the transcribed message later.
     if (inputData.query) {
-      const userMessage: Message = { role: 'user', text: inputData.query };
-      setMessages(prev => [...prev, userMessage]);
+      addMessage({ role: 'user', text: inputData.query });
     }
     
     setInput('');
@@ -125,17 +118,14 @@ export function ChatAssistant() {
       
       // If the input was audio, display the transcribed text as the user's message.
       if (result.transcribedQuery) {
-        const userMessage: Message = { role: 'user', text: result.transcribedQuery };
-        setMessages(prev => [...prev, userMessage]);
+        addMessage({ role: 'user', text: result.transcribedQuery });
       }
 
-      const assistantMessage: Message = { role: 'model', text: result.response };
-      setMessages(prev => [...prev, assistantMessage]);
+      addMessage({ role: 'model', text: result.response });
   
     } catch (error) {
         console.error('Chat assistant error:', error);
-        const errorMessage: Message = { role: 'model', text: 'Sorry, I ran into a problem. Please try again.' };
-        setMessages(prev => [...prev, errorMessage]);
+        addMessage({ role: 'model', text: 'Sorry, I ran into a problem. Please try again.' });
     } finally {
         setIsLoading(false);
     }
