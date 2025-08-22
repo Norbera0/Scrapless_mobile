@@ -334,36 +334,7 @@ export default function AnalyticsPage() {
                     <TrendingUp className="w-5 h-5"/>
                     Waste & Savings Trends
                   </CardTitle>
-                  <CardDescription className="text-xs">
-                    This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
-                  </CardDescription>
                   <div className="flex flex-wrap items-center gap-1 pt-2 sm:gap-2">
-                    <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
-                      <Button
-                        size="sm"
-                        onClick={() => setViewType('daily')}
-                        className={cn(
-                          'h-auto px-2 py-1 text-xs',
-                          viewType === 'daily'
-                            ? 'bg-background text-foreground shadow'
-                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
-                        )}
-                      >
-                        Daily
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => setViewType('aggregate')}
-                        className={cn(
-                          'h-auto px-2 py-1 text-xs',
-                          viewType === 'aggregate'
-                            ? 'bg-background text-foreground shadow'
-                            : 'bg-transparent text-muted-foreground hover:bg-background/50'
-                        )}
-                      >
-                        Aggregate
-                      </Button>
-                    </div>
                     <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
                       <Button
                         size="sm"
@@ -463,6 +434,34 @@ export default function AnalyticsPage() {
                         )}
                     </AreaChart>
                   </ChartContainer>
+                   <div className="flex justify-end">
+                      <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
+                          <Button
+                            size="sm"
+                            onClick={() => setViewType('daily')}
+                            className={cn(
+                              'h-auto px-2 py-1 text-xs',
+                              viewType === 'daily'
+                                ? 'bg-background text-foreground shadow'
+                                : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                            )}
+                          >
+                            Daily
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => setViewType('aggregate')}
+                            className={cn(
+                              'h-auto px-2 py-1 text-xs',
+                              viewType === 'aggregate'
+                                ? 'bg-background text-foreground shadow'
+                                : 'bg-transparent text-muted-foreground hover:bg-background/50'
+                            )}
+                          >
+                            Aggregate
+                          </Button>
+                      </div>
+                  </div>
                 </CardContent>
                  <CardFooter className="px-4 py-3 border-t bg-secondary/50">
                     <p className="text-xs text-muted-foreground">
