@@ -274,7 +274,7 @@ export default function HomePage() {
               <span className="font-bold">Scrapless</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 Scrapless. Reduce food waste intelligently.
+              © 2025 Scrapless. Reduce food waste intelligently.
             </p>
           </div>
         </div>
