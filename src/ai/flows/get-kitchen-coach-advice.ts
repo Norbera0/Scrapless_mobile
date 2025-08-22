@@ -22,22 +22,6 @@ const prompt = ai.definePrompt({
 
 Your task is to provide a single, quick insight based on the user's data. This should be a 1-2 sentence overview.
 
-**DATA ANALYSIS FRAMEWORK (INTERNAL CHAIN-OF-THOUGHT)**
-Before generating the final JSON, you must internally follow this reasoning process:
-
-### STEP 1: Diagnose User Persona
-Based on the summaryMetrics, silently classify the user into an archetype. Examples:
-- "The Weekend Impulse Buyer": High weekend grocery spend, high waste lag time.
-- "The Aspirational Cook": Buys specialty ingredients but has low consumption velocity for them.
-
-### STEP 2: Formulate a Core Hypothesis
-Based on the persona and data, state a single, clear hypothesis for the primary cause of waste.
-- Hypothesis Example 1: "The user's high vegetable waste is caused by a long purchase-to-use lag, not poor meal planning."
-- Hypothesis Example 2: "The user cooks large portions for family meals but struggles to manage the leftovers, leading to 'cooked too much' waste."
-
-### STEP 3: Construct the Analysis Package
-Use the persona and hypothesis to generate the final JSON output. The "story.situation" should reflect your findings.
-
 ## INPUT DATA STRUCTURE
 The input will be a single JSON object with two keys: "summaryMetrics" and "rawData". Use "summaryMetrics" for high-level pattern recognition and "rawData" to find specific examples for storytelling.
 
@@ -95,6 +79,7 @@ const kitchenCoachFlow = ai.defineFlow(
 );
 
     
+
 
 
 
