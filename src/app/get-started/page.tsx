@@ -128,7 +128,7 @@ export default function HomePage() {
               <span className="text-black">Turn Your </span>
               <span className="text-orange-400">SAYANG</span>
               <span className="text-black"> Into </span>
-              <span className="text-green-500">SAVINGS</span>
+              <span className="text-green-600">SAVINGS</span>
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
               Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
