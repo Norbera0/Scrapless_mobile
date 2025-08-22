@@ -105,7 +105,7 @@ export default function HomePage() {
             <span className="text-xl font-bold">Scrapless</span>
           </div>
           <Button onClick={() => router.push('/login')} size="sm">
-            Get Started
+            Log In
           </Button>
         </div>
       </header>
@@ -125,9 +125,10 @@ export default function HomePage() {
               AI-Powered Food Waste Reduction
             </Badge>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
-              Turn Your{' '}
-              <span className="text-orange-500">SAYANG</span> Into{' '}
-              <span className="text-green-500">SAVINGS</span>
+              <span className="text-black">Turn Your </span>
+              <span className="text-orange-400">SAYANG</span>
+              <span className="text-black"> Into </span>
+              <span className="text-green-400">SAVINGS</span>
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
               Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
