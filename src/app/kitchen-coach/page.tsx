@@ -266,11 +266,6 @@ export default function KitchenCoachPage() {
                                 </div>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {solutions.analysisSummary && (
-                                    <div className="p-4 bg-secondary/50 rounded-lg border">
-                                        <p className="text-sm text-foreground">{solutions.analysisSummary}</p>
-                                    </div>
-                                )}
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="situation">
                                         <AccordionTrigger>
