@@ -329,15 +329,17 @@ export default function DashboardPage() {
         <Card className="shadow-sm overflow-hidden">
             <CardContent className="p-0 flex">
                 <div className="p-6 flex-1">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4 border-4 border-primary/20">
-                        <CookingPot className="w-8 h-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground mb-2">Cook &amp; Shop Hub</h3>
+                    <CardHeader className="p-0 mb-4">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <CookingPot className="w-5 h-5 text-primary" />
+                            Cook & Shop Hub
+                        </CardTitle>
+                    </CardHeader>
                     <p className="text-muted-foreground mb-4 text-sm">
                         Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
                     </p>
                     <Button variant="default" onClick={() => router.push('/cook-shop')}>
-                        Plan &amp; Prepare
+                        Plan & Prepare
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                 </div>

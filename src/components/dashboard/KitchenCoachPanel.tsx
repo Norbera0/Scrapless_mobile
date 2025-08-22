@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useEffect } from 'react';
@@ -32,10 +31,10 @@ export function KitchenCoachPanel() {
 
     // Zustand store for coach state
     const {
-        lastTip,
+        analysis: lastTip,
         lastGenerated,
         isGenerating,
-        setLastTip,
+        setAnalysis: setLastTip,
         setIsGenerating,
     } = useCoachStore();
 
