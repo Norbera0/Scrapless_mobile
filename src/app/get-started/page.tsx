@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -107,7 +108,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2">
-            <Image src="/logo.jpg" alt="Scrapless Logo" width={40} height={40} className="rounded-lg" />
+            <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={40} height={40} className="rounded-lg" />
             <span className="text-xl font-bold">Scrapless</span>
           </div>
           <Button onClick={() => router.push('/login')} size="sm">
@@ -298,7 +299,7 @@ export default function HomePage() {
         <div className="container px-4 py-8 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="flex items-center gap-2">
-              <Image src="/logo.jpg" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
+              <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={32} height={32} className="rounded-lg" />
               <span className="font-bold">Scrapless</span>
             </div>
             <p className="text-sm text-muted-foreground">
