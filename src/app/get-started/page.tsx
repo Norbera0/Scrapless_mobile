@@ -124,11 +124,11 @@ export default function HomePage() {
               <Sparkles className="h-3 w-3 mr-1" />
               AI-Powered Food Waste Reduction
             </Badge>
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl mx-auto">
+            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
               Turn Food Waste Into{' '}
               <span className="text-primary bg-clip-text">Smart Savings</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground text-lg md:text-xl">
+            <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
               Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
               and personalized recommendations. Save money while saving the planet.
             </p>
@@ -142,7 +142,7 @@ export default function HomePage() {
           >
             <Button 
               size="lg" 
-              className="text-lg px-8"
+              className="text-base px-8 h-12"
               onClick={() => router.push('/login')}
             >
               Start Reducing Waste
@@ -155,11 +155,11 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="container px-4 py-16 md:px-6">
         <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Everything You Need to{' '}
             <span className="text-primary">Reduce Waste</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground text-lg">
+          <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
             Our comprehensive platform combines AI technology with practical tools 
             to make reducing food waste effortless and rewarding.
           </p>
@@ -193,7 +193,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
             Simple Steps, Big Impact
           </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground text-lg">
+          <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
             Get started in minutes and see results from day one
           </p>
         </div>
@@ -242,14 +242,14 @@ export default function HomePage() {
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
                   Ready to Start Your Waste-Free Journey?
                 </h2>
-                <p className="mx-auto max-w-2xl text-muted-foreground text-lg">
+                <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
                   Join thousands of users who are already saving money and reducing their environmental impact
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="text-lg px-8"
+                  className="text-base px-8 h-12"
                   onClick={() => router.push('/login')}
                 >
                   <Leaf className="mr-2 h-5 w-5" />
