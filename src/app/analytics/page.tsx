@@ -244,9 +244,6 @@ export default function AnalyticsPage() {
               <BarChart2 className="w-8 h-8 text-primary" />
               Analytics
             </h1>
-            <p className="text-muted-foreground text-sm">
-                Track your patterns, reduce waste, spend less
-            </p>
         </div>
         <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
           <PopoverTrigger asChild>
@@ -553,5 +550,3 @@ export default function AnalyticsPage() {
     </div>
   );
 }
-
-
