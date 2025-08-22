@@ -7,7 +7,7 @@ import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsi
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem, ArrowRight } from 'lucide-react';
+import { Loader2, Lightbulb, AlertTriangle, TrendingUp, BarChart2, Brain, CalendarClock, Users, Soup, MessageCircleQuestion, Plus, ShoppingCart, Utensils, ThumbsDown, Leaf, Sprout, Apple, Drumstick, Fish, Beef, Wheat, Sandwich, IceCream, Star, Flame, Package, Trash, Clock, ChevronLeft, ChevronRight, History, RefreshCw, Camera, Mic, Type, Gem, ArrowRight, TrendingDown } from 'lucide-react';
 import type { WasteLog } from '@/types';
 import { format, subDays, startOfDay, isAfter, endOfDay, eachDayOfInterval, parseISO, isSameDay, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -223,14 +223,14 @@ export default function AnalyticsPage() {
         label: "Savings (₱)",
         color: "hsl(var(--chart-1))",
     }
-  } satisfies ChartConfig
+  }
   
   const reasonChartConfig = {
       ...allCategories.reduce((acc, cat, i) => ({
           ...acc,
           [cat]: { label: cat, color: COLORS[i % COLORS.length] }
       }), {}),
-  } satisfies ChartConfig
+  }
   
   const netOffset = totalSavings - totalWaste;
 
@@ -271,6 +271,24 @@ export default function AnalyticsPage() {
         </Popover>
       </div>
 
+      <Card className="shadow-sm">
+        <CardContent className="p-0 flex items-center">
+            <div className={cn("w-3/5 flex flex-col items-center justify-center p-4", netOffset >= 0 ? "text-green-600" : "text-red-600")}>
+                <p className="text-4xl md:text-6xl font-bold tracking-tighter">
+                  {netOffset >= 0 ? `₱${netOffset.toFixed(0)}` : `-₱${Math.abs(netOffset).toFixed(0)}`}
+                </p>
+                <p className="text-xs font-semibold uppercase tracking-wider">{netOffset >= 0 ? 'Net Savings' : 'Net Loss'}</p>
+            </div>
+            <div className="w-2/5 p-4 text-sm font-medium">
+                 {netOffset >= 0 ? (
+                    <p>🎉 Great job! You saved more than you wasted in this period!</p>
+                 ) : (
+                    <p>⚠️ You wasted more than you saved. Let's improve!</p>
+                 )}
+            </div>
+        </CardContent>
+      </Card>
+
 
       {!logsInitialized ? (
           <div className="flex h-64 w-full items-center justify-center p-4">
@@ -283,8 +301,8 @@ export default function AnalyticsPage() {
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <BarChart2 className="w-5 h-5"/>
-                    Waste & Savings
+                    <TrendingUp className="w-5 h-5"/>
+                    Waste & Savings Trends
                   </CardTitle>
                   <CardDescription className="text-xs">
                     This chart shows the daily cost of your food waste versus the virtual savings you've earned from sustainable actions.
@@ -385,12 +403,12 @@ export default function AnalyticsPage() {
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                         <defs>
                             <linearGradient id="fillWaste" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={chartConfig[chartMetric].color} stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor={chartConfig[chartMetric].color} stopOpacity={0.1}/>
+                                <stop offset="5%" stopColor={`hsl(${getComputedStyle(document.documentElement).getPropertyValue(chartMetric === 'totalPesoValue' ? '--destructive' : '--primary')})`} stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor={`hsl(${getComputedStyle(document.documentElement).getPropertyValue(chartMetric === 'totalPesoValue' ? '--destructive' : '--primary')})`} stopOpacity={0.1}/>
                             </linearGradient>
-                            <linearGradient id="fillSavings" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={chartConfig.totalSavings.color} stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor={chartConfig.totalSavings.color} stopOpacity={0.1}/>
+                             <linearGradient id="fillSavings" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={`hsl(${getComputedStyle(document.documentElement).getPropertyValue('--chart-1')})`} stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor={`hsl(${getComputedStyle(document.documentElement).getPropertyValue('--chart-1')})`} stopOpacity={0.1}/>
                             </linearGradient>
                         </defs>
                         <Area
@@ -399,7 +417,7 @@ export default function AnalyticsPage() {
                             type="monotone"
                             fill="url(#fillWaste)"
                             fillOpacity={0.4}
-                            stroke={chartConfig[chartMetric].color}
+                            stroke={`hsl(${getComputedStyle(document.documentElement).getPropertyValue(chartMetric === 'totalPesoValue' ? '--destructive' : '--primary')})`}
                             stackId={chartMetric === 'totalPesoValue' ? "value" : "co2"}
                         />
                         {chartMetric === 'totalPesoValue' && (
@@ -409,7 +427,7 @@ export default function AnalyticsPage() {
                                 type="monotone"
                                 fill="url(#fillSavings)"
                                 fillOpacity={0.4}
-                                stroke={chartConfig.totalSavings.color}
+                                stroke={`hsl(${getComputedStyle(document.documentElement).getPropertyValue('--chart-1')})`}
                                 stackId="value"
                             />
                         )}
@@ -418,8 +436,7 @@ export default function AnalyticsPage() {
                 </CardContent>
                  <CardFooter className="px-4 py-3 border-t bg-secondary/50">
                     <p className="text-xs text-muted-foreground">
-                        Insight: You've saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong> and wasted <strong className="text-destructive">₱{totalWaste.toFixed(2)}</strong>. 
-                        Your net offset is <strong className={cn(netOffset >= 0 ? "text-green-600" : "text-destructive")}>₱{netOffset.toFixed(2)}</strong>.
+                        Insight: You've saved <strong className="text-green-600">₱{totalSavings.toFixed(2)}</strong> and wasted <strong className="text-destructive">₱{totalWaste.toFixed(2)}</strong> in the past {getDaysFromTimeframe(timeframe)} days.
                     </p>
                 </CardFooter>
               </Card>
@@ -503,3 +520,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+
