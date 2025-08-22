@@ -65,7 +65,7 @@ const kitchenCoachFlow = ai.defineFlow(
     name: 'kitchenCoachFlow',
     inputSchema: KitchenCoachInputSchema,
     outputSchema: KitchenCoachOutputSchema,
-    model: 'googleai/gemini-1.5-flash',
+    model: 'googleai/gemini-1.5-pro',
   },
   async (input) => {
     // Basic validation for getting_started case
@@ -95,5 +95,6 @@ const kitchenCoachFlow = ai.defineFlow(
 );
 
     
+
 
 
