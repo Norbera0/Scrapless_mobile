@@ -194,7 +194,7 @@ export default function KitchenCoachPage() {
     return (
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-                 <div className="space-y-1">
+                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
                         <DotLottieReact
                           src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
@@ -204,9 +204,6 @@ export default function KitchenCoachPage() {
                         />
                         Kitchen Coach
                     </h1>
-                </div>
-                
-                <div className="text-center">
                      <Button
                         size="sm"
                         onClick={handleAskCoach} 
@@ -220,7 +217,7 @@ export default function KitchenCoachPage() {
                         ) : (
                             <>
                                 <Sparkles className="mr-2 h-4 w-4" />
-                                Ask Your Coach for Advice
+                                Ask for Advice
                             </>
                         )}
                     </Button>
