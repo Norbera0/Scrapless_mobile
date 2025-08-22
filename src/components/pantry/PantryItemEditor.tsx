@@ -36,14 +36,41 @@ const storageLocations = [
 
 const pantryItemSchema = z.object({
   name: z.string().min(1, 'Item name is required.'),
-  quantity: z.number().min(0, 'Quantity must be a positive number.'),
+  quantity: z.union([z.string(), z.number()]).refine(val => {
+    if (typeof val === 'number') return val > 0;
+    if (typeof val === 'string') {
+        if (!isNaN(parseFloat(val))) return parseFloat(val) > 0;
+        const parts = val.split('/');
+        return parts.length === 2 && !isNaN(parseInt(parts[0])) && !isNaN(parseInt(parts[1]));
+    }
+    return false;
+  }, { message: "Quantity must be a positive number or fraction."}),
   unit: z.string().min(1, 'Unit is required.'),
   estimatedExpirationDate: z.date({ required_error: "Expiration date is required."}),
   storageLocation: z.string().optional(),
-  estimatedCost: z.number().optional(),
+  estimatedCost: z.union([z.string(), z.number()]).optional(),
 });
 
 type PantryItemFormData = z.infer<typeof pantryItemSchema>;
+
+const parseFraction = (value: string | number): number => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+        if (value.includes('/')) {
+            const parts = value.split('/');
+            if (parts.length === 2) {
+                const numerator = parseInt(parts[0], 10);
+                const denominator = parseInt(parts[1], 10);
+                if (!isNaN(numerator) && !isNaN(denominator) && denominator !== 0) {
+                    return numerator / denominator;
+                }
+            }
+        }
+        return parseFloat(value);
+    }
+    return 0;
+};
+
 
 interface PantryItemEditorProps {
   item: PantryItem | null;
@@ -86,8 +113,12 @@ export function PantryItemEditor({ item, isOpen, onClose }: PantryItemEditorProp
     try {
       const itemToSave: PantryItem = {
         ...item,
-        ...data,
+        name: data.name,
+        quantity: parseFraction(data.quantity),
+        unit: data.unit,
         estimatedExpirationDate: data.estimatedExpirationDate.toISOString(),
+        storageLocation: data.storageLocation,
+        estimatedCost: data.estimatedCost ? parseFraction(data.estimatedCost) : undefined,
       };
       
       await savePantryItems(user.uid, [itemToSave]);
@@ -132,7 +163,7 @@ export function PantryItemEditor({ item, isOpen, onClose }: PantryItemEditorProp
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
                 <Label htmlFor="quantity">Quantity</Label>
-                <Input id="quantity" type="number" {...register('quantity', { valueAsNumber: true })} />
+                <Input id="quantity" type="text" {...register('quantity')} />
                 {errors.quantity && <p className="text-xs text-destructive">{errors.quantity.message}</p>}
             </div>
              <div className="grid gap-2">
@@ -177,7 +208,8 @@ export function PantryItemEditor({ item, isOpen, onClose }: PantryItemEditorProp
 
             <div className="grid gap-2">
                 <Label htmlFor="estimatedCost">Estimated Cost (₱)</Label>
-                <Input id="estimatedCost" type="number" {...register('estimatedCost', { valueAsNumber: true })} />
+                <Input id="estimatedCost" type="text" {...register('estimatedCost')} />
+                 {errors.estimatedCost && <p className="text-xs text-destructive">{errors.estimatedCost.message}</p>}
             </div>
 
             <DialogFooter>
