@@ -126,6 +126,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
             className="space-y-4"
           >
+            <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={80} height={80} className="rounded-lg mx-auto mb-4" />
             <Badge variant="secondary" className="mb-4">
               <Sparkles className="h-3 w-3 mr-1" />
               AI-Powered Food Waste Reduction
