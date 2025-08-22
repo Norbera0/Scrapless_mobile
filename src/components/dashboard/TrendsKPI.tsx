@@ -162,15 +162,16 @@ export function TrendsKPI({ logs }: { logs: WasteLog[] }) {
     return (
         <div className="lg:grid lg:grid-cols-4 lg:gap-4">
              <Carousel 
-                className="lg:hidden -ml-4" // Use negative margin to offset the first item's padding
+                className="lg:hidden"
                 opts={{
                     align: "start",
                     slidesToScroll: 1,
+                    dragFree: true,
                 }}
             >
-                <CarouselContent>
+                <CarouselContent className="pl-4">
                     {kpiCards.map((card, index) => (
-                        <CarouselItem key={index} className="basis-[43.5%]">
+                        <CarouselItem key={index} className="basis-[43.5%] pl-0 pr-4">
                             {card}
                         </CarouselItem>
                     ))}
