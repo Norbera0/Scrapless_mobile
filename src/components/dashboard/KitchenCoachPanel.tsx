@@ -103,7 +103,6 @@ export function KitchenCoachPanel() {
                     Your Kitchen Coach
                 </CardTitle>
                 <CardDescription className="text-xs">
-                    Quick tips to reduce waste today.
                     {lastGenerated && (
                         <span className="block text-xs mt-1">
                             Last updated: {formatDistanceToNow(new Date(lastGenerated), { addSuffix: true })}
@@ -120,10 +119,7 @@ export function KitchenCoachPanel() {
                 ) : lastTip ? (
                     <div className="space-y-4">
                         <div className="bg-secondary/50 rounded-xl p-4 border">
-                            <h3 className="font-bold text-base mb-1">{lastTip.title}</h3>
-                            <ul className="text-muted-foreground text-sm list-disc list-inside space-y-1">
-                                {lastTip.story.situation.map((sit, i) => <li key={i}>{sit}</li>)}
-                            </ul>
+                            <p className="text-muted-foreground text-sm font-medium">{lastTip.title}</p>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                              <Button 
