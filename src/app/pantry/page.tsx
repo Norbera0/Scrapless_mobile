@@ -394,6 +394,11 @@ export default function PantryPage() {
     }
   };
 
+  const handleEdit = (item: PantryItem) => {
+    setSelectedItem(null);
+    setEditingItem(item);
+  };
+
 
   const handleMethodSelect = (method: 'camera' | 'voice' | 'text') => {
     setIsAddMethodOpen(false);
@@ -578,6 +583,7 @@ export default function PantryPage() {
             isOpen={!!selectedItem}
             onClose={() => setSelectedItem(null)}
             onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         )}
         {/* Item Editor Modal */}

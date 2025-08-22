@@ -321,3 +321,29 @@ export const GetWasteBreakdownInsightOutputSchema = z.object({
     insight: z.string().describe("A short, actionable tip to help the user reduce waste in their top category."),
 });
 export type GetWasteBreakdownInsightOutput = z.infer<typeof GetWasteBreakdownInsightOutputSchema>;
+
+
+// Item-specific AI Insights Schemas
+export const GetItemInsightsInputSchema = z.object({
+  name: z.string(),
+  quantity: z.number(),
+  unit: z.string(),
+  estimatedExpirationDate: z.string(),
+  estimatedCost: z.number().optional(),
+});
+export type GetItemInsightsInput = z.infer<typeof GetItemInsightsInputSchema>;
+
+export const GetItemInsightsOutputSchema = z.object({
+  storageTip: z.string().describe("A practical tip for storing the item to maximize freshness."),
+  wastePreventionTip: z.string().describe("An actionable tip to prevent the item from being wasted."),
+  recipes: z.array(
+    z.object({
+      id: z.string().describe("A unique slug-style ID for the recipe."),
+      name: z.string().describe("The name of the recipe."),
+      description: z.string().describe("A brief, enticing description of the recipe."),
+      difficulty: z.enum(['Easy', 'Medium', 'Hard']).describe("The recipe's difficulty level."),
+      cookingTime: z.string().describe("The estimated cooking time (e.g., '15 min')."),
+    })
+  ).describe("A list of 2-3 simple recipe ideas."),
+});
+export type GetItemInsightsOutput = z.infer<typeof GetItemInsightsOutputSchema>;

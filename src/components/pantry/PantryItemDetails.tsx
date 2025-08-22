@@ -3,13 +3,13 @@
 import { Button } from '../ui/button';
 import { PantryItem } from '@/types';
 import { format, formatDistanceToNowStrict, parseISO } from 'date-fns';
-import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot, Check, MinusCircle, Package, DivideCircle, PackageCheck } from 'lucide-react';
+import { X, Bot, Utensils, Trash2, Edit, Loader2, Info, CookingPot, Check, MinusCircle, Package, DivideCircle, PackageCheck, Lightbulb, RefreshCw, Star, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { updatePantryItemStatus, savePantryItems } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { calculateAndSaveAvoidedExpiry } from '@/lib/savings';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -31,13 +31,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { fetchItemInsights } from '@/app/actions';
+import { useItemInsightStore } from '@/stores/item-insight-store';
+import type { GetItemInsightsOutput } from '@/ai/schemas';
+import { Badge } from '../ui/badge';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 interface PantryItemDetailsProps {
     item: PantryItem | null;
     isOpen: boolean;
     onClose: () => void;
     onDelete: (itemId: string) => void;
+    onEdit: (item: PantryItem) => void;
 }
 
 function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: boolean, onOpenChange: (open: boolean) => void, onSave: (cost: number) => void, isUpdating: boolean }) {
@@ -78,8 +84,96 @@ function CostPromptDialog({ open, onOpenChange, onSave, isUpdating }: { open: bo
     )
 }
 
+function AITipsSection({ item, forceRegenerate = false }: { item: PantryItem, forceRegenerate?: boolean }) {
+    const { insights, setInsight, isGenerating, setIsGenerating } = useItemInsightStore();
+    const { toast } = useToast();
+    
+    const itemInsight = insights[item.id];
 
-export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryItemDetailsProps) {
+    const handleGenerate = async () => {
+        setIsGenerating(item.id, true);
+        try {
+            const result = await fetchItemInsights({
+                name: item.name,
+                quantity: item.quantity,
+                unit: item.unit,
+                estimatedExpirationDate: item.estimatedExpirationDate,
+                estimatedCost: item.estimatedCost,
+            });
+            setInsight(item.id, result);
+        } catch (error) {
+            toast({ variant: 'destructive', title: 'Failed to get insights', description: 'The AI assistant is busy. Please try again later.' });
+        } finally {
+            setIsGenerating(item.id, false);
+        }
+    }
+
+    useEffect(() => {
+        if (!itemInsight || forceRegenerate) {
+            handleGenerate();
+        }
+    }, [item.id, forceRegenerate]);
+
+
+    if (isGenerating[item.id]) {
+        return (
+            <div className="flex items-center justify-center text-muted-foreground p-8">
+                <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                <p>Generating tips...</p>
+            </div>
+        );
+    }
+    
+    if (!itemInsight) {
+        return (
+             <Button onClick={handleGenerate} className="w-full">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Get AI-Powered Tips
+             </Button>
+        )
+    }
+
+    return (
+        <div className="space-y-4">
+            <Accordion type="single" collapsible className="w-full" defaultValue="storage">
+                <AccordionItem value="storage">
+                    <AccordionTrigger>Storage Tip</AccordionTrigger>
+                    <AccordionContent>
+                        {itemInsight.storageTip}
+                    </AccordionContent>
+                </AccordionItem>
+                 <AccordionItem value="waste">
+                    <AccordionTrigger>Waste Prevention</AccordionTrigger>
+                    <AccordionContent>
+                       {itemInsight.wastePreventionTip}
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="recipes">
+                    <AccordionTrigger>Recipe Ideas</AccordionTrigger>
+                    <AccordionContent className="space-y-3">
+                        {itemInsight.recipes.map(recipe => (
+                             <div key={recipe.id} className="p-3 bg-secondary/50 rounded-lg">
+                                <h4 className="font-semibold">{recipe.name}</h4>
+                                <p className="text-xs text-muted-foreground">{recipe.description}</p>
+                                <div className="flex items-center gap-4 text-xs mt-1">
+                                    <Badge variant="outline">{recipe.difficulty}</Badge>
+                                    <span className="text-muted-foreground">{recipe.cookingTime}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
+            <Button variant="outline" size="sm" onClick={handleGenerate} className="w-full">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Regenerate
+            </Button>
+        </div>
+    )
+}
+
+
+export function PantryItemDetails({ item, isOpen, onClose, onDelete, onEdit }: PantryItemDetailsProps) {
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUpdating, setIsUpdating] = useState(false);
@@ -122,7 +216,6 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryIte
         if (!user || !item) return;
         const updatedItem = { ...item, estimatedCost: cost };
         
-        // This is a fire-and-forget update to simplify the UX
         savePantryItems(user.uid, [{
             id: updatedItem.id,
             ...updatedItem,
@@ -147,6 +240,11 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryIte
         } finally {
             setIsUpdating(false);
         }
+    }
+    
+    const handleEdit = () => {
+        onClose();
+        onEdit(item);
     }
 
 
@@ -186,9 +284,8 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryIte
                     </div>
                 </div>
                 
-                <div className="space-y-4">
-                    <p className='text-sm text-muted-foreground text-center'>For tips and recipes, visit the Kitchen Coach.</p>
-                </div>
+                <AITipsSection item={item} />
+
 
                 <DialogFooter className="grid grid-cols-2 gap-2 pt-4">
                      <Button 
@@ -223,26 +320,32 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete }: PantryIte
                         </AlertDialogContent>
                     </AlertDialog>
                     
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" className="col-span-2">
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete Item Permanently
-                            </Button>
-                        </AlertDialogTrigger>
-                         <AlertDialogContent>
-                             <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete "{item.name}" from your pantry and all associated data.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => onDelete(item.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    <div className="col-span-2 flex gap-2">
+                        <Button variant="outline" className="flex-1" onClick={handleEdit}>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" className="flex-1">
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                             <AlertDialogContent>
+                                 <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete "{item.name}" from your pantry and all associated data.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => onDelete(item.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
 
                 </DialogFooter>
             </DialogContent>

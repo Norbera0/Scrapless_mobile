@@ -16,7 +16,6 @@ import {
     type GetItemInsightsInput,
     type GetItemInsightsOutput,
 } from '@/ai/schemas';
-import { generateFoodImage } from './food-image-generation';
 
 export async function getItemInsights(input: GetItemInsightsInput): Promise<GetItemInsightsOutput> {
   return getItemInsightsFlow(input);
@@ -49,29 +48,13 @@ const getItemInsightsFlow = ai.defineFlow(
     name: 'getItemInsightsFlow',
     inputSchema: GetItemInsightsInputSchema,
     outputSchema: GetItemInsightsOutputSchema,
+    model: 'googleai/gemini-1.5-flash',
   },
   async (input) => {
     const { output } = await prompt(input);
     if (!output) {
       throw new Error("Failed to generate insights for the item.");
     }
-
-    if (output.recipes && output.recipes.length > 0) {
-        // Generate images for each recipe in parallel
-        const recipesWithImages = await Promise.all(
-            output.recipes.map(async (recipe) => {
-                try {
-                  const { imageUrl } = await generateFoodImage({ recipeName: recipe.name });
-                  return { ...recipe, photoDataUri: imageUrl };
-                } catch (error) {
-                  console.error(`Error generating image for ${recipe.name}:`, error);
-                  return { ...recipe, photoDataUri: undefined };
-                }
-            })
-        );
-        output.recipes = recipesWithImages;
-    }
-
     return output;
   }
 );
