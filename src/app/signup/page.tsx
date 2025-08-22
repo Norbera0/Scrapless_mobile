@@ -10,21 +10,13 @@ import Link from 'next/link';
 export default function SignUpPage() {
   return (
     <div className="min-h-screen w-full flex flex-col md:flex-row-reverse bg-[#F4F4F4]">
-        {/* Right Section with Image (Desktop) / Top Image (Mobile) */}
+        {/* Right Section with Image */}
         <div className="relative w-full h-[30vh] md:h-screen md:w-1/2">
-             {/* Mobile Image */}
             <Image
-                src="/log_in_page/log_in_bg_2.png"
-                alt="A bowl of healthy food on mobile"
+                src="/log_in_page/log_in_bg_3.png"
+                alt="A bowl of healthy food"
                 layout="fill"
-                className="object-cover md:hidden"
-            />
-             {/* Desktop Image */}
-            <Image
-                src="/log_in_page/log_in_bg_desktop.png"
-                alt="A bowl of healthy food on desktop"
-                layout="fill"
-                className="hidden md:block object-cover"
+                className="object-cover"
             />
         </div>
 
