@@ -22,7 +22,7 @@ import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useCoachStore } from '@/stores/coach-store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -34,27 +34,32 @@ const loadingSteps = [
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
-        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 h-full">
             <CardHeader>
                 <CardTitle className='text-base flex items-center gap-2'>
                     {solution.title}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 pt-0 space-y-3 flex-1 flex flex-col justify-between">
-                <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">{solution.description}</p>
-                    <p className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}/mo</p>
-                    <div className="space-y-1">
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>Success Rate</span>
-                            <span>{Math.round(solution.successRate * 100)}%</span>
-                        </div>
-                        <Progress value={solution.successRate * 100} className="h-2" />
-                    </div>
-                </div>
+            <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
+                <Accordion type="single" collapsible className="w-full mb-4">
+                    <AccordionItem value="details">
+                        <AccordionTrigger>View Details</AccordionTrigger>
+                        <AccordionContent className="space-y-3 pt-2">
+                             <p className="text-sm text-muted-foreground">{solution.description}</p>
+                            <p className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}/mo</p>
+                            <div className="space-y-1">
+                                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                                    <span>Success Rate</span>
+                                    <span>{Math.round(solution.successRate * 100)}%</span>
+                                </div>
+                                <Progress value={solution.successRate * 100} className="h-2" />
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
                  <Button 
                     size="sm" 
-                    className="w-full mt-4" 
+                    className="w-full" 
                     onClick={onSelect} 
                     disabled={isUpdating}
                     variant={isSelected ? 'default' : 'outline'}
@@ -288,17 +293,27 @@ export default function KitchenCoachPage() {
                         {/* Solutions Section */}
                         <div>
                             <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {solutions.solutions.map((solution, index) => (
-                                    <SolutionCard 
-                                        key={index} 
-                                        solution={solution} 
-                                        onSelect={() => handleSelectSolution(solution.title)} 
-                                        isSelected={selectedSolutions.has(solution.title)}
-                                        isUpdating={isGenerating}
-                                    />
-                                ))}
-                            </div>
+                            <Carousel
+                                opts={{
+                                    align: "start",
+                                }}
+                                className="-ml-4"
+                            >
+                                <CarouselContent>
+                                    {solutions.solutions.map((solution, index) => (
+                                        <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 basis-[77%]">
+                                            <div className="p-1 h-full">
+                                                <SolutionCard 
+                                                    solution={solution} 
+                                                    onSelect={() => handleSelectSolution(solution.title)} 
+                                                    isSelected={selectedSolutions.has(solution.title)}
+                                                    isUpdating={isGenerating}
+                                                />
+                                            </div>
+                                        </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                            </Carousel>
                         </div>
 
                         {/* Quick Win & Encouragement */}
