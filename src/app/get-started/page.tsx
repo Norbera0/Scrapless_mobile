@@ -111,160 +111,168 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container px-4 py-16 md:px-6 md:py-24">
-        <div className="flex flex-col items-center text-center space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-4"
-          >
-            <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={80} height={80} className="rounded-lg mx-auto mb-4" />
-            <Badge variant="secondary" className="mb-4">
-              <Sparkles className="h-3 w-3 mr-1" />
-              AI-Powered Food Waste Reduction
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
-              <span className="text-black">Turn Your </span>
-              <span className="text-orange-600">SAYANG</span>
-              <span className="text-black"> Into </span>
-              <span className="text-green-600">SAVINGS</span>
-            </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
-              Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
-              and personalized recommendations. Save money while saving the planet.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4"
-          >
-            <Button 
-              size="lg" 
-              className="text-base px-8 h-12"
-              onClick={() => router.push('/login')}
-            >
-              Start Reducing Waste
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container px-4 py-16 md:px-6">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-            Everything You Need to{' '}
-            <span className="text-primary">Reduce Waste</span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
-            Our comprehensive platform combines AI technology with practical tools 
-            to make reducing food waste effortless and rewarding.
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 * index }}
-            >
-              <Card className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm h-full hover:bg-card/80 transition-colors">
-                <CardContent className="p-6">
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="container px-4 py-16 md:px-6">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-            Simple Steps, Big Impact
-          </h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
-            Get started in minutes and see results from day one
-          </p>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-3">
-          {[
-            {
-              step: "01",
-              title: "Track Your Pantry",
-              description: "Add items to your digital pantry with photos or voice commands"
-            },
-            {
-              step: "02", 
-              title: "Get AI Insights",
-              description: "Receive personalized recommendations and expiration alerts"
-            },
-            {
-              step: "03",
-              title: "Reduce & Save",
-              description: "Follow smart suggestions to minimize waste and maximize savings"
-            }
-          ].map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 * index }}
-              className="text-center"
-            >
-              <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-xl font-bold">
-                {step.step}
-              </div>
-              <h3 className="mb-2 text-xl font-semibold">{step.title}</h3>
-              <p className="text-muted-foreground">{step.description}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container px-4 py-16 md:px-6">
-        <Card className="border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
-          <CardContent className="p-8 md:p-12">
-            <div className="text-center space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
-                  Ready to Start Your Waste-Free Journey?
-                </h2>
+      <section className="w-full px-4 py-16 md:px-6 md:py-24">
+        <div className="container">
+            <div className="flex flex-col items-center text-center space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="space-y-4"
+              >
+                <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={80} height={80} className="rounded-lg mx-auto mb-4" />
+                <Badge variant="secondary" className="mb-4">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  AI-Powered Food Waste Reduction
+                </Badge>
+                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
+                  <span className="text-black">Turn Your </span>
+                  <span className="text-orange-600">SAYANG</span>
+                  <span className="text-black"> Into </span>
+                  <span className="text-green-600">SAVINGS</span>
+                </h1>
                 <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
-                  Join thousands of users who are already saving money and reducing their environmental impact
+                  Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
+                  and personalized recommendations. Save money while saving the planet.
                 </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
                 <Button 
                   size="lg" 
                   className="text-base px-8 h-12"
                   onClick={() => router.push('/login')}
                 >
-                  <Leaf className="mr-2 h-5 w-5" />
-                  Start Free Today
+                  Start Reducing Waste
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  No credit card required
-                </div>
-              </div>
+              </motion.div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="w-full px-4 py-16 md:px-6">
+        <div className="container">
+            <div className="text-center space-y-4 mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                Everything You Need to{' '}
+                <span className="text-primary">Reduce Waste</span>
+              </h2>
+              <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
+                Our comprehensive platform combines AI technology with practical tools 
+                to make reducing food waste effortless and rewarding.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 * index }}
+                >
+                  <Card className="relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm h-full hover:bg-card/80 transition-colors">
+                    <CardContent className="p-6">
+                      <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                        <feature.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="w-full px-4 py-16 md:px-6">
+        <div className="container">
+            <div className="text-center space-y-4 mb-12">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                Simple Steps, Big Impact
+              </h2>
+              <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
+                Get started in minutes and see results from day one
+              </p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              {[
+                {
+                  step: "01",
+                  title: "Track Your Pantry",
+                  description: "Add items to your digital pantry with photos or voice commands"
+                },
+                {
+                  step: "02", 
+                  title: "Get AI Insights",
+                  description: "Receive personalized recommendations and expiration alerts"
+                },
+                {
+                  step: "03",
+                  title: "Reduce & Save",
+                  description: "Follow smart suggestions to minimize waste and maximize savings"
+                }
+              ].map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 * index }}
+                  className="text-center"
+                >
+                  <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-xl font-bold">
+                    {step.step}
+                  </div>
+                  <h3 className="mb-2 text-xl font-semibold">{step.title}</h3>
+                  <p className="text-muted-foreground">{step.description}</p>
+                </motion.div>
+              ))}
+            </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full px-4 py-16 md:px-6">
+        <div className="container">
+            <Card className="border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+              <CardContent className="p-8 md:p-12">
+                <div className="text-center space-y-6">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                      Ready to Start Your Waste-Free Journey?
+                    </h2>
+                    <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
+                      Join thousands of users who are already saving money and reducing their environmental impact
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button 
+                      size="lg" 
+                      className="text-base px-8 h-12"
+                      onClick={() => router.push('/login')}
+                    >
+                      <Leaf className="mr-2 h-5 w-5" />
+                      Start Free Today
+                    </Button>
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      No credit card required
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+        </div>
       </section>
 
       {/* Footer */}
