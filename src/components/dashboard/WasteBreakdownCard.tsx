@@ -79,8 +79,8 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                 <CardDescription className="text-xs">By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col md:flex-row items-center gap-4">
-                    <div className="w-full md:w-1/2 h-[180px]">
+                <div className="flex flex-col md:flex-row items-center gap-2">
+                    <div className="w-full md:w-1/2 h-[150px]">
                          <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -88,8 +88,8 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                                     cx="50%"
                                     cy="50%"
                                     labelLine={false}
-                                    outerRadius={80}
-                                    innerRadius={50}
+                                    outerRadius={60}
+                                    innerRadius={40}
                                     fill="#8884d8"
                                     dataKey="value"
                                     paddingAngle={2}
