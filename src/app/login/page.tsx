@@ -25,6 +25,7 @@ export default function LoginPage() {
             <div className="mx-auto grid w-full max-w-sm gap-6">
                 <div className="grid gap-4 text-center">
                     <div className="flex items-center justify-center gap-3">
+                        <Image src="/Scrapless Logo PNG - GREEN2.png" alt="Scrapless Logo" width={40} height={40} />
                         <h1 className="text-2xl font-bold text-[#003726]">Scrapless</h1>
                     </div>
                     <div className="text-center">
