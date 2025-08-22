@@ -1,37 +1,28 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { KitchenCoachOutput } from '@/ai/schemas';
-import { differenceInHours } from 'date-fns';
+import type { KitchenCoachOutput, GetCoachSolutionsOutput } from '@/ai/schemas';
 
 interface CoachState {
-  lastTip: KitchenCoachOutput | null;
-  lastGenerated: string | null; // ISO string
+  analysis: KitchenCoachOutput | null;
+  solutions: GetCoachSolutionsOutput | null;
   isGenerating: boolean;
-  setLastTip: (tip: KitchenCoachOutput, date: Date) => void;
+  setAnalysis: (analysis: KitchenCoachOutput | null) => void;
+  setSolutions: (solutions: GetCoachSolutionsOutput | null) => void;
   setIsGenerating: (generating: boolean) => void;
-  isEligibleForRefresh: () => boolean;
 }
 
-const REFRESH_INTERVAL_HOURS = 6;
 const isBrowser = typeof window !== 'undefined';
 
 export const useCoachStore = create<CoachState>()(
   persist(
-    (set, get) => ({
-      lastTip: null,
-      lastGenerated: null,
+    (set) => ({
+      analysis: null,
+      solutions: null,
       isGenerating: false,
-      setLastTip: (tip, date) => set({ lastTip: tip, lastGenerated: date.toISOString() }),
+      setAnalysis: (analysis) => set({ analysis }),
+      setSolutions: (solutions) => set({ solutions }),
       setIsGenerating: (generating) => set({ isGenerating: generating }),
-      isEligibleForRefresh: () => {
-        const { lastGenerated } = get();
-        if (!lastGenerated) {
-          return true; // No tip ever generated
-        }
-        const hoursSinceLast = differenceInHours(new Date(), new Date(lastGenerated));
-        return hoursSinceLast >= REFRESH_INTERVAL_HOURS;
-      },
     }),
     {
       name: 'scrapless-coach-storage',

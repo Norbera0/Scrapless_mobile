@@ -20,6 +20,7 @@ import { format, parseISO, startOfMonth } from 'date-fns';
 import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useCoachStore } from '@/stores/coach-store';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -73,11 +74,16 @@ export default function KitchenCoachPage() {
     const { liveItems, archivedItems } = usePantryLogStore();
     const { savingsEvents } = useSavingsStore();
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isFetchingSolutions, setIsFetchingSolutions] = useState(false);
+    const { 
+        analysis, 
+        solutions, 
+        isGenerating, 
+        setAnalysis, 
+        setSolutions, 
+        setIsGenerating 
+    } = useCoachStore();
     
-    const [analysis, setAnalysis] = useState<KitchenCoachOutput | null>(null);
-    const [solutions, setSolutions] = useState<Solutions | null>(null);
+    const [isFetchingSolutions, setIsFetchingSolutions] = useState(false);
     const [showWizard, setShowWizard] = useState(false);
     
     const [selectedSolutions, setSelectedSolutions] = useState<Set<string>>(new Set());
@@ -88,7 +94,7 @@ export default function KitchenCoachPage() {
     
     useEffect(() => {
         let intervalId: NodeJS.Timeout | undefined;
-        if (isLoading || isFetchingSolutions) {
+        if (isGenerating || isFetchingSolutions) {
             let step = 0;
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
@@ -98,15 +104,15 @@ export default function KitchenCoachPage() {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
         return () => clearInterval(intervalId);
-    }, [isLoading, isFetchingSolutions]);
+    }, [isGenerating, isFetchingSolutions]);
     
     const handleAskCoach = async () => {
-        setIsLoading(true);
+        setIsGenerating(true);
         setAnalysis(null);
         setSolutions(null);
         if (!user || !analytics) {
             toast({ variant: 'destructive', title: 'Could not get advice', description: 'User or analytics data is not available.' });
-            setIsLoading(false);
+            setIsGenerating(false);
             return;
         }
 
@@ -148,7 +154,7 @@ export default function KitchenCoachPage() {
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
                 setSolutions(solutionsResult);
                 setIsFetchingSolutions(false);
-                setShowWizard(true); 
+                setShowWizard(true); // Only show wizard for new advice
             }
 
         } catch (error) {
@@ -159,7 +165,7 @@ export default function KitchenCoachPage() {
                 description: 'Could not get advice from the Kitchen Coach. Please try again later.'
             });
         } finally {
-            setIsLoading(false);
+            setIsGenerating(false);
         }
     };
     
@@ -176,7 +182,7 @@ export default function KitchenCoachPage() {
         toast({ title: 'Great!', description: "We'll track your progress on this solution." });
     };
 
-    if (!analytics && !isLoading) {
+    if (!analytics && !isGenerating) {
         return (
             <div className="flex h-full items-center justify-center p-4">
                 <Loader2 className="h-8 w-8 animate-spin" />
@@ -204,9 +210,9 @@ export default function KitchenCoachPage() {
                      <Button
                         size="sm"
                         onClick={handleAskCoach} 
-                        disabled={isLoading || isFetchingSolutions}
+                        disabled={isGenerating || isFetchingSolutions}
                     >
-                        {isLoading || isFetchingSolutions ? (
+                        {isGenerating || isFetchingSolutions ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 {loadingMessage}
@@ -220,7 +226,7 @@ export default function KitchenCoachPage() {
                     </Button>
                 </div>
 
-                {analysis && solutions && !showWizard && (
+                {analysis && solutions && (
                     <div className="grid gap-6">
                         {/* Analysis Section */}
                         <Card>
@@ -282,7 +288,7 @@ export default function KitchenCoachPage() {
                                         solution={solution} 
                                         onSelect={() => handleSelectSolution(solution.title)} 
                                         isSelected={selectedSolutions.has(solution.title)}
-                                        isUpdating={isLoading}
+                                        isUpdating={isGenerating}
                                     />
                                 ))}
                             </div>
@@ -319,7 +325,7 @@ export default function KitchenCoachPage() {
                     solutions={solutions}
                     onSelectSolution={handleSelectSolution}
                     selectedSolutions={selectedSolutions}
-                    isUpdatingSolution={isLoading}
+                    isUpdatingSolution={isGenerating}
                     isBpiLinked={false}
                  />
             )}
