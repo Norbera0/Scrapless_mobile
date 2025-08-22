@@ -86,17 +86,26 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !user && !['/login', '/signup', '/get-started'].includes(pathname)) {
-      router.replace('/login');
-    }
-    if (user) {
-        initializeUserCache(user.uid);
+    if (!isLoading) {
+      if (user) {
+        if (pathname === '/') {
+          router.replace('/dashboard');
+        } else {
+          initializeUserCache(user.uid);
+        }
+      } else {
+        if (pathname === '/') {
+          router.replace('/login');
+        } else if (!['/login', '/signup', '/get-started'].includes(pathname)) {
+          router.replace('/login');
+        }
+      }
     }
   }, [user, isLoading, router, pathname]);
   
-  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/GCashConfirm-Mockup' || pathname === '/get-started';
+  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/GCashConfirm-Mockup' || pathname === '/get-started' || pathname === '/';
 
-  if (isLoading) {
+  if (isLoading || pathname === '/') {
     return (
       <div className="flex h-screen items-center justify-center">
         <div>Loading...</div>
@@ -104,11 +113,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
     );
   }
   
-  if (isSpecialPage) {
+  if (isSpecialPage && !user) {
     return <>{children}</>;
   }
 
-  if (!user) {
+  if (!user && !isSpecialPage) {
       return null;
   }
   
@@ -125,7 +134,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <div className="flex h-screen w-full">
         <Sidebar>
-          <SidebarNav user={user} />
+          <SidebarNav user={user!} />
           <SidebarRail />
         </Sidebar>
         <div className="flex-1 flex flex-col">
