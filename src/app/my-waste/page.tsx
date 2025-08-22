@@ -248,7 +248,7 @@ export default function MyWastePage() {
       <div className="flex justify-end">
           <Popover open={isLogMethodOpen} onOpenChange={setIsLogMethodOpen}>
             <PopoverTrigger asChild>
-              <Button className="whitespace-nowrap bg-primary hover:bg-primary/90 h-10 text-sm">
+              <Button size="sm" className="whitespace-nowrap bg-primary hover:bg-primary/90">
                   <Trash className="w-4 h-4 mr-2" />
                   <span>Log Waste</span>
               </Button>
