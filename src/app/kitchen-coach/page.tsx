@@ -204,16 +204,18 @@ export default function KitchenCoachPage() {
     return (
         <>
             <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
-                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-                        <DotLottieReact
-                          src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
-                          style={{width: '40px', height: '40px'}}
-                          loop
-                          autoplay
-                        />
-                        Kitchen Coach
-                    </h1>
+                 <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
+                            <DotLottieReact
+                              src="https://lottie.host/55c18eb1-89f2-4916-8211-c063d81a959d/Xf9C5RWU4z.lottie"
+                              style={{width: '40px', height: '40px'}}
+                              loop
+                              autoplay
+                            />
+                            Kitchen Coach
+                        </h1>
+                    </div>
                      <Button
                         size="sm"
                         onClick={handleAskCoach} 
@@ -250,8 +252,13 @@ export default function KitchenCoachPage() {
                                     )}
                                 </div>
                             </CardHeader>
-                            <CardContent className="space-y-2">
-                                <Accordion type="single" collapsible className="w-full" defaultValue="situation">
+                            <CardContent className="space-y-4">
+                                {solutions.analysisSummary && (
+                                    <div className="p-4 bg-secondary/50 rounded-lg border">
+                                        <p className="text-sm text-foreground">{solutions.analysisSummary}</p>
+                                    </div>
+                                )}
+                                <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="situation">
                                         <AccordionTrigger>
                                             <span className="flex items-center gap-2 font-semibold"><Target className="text-primary" /> What's Happening</span>

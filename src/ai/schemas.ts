@@ -225,12 +225,13 @@ export type GetCoachSolutionsInput = z.infer<typeof GetCoachSolutionsInputSchema
 
 
 export const GetCoachSolutionsOutputSchema = z.object({
+  analysisSummary: z.string().describe("A 2-3 sentence overview of the analysis for the main display."),
   solutions: z.array(z.object({
     title: z.string().describe("Primary solution (Tailored to user stage and history)"),
     description: z.string().describe("Specific action steps (Dynamic based on user context)"),
     difficulty: z.enum(['easy', 'medium', 'hard']),
     timeToSee: z.string().describe("Days/weeks until results"),
-    estimatedSavings: z.number().describe("Estimated savings in PHP per month"),
+    estimatedSavings: z.number().describe("A single, one-time estimated savings value in PHP."),
     successRate: z.number().describe("Success rate from 0 to 1"),
     filipinoContext: z.string().describe("Why this works for Filipino families"),
   })),
