@@ -125,8 +125,8 @@ export default function HomePage() {
               AI-Powered Food Waste Reduction
             </Badge>
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl max-w-4xl mx-auto">
-              Turn Food Waste Into{' '}
-              <span className="text-primary bg-clip-text">Smart Savings</span>
+              Turn Your{' '}
+              <span className="text-primary bg-clip-text">Sayang</span> into Savings
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground text-base md:text-lg">
               Reduce food waste by up to 40% with AI-powered insights, smart pantry management, 
