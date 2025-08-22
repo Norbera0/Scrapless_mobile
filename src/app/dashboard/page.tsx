@@ -164,7 +164,7 @@ export default function DashboardPage() {
       namesString = `${itemNames[0]}, ${itemNames[1]}, and ${itemNames[2]}`;
     }
 
-    return `Don't let them go to waste! ${count} of your food in the pantry including ${namesString} are expiring soon.`;
+    return `${count} of your food in the pantry including ${namesString} are expiring soon.`;
   }, [expiringSoonItems]);
 
   const lowStockEssentialsMessage = useMemo(() => {
