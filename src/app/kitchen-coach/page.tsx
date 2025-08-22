@@ -16,11 +16,13 @@ import { Progress } from '@/components/ui/progress';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { format, parseISO, startOfMonth } from 'date-fns';
+import { format, parseISO, startOfMonth, formatDistanceToNow } from 'date-fns';
 import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
 import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useCoachStore } from '@/stores/coach-store';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -77,7 +79,8 @@ export default function KitchenCoachPage() {
     const { 
         analysis, 
         solutions, 
-        isGenerating, 
+        isGenerating,
+        lastGenerated,
         setAnalysis, 
         setSolutions, 
         setIsGenerating 
@@ -228,50 +231,57 @@ export default function KitchenCoachPage() {
                         {/* Analysis Section */}
                         <Card>
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
-                                <CardDescription>{analysis.title}</CardDescription>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
+                                        <CardDescription>{analysis.title}</CardDescription>
+                                    </div>
+                                     {lastGenerated && (
+                                        <p className="text-xs text-muted-foreground whitespace-nowrap">
+                                            {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
+                                        </p>
+                                    )}
+                                </div>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center gap-2 text-base"><Target className="text-primary" /> What's Happening</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                            <CardContent className="space-y-2">
+                                <Accordion type="single" collapsible className="w-full" defaultValue="situation">
+                                    <AccordionItem value="situation">
+                                        <AccordionTrigger>
+                                            <span className="flex items-center gap-2 font-semibold"><Target className="text-primary" /> What's Happening</span>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
                                                 {analysis.story.situation.map((s, i) => <li key={i}>{s}</li>)}
                                             </ul>
-                                        </CardContent>
-                                    </Card>
-                                    <Card>
-                                        <CardHeader>
-                                            <CardTitle className="flex items-center gap-2 text-base"><HelpCircle className="text-primary" /> The Root Cause</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                     <AccordionItem value="rootCause">
+                                        <AccordionTrigger>
+                                            <span className="flex items-center gap-2 font-semibold"><HelpCircle className="text-primary" /> The Root Cause</span>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
                                                 {analysis.story.rootCause.map((s, i) => <li key={i}>{s}</li>)}
                                             </ul>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                                 <Card className="bg-red-50 border-red-200">
-                                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                        <CardTitle className="text-sm font-medium text-red-800">Financial Impact</CardTitle>
-                                        <Wallet className="h-4 w-4 text-red-700" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-red-900 font-semibold">{analysis.story.impact}</p>
-                                    </CardContent>
-                                </Card>
-                                <Card className="bg-amber-50 border-amber-200">
-                                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                        <CardTitle className="text-sm font-medium text-amber-800">Prediction</CardTitle>
-                                        <AlertTriangle className="h-4 w-4 text-amber-700" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm text-amber-900 font-semibold">{analysis.prediction}</p>
-                                    </CardContent>
-                                </Card>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="impact">
+                                        <AccordionTrigger>
+                                            <span className="flex items-center gap-2 font-semibold"><Wallet className="text-red-600" /> Financial Impact</span>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <p className="text-sm text-muted-foreground pl-2">{analysis.story.impact}</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                    <AccordionItem value="prediction">
+                                        <AccordionTrigger>
+                                            <span className="flex items-center gap-2 font-semibold"><AlertTriangle className="text-amber-600" /> Prediction</span>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <p className="text-sm text-muted-foreground pl-2">{analysis.prediction}</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
                             </CardContent>
                         </Card>
 

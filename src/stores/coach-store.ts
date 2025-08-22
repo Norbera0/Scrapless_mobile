@@ -7,6 +7,7 @@ interface CoachState {
   analysis: KitchenCoachOutput | null;
   solutions: GetCoachSolutionsOutput | null;
   isGenerating: boolean;
+  lastGenerated: string | null;
   setAnalysis: (analysis: KitchenCoachOutput | null) => void;
   setSolutions: (solutions: GetCoachSolutionsOutput | null) => void;
   setIsGenerating: (generating: boolean) => void;
@@ -20,7 +21,8 @@ export const useCoachStore = create<CoachState>()(
       analysis: null,
       solutions: null,
       isGenerating: false,
-      setAnalysis: (analysis) => set({ analysis }),
+      lastGenerated: null,
+      setAnalysis: (analysis) => set({ analysis: analysis, lastGenerated: new Date().toISOString() }),
       setSolutions: (solutions) => set({ solutions }),
       setIsGenerating: (generating) => set({ isGenerating: generating }),
     }),
