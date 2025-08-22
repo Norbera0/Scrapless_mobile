@@ -334,8 +334,34 @@ export default function AnalyticsPage() {
                     <TrendingUp className="w-5 h-5"/>
                     Waste & Savings Trends
                   </CardTitle>
-                  <div className="flex flex-wrap items-center gap-1 pt-2 sm:gap-2">
-                    <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
+                </CardHeader>
+
+                <CardContent className="space-y-2 px-2 sm:px-4 pb-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className='flex items-center gap-2'>
+                        <Button
+                          size="sm"
+                          variant={timeframe === '7d' ? 'destructive' : 'outline'}
+                          onClick={() => setTimeframe('7d')}
+                        >
+                          7d
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={timeframe === '15d' ? 'destructive' : 'outline'}
+                          onClick={() => setTimeframe('15d')}
+                        >
+                          15d
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={timeframe === '30d' ? 'destructive' : 'outline'}
+                          onClick={() => setTimeframe('30d')}
+                        >
+                          30d
+                        </Button>
+                    </div>
+                     <div className="flex items-center space-x-1 bg-muted p-1 rounded-lg">
                       <Button
                         size="sm"
                         onClick={() => setChartMetric('totalPesoValue')}
@@ -361,32 +387,6 @@ export default function AnalyticsPage() {
                         CO₂e
                       </Button>
                     </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-2 px-2 sm:px-4 pb-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant={timeframe === '7d' ? 'destructive' : 'outline'}
-                      onClick={() => setTimeframe('7d')}
-                    >
-                      7d
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={timeframe === '15d' ? 'destructive' : 'outline'}
-                      onClick={() => setTimeframe('15d')}
-                    >
-                      15d
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={timeframe === '30d' ? 'destructive' : 'outline'}
-                      onClick={() => setTimeframe('30d')}
-                    >
-                      30d
-                    </Button>
                   </div>
 
                   <ChartContainer config={chartConfig} className="h-[200px] sm:h-[250px] w-full">
