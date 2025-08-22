@@ -39,10 +39,10 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                 <CardTitle className='text-base flex items-center gap-2'>
                     {solution.title}
                 </CardTitle>
+                <CardDescription className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
                 <div>
-                    <p className="text-lg font-bold text-green-600 mb-4">💰 Save ~₱{solution.estimatedSavings}/mo</p>
                     <Accordion type="single" collapsible className="w-full mb-4">
                         <AccordionItem value="details">
                             <AccordionTrigger>View Details</AccordionTrigger>

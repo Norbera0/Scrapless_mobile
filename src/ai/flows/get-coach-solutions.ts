@@ -42,7 +42,8 @@ Based *only* on the provided analysis and user context, generate a complete solu
     -   For 'advanced_user', provide "Level Up" challenges instead of basic tips.
     -   For 'new_user', provide simple, foundational habits.
 3.  **Filipino Context**: Ensure solutions are practical and relatable for a Filipino household.
-4.  **Quick Win & Encouragement**: Provide one quick win for today and a motivational message.
+4.  **One-Time Savings**: For the 'estimatedSavings' field, provide a single, one-time estimated savings value in PHP, NOT a monthly recurring value. For example, if a solution helps save a specific item worth ₱100, the value should be 100.
+5.  **Quick Win & Encouragement**: Provide one quick win for today and a motivational message.
 
 Generate the output as a single JSON object that strictly follows the output schema.
 `,
