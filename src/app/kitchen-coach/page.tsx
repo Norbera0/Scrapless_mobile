@@ -224,7 +224,7 @@ export default function KitchenCoachPage() {
                         {isGenerating || isFetchingSolutions ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                {loadingMessage}
+                                Analyzing...
                             </>
                         ) : (
                             <>
@@ -235,7 +235,15 @@ export default function KitchenCoachPage() {
                     </Button>
                 </div>
 
-                {analysis && solutions && (
+                {(isGenerating || isFetchingSolutions) && (
+                    <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-16">
+                        <Loader2 className="h-12 w-12 animate-spin mb-4" />
+                        <p className="font-semibold text-lg">{loadingMessage}</p>
+                        <p className="text-sm">Your new insights will be ready shortly.</p>
+                    </div>
+                )}
+
+                {!isGenerating && !isFetchingSolutions && analysis && solutions && (
                     <div className="grid gap-6">
                         {/* Analysis Section */}
                         <Card>
