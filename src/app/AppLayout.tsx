@@ -86,7 +86,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/login' && pathname !== '/signup' && pathname !== '/') {
+    if (!isLoading && !user && !['/login', '/signup', '/get-started'].includes(pathname)) {
       router.replace('/login');
     }
     if (user) {
@@ -94,7 +94,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }, [user, isLoading, router, pathname]);
   
-  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/GCashConfirm-Mockup' || pathname === '/';
+  const isSpecialPage = pathname === '/login' || pathname === '/signup' || pathname === '/GCashRedirect-Mockup' || pathname === '/GCashConfirm-Mockup' || pathname === '/get-started';
 
   if (isLoading) {
     return (
