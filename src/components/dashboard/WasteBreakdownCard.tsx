@@ -85,7 +85,7 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                 <CardDescription className="text-xs">By food category based on cost.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="flex justify-center items-center">
                     <div className="w-full h-[200px]">
                          <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -107,17 +107,6 @@ export function WasteBreakdownCard({ wasteLogs }: WasteBreakdownCardProps) {
                                 <Tooltip content={<CustomTooltip />} />
                             </PieChart>
                         </ResponsiveContainer>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                        {categoryData.map((entry, index) => (
-                           <div key={entry.name} className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                     <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
-                                     <span className="font-medium">{EMOJIS[entry.name] || '🍽️'} {entry.name}</span>
-                                </div>
-                                <span className="font-semibold">{entry.value.toFixed(1)}%</span>
-                           </div>
-                        ))}
                     </div>
                 </div>
             </CardContent>
