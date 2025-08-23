@@ -217,6 +217,7 @@ export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 
 export const KitchenCoachOutputSchema = z.object({
   insightType: z.enum(['pattern_detected', 'getting_started', 'first_steps', 're_engagement', 'connect_the_dots']),
+  priority: z.enum(['critical', 'high', 'medium', 'low']),
   confidence: z.enum(['high', 'medium', 'low']),
   title: z.string().describe("A clear, specific pattern name (e.g., 'Weekend Vegetable Overbuying')"),
   story: z.object({
@@ -225,6 +226,7 @@ export const KitchenCoachOutputSchema = z.object({
     rootCause: z.array(z.string()).describe("Why this happens (psychological/cultural reasons, referencing the user persona, 2-3 bullets)"),
   }),
   prediction: z.string().describe("What happens if nothing changes (specific timeline)"),
+  disclaimer: z.string().describe("A standard disclaimer that values are AI-estimated."),
 });
 export type KitchenCoachOutput = z.infer<typeof KitchenCoachOutputSchema>;
 
@@ -248,7 +250,7 @@ export const GetCoachSolutionsOutputSchema = z.object({
     timeToSee: z.string().describe("Days/weeks until results"),
     estimatedSavings: z.number().describe("A single, one-time estimated savings value in PHP."),
     successRate: z.number().describe("Success rate from 0 to 1"),
-    filipinoContext: z.string().describe("Why this works for Filipino families"),
+    whyItWorks: z.string().describe("The reasoning behind why this solution is effective."),
   })),
   quickWin: z.string().describe("One thing to try today"),
   encouragement: z.string().describe("Personalized motivational message referencing user progress"),

@@ -43,6 +43,15 @@ You have two key data sources: "summaryMetrics" for a high-level overview, and "
     - Prediction: "If this continues, you could lose over ₱XXXX in the next 6 months."
 6.  **Confidence & Priority**: You must assess your own analysis. Is the data strong? (confidence). Is the issue costly? (priority).
 
+## RESPONSIBLE AI REQUIREMENTS
+- All numbers (peso, CO₂e, usage rates) must be clearly framed as "AI-estimates".
+- Avoid stereotyping. Always ground analysis in user’s actual data first.
+- Never include personal identifiers in examples.
+- Add a "confidence" field to indicate reliability.
+- Include a "disclaimer" field in the JSON output:
+  "These are AI-estimated values based on your logged patterns. Actual results may vary."
+
+
 Generate a single JSON object that strictly follows the output schema. Ensure all fields are populated.
 `,
 });
@@ -58,6 +67,7 @@ const kitchenCoachFlow = ai.defineFlow(
     // Basic validation for getting_started case
     if (input.summaryMetrics.pantry.totalItems === 0 && input.summaryMetrics.waste.daysSinceLastLog === -1) {
         return {
+            insightType: 'first_steps',
             priority: 'critical',
             confidence: 'high',
             behavioralProfile: {
@@ -86,7 +96,8 @@ const kitchenCoachFlow = ai.defineFlow(
                 shortTerm: "By logging your first few pantry items and any food waste, you'll unlock your first personalized insight within a week.",
                 longTerm: "Consistent tracking over the next few months can lead to significant savings and a more sustainable lifestyle.",
                 potentialSavings: 2500
-            }
+            },
+            disclaimer: "Welcome! Start logging to get personalized, AI-estimated insights."
         };
     }
     
