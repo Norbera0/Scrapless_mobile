@@ -1,4 +1,5 @@
 
+
 /**
  * @fileOverview This file defines shared Zod schemas for Genkit flows.
  */
@@ -192,11 +193,25 @@ export const GenerateShoppingListOutputSchema = z.object({
 export type GenerateShoppingListOutput = z.infer<typeof GenerateShoppingListOutputSchema>;
 
 // Kitchen Coach Schemas
+const UserSettingsSchema = z.object({
+    language: z.enum(['en', 'fil']).optional(),
+    savingsGoal: z.number().optional(),
+    householdSize: z.enum(['1', '2', '3-4', '5+']).optional(),
+    monthlyBudget: z.enum(['under_3k', '3k_6k', '6k_10k', 'over_10k']).optional(),
+    dietaryRestrictions: z.array(z.string()).optional(),
+    foodAllergies: z.string().optional(),
+    cookingFrequency: z.enum(['daily', '4_5_times', '2_3_times', 'rarely']).optional(),
+    shoppingLocations: z.array(z.string()).optional(),
+    primaryGoal: z.string().optional(),
+    otherGoal: z.string().optional(),
+    notes: z.string().optional(),
+});
 
 // Schema for the main analysis flow
 export const KitchenCoachInputSchema = z.object({
   summaryMetrics: z.any(), // Keeping this flexible for now
   rawData: z.any(),
+  userSettings: UserSettingsSchema.optional(),
 });
 export type KitchenCoachInput = z.infer<typeof KitchenCoachInputSchema>;
 

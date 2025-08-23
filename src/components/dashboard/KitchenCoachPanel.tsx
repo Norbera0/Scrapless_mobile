@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect } from 'react';
@@ -15,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
+import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { formatDistanceToNow, isBefore, parseISO } from 'date-fns';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Badge } from '../ui/badge';
@@ -29,6 +31,7 @@ export function KitchenCoachPanel() {
     const { logs } = useWasteLogStore();
     const { liveItems, archivedItems } = usePantryLogStore();
     const { savingsEvents } = useSavingsStore();
+    const { settings } = useUserSettingsStore();
 
     // Zustand store for coach state
     const {
@@ -63,7 +66,8 @@ export function KitchenCoachPanel() {
                     recentPantryLogs: liveItems.slice(0,10).map(i => ({ date: i.addedDate, items: [{name: i.name, estimatedCost: i.estimatedCost }]})),
                     recentUsageLogs: archivedItems.filter(i => i.status === 'used').slice(0, 5).map(i => ({ name: i.name, dateAdded: i.addedDate, dateUsed: i.usedDate })),
                     recentSavingsEvents: savingsEvents.slice(0,5).map(e => ({ type: e.type, amount: e.amount, date: e.date, description: e.description })),
-                }
+                },
+                userSettings: settings,
             };
 
             const tip = await getCoachAdvice(input);
