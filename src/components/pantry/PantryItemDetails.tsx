@@ -192,7 +192,7 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onEdit }: P
             
             if (savedAmount > 0) {
                  toast({ 
-                    title: "✅ Great save!", 
+                    title: "✅ Waste Prevented!", 
                     description: `You avoided losing ₱${savedAmount.toFixed(2)} by using your ${item.name} just in time.`
                 });
             } else {
