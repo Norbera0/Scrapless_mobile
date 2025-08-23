@@ -237,72 +237,77 @@ export default function KitchenCoachPage() {
                 {!isGenerating && !isFetchingSolutions && analysis && solutions && (
                     <div className="grid gap-6">
                         {/* Analysis Section */}
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
-                                    </div>
-                                    <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                                        <Bot className="w-3 h-3 mr-1" />
-                                        AI-Generated
-                                    </Badge>
-                                </div>
-                                {lastGenerated && (
-                                    <p className="text-xs text-muted-foreground">
-                                        {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
-                                    </p>
-                                )}
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="font-semibold text-foreground">{analysis.title}</p>
-                                <Accordion type="single" collapsible className="w-full">
-                                    <AccordionItem value="situation">
-                                        <AccordionTrigger>
-                                            <span className="flex items-center gap-2 font-semibold"><Target className="text-primary" /> What's Happening</span>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
-                                                {analysis.story.situation.map((s, i) => <li key={i}>{s}</li>)}
-                                            </ul>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                     <AccordionItem value="rootCause">
-                                        <AccordionTrigger>
-                                            <span className="flex items-center gap-2 font-semibold"><HelpCircle className="text-primary" /> The Root Cause</span>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
-                                                {analysis.story.rootCause.map((s, i) => <li key={i}>{s}</li>)}
-                                            </ul>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                    <AccordionItem value="impact">
-                                        <AccordionTrigger>
-                                            <span className="flex items-center gap-2 font-semibold"><Wallet className="text-red-600" /> Financial Impact</span>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            <p className="text-sm text-muted-foreground pl-2">{analysis.story.impact}</p>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                    <AccordionItem value="prediction">
-                                        <AccordionTrigger>
-                                            <span className="flex items-center gap-2 font-semibold"><AlertTriangle className="text-amber-600" /> Prediction</span>
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            <p className="text-sm text-muted-foreground pl-2">{analysis.prediction}</p>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-                            </CardContent>
-                        </Card>
+                        <div>
+                             <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+                                    <Brain className="text-primary" /> The Analysis
+                                </h2>
+                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                    <Bot className="w-3 h-3 mr-1" />
+                                    AI-Generated
+                                </Badge>
+                            </div>
+                            {lastGenerated && (
+                                <p className="text-xs text-muted-foreground mb-4">
+                                    {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
+                                </p>
+                            )}
+                            <Card>
+                                <CardContent className="space-y-4 pt-6">
+                                    <p className="font-semibold text-foreground">{analysis.title}</p>
+                                    <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="situation">
+                                            <AccordionTrigger>
+                                                <span className="flex items-center gap-2 font-semibold"><Target className="text-primary" /> What's Happening</span>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
+                                                    {analysis.story.situation.map((s, i) => <li key={i}>{s}</li>)}
+                                                </ul>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                         <AccordionItem value="rootCause">
+                                            <AccordionTrigger>
+                                                <span className="flex items-center gap-2 font-semibold"><HelpCircle className="text-primary" /> The Root Cause</span>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 pl-2">
+                                                    {analysis.story.rootCause.map((s, i) => <li key={i}>{s}</li>)}
+                                                </ul>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                        <AccordionItem value="impact">
+                                            <AccordionTrigger>
+                                                <span className="flex items-center gap-2 font-semibold"><Wallet className="text-red-600" /> Financial Impact</span>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <p className="text-sm text-muted-foreground pl-2">{analysis.story.impact}</p>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                        <AccordionItem value="prediction">
+                                            <AccordionTrigger>
+                                                <span className="flex items-center gap-2 font-semibold"><AlertTriangle className="text-amber-600" /> Prediction</span>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <p className="text-sm text-muted-foreground pl-2">{analysis.prediction}</p>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    </Accordion>
+                                </CardContent>
+                            </Card>
+                        </div>
 
                         {/* Replace the Solutions Section with this code */}
                         <div>
-                            <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2">
-                                <Lightbulb className="text-primary" />
-                                Actionable Solutions
-                            </h2>
+                            <div className="flex justify-between items-center mb-2">
+                                <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+                                    <Lightbulb className="text-primary" /> Actionable Solutions
+                                </h2>
+                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                    <Bot className="w-3 h-3 mr-1" />
+                                    AI-Generated
+                                </Badge>
+                            </div>
                             <Carousel
                                 opts={{
                                     align: "start",
