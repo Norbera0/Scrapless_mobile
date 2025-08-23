@@ -69,7 +69,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                     size="sm" 
                     onClick={onSelect} 
                     disabled={isUpdating}
-                    variant={isSelected ? 'default' : 'secondary'}
+                    className={isSelected ? '' : 'bg-primary hover:bg-primary/90'}
                  >
                     {isUpdating ? 
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
@@ -114,7 +114,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 15000); // 15 seconds
+            }, 90000); // 15 seconds * 6
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
@@ -320,11 +320,11 @@ export default function KitchenCoachPage() {
                                     slidesToScroll: 1,
                                     loop: false,
                                 }}
-                                className="w-full"
+                                className="w-full -ml-2"
                             >
                                 <CarouselContent className="-ml-1">
                                     {solutions.solutions.map((solution, index) => (
-                                        <CarouselItem key={index} className="basis-[90%] md:basis-1/2 lg:basis-1/3 pl-3">
+                                        <CarouselItem key={index} className="basis-[80%] sm:basis-1/2 lg:basis-1/3 pl-3">
                                             <div className="p-1 h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
