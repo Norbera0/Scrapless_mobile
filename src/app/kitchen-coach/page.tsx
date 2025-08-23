@@ -48,28 +48,21 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                 <CardDescription className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
-                <div>
-                    <Accordion type="single" collapsible className="w-full mb-4">
-                        <AccordionItem value="details">
-                            <AccordionTrigger>View Details</AccordionTrigger>
-                            <AccordionContent className="space-y-3 pt-2">
-                                 <p className="text-sm text-muted-foreground">{solution.description}</p>
-                                <div className="space-y-1">
-                                    <div className="flex justify-between items-center text-xs text-muted-foreground">
-                                        <span>Success Rate</span>
-                                        <span>{Math.round(solution.successRate * 100)}%</span>
-                                    </div>
-                                    <Progress value={solution.successRate * 100} className="h-2" />
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
+                <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">{solution.description}</p>
+                    <div className="space-y-1">
+                        <div className="flex justify-between items-center text-xs text-muted-foreground">
+                            <span>Success Rate</span>
+                            <span>{Math.round(solution.successRate * 100)}%</span>
+                        </div>
+                        <Progress value={solution.successRate * 100} className="h-2" />
+                    </div>
                 </div>
                  <Button 
                     size="sm" 
                     onClick={onSelect} 
                     disabled={isUpdating}
-                    className="bg-primary hover:bg-primary/90"
+                    className="mt-4 bg-primary hover:bg-primary/90"
                  >
                     {isUpdating ? 
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
@@ -312,20 +305,18 @@ export default function KitchenCoachPage() {
                         </Card>
 
                         {/* Solutions Section */}
-                        {/*
+                        
                         <div>
                             <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
                             <Carousel
                                 opts={{
                                     align: "start",
-                                    slidesToScroll: 1,
-                                    loop: false,
                                 }}
-                                className="w-full -ml-2"
+                                className="w-full -ml-4"
                             >
-                                <CarouselContent className="-ml-1">
+                                <CarouselContent>
                                     {solutions.solutions.map((solution, index) => (
-                                        <CarouselItem key={index} className="basis-[80%] sm:basis-1/2 lg:basis-1/3 pl-3">
+                                        <CarouselItem key={index} className="basis-full md:basis-1/2 lg:basis-1/3 pl-4">
                                             <div className="p-1 h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
@@ -339,7 +330,7 @@ export default function KitchenCoachPage() {
                                 </CarouselContent>
                             </Carousel>
                         </div>
-                        */}
+                        
 
                         {/* Quick Win & Encouragement */}
                         <div className="grid md:grid-cols-2 gap-4">
