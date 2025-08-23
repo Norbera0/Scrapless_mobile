@@ -19,6 +19,11 @@ import { Accordion, AccordionItem, AccordionTrigger } from '@/components/ui/acco
 import { ProfilePolicyDialog } from '@/components/auth/ProfilePolicyDialog';
 import { privacyPolicy, termsAndConditions } from '@/lib/legal';
 import { Label } from '@/components/ui/label';
+import { useCoachStore } from '@/stores/coach-store';
+import { useRecipeStore } from '@/stores/recipe-store';
+import { useShoppingListStore } from '@/stores/shopping-list-store';
+import { useChatStore } from '@/stores/chat-store';
+import { useWasteInsightStore } from '@/stores/waste-insight-store';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -39,6 +44,14 @@ export default function ProfilePage() {
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
+            // Clear all persisted local storage data from Zustand stores
+            useCoachStore.persist.clearStorage();
+            useRecipeStore.persist.clearStorage();
+            useShoppingListStore.persist.clearStorage();
+            useChatStore.persist.clearStorage();
+            useWasteInsightStore.persist.clearStorage();
+            
+            // Clean up all Firestore listeners
             cleanupListeners();
             await signOut(auth);
             toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });

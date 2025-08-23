@@ -40,11 +40,6 @@ import { auth } from '@/lib/firebase';
 import { cleanupListeners } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { useCoachStore } from '@/stores/coach-store';
-import { useRecipeStore } from '@/stores/recipe-store';
-import { useShoppingListStore } from '@/stores/shopping-list-store';
-import { useChatStore } from '@/stores/chat-store';
-import { useWasteInsightStore } from '@/stores/waste-insight-store';
 
 export function SidebarNav({ user }: { user: UserType }) {
   const pathname = usePathname();
@@ -53,13 +48,6 @@ export function SidebarNav({ user }: { user: UserType }) {
 
   const handleLogout = async () => {
     try {
-        // Clear all persisted local storage data
-        useCoachStore.persist.clearStorage();
-        useRecipeStore.persist.clearStorage();
-        useShoppingListStore.persist.clearStorage();
-        useChatStore.persist.clearStorage();
-        useWasteInsightStore.persist.clearStorage();
-
         // Clean up all Firestore listeners
         cleanupListeners();
         // Then, sign out from Firebase Auth
