@@ -51,13 +51,13 @@ Based *only* on the provided analysis and user context, generate a complete solu
 
 **OUTPUT REQUIREMENTS**
 1.  **Analysis Summary**: Create a compelling 2-3 sentence summary that explains the user's pattern in relatable terms, mentions the impact, and sets up the solutions positively.
-2.  **Generate Solutions**: Create a list of 2-3 tailored solutions. For the titles, use creative and engaging names like "Plan your meals", "FIFO Fridge Organization", or "The Kangkong Challenge" where appropriate for the context.
+2.  **Generate Solutions**: Create a list of 2-5 tailored solutions. For the titles, use creative and engaging names like "Plan your meals", "FIFO Fridge Organization", or "The Kangkong Challenge" where appropriate for the context.
 3.  **Dynamic Difficulty**: The solutions MUST be tailored based on \`userContext.userStage\` and \`userContext.previouslyAttemptedSolutions\`.
     -   If a solution has been previously attempted, DO NOT suggest it again.
     -   For 'advanced_user', provide "Level Up" challenges instead of basic tips.
     -   For 'new_user', provide simple, foundational habits.
 4.  **Filipino Context**: Ensure solutions are practical and relatable for a Filipino household.
-5.  **One-Time Savings**: For the 'estimatedSavings' field, provide a single, one-time estimated savings value in PHP, NOT a monthly recurring value. For example, if a solution helps save a specific item worth ₱100, the value should be 100.
+5.  **Credible Savings**: For the 'estimatedSavings' field, provide a single, one-time estimated savings value in PHP. This value **must be realistic** and **at least 100 PHP**. The saving should be logically tied to preventing a specific waste pattern identified in the analysis (e.g., saving a specific type of spoiled vegetable worth over ₱100). Do not use arbitrary numbers.
 6.  **Quick Win & Encouragement**: Provide one quick win for today and a motivational message.
 
 Generate the output as a single JSON object that strictly follows the output schema.
@@ -80,7 +80,7 @@ const getCoachSolutionsFlow = ai.defineFlow(
           description: "Go to the 'Add to Pantry' section and use your camera to quickly log what's in your fridge or shelves.",
           difficulty: 'easy',
           timeToSee: '1 day',
-          estimatedSavings: 50,
+          estimatedSavings: 100, // Starting bonus
           successRate: 0.95,
           filipinoContext: "Knowing what's in the pantry is the first step to any Filipino meal plan."
         }],
