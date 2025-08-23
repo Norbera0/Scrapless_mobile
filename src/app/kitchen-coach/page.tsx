@@ -100,7 +100,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 90000); // 15 seconds * 6
+            }, 6000); // 6 seconds
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
@@ -297,8 +297,7 @@ export default function KitchenCoachPage() {
                             </CardContent>
                         </Card>
 
-                        {/* Solutions Section */}
-                        
+                        {/* Replace the Solutions Section with this code */}
                         <div>
                             <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2">
                                 <Lightbulb className="text-primary" />
@@ -314,7 +313,7 @@ export default function KitchenCoachPage() {
                                     {solutions.solutions.map((solution, index) => (
                                         <CarouselItem 
                                             key={index} 
-                                            className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
+                                            className="pl-2 md:pl-4 basis-[85%] sm:basis-[80%] md:basis-[48%] lg:basis-[32%]"
                                         >
                                             <div className="h-full">
                                                 <SolutionCard 
