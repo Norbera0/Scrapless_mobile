@@ -18,36 +18,32 @@ const prompt = ai.definePrompt({
   name: 'kitchenCoachPrompt',
   input: { schema: KitchenCoachInputSchema },
   output: { schema: KitchenCoachOutputSchema },
-  prompt: `You are a Personal Kitchen Economist and Behavioral Coach for Scrapless, a Filipino-centric app. Your specialty is analyzing household data to find the economic root cause of food waste.
+  prompt: `You are a Personal Kitchen Economist and Behavioral Coach for Scrapless, a Filipino-centric app. Your specialty is analyzing household data to find the economic and behavioral root cause of food waste. You are an expert in Filipino food culture, the "sayang" mentality, and household dynamics.
 
-Your task is to provide a single, quick insight based on the user's data. This should be a 1-2 sentence overview.
+Your task is to provide a single, deeply analytical insight based on the user's comprehensive data. This is NOT just a data summary; it's a narrative diagnosis.
 
-## USER CONTEXT
-You MUST tailor your analysis and tone based on these user settings. For example, if their goal is to save money, frame your insights around financial loss. If they have a large household, consider bulk buying patterns.
+## USER CONTEXT & SETTINGS
+You MUST tailor your analysis and tone based on these user settings. This is the lens through which you must view all other data.
 - **Household Size:** {{userSettings.householdSize}}
 - **Monthly Grocery Budget:** {{userSettings.monthlyBudget}}
-- **Primary Goal:** {{userSettings.primaryGoal}}
-- **User Notes:** {{userSettings.notes}}
+- **Primary Goal:** {{userSettings.primaryGoal}} (e.g., save money, reduce waste)
+- **User Notes:** "{{userSettings.notes}}"
 
 ## INPUT DATA STRUCTURE
-The input will be a single JSON object with two keys: "summaryMetrics" and "rawData". Use "summaryMetrics" for high-level pattern recognition and "rawData" to find specific examples for storytelling.
+You have two key data sources: "summaryMetrics" for a high-level overview, and "rawData" for finding the specific "smoking gun" examples to build your story. Your analysis MUST connect these two.
 
-## OUTPUT REQUIREMENTS
+## ANALYSIS & OUTPUT REQUIREMENTS
 
-Generate a single analysis focusing on the most impactful pattern. The 'title' must be a short, engaging 1-2 sentence insight. After the insight, add the sentence: "To learn more go to the Kitchen Coach to ask for more advice."
+1.  **Persona**: Adopt a supportive but expert tone. Use Filipino context (e.g., "sulit," "palengke," "sayang") where natural.
+2.  **Core Task**: Find the *single most impactful pattern* in the user's data. Do not list multiple, unrelated observations. Your entire output should revolve around this one core insight.
+3.  **Use Raw Data**: Your analysis is weak without proof. You MUST cite specific examples from the \`rawData\` to support your claims. For instance, if you identify a pattern of wasting vegetables, you should mention a specific vegetable from their waste logs (e.g., "like the Kangkong you threw out last Tuesday").
+4.  **Connect the Dots**: The magic is in connecting different data types. Link their `shoppingPattern` from the behavioral profile to their `pantryItems` source. Connect their `wasteLogs` to their `savingsEvents`. Show them the cause and effect.
+5.  **Quantify Everything**: Do not be vague. Use the peso values and dates provided in the raw data.
+    - Financial Impact: "This cost you ₱XXX this month."
+    - Prediction: "If this continues, you could lose over ₱XXXX in the next 6 months."
+6.  **Confidence & Priority**: You must assess your own analysis. Is the data strong? (confidence). Is the issue costly? (priority).
 
-The output JSON must strictly follow this schema.
-{
-  "insightType": "pattern_detected|getting_started|first_steps|re_engagement|connect_the_dots",
-  "confidence": "high|medium|low",
-  "title": "A short 1-2 sentence insight about the user's patterns, ending with a call to action to visit the main coach page.",
-  "story": {
-    "situation": ["A list of 2-3 concise bullet points describing what's happening, citing a 'smoking gun' example. E.g., ['On Saturday you bought fresh Kangkong...', 'But it was logged as 'wasted' on Friday...', 'This is an 8-day lag...']"],
-    "impact": "Financial + environmental cost (specific numbers)",
-    "rootCause": ["Why this happens (psychological/cultural reasons, referencing the user persona, 2-3 bullets)"]
-  },
-  "prediction": "What happens if nothing changes (specific timeline)"
-}
+Generate a single JSON object that strictly follows the output schema. Ensure all fields are populated.
 `,
 });
 
@@ -56,21 +52,41 @@ const kitchenCoachFlow = ai.defineFlow(
     name: 'kitchenCoachFlow',
     inputSchema: KitchenCoachInputSchema,
     outputSchema: KitchenCoachOutputSchema,
-    model: 'googleai/gemini-live-2.5-flash-lite',
+    model: 'googleai/gemini-pro',
   },
   async (input) => {
     // Basic validation for getting_started case
     if (input.summaryMetrics.pantry.totalItems === 0 && input.summaryMetrics.waste.daysSinceLastLog === -1) {
         return {
-            insightType: 'first_steps',
+            priority: 'critical',
             confidence: 'high',
-            title: "Welcome to Your Smart Kitchen! Log your pantry items and any food waste to begin unlocking powerful insights. To learn more go to the Kitchen Coach to ask for more advice.",
-            story: {
-              situation: ["Your kitchen journey starts now.", "Log your pantry items and any food waste to begin."],
-              impact: "Unlock potential savings of up to ₱2,500/month by tracking your habits.",
-              rootCause: ["Most food waste happens simply because we don't track what we have.", "Getting started is the hardest part, but you're here now!"]
+            behavioralProfile: {
+                shoppingPattern: 'unknown',
+                cookingPattern: 'unknown',
+                planningLevel: 'beginner',
+                riskFactors: ['No data available.'],
+                strengths: ['Ready to start!'],
             },
-            prediction: "By logging your first few items, you'll be on track to see your first insight in a week.",
+            story: {
+              title: "Welcome to Your Smart Kitchen!",
+              narrative: "Your journey to reducing waste and saving money starts now. The first step is to let your Kitchen Coach get to know your habits.",
+              wastePattern: {
+                primaryCategory: 'None',
+                frequency: 'N/A',
+                triggerEvents: ['N/A'],
+                seasonality: 'N/A'
+              },
+              impact: {
+                financial: "You have the potential to save up to ₱2,500 per month by consistently tracking your habits.",
+                environmental: "Every item you save makes a difference for the environment.",
+                behavioral: "Building the habit of logging is the first step to mindful consumption."
+              }
+            },
+            prediction: {
+                shortTerm: "By logging your first few pantry items and any food waste, you'll unlock your first personalized insight within a week.",
+                longTerm: "Consistent tracking over the next few months can lead to significant savings and a more sustainable lifestyle.",
+                potentialSavings: 2500
+            }
         };
     }
     
@@ -84,10 +100,3 @@ const kitchenCoachFlow = ai.defineFlow(
     return output;
   }
 );
-
-    
-
-
-
-
-
