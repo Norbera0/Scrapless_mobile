@@ -226,6 +226,12 @@ export default function KitchenCoachPage() {
                     </Button>
                 </div>
 
+                {lastGenerated && (
+                    <p className="text-xs text-muted-foreground -mt-4">
+                        Insights generated: {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
+                    </p>
+                )}
+
                 {(isGenerating || isFetchingSolutions) && (
                     <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-16">
                         <Loader2 className="h-12 w-12 animate-spin mb-4" />
@@ -247,11 +253,6 @@ export default function KitchenCoachPage() {
                                     AI-Generated
                                 </Badge>
                             </div>
-                            {lastGenerated && (
-                                <p className="text-xs text-muted-foreground mb-4">
-                                    {formatDistanceToNow(parseISO(lastGenerated), { addSuffix: true })}
-                                </p>
-                            )}
                             <Card>
                                 <CardContent className="space-y-4 pt-6">
                                     <p className="font-semibold text-foreground">{analysis.title}</p>
@@ -297,7 +298,7 @@ export default function KitchenCoachPage() {
                             </Card>
                         </div>
 
-                        {/* Replace the Solutions Section with this code */}
+                        {/* Solutions Section */}
                         <div>
                             <div className="flex justify-between items-center mb-2">
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
@@ -334,7 +335,6 @@ export default function KitchenCoachPage() {
                             </Carousel>
                         </div>
                         
-
                         {/* Quick Win & Encouragement */}
                         <div className="grid md:grid-cols-2 gap-4">
                             <Card>
