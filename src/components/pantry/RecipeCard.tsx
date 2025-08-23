@@ -68,7 +68,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                                 <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                             ) : (
                                 <div className="w-full h-full bg-muted flex items-center justify-center">
-                                    <ImageOff className="w-10 h-10 text-muted-foreground" />
+                                    <CookingPot className="w-10 h-10 text-muted-foreground" />
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
@@ -109,11 +109,15 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
             {/* Modal Content */}
             <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
-                    {recipe.photoDataUri && (
-                        <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
+                    <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
+                        {recipe.photoDataUri ? (
                             <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
-                        </div>
-                    )}
+                        ) : (
+                             <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <CookingPot className="w-12 h-12 text-muted-foreground" />
+                            </div>
+                        )}
+                    </div>
                     <DialogTitle>{recipe.name}</DialogTitle>
                     <DialogDescription>
                         {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
