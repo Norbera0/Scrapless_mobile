@@ -115,7 +115,7 @@ export default function KitchenCoachPage() {
             intervalId = setInterval(() => {
                 step = (step + 1) % loadingSteps.length;
                 setLoadingMessage(loadingSteps[step]);
-            }, 2500);
+            }, 15000); // 15 seconds
         } else {
             setLoadingMessage(loadingSteps[0]); // Reset
         }
@@ -235,7 +235,7 @@ export default function KitchenCoachPage() {
                         ) : (
                             <>
                                 <Sparkles className="mr-2 h-4 w-4" />
-                                Ask for Advice
+                                Get New Advice
                             </>
                         )}
                     </Button>
@@ -321,10 +321,11 @@ export default function KitchenCoachPage() {
                                     slidesToScroll: 1,
                                     loop: false,
                                 }}
+                                className="w-full"
                             >
                                 <CarouselContent className="-ml-1">
                                     {solutions.solutions.map((solution, index) => (
-                                        <CarouselItem key={index} className="basis-[85%] md:basis-1/2 lg:basis-1/3 pl-3">
+                                        <CarouselItem key={index} className="basis-[90%] md:basis-1/2 lg:basis-1/3 pl-3">
                                             <div className="p-1 h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
