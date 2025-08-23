@@ -13,7 +13,7 @@ export default function BpiPage() {
     return (
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center gap-3">
-                <Image src="/bpi-logo.png" alt="BPI Logo" width={40} height={40} />
+                <Image src="/bpi-logo-2.png" alt="BPI Logo" width={40} height={40} />
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight">BPI Integration</h1>
                     <p className="text-muted-foreground text-sm">
