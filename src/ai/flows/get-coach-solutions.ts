@@ -63,7 +63,7 @@ Based *only* on the provided analysis and user context, generate a complete solu
 ## RESPONSIBLE AI REQUIREMENTS
 - All numbers (peso, savings) must be clearly framed as "AI-estimates".
 - Avoid stereotyping. Always ground analysis in the user’s actual data first.
-- Provide a clear `whyItWorks` reason for each solution.
+- Provide a clear \`whyItWorks\` reason for each solution.
 
 Generate the output as a single JSON object that strictly follows the output schema.
 `,
