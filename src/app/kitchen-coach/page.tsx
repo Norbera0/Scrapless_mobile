@@ -18,12 +18,11 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { format, parseISO, startOfMonth, formatDistanceToNow } from 'date-fns';
 import { KitchenCoachWizard } from '@/components/coach/KitchenCoachWizard';
-import { useBpiTrackPlanStore } from '@/stores/bpiTrackPlanStore';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useCoachStore } from '@/stores/coach-store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -315,13 +314,13 @@ export default function KitchenCoachPage() {
                                 }}
                                 className="w-full"
                             >
-                                <CarouselContent>
+                                <CarouselContent className="-ml-2 md:-ml-4">
                                     {solutions.solutions.map((solution, index) => (
                                         <CarouselItem 
                                             key={index} 
-                                            className="basis-[85%] sm:basis-[80%] md:basis-[48%] lg:basis-[32%]"
+                                            className="pl-2 md:pl-4 basis-[85%] sm:basis-[80%] md:basis-[48%] lg:basis-[32%]"
                                         >
-                                            <div className="h-full p-1">
+                                            <div className="h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
                                                     onSelect={() => handleSelectSolution(solution.title)} 
