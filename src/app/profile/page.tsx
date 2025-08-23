@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles } from 'lucide-react';
+import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles, Shield } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
@@ -18,6 +18,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { ProfilePolicyDialog } from '@/components/auth/ProfilePolicyDialog';
+import { privacyPolicy, termsAndConditions } from '@/lib/legal';
+
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -200,6 +204,35 @@ export default function ProfilePage() {
                             <Label htmlFor="lang-fil" className={settings.language === 'fil' ? 'font-semibold' : 'text-muted-foreground'}>FIL</Label>
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Legal Section */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2"><Shield className="w-5 h-5 text-primary" />Legal</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="terms">
+                            <AccordionTrigger>
+                                <ProfilePolicyDialog
+                                  linkText="Terms & Conditions"
+                                  title="Terms & Conditions"
+                                  content={termsAndConditions}
+                                />
+                            </AccordionTrigger>
+                        </AccordionItem>
+                        <AccordionItem value="privacy">
+                            <AccordionTrigger>
+                                <ProfilePolicyDialog
+                                  linkText="Privacy Policy"
+                                  title="Privacy Policy"
+                                  content={privacyPolicy}
+                                />
+                            </AccordionTrigger>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
             
