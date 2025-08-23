@@ -194,7 +194,7 @@ export default function KitchenCoachPage() {
 
     return (
         <>
-            <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full pb-16">
+            <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full pb-24">
                  <div className="flex items-start justify-between">
                     <div className="space-y-1">
                         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
@@ -315,13 +315,13 @@ export default function KitchenCoachPage() {
                                 }}
                                 className="w-full"
                             >
-                                <CarouselContent className="-ml-2 md:-ml-4">
+                                <CarouselContent>
                                     {solutions.solutions.map((solution, index) => (
                                         <CarouselItem 
                                             key={index} 
-                                            className="pl-2 md:pl-4 basis-[85%] sm:basis-[80%] md:basis-[48%] lg:basis-[32%]"
+                                            className="basis-[85%] sm:basis-[80%] md:basis-[48%] lg:basis-[32%]"
                                         >
-                                            <div className="h-full">
+                                            <div className="h-full p-1">
                                                 <SolutionCard 
                                                     solution={solution} 
                                                     onSelect={() => handleSelectSolution(solution.title)} 
