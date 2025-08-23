@@ -20,6 +20,8 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { useAuth } from '@/hooks/use-auth';
 import { updatePantryItemStatus } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
+import { calculateAndSaveAvoidedExpiry } from '@/lib/savings';
+import { useRouter } from 'next/navigation';
 
 interface PantryItemCardProps {
     item: PantryItem;
@@ -60,15 +62,29 @@ export function PantryItemCard({ item, onSelect, onEdit, onDelete, isDeleting }:
     const archiveItem = usePantryLogStore((state) => state.archiveItem);
     const { user } = useAuth();
     const { toast } = useToast();
+    const router = useRouter();
 
     const handleUseNow = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if(!user) return;
+
+        // Perform the same logic as in the details view for consistency
         archiveItem(item.id, 'used');
-        await updatePantryItemStatus(user.uid, item.id, 'used').catch(err => {
-            console.error("Failed to mark item as used on server", err);
-        });
-        toast({ title: "Item used!", description: `You've used "${item.name}".`});
+        updatePantryItemStatus(user.uid, item.id, 'used').catch(console.error);
+        
+        const savedAmount = await calculateAndSaveAvoidedExpiry(user, item, 1.0);
+
+        if (savedAmount > 0) {
+            toast({
+                title: "✅ Waste Prevented!",
+                description: `You avoided losing ₱${savedAmount.toFixed(2)} on your ${item.name}. Visit 'My Savings' to learn more.`,
+            });
+        } else {
+            toast({
+                title: "Item used!",
+                description: `You've logged the usage of "${item.name}".`,
+            });
+        }
     }
 
     const borderColorClass = {
