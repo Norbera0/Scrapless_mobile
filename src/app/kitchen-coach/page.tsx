@@ -40,28 +40,28 @@ const loadingSteps = [
 
 function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution: Solutions['solutions'][0], onSelect: () => void, isSelected: boolean, isUpdating: boolean }) {
     return (
-        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 h-full">
+        <Card className="bg-background flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 h-full min-w-0">
             <CardHeader>
-                <CardTitle className='text-base flex items-center gap-2'>
+                <CardTitle className='text-base flex items-center gap-2 leading-tight break-words'>
                     {solution.title}
                 </CardTitle>
                 <CardDescription className="text-lg font-bold text-green-600">💰 Save ~₱{solution.estimatedSavings}</CardDescription>
             </CardHeader>
             <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">{solution.description}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed break-words">{solution.description}</p>
                 </div>
                  <Button 
                     size="sm" 
                     onClick={onSelect} 
                     disabled={isUpdating}
-                    className="mt-4 bg-primary hover:bg-primary/90"
+                    className="mt-4 bg-primary hover:bg-primary/90 w-full"
                  >
                     {isUpdating ? 
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
-                        (isSelected ? <Check className="mr-2 h-4 w-4" /> : null)
+                        (isSelected ? <Check className="mr-2 h-3 w-3 sm:h-4 sm:w-4" /> : null)
                     }
-                    {isSelected ? "Working on it!" : `I'll try this`}
+                    <span className="truncate text-xs sm:text-sm">{isSelected ? "Working on it!" : `I'll try this`}</span>
                  </Button>
             </CardContent>
         </Card>
@@ -300,17 +300,23 @@ export default function KitchenCoachPage() {
                         {/* Solutions Section */}
                         
                         <div>
-                            <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
+                            <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2">
+                                <Lightbulb className="text-primary" />
+                                Actionable Solutions
+                            </h2>
                             <Carousel
                                 opts={{
                                     align: "start",
                                 }}
                                 className="w-full"
                             >
-                                <CarouselContent>
+                                <CarouselContent className="-ml-2 md:-ml-4">
                                     {solutions.solutions.map((solution, index) => (
-                                        <CarouselItem key={index} className="basis-[80%] sm:basis-1/2 lg:basis-1/3 pl-3">
-                                            <div className="p-1 h-full">
+                                        <CarouselItem 
+                                            key={index} 
+                                            className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
+                                        >
+                                            <div className="h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
                                                     onSelect={() => handleSelectSolution(solution.title)} 
