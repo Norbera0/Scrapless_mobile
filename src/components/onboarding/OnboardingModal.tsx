@@ -245,11 +245,15 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
             <p className="text-gray-600">
                 We’ve saved your preferences. Here’s how to get started:
             </p>
-            <div className="grid gap-3 text-left w-full max-w-sm">
-                <div className="flex items-center gap-3">🥘 <b>Log your food waste</b> — snap a photo or use voice</div>
-                <div className="flex items-center gap-3">📦 <b>Add food items to your pantry</b> — keep track & get recipes</div>
-                <div className="flex items-center gap-3">💰 <b>See how much you’ve saved</b> — money + CO₂ reduced</div>
-                <div className="flex items-center gap-3">🏦 <b>Grow your savings with BPI</b> — less waste, more savings</div>
+            <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-3 text-left w-full max-w-sm text-sm">
+                <div className="text-lg">🥘</div>
+                <div><b>Log your food waste</b> — snap a photo or use voice</div>
+                <div className="text-lg">📦</div>
+                <div><b>Add food items to your pantry</b> — track freshness & get recipes</div>
+                <div className="text-lg">💰</div>
+                <div><b>See how much you’ve saved</b> — money + CO₂ reduced</div>
+                <div className="text-lg">🏦</div>
+                <div><b>Grow your savings with BPI</b> — less waste, more savings</div>
             </div>
           </div>
       ),
@@ -260,7 +264,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-        if (!open && !isSaving) { // only allow close if not saving
+        if (!open && !isSaving) {
             onClose();
         }
     }}>
