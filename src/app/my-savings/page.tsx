@@ -92,9 +92,9 @@ export default function MySavingsPage() {
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Savings</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Waste-Free Wins</h1>
                     <p className="text-muted-foreground text-sm">
-                        Your virtual savings from reducing food waste.
+                        The value you've rescued from being wasted.
                     </p>
                 </div>
             </div>
@@ -107,7 +107,7 @@ export default function MySavingsPage() {
                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
                               <PiggyBank className="w-4 h-4" />
                             </div>
-                            Virtual Savings
+                            Waste-Free Wins Jar
                         </div>
                         <TooltipProvider>
                             <Tooltip>
@@ -115,7 +115,7 @@ export default function MySavingsPage() {
                                      <Info className="w-4 h-4 text-green-200 cursor-pointer" />
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p className="max-w-xs">Savings are calculated based on using items before they expire and following recipe suggestions instead of buying more expensive alternatives.</p>
+                                    <p className="max-w-xs">Value is recovered by using at-risk items before expiry and following smart recipe suggestions.</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -123,7 +123,7 @@ export default function MySavingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                      <div>
-                        <div className="text-sm text-green-200">Total Saved</div>
+                        <div className="text-sm text-green-200">Total Value Rescued</div>
                         <p className="text-4xl font-bold tracking-tighter">₱{total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     </div>
                      <div className="space-y-1 text-sm">
@@ -198,13 +198,12 @@ export default function MySavingsPage() {
                 </CardFooter>
             </Card>
 
-             <Card className="cursor-pointer hover:bg-secondary/50">
+             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center justify-between" onClick={() => router.push('/my-savings/history')}>
+                    <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2 text-base">
-                            <History /> Savings History
+                            <History /> Wins History
                         </span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </CardTitle>
                     <CardDescription>See how your smart habits are adding up.</CardDescription>
                 </CardHeader>
@@ -213,11 +212,22 @@ export default function MySavingsPage() {
                         <div className="space-y-3 pr-4">
                             {savingsEvents.map(event => (
                                 <div key={event.id} className="flex items-center justify-between">
-                                    <div>
+                                    <div className="flex-1">
                                         <p className="font-medium text-sm">{event.description}</p>
                                         <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMM d, h:mm a')}</p>
                                     </div>
-                                    <p className="font-semibold text-green-600 text-sm whitespace-nowrap">+ ₱{event.amount.toFixed(2)}</p>
+                                     <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <p className="font-semibold text-green-600 text-sm whitespace-nowrap cursor-help flex items-center gap-1">
+                                                    + ₱{event.amount.toFixed(2)} <Info className="w-3 h-3 text-muted-foreground" />
+                                                </p>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p className="text-xs max-w-xs">{event.calculationMethod}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             ))}
                         </div>

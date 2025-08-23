@@ -186,11 +186,22 @@ export function PantryItemDetails({ item, isOpen, onClose, onDelete, onEdit }: P
         if (!user) return;
         setIsUpdating(true);
         try {
-            calculateAndSaveAvoidedExpiry(user, itemWithCost, 1.0).catch(console.error);
+            const savedAmount = await calculateAndSaveAvoidedExpiry(user, itemWithCost, 1.0);
             archiveItem(itemWithCost.id, 'used');
             updatePantryItemStatus(user.uid, itemWithCost.id, 'used').catch(console.error);
             
-            toast({ title: "Item usage logged!", description: `You've used "${itemWithCost.name}".`});
+            if (savedAmount > 0) {
+                 toast({ 
+                    title: "✅ Great save!", 
+                    description: `You avoided losing ₱${savedAmount.toFixed(2)} by using your ${item.name} just in time.`
+                });
+            } else {
+                 toast({
+                    title: "Item used!",
+                    description: `You've logged the usage of "${itemWithCost.name}".`
+                 });
+            }
+           
             onClose();
         } catch (error) {
             console.error(`Failed to mark item as used`, error);

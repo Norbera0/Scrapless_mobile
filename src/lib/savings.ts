@@ -34,7 +34,7 @@ const getBaseUnit = (unit: string): string => {
  * Calculates savings based on a dynamic model of spoil probability and user behavior.
  * Also awards Green Points for using an item.
  */
-export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem, usageEfficiency: number) => {
+export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem, usageEfficiency: number): Promise<number> => {
     // Award Green Points for using an item
     const pointsConfig = GREEN_POINTS_CONFIG.use_pantry_item;
     const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
@@ -52,7 +52,7 @@ export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem
     const usedDate = startOfToday();
     const expiryDate = parseISO(item.estimatedExpirationDate);
     if (!item.estimatedCost || item.estimatedCost === 0 || usedDate > expiryDate) {
-        return;
+        return 0;
     }
 
     // 1. Get shelf life from the correct storage type
@@ -76,13 +76,13 @@ export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem
     const userWasteProb = userStats.logsCount >= 10 ? userStats.avgWasteRate : 0.25; // Fallback to 25%
 
     // 5. Usage efficiency is passed in directly (e.g., 1.0 for all, 0.5 for half)
-    if (usageEfficiency <= 0) return;
+    if (usageEfficiency <= 0) return 0;
 
     // 6. Final avoided expiry savings calculation
     const savings = item.estimatedCost * spoilProbability * userWasteProb * usageEfficiency;
     const finalSavings = roundToTwoDecimals(savings);
     
-    if (finalSavings <= 0) return;
+    if (finalSavings <= 0) return 0;
 
     // Create and save the savings event
     const savingsEvent: Omit<SavingsEvent, 'id'> = {
@@ -90,17 +90,19 @@ export const calculateAndSaveAvoidedExpiry = async (user: User, item: PantryItem
         date: new Date().toISOString(),
         type: 'avoided_expiry',
         amount: finalSavings,
-        description: `Used ${(usageEfficiency * 100).toFixed(0)}% of "${item.name}" ${daysUntilExpiry} day(s) before expiry.`,
+        description: `You avoided losing ₱${finalSavings.toFixed(2)} by finishing your ${item.name}.`,
         relatedPantryItemId: item.id,
-        calculationMethod: `Price (₱${item.estimatedCost}) × Spoil Prob. (${(spoilProbability*100).toFixed(0)}%) × User Waste Prob. (${(userWasteProb*100).toFixed(0)}%) × Usage (${(usageEfficiency*100).toFixed(0)}%)`,
+        calculationMethod: `Price (₱${item.estimatedCost.toFixed(2)}) × Spoil Prob. (${(spoilProbability*100).toFixed(0)}%)`,
         transferredToBank: false,
     };
 
     try {
         await saveSavingsEvent(user.uid, savingsEvent);
         console.log(`Saved ₱${finalSavings} for avoiding expiry of ${item.name}.`);
+        return finalSavings;
     } catch (error) {
         console.error('Failed to save avoided expiry event:', error);
+        return 0;
     }
 };
 
@@ -142,7 +144,7 @@ export const calculateAndSaveRecipeSavings = async (user: User, recipe: Recipe) 
         date: new Date().toISOString(),
         type: 'recipe_followed',
         amount: finalSavings,
-        description: `Cooked "${recipe.name}" instead of opting for a more expensive meal.`,
+        description: `Rescued ₱${finalSavings.toFixed(2)} from waste by cooking "${recipe.name}".`,
         calculationMethod: `Alternative Meal Cost (₱${RECIPE_ALTERNATIVE_COST}) - Needed Ingredients (₱${neededIngredientsCost})`,
         transferredToBank: false,
     };
