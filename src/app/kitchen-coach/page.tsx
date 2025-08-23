@@ -69,7 +69,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                     size="sm" 
                     onClick={onSelect} 
                     disabled={isUpdating}
-                    className={isSelected ? '' : 'bg-primary hover:bg-primary/90'}
+                    className="bg-primary hover:bg-primary/90"
                  >
                     {isUpdating ? 
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
@@ -312,6 +312,7 @@ export default function KitchenCoachPage() {
                         </Card>
 
                         {/* Solutions Section */}
+                        {/*
                         <div>
                             <h2 className="text-xl font-bold tracking-tight mb-4 flex items-center gap-2"><Lightbulb className="text-primary" />Actionable Solutions</h2>
                             <Carousel
@@ -338,6 +339,7 @@ export default function KitchenCoachPage() {
                                 </CarouselContent>
                             </Carousel>
                         </div>
+                        */}
 
                         {/* Quick Win & Encouragement */}
                         <div className="grid md:grid-cols-2 gap-4">
