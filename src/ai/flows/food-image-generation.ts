@@ -42,7 +42,13 @@ const generateFoodImageFlow = ai.defineFlow(
     // 1. Generate the image using the AI model
     const { media } = await ai.generate({
       model: 'googleai/imagen-3.0-generate-001',
-      prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
+      prompt: `High-resolution, hyper-realistic food photograph of ${recipeName}. 
+Styled as if for a modern professional cookbook series: consistent look across all dishes. 
+Always presented on a simple round white ceramic plate, centered in the frame. 
+Shot from a consistent 45-degree angle, medium distance, with the entire plate visible. 
+Background is a clean light-gray tabletop with soft natural lighting, minimal shadows, and no clutter. 
+No props, no utensils, no drinks — just the dish on the plate. 
+Cookbook-quality with uniform angle, plate, background, lighting, and framing for every image.`,
       config: { responseModalities: ['TEXT', 'IMAGE'] },
     });
 
