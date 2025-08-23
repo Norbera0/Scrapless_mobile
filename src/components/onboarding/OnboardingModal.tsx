@@ -170,8 +170,14 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0">
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) {
+            // Prevent closing via overlay click or escape key
+            return;
+        }
+        onClose();
+    }}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-2xl flex items-center gap-2"><Sparkles className="text-primary w-6 h-6"/>Welcome to Scrapless!</DialogTitle>
           <DialogDescription>Let's quickly personalize your experience.</DialogDescription>
