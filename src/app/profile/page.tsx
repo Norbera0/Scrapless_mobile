@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, ChevronRight, Palette, Bookmark, Shield, PencilRuler } from 'lucide-react';
+import { LogOut, ChevronRight, Palette, Bookmark, Shield, PencilRuler, Landmark } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
@@ -101,6 +101,24 @@ export default function ProfilePage() {
                     </div>
                     <CardDescription>
                         Update your household, lifestyle, and food waste goals to get better recommendations.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+            
+            <Card 
+                className="cursor-pointer hover:bg-secondary/50 transition-colors"
+                onClick={() => router.push('/bpi')}
+            >
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <Landmark className="w-5 h-5 text-primary" />
+                            <CardTitle className="text-lg">BPI Integration</CardTitle>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <CardDescription>
+                       Manage your savings transfers and rewards points.
                     </CardDescription>
                 </CardHeader>
             </Card>

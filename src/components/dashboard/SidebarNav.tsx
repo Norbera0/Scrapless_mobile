@@ -70,7 +70,6 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/analytics', label: 'Analytics', icon: BarChart2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
     { href: '/cook-shop', label: 'Cook & Shop', icon: ChefHat },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
-    { href: '/user-preference', label: 'Preferences', icon: PencilRuler, relatedPaths: ['/profile', '/saves'] },
   ];
   
   const getInitials = (name?: string | null) => {
