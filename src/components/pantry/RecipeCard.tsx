@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot } from 'lucide-react';
+import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot, Utensils } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { cn } from '@/lib/utils';
@@ -67,8 +67,8 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                             {recipe.photoDataUri ? (
                                 <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                             ) : (
-                                <div className="w-full h-full bg-muted flex items-center justify-center">
-                                    <CookingPot className="w-10 h-10 text-muted-foreground" />
+                                <div className="w-full h-full bg-secondary/70 flex items-center justify-center">
+                                    <Utensils className="w-16 h-16 text-primary/40" />
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
@@ -113,8 +113,8 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                         {recipe.photoDataUri ? (
                             <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
                         ) : (
-                             <div className="w-full h-full bg-muted flex items-center justify-center">
-                                <CookingPot className="w-12 h-12 text-muted-foreground" />
+                             <div className="w-full h-full bg-secondary/70 flex items-center justify-center">
+                                <Utensils className="w-20 h-20 text-primary/40" />
                             </div>
                         )}
                     </div>
