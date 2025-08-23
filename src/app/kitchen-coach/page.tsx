@@ -319,7 +319,7 @@ export default function KitchenCoachPage() {
                             >
                                 <CarouselContent className="-ml-1">
                                     {solutions.solutions.map((solution, index) => (
-                                        <CarouselItem key={index} className="basis-[77%] md:basis-1/2 lg:basis-1/3 pl-3">
+                                        <CarouselItem key={index} className="basis-[85%] md:basis-1/2 lg:basis-1/3 pl-3">
                                             <div className="p-1 h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
