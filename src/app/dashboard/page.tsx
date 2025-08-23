@@ -105,11 +105,12 @@ function DashboardContent() {
   const [greeting, setGreeting] = useState("Good morning");
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
   const [isLogWasteMethodOpen, setIsLogWasteMethodOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true); // TEMPORARY: Always show for debugging
 
   const { total, available } = useSavingsSummary(savingsEvents);
   const transferred = total - available;
 
+  /* TEMPORARY: Commented out to force onboarding for debugging
   useEffect(() => {
     const shouldShow = searchParams.get('onboarding') === 'true';
     if (shouldShow) {
@@ -118,6 +119,7 @@ function DashboardContent() {
       router.replace('/dashboard', { scroll: false });
     }
   }, [searchParams, router]);
+  */
 
   useEffect(() => {
     const hour = new Date().getHours();
