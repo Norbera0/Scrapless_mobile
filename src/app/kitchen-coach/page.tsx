@@ -49,7 +49,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
             </CardHeader>
             <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
                 <div>
-                    {/* <Accordion type="single" collapsible className="w-full mb-4">
+                    <Accordion type="single" collapsible className="w-full mb-4">
                         <AccordionItem value="details">
                             <AccordionTrigger>View Details</AccordionTrigger>
                             <AccordionContent className="space-y-3 pt-2">
@@ -63,14 +63,13 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
-                    </Accordion> */}
+                    </Accordion>
                 </div>
                  <Button 
                     size="sm" 
-                    className="w-full" 
                     onClick={onSelect} 
                     disabled={isUpdating}
-                    variant={isSelected ? 'default' : 'outline'}
+                    variant={isSelected ? 'default' : 'secondary'}
                  >
                     {isUpdating ? 
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
