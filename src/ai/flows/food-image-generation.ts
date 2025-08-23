@@ -39,58 +39,76 @@ const generateFoodImageFlow = ai.defineFlow(
     outputSchema: GenerateFoodImageOutputSchema,
   },
   async ({ recipeName }) => {
-    // 1. Generate the image using the AI model
-    const { media } = await ai.generate({
-      model: 'googleai/imagen-3.0-generate-001',
-      prompt: `High-resolution, hyper-realistic food photograph of ${recipeName}. 
+    console.log(`[generateFoodImageFlow] Starting image generation for: ${recipeName}`);
+    
+    try {
+        // 1. Generate the image using the AI model
+        const { media } = await ai.generate({
+          model: 'googleai/imagen-3.0-generate-001',
+          prompt: `High-resolution, hyper-realistic food photograph of ${recipeName}. 
 Styled as if for a modern professional cookbook series: consistent look across all dishes. 
 Always presented on a simple round white ceramic plate, centered in the frame. 
 Shot from a consistent 45-degree angle, medium distance, with the entire plate visible. 
 Background is a clean light-gray tabletop with soft natural lighting, minimal shadows, and no clutter. 
 No props, no utensils, no drinks — just the dish on the plate. 
 Cookbook-quality with uniform angle, plate, background, lighting, and framing for every image.`,
-      config: { responseModalities: ['TEXT', 'IMAGE'] },
-    });
+          config: { responseModalities: ['TEXT', 'IMAGE'] },
+        });
 
-    if (!media?.url) {
-      throw new Error('Failed to generate image data.');
+        console.log('[generateFoodImageFlow] AI response received.');
+
+        if (!media?.url) {
+          console.error('[generateFoodImageFlow] Error: AI response did not contain media URL.');
+          throw new Error('Failed to generate image data.');
+        }
+
+        console.log('[generateFoodImageFlow] Media URL is present. Preparing for upload.');
+
+        // 2. Upload the image to Firebase Cloud Storage
+        const bucket = getStorage().bucket(); // Use the default bucket
+
+        const dataUri = media.url;
+        const match = dataUri.match(/^data:(image\/(\w+));base64,(.+)$/);
+        
+        if (!match) {
+          console.error('[generateFoodImageFlow] Error: Invalid data URI format.');
+          throw new Error('Invalid data URI format for the generated image.');
+        }
+
+        const contentType = match[1];
+        const imageType = match[2];
+        const base64Data = match[3];
+
+        console.log(`[generateFoodImageFlow] Image details: contentType=${contentType}, imageType=${imageType}`);
+        
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        const fileName = `recipe-images/${uuidv4()}.${imageType}`;
+        const file = bucket.file(fileName);
+
+        console.log(`[generateFoodImageFlow] Uploading to Cloud Storage: ${fileName}`);
+
+        await file.save(imageBuffer, {
+          metadata: {
+            contentType: contentType,
+          },
+        });
+
+        console.log('[generateFoodImageFlow] Upload successful.');
+
+        // 3. Get a long-lived signed URL for the file
+        const [publicUrl] = await file.getSignedUrl({
+          action: 'read',
+          expires: '03-09-2491',
+        });
+        
+        console.log(`[generateFoodImageFlow] Generated public URL: ${publicUrl}`);
+
+        // 4. Return the public Cloud Storage URL
+        return { imageUrl: publicUrl };
+
+    } catch (error) {
+        console.error('[generateFoodImageFlow] An error occurred during the flow:', error);
+        throw error; // Re-throw the error to be caught by the caller
     }
-
-    // 2. Upload the image to Firebase Cloud Storage
-    const bucket = getStorage().bucket(); // Use the default bucket
-
-    // The media.url is a data URI like 'data:image/png;base64,iVBORw0KGgo...'
-    const dataUri = media.url;
-
-    // Extract the base64 data and content type
-    const match = dataUri.match(/^data:(image\/(\w+));base64,(.+)$/);
-    if (!match) {
-      throw new Error('Invalid data URI format for the generated image.');
-    }
-    const contentType = match[1]; // e.g., 'image/png'
-    const imageType = match[2]; // e.g., 'png'
-    const base64Data = match[3];
-
-    const imageBuffer = Buffer.from(base64Data, 'base64');
-
-    // Create a unique filename
-    const fileName = `recipe-images/${uuidv4()}.${imageType}`;
-    const file = bucket.file(fileName);
-
-    // Save the buffer to the bucket
-    await file.save(imageBuffer, {
-      metadata: {
-        contentType: contentType,
-      },
-    });
-
-    // 3. Get a long-lived signed URL for the file
-    const [publicUrl] = await file.getSignedUrl({
-      action: 'read',
-      expires: '03-09-2491', // Far-future expiration date
-    });
-
-    // 4. Return the public Cloud Storage URL
-    return { imageUrl: publicUrl };
   }
 );
