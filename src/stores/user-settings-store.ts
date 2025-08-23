@@ -10,6 +10,7 @@ interface UserSettingsState {
   setHouseholdSize: (size: HouseholdSize) => void;
   setMonthlyBudget: (budget: MonthlyBudget) => void;
   setDietaryRestrictions: (restrictions: DietaryRestriction[]) => void;
+  setFoodAllergies: (allergies: string) => void;
   setCookingFrequency: (frequency: CookingFrequency) => void;
   setShoppingLocations: (locations: ShoppingLocation[]) => void;
   setPrimaryGoal: (goal: UserGoal) => void;
@@ -45,6 +46,9 @@ export const useUserSettingsStore = create<UserSettingsState>()((set) => ({
   })),
   setDietaryRestrictions: (restrictions) => set(state => ({
     settings: { ...state.settings, dietaryRestrictions: restrictions }
+  })),
+  setFoodAllergies: (allergies) => set(state => ({
+    settings: { ...state.settings, foodAllergies: allergies }
   })),
   setCookingFrequency: (frequency) => set(state => ({
     settings: { ...state.settings, cookingFrequency: frequency }

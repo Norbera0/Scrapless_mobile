@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -29,6 +30,7 @@ import { useUserSettingsStore } from '@/stores/user-settings-store';
 import type { HouseholdSize, MonthlyBudget, DietaryRestriction, CookingFrequency, ShoppingLocation, UserGoal } from '@/types';
 import { cn } from '@/lib/utils';
 import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { Input } from '../ui/input';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -52,7 +54,8 @@ const dietaryOptions: { value: DietaryRestriction; label: string }[] = [
     { value: 'no_beef', label: 'No beef' },
     { value: 'vegetarian', label: 'Vegetarian' },
     { value: 'diabetic_friendly', label: 'Diabetic-friendly' },
-    { value: 'allergies', label: 'Food allergies' }
+    { value: 'allergies', label: 'Food allergies' },
+    { value: 'none', label: 'None' },
 ];
 const cookingFrequencyOptions: { value: CookingFrequency; label: string }[] = [
     { value: 'daily', label: 'Daily' },
@@ -85,6 +88,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const [householdSize, setHouseholdSize] = useState<HouseholdSize>('2');
   const [monthlyBudget, setMonthlyBudget] = useState<MonthlyBudget>('6k_10k');
   const [dietary, setDietary] = useState<DietaryRestriction[]>([]);
+  const [foodAllergiesText, setFoodAllergiesText] = useState('');
   const [frequency, setFrequency] = useState<CookingFrequency>('daily');
   const [shopping, setShopping] = useState<ShoppingLocation[]>(['supermarket']);
   const [goal, setGoal] = useState<UserGoal>('save_money');
@@ -111,6 +115,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
         householdSize,
         monthlyBudget,
         dietaryRestrictions: dietary,
+        foodAllergies: foodAllergiesText,
         cookingFrequency: frequency,
         shoppingLocations: shopping,
         primaryGoal: goal,
@@ -127,6 +132,19 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     }
   };
 
+  const handleDietaryChange = (checked: boolean, value: DietaryRestriction) => {
+    if (value === 'none') {
+        setDietary(checked ? ['none'] : []);
+    } else {
+        setDietary(prev => {
+            const newDietary = checked ? [...prev, value] : prev.filter(v => v !== value);
+            return newDietary.filter(v => v !== 'none'); // Remove 'none' if other options are selected
+        });
+    }
+  };
+
+  const isAllergiesChecked = dietary.includes('allergies');
+
   const steps = [
     { title: "Household Size", content: 
       <RadioGroup value={householdSize} onValueChange={setHouseholdSize} className="gap-3">
@@ -140,7 +158,25 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     },
     { title: "Dietary Needs", content:
       <div className="space-y-3">
-        {dietaryOptions.map(o => <div key={o.value} className="flex items-center space-x-2"><Checkbox id={o.value} checked={dietary.includes(o.value)} onCheckedChange={c => setDietary(c ? [...dietary, o.value] : dietary.filter(v => v !== o.value))} /><Label htmlFor={o.value}>{o.label}</Label></div>)}
+        {dietaryOptions.map(o => (
+            <div key={o.value} className="flex items-center space-x-2">
+                <Checkbox 
+                    id={o.value} 
+                    checked={dietary.includes(o.value)} 
+                    onCheckedChange={(c) => handleDietaryChange(!!c, o.value)} 
+                />
+                <Label htmlFor={o.value}>{o.label}</Label>
+            </div>
+        ))}
+        {isAllergiesChecked && (
+            <div className="pl-6 pt-2">
+                <Input 
+                    placeholder="Please specify allergies..."
+                    value={foodAllergiesText}
+                    onChange={(e) => setFoodAllergiesText(e.target.value)}
+                />
+            </div>
+        )}
       </div>
     },
     { title: "Cooking & Shopping", content:
@@ -172,7 +208,6 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
         if (!open) {
-            // Prevent closing via overlay click or escape key
             return;
         }
         onClose();

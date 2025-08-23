@@ -1,4 +1,5 @@
 
+
 export interface User {
   uid: string;
   name?: string | null;
@@ -7,7 +8,7 @@ export interface User {
 
 export type HouseholdSize = '1' | '2' | '3-4' | '5+';
 export type MonthlyBudget = 'under_3k' | '3k_6k' | '6k_10k' | 'over_10k';
-export type DietaryRestriction = 'no_pork' | 'no_beef' | 'vegetarian' | 'diabetic_friendly' | 'allergies';
+export type DietaryRestriction = 'no_pork' | 'no_beef' | 'vegetarian' | 'diabetic_friendly' | 'allergies' | 'none';
 export type CookingFrequency = 'daily' | '4_5_times' | '2_3_times' | 'rarely';
 export type ShoppingLocation = 'wet_market' | 'supermarket' | 'online' | 'mixed';
 export type UserGoal = 'save_money' | 'reduce_waste' | 'meal_planning' | 'stop_spoiling';
