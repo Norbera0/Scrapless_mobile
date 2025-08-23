@@ -24,7 +24,8 @@ import {
   Leaf,
   CookingPot,
   Zap,
-  Landmark
+  Landmark,
+  Bot
 } from 'lucide-react';
 import type { PantryItem, Recipe, WasteLog } from '@/types';
 import { getSavedRecipes, saveRecipe, unsaveRecipe } from '@/lib/data';
@@ -44,6 +45,7 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import { useSavingsStore } from '@/stores/savings-store';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 
 const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['items'][0]['deal']> }) => {
     
@@ -317,6 +319,10 @@ export default function CookAndShopPage() {
                 </Button>
             ) : (
                 <div className="space-y-4">
+                    <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                        <Bot className="w-3 h-3 mr-1" />
+                        AI-Generated List
+                    </Badge>
                     {generatedList.items.map(item => (
                         <div key={item.id} className={cn("flex flex-col gap-2 p-3 rounded-lg transition-colors", item.isChecked && "bg-green-50/50")}>
                             <div className="flex items-start gap-3">

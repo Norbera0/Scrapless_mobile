@@ -8,7 +8,7 @@ import { useAnalytics } from '@/hooks/use-analytics';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Button } from '../ui/button';
-import { Loader2, Sparkles, Lightbulb, ArrowRight, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, ArrowRight, RefreshCw, Bot } from 'lucide-react';
 import { getCoachAdvice } from '@/app/actions';
 import type { KitchenCoachInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +17,7 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { useSavingsStore } from '@/stores/savings-store';
 import { formatDistanceToNow, isBefore, parseISO } from 'date-fns';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { Badge } from '../ui/badge';
 
 export function KitchenCoachPanel() {
     const router = useRouter();
@@ -117,8 +118,14 @@ export function KitchenCoachPanel() {
                     </div>
                 ) : lastTip ? (
                     <div className="space-y-4">
-                        <div className="bg-secondary/50 rounded-xl p-4 border">
-                            <p className="text-muted-foreground text-sm font-medium">{lastTip.title}</p>
+                        <div className="space-y-2">
+                             <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                <Bot className="w-3 h-3 mr-1" />
+                                AI-Generated Tip
+                            </Badge>
+                            <div className="bg-secondary/50 rounded-xl p-4 border">
+                                <p className="text-muted-foreground text-sm font-medium">{lastTip.title}</p>
+                            </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                              <Button 

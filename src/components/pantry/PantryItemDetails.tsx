@@ -128,6 +128,10 @@ function AITipsSection({ item }: { item: PantryItem }) {
 
     return (
         <div className="space-y-4">
+            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                <Bot className="w-3 h-3 mr-1" />
+                AI-Generated
+            </Badge>
             <Accordion type="single" collapsible className="w-full" defaultValue="storage">
                 <AccordionItem value="storage">
                     <AccordionTrigger>Storage Tip</AccordionTrigger>

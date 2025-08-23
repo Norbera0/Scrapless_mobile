@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot, Utensils } from 'lucide-react';
+import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot, Utensils, Bot } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { cn } from '@/lib/utils';
@@ -72,6 +72,10 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
+                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                                <Bot className="h-3 w-3 mr-1.5" />
+                                AI-Generated
+                            </Badge>
                         </div>
                     </DialogTrigger>
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
@@ -117,6 +121,10 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                                 <Utensils className="w-20 h-20 text-primary/40" />
                             </div>
                         )}
+                         <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                            <Bot className="h-3 w-3 mr-1.5" />
+                            AI-Generated Image
+                        </Badge>
                     </div>
                     <DialogTitle>{recipe.name}</DialogTitle>
                     <DialogDescription>

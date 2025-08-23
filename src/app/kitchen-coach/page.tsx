@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp, ChefHat } from 'lucide-react';
+import { Loader2, Sparkles, Lightbulb, AlertTriangle, Wallet, Brain, Clock, Check, Target, HelpCircle, TrendingUp, ChefHat, Bot } from 'lucide-react';
 import { getCoachAdvice, fetchCoachSolutions } from '../actions';
 import { type KitchenCoachOutput, type GetCoachSolutionsOutput, type KitchenCoachInput, type GetCoachSolutionsInput } from '@/ai/schemas';
 import { useToast } from '@/hooks/use-toast';
@@ -23,6 +23,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useCoachStore } from '@/stores/coach-store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
+import { Badge } from '@/components/ui/badge';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -257,6 +258,10 @@ export default function KitchenCoachPage() {
                                     <div className="flex-1">
                                         <CardTitle className="flex items-center gap-2 text-lg"><Brain className="text-primary" /> The Analysis</CardTitle>
                                     </div>
+                                    <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                        <Bot className="w-3 h-3 mr-1" />
+                                        AI-Generated
+                                    </Badge>
                                 </div>
                                 {lastGenerated && (
                                     <p className="text-xs text-muted-foreground">
