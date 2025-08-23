@@ -59,6 +59,19 @@ export const cleanupListeners = (key?: keyof typeof listenerManager) => {
     }
 };
 
+const defaultSettings: UserSettings = {
+    language: 'en',
+    savingsGoal: 5000,
+    householdSize: '2',
+    monthlyBudget: '6k_10k',
+    dietaryRestrictions: [],
+    foodAllergies: '',
+    cookingFrequency: 'daily',
+    shoppingLocations: ['supermarket'],
+    primaryGoal: 'save_money',
+    notes: '',
+};
+
 // --- Cache Initialization ---
 export const initializeUserCache = (userId: string) => {
     cleanupListeners();
@@ -72,18 +85,14 @@ export const initializeUserCache = (userId: string) => {
     const settingsDoc = doc(db, `users/${userId}/settings`, 'app');
     const settingsUnsub = onSnapshot(settingsDoc, (doc) => {
         const settings = doc.data() as UserSettings;
-        const defaults = {
-            savingsGoal: 5000,
-            householdSize: '2' as const
-        };
         // Ensure default values if fields are missing
-        const finalSettings = { ...defaults, ...settings };
+        const finalSettings = { ...defaultSettings, ...settings };
         useUserSettingsStore.getState().setSettings(finalSettings);
         useUserSettingsStore.getState().setSettingsInitialized(true);
     }, (error) => {
         console.error("Error with settings listener:", error);
         // Set default settings on error
-        useUserSettingsStore.getState().setSettings({ savingsGoal: 5000, language: 'en', householdSize: '2' });
+        useUserSettingsStore.getState().setSettings(defaultSettings);
         useUserSettingsStore.getState().setSettingsInitialized(true);
     });
     listenerManager.userSettings.push(settingsUnsub);
@@ -394,16 +403,11 @@ export const getUserSettings = async (userId: string): Promise<UserSettings> => 
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         const settings = docSnap.data() as UserSettings;
-        const defaults = {
-            savingsGoal: 5000,
-            householdSize: '2' as const
-        };
         // Ensure default values if fields are missing
-        const finalSettings = { ...defaults, ...settings };
-        return finalSettings;
+        return { ...defaultSettings, ...settings };
     }
     // Return default settings if document doesn't exist
-    return { language: 'en', savingsGoal: 5000, householdSize: '2' };
+    return defaultSettings;
 };
 
 

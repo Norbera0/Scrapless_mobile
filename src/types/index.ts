@@ -6,11 +6,23 @@ export interface User {
 }
 
 export type HouseholdSize = '1' | '2' | '3-4' | '5+';
+export type MonthlyBudget = 'under_3k' | '3k_6k' | '6k_10k' | 'over_10k';
+export type DietaryRestriction = 'no_pork' | 'no_beef' | 'vegetarian' | 'diabetic_friendly' | 'allergies';
+export type CookingFrequency = 'daily' | '4_5_times' | '2_3_times' | 'rarely';
+export type ShoppingLocation = 'wet_market' | 'supermarket' | 'online' | 'mixed';
+export type UserGoal = 'save_money' | 'reduce_waste' | 'meal_planning' | 'stop_spoiling';
 
 export interface UserSettings {
   language?: 'en' | 'fil';
   savingsGoal?: number;
   householdSize?: HouseholdSize;
+  monthlyBudget?: MonthlyBudget;
+  dietaryRestrictions?: DietaryRestriction[];
+  foodAllergies?: string; // For specific allergy notes
+  cookingFrequency?: CookingFrequency;
+  shoppingLocations?: ShoppingLocation[];
+  primaryGoal?: UserGoal;
+  notes?: string;
 }
 
 
