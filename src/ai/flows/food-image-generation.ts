@@ -4,15 +4,28 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { getStorage } from 'firebase-admin/storage';
-import { initializeApp, getApps } from 'firebase-admin/app';
+import { initializeApp, getApps, App, getApp } from 'firebase-admin/app';
 import { v4 as uuidv4 } from 'uuid';
 
-// Initialize Firebase Admin SDK if not already initialized
-if (!getApps().length) {
-  initializeApp({
-    storageBucket: 'scrapless-bzy61.appspot.com',
-  });
+const APP_NAME = 'image-generation-app';
+
+// More robust Firebase Admin SDK Initialization
+// Get a named app instance to avoid conflicts.
+function getFirebaseApp() {
+  try {
+    return getApp(APP_NAME);
+  } catch (error) {
+    console.log(`[Firebase Init] Initializing new Firebase app: ${APP_NAME}`);
+    const storageBucket = 'scrapless-bzy61';
+    console.log(`[Firebase Init] Using storage bucket for new app: ${storageBucket}`);
+    return initializeApp({
+      storageBucket: storageBucket,
+    }, APP_NAME);
+  }
 }
+
+const app = getFirebaseApp();
+const storage = getStorage(app);
 
 const GenerateFoodImageInputSchema = z.object({
   recipeName: z.string().describe('The name of the recipe.'),
@@ -46,7 +59,7 @@ const generateFoodImageFlow = ai.defineFlow(
     try {
         // 1. Generate the image using the AI model
         const { media } = await ai.generate({
-          model: 'googleai/imagen-3.0-generate-001',
+          model: 'googleai/imagen-4.0-fast-generate-001',
           prompt: `High-resolution, hyper-realistic food photograph of ${recipeName}. 
 Styled as if for a modern professional cookbook series: consistent look across all dishes. 
 Always presented on a simple round white ceramic plate, centered in the frame. 
@@ -67,7 +80,15 @@ Cookbook-quality with uniform angle, plate, background, lighting, and framing fo
         console.log('[generateFoodImageFlow] Media URL is present. Preparing for upload.');
 
         // 2. Upload the image to Firebase Cloud Storage
-        const bucket = getStorage().bucket(); // Use the default bucket
+        let bucket;
+        try {
+            console.log('[generateFoodImageFlow] Attempting to get storage bucket from named app...');
+            bucket = storage.bucket('scrapless-bzy61');
+            console.log(`[generateFoodImageFlow] Successfully accessed bucket: ${bucket.name}`);
+        } catch (storageError) {
+            console.error('[generateFoodImageFlow] Error accessing storage bucket:', storageError);
+            throw new Error('Failed to access Firebase Storage bucket. Check initialization and permissions.');
+        }
 
         const dataUri = media.url;
         const match = dataUri.match(/^data:(image\/(\w+));base64,(.+)$/);
