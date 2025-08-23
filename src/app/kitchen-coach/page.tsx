@@ -194,7 +194,7 @@ export default function KitchenCoachPage() {
 
     return (
         <>
-            <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full">
+            <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-full pb-16">
                  <div className="flex items-start justify-between">
                     <div className="space-y-1">
                         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
