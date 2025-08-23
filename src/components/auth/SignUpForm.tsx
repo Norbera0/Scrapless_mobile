@@ -44,8 +44,8 @@ export function SignUpForm() {
         displayName: name,
       });
 
-      toast({ title: 'Account Created!', description: 'Welcome to Scrapless!' });
-      router.push('/dashboard');
+      toast({ title: 'Account Created!', description: 'Welcome to Scrapless! Let\'s get you set up.' });
+      router.push('/dashboard?onboarding=true');
     } catch (error: any) {
       console.error('Sign up failed:', error);
       toast({

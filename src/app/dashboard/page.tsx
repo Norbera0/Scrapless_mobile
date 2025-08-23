@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useMemo, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -65,6 +65,7 @@ import { WeeklyPerformancePanel } from '@/components/dashboard/WeeklyPerformance
 import { WasteBreakdownCard } from '@/components/dashboard/WasteBreakdownCard';
 import { useSavingsSummary } from '@/lib/bpi';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
 
 const oneHour = 60 * 60 * 1000;
 
@@ -88,8 +89,9 @@ const QuickActionButton = ({ icon, label, onClick, className, ...props }: { icon
     );
 };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { logs, logsInitialized } = useWasteLogStore();
   const { liveItems, pantryInitialized, archiveItem } = usePantryLogStore();
@@ -103,9 +105,19 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState("Good morning");
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
   const [isLogWasteMethodOpen, setIsLogWasteMethodOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { total, available } = useSavingsSummary(savingsEvents);
   const transferred = total - available;
+
+  useEffect(() => {
+    const shouldShow = searchParams.get('onboarding') === 'true';
+    if (shouldShow) {
+      setShowOnboarding(true);
+      // Clean up URL
+      router.replace('/dashboard', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -182,7 +194,6 @@ export default function DashboardPage() {
         if (!itemInPantry) return { name: key.charAt(0).toUpperCase() + key.slice(1), isLow: true };
 
         const config = essentials[key];
-        // If unit is specified (like kg), check for that unit. Otherwise, check quantity.
         if (config.unit) {
             if (itemInPantry.unit.toLowerCase().includes(config.unit) && itemInPantry.quantity < config.threshold) {
                 return { name: itemInPantry.name, isLow: true };
@@ -230,137 +241,148 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-full">
-       <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('/dashboard/total_impact_bg.jpg')" }}></div>
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-      <div className="relative p-5 space-y-6">
+    <>
+      <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <div className="relative min-h-full">
+         <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('/dashboard/total_impact_bg.jpg')" }}></div>
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
+        <div className="relative p-5 space-y-6">
 
-          <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
-            <Image src="/dashboard/user_impact_final.jpg" layout="fill" objectFit="cover" alt="Dashboard hero image" className="z-0" data-ai-hint="impact savings" />
-            <div className="absolute inset-0 bg-black/40 z-0"></div>
-            <div className="relative z-10 p-6 space-y-4">
-              <CardHeader className="p-0">
-                  <CardTitle className="text-lg font-bold tracking-tight sm:text-xl">{user?.name}'s Impact</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
-                  <div>
-                      <p className="text-xs text-green-200 mb-1">Total Virtual Savings</p>
-                      <div className="flex items-center justify-center gap-2">
-                          <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
-                          <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
-                      </div>
-                  </div>
-                  <div>
-                      <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
-                      <p className="text-2xl sm:text-3xl font-bold">{analytics.totalWasteCO2e.toFixed(2)}<span className="text-base font-medium text-green-200">kg</span></p>
-                  </div>
-              </CardContent>
-               <div className="pt-4 border-t border-white/20">
-                    <div className="flex justify-between items-center mb-1">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-xs text-green-200">Savings Goal</p>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <Info className="w-3 h-3 text-green-200 cursor-pointer" />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>This goal is funded by transferring your virtual savings to your bank account.</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <p className="text-xs text-green-200 font-semibold">{formatPeso(transferred)} / {formatPeso(savingsGoal)}</p>
+            <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
+              <Image src="/dashboard/user_impact_final.jpg" layout="fill" objectFit="cover" alt="Dashboard hero image" className="z-0" data-ai-hint="impact savings" />
+              <div className="absolute inset-0 bg-black/40 z-0"></div>
+              <div className="relative z-10 p-6 space-y-4">
+                <CardHeader className="p-0">
+                    <CardTitle className="text-lg font-bold tracking-tight sm:text-xl">{user?.name}'s Impact</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
+                    <div>
+                        <p className="text-xs text-green-200 mb-1">Total Virtual Savings</p>
+                        <div className="flex items-center justify-center gap-2">
+                            <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
+                            <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <Progress value={goalProgress} className="h-2 flex-1" style={{
-                            // @ts-ignore
-                            '--indicator-bg': '#FBBF24'
-                        }} />
-                        <p className="text-sm font-bold">{goalProgress}%</p>
-                    </div>
-                </div>
-            </div>
-          </Card>
-        
-        <div className="grid grid-cols-2 gap-4">
-            <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
-              <PopoverTrigger asChild>
-                <QuickActionButton icon={PackagePlus} label="Add to Pantry" />
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-primary">
-                <div className="flex flex-col">
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'camera')}>
-                    <Camera className="w-4 h-4 mr-2" /> Scan with Camera
-                  </Button>
-                  <Separator className="my-1 bg-white/20" />
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'voice')}>
-                    <Mic className="w-4 h-4 mr-2" /> Use Voice Log
-                  </Button>
-                  <Separator className="my-1 bg-white/20" />
-                  <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'text')}>
-                    <Type className="w-4 h-4 mr-2" /> Type Manually
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
-                <PopoverTrigger asChild>
-                     <QuickActionButton icon={Trash2} label="Log Food Waste" />
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-primary">
-                    <div className="flex flex-col">
-                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'camera')}>
-                        <Camera className="w-4 h-4 mr-2" /> Scan with Camera
-                    </Button>
-                    <Separator className="my-1 bg-white/20" />
-                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'voice')}>
-                        <Mic className="w-4 h-4 mr-2" /> Use Voice Log
-                    </Button>
-                    <Separator className="my-1 bg-white/20" />
-                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'text')}>
-                        <Type className="w-4 h-4 mr-2" /> Type Manually
-                    </Button>
-                    </div>
-                </PopoverContent>
-            </Popover>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <WasteBreakdownCard wasteLogs={logs} />
-            <KitchenCoachPanel />
-            <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
-            <Card className="shadow-sm overflow-hidden">
-                <CardContent className="p-0 flex">
-                    <div className="p-6 flex-1">
-                        <CardHeader className="p-0 mb-4">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <CookingPot className="w-5 h-5 text-primary" />
-                                Cook &amp; Shop Hub
-                            </CardTitle>
-                        </CardHeader>
-                        <p className="text-muted-foreground mb-4 text-sm">
-                            Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
-                        </p>
-                        <Button variant="default" onClick={() => router.push('/cook-shop')}>
-                            Plan &amp; Prepare
-                            <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
-                    </div>
-                    <div className="relative w-1/3 flex-shrink-0">
-                        <Image
-                            src="/dashboard/recipe_generator_home_3.png"
-                            alt="Cook and Shop Hub illustration"
-                            layout="fill"
-                            objectFit="cover"
-                            data-ai-hint="cooking ingredients"
-                        />
+                    <div>
+                        <p className="text-xs text-green-200 mb-1">Carbon Footprint</p>
+                        <p className="text-2xl sm:text-3xl font-bold">{analytics.totalWasteCO2e.toFixed(2)}<span className="text-base font-medium text-green-200">kg</span></p>
                     </div>
                 </CardContent>
+                 <div className="pt-4 border-t border-white/20">
+                      <div className="flex justify-between items-center mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs text-green-200">Savings Goal</p>
+                          <TooltipProvider>
+                              <Tooltip>
+                                  <TooltipTrigger>
+                                      <Info className="w-3 h-3 text-green-200 cursor-pointer" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                      <p>This goal is funded by transferring your virtual savings to your bank account.</p>
+                                  </TooltipContent>
+                              </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                        <p className="text-xs text-green-200 font-semibold">{formatPeso(transferred)} / {formatPeso(savingsGoal)}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                          <Progress value={goalProgress} className="h-2 flex-1" style={{
+                              // @ts-ignore
+                              '--indicator-bg': '#FBBF24'
+                          }} />
+                          <p className="text-sm font-bold">{goalProgress}%</p>
+                      </div>
+                  </div>
+              </div>
             </Card>
+          
+          <div className="grid grid-cols-2 gap-4">
+              <Popover open={isAddMethodOpen} onOpenChange={setIsAddMethodOpen}>
+                <PopoverTrigger asChild>
+                  <QuickActionButton icon={PackagePlus} label="Add to Pantry" />
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-primary">
+                  <div className="flex flex-col">
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'camera')}>
+                      <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                    </Button>
+                    <Separator className="my-1 bg-white/20" />
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'voice')}>
+                      <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                    </Button>
+                    <Separator className="my-1 bg-white/20" />
+                    <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('pantry', 'text')}>
+                      <Type className="w-4 h-4 mr-2" /> Type Manually
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Popover open={isLogWasteMethodOpen} onOpenChange={setIsLogWasteMethodOpen}>
+                  <PopoverTrigger asChild>
+                       <QuickActionButton icon={Trash2} label="Log Food Waste" />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-primary">
+                      <div className="flex flex-col">
+                      <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'camera')}>
+                          <Camera className="w-4 h-4 mr-2" /> Scan with Camera
+                      </Button>
+                      <Separator className="my-1 bg-white/20" />
+                      <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'voice')}>
+                          <Mic className="w-4 h-4 mr-2" /> Use Voice Log
+                      </Button>
+                      <Separator className="my-1 bg-white/20" />
+                      <Button variant="ghost" className="justify-start text-primary-foreground hover:bg-white/20" onClick={() => handleMethodSelect('waste', 'text')}>
+                          <Type className="w-4 h-4 mr-2" /> Type Manually
+                      </Button>
+                      </div>
+                  </PopoverContent>
+              </Popover>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <WasteBreakdownCard wasteLogs={logs} />
+              <KitchenCoachPanel />
+              <FunFactPanel wasteLogs={logs} savingsEvents={savingsEvents}/>
+              <Card className="shadow-sm overflow-hidden">
+                  <CardContent className="p-0 flex">
+                      <div className="p-6 flex-1">
+                          <CardHeader className="p-0 mb-4">
+                              <CardTitle className="flex items-center gap-2 text-base">
+                                  <CookingPot className="w-5 h-5 text-primary" />
+                                  Cook &amp; Shop Hub
+                              </CardTitle>
+                          </CardHeader>
+                          <p className="text-muted-foreground mb-4 text-sm">
+                              Get recipe ideas for expiring items and build smart shopping lists to reduce future waste.
+                          </p>
+                          <Button variant="default" onClick={() => router.push('/cook-shop')}>
+                              Plan &amp; Prepare
+                              <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                      </div>
+                      <div className="relative w-1/3 flex-shrink-0">
+                          <Image
+                              src="/dashboard/recipe_generator_home_3.png"
+                              alt="Cook and Shop Hub illustration"
+                              layout="fill"
+                              objectFit="cover"
+                              data-ai-hint="cooking ingredients"
+                          />
+                      </div>
+                  </CardContent>
+              </Card>
+          </div>
+          
         </div>
-        
       </div>
-    </div>
+    </>
   );
+}
+
+export default function DashboardPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center"><Loader2 className="h-10 w-10 animate-spin" /></div>}>
+            <DashboardContent />
+        </Suspense>
+    );
 }
