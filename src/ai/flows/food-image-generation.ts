@@ -9,7 +9,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!getApps().length) {
-  initializeApp();
+  initializeApp({
+    storageBucket: 'scrapless-bzy61.appspot.com',
+  });
 }
 
 const GenerateFoodImageInputSchema = z.object({
@@ -44,7 +46,7 @@ const generateFoodImageFlow = ai.defineFlow(
     try {
         // 1. Generate the image using the AI model
         const { media } = await ai.generate({
-          model: 'googleai/imagen-4.0-fast-generate-001',
+          model: 'googleai/imagen-3.0-generate-001',
           prompt: `High-resolution, hyper-realistic food photograph of ${recipeName}. 
 Styled as if for a modern professional cookbook series: consistent look across all dishes. 
 Always presented on a simple round white ceramic plate, centered in the frame. 
