@@ -242,13 +242,16 @@ export function ReviewPantryItems() {
         const shelfLife = item.shelfLifeByStorage[item.storageLocation as keyof typeof item.shelfLifeByStorage || 'counter'] || 7;
         const expirationDate = addDays(new Date(), shelfLife);
         
-        const finalPurchaseSource = item.purchaseSource === 'other' ? item.otherPurchaseSourceText : item.purchaseSource;
+        let finalPurchaseSource = item.purchaseSource;
+        if (item.purchaseSource === 'other') {
+          finalPurchaseSource = item.otherPurchaseSourceText;
+        }
 
         return {
             ...item,
             userId: user.uid,
             estimatedExpirationDate: expirationDate.toISOString(),
-            purchaseSource: finalPurchaseSource,
+            purchaseSource: finalPurchaseSource || null, // Ensure we save null instead of undefined
         }
       });
       
