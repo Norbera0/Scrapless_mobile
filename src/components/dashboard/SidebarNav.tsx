@@ -17,7 +17,8 @@ import {
     Gift,
     Sparkles,
     ChefHat,
-    BarChart2
+    BarChart2,
+    PencilRuler
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -65,10 +66,11 @@ export function SidebarNav({ user }: { user: UserType }) {
 
   const menuItems = [
     { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-    { href: '/pantry', label: 'My Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items', '/saves'] },
+    { href: '/pantry', label: 'My Pantry', icon: CookingPot, relatedPaths: ['/add-to-pantry', '/review-pantry-items'] },
     { href: '/analytics', label: 'Analytics', icon: BarChart2, relatedPaths: ['/log-waste', '/review-items', '/summary'] },
     { href: '/cook-shop', label: 'Cook & Shop', icon: ChefHat },
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
+    { href: '/user-preference', label: 'Preferences', icon: PencilRuler, relatedPaths: ['/profile', '/saves'] },
   ];
   
   const getInitials = (name?: string | null) => {

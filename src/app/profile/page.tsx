@@ -7,25 +7,18 @@ import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles, Shield, Users, Utensils, Heart, ShoppingBag, Target, PencilRuler } from 'lucide-react';
+import { LogOut, ChevronRight, Palette, Bookmark, Shield, PencilRuler } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Accordion, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ProfilePolicyDialog } from '@/components/auth/ProfilePolicyDialog';
 import { privacyPolicy, termsAndConditions } from '@/lib/legal';
-import type { HouseholdSize, MonthlyBudget, DietaryRestriction, CookingFrequency, ShoppingLocation, UserGoal } from '@/types';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
-
+import { Label } from '@/components/ui/label';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -34,303 +27,6 @@ const getInitials = (name?: string | null) => {
         return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
     }
     return name.charAt(0).toUpperCase();
-}
-
-const householdSizeOptions: { value: HouseholdSize, label: string }[] = [
-    { value: '1', label: 'Just me (1)' },
-    { value: '2', label: '2 people' },
-    { value: '3-4', label: '3-4 people' },
-    { value: '5+', label: '5+ people' }
-];
-
-const budgetOptions: { value: MonthlyBudget, label: string }[] = [
-    { value: 'under_3k', label: '₱3,000 or less' },
-    { value: '3k_6k', label: '₱3,000 - ₱6,000' },
-    { value: '6k_10k', label: '₱6,000 - ₱10,000' },
-    { value: 'over_10k', label: '₱10,000+' }
-];
-
-const dietaryOptions: { value: DietaryRestriction, label: string }[] = [
-    { value: 'no_pork', label: 'No pork' },
-    { value: 'no_beef', label: 'No beef' },
-    { value: 'vegetarian', label: 'Vegetarian' },
-    { value: 'diabetic_friendly', label: 'Diabetic-friendly' },
-    { value: 'allergies', label: 'Food allergies' }
-];
-
-const cookingFrequencyOptions: { value: CookingFrequency, label: string }[] = [
-    { value: 'daily', label: 'Daily' },
-    { value: '4_5_times', label: '4-5 times a week' },
-    { value: '2_3_times', label: '2-3 times a week' },
-    { value: 'rarely', label: 'Rarely/Weekends only' }
-];
-
-const shoppingLocationOptions: { value: ShoppingLocation, label: string }[] = [
-    { value: 'wet_market', label: 'Wet market' },
-    { value: 'supermarket', label: 'Supermarket' },
-    { value: 'online', label: 'Online delivery' },
-    { value: 'mixed', label: 'Mix of places' }
-];
-
-const goalOptions: { value: UserGoal, label: string }[] = [
-    { value: 'save_money', label: 'Save money on groceries' },
-    { value: 'reduce_waste', label: 'Reduce food waste by half' },
-    { value: 'meal_planning', label: 'Learn better meal planning' },
-    { value: 'stop_spoiling', label: 'Stop throwing away spoiled food' }
-];
-
-const HouseholdInfoSection = () => {
-    const { user } = useAuth();
-    const { settings, setSavingsGoal, setHouseholdSize, setMonthlyBudget } = useUserSettingsStore();
-    const { toast } = useToast();
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [localSavingsGoal, setLocalSavingsGoal] = useState(settings.savingsGoal);
-    const [householdSize, setHouseholdSizeState] = useState<HouseholdSize>(settings.householdSize || '2');
-    const [monthlyBudget, setMonthlyBudgetState] = useState<MonthlyBudget>(settings.monthlyBudget || '6k_10k');
-
-    useEffect(() => {
-        setLocalSavingsGoal(settings.savingsGoal);
-        setHouseholdSizeState(settings.householdSize || '2');
-        setMonthlyBudgetState(settings.monthlyBudget || '6k_10k');
-    }, [settings]);
-
-    const handleSave = async () => {
-        if (!user || !localSavingsGoal) return;
-        setSavingsGoal(localSavingsGoal);
-        setHouseholdSize(householdSize);
-        setMonthlyBudget(monthlyBudget);
-        await saveUserSettings(user.uid, { ...settings, savingsGoal: localSavingsGoal, householdSize, monthlyBudget });
-        toast({ title: 'Household Info Updated!', description: `Your settings have been saved.` });
-        setIsEditing(false);
-    };
-
-    return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Users className="text-primary" />
-                        Household & Budget
-                    </CardTitle>
-                    <Button size="sm" variant={isEditing ? 'default' : 'ghost'} onClick={isEditing ? handleSave : () => setIsEditing(true)}>
-                        {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                        {isEditing ? 'Save' : 'Edit'}
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="household-size">Household Size</Label>
-                    <Select value={householdSize} onValueChange={(value) => setHouseholdSizeState(value as HouseholdSize)} disabled={!isEditing}>
-                        <SelectTrigger id="household-size"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            {householdSizeOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                 <div className="grid gap-2">
-                    <Label htmlFor="monthly-budget">Monthly Grocery Budget</Label>
-                    <Select value={monthlyBudget} onValueChange={(value) => setMonthlyBudgetState(value as MonthlyBudget)} disabled={!isEditing}>
-                        <SelectTrigger id="monthly-budget"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            {budgetOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="savings-goal">Monthly Savings Goal</Label>
-                    <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">₱</span>
-                        <Input
-                            id="savings-goal"
-                            type="number"
-                            value={localSavingsGoal}
-                            onChange={(e) => setLocalSavingsGoal(Number(e.target.value))}
-                            className="font-semibold"
-                            disabled={!isEditing}
-                        />
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-const FoodAndLifestyleSection = () => {
-    const { user } = useAuth();
-    const { settings, setDietaryRestrictions, setCookingFrequency, setShoppingLocations, setNotes } = useUserSettingsStore();
-    const { toast } = useToast();
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [localDietary, setLocalDietary] = useState<DietaryRestriction[]>(settings.dietaryRestrictions || []);
-    const [localFrequency, setLocalFrequency] = useState<CookingFrequency>(settings.cookingFrequency || 'daily');
-    const [localShopping, setLocalShopping] = useState<ShoppingLocation[]>(settings.shoppingLocations || ['supermarket']);
-    const [localNotes, setLocalNotes] = useState(settings.notes || '');
-
-    useEffect(() => {
-        setLocalDietary(settings.dietaryRestrictions || []);
-        setLocalFrequency(settings.cookingFrequency || 'daily');
-        setLocalShopping(settings.shoppingLocations || ['supermarket']);
-        setLocalNotes(settings.notes || '');
-    }, [settings]);
-
-    const handleSave = async () => {
-        if (!user) return;
-        setDietaryRestrictions(localDietary);
-        setCookingFrequency(localFrequency);
-        setShoppingLocations(localShopping);
-        setNotes(localNotes);
-
-        await saveUserSettings(user.uid, { 
-            ...settings, 
-            dietaryRestrictions: localDietary, 
-            cookingFrequency: localFrequency, 
-            shoppingLocations: localShopping,
-            notes: localNotes
-        });
-        toast({ title: 'Lifestyle Info Updated!', description: 'Your preferences have been saved.' });
-        setIsEditing(false);
-    };
-
-    return (
-        <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Heart className="text-primary" /> Food & Lifestyle
-                    </CardTitle>
-                    <Button size="sm" variant={isEditing ? 'default' : 'ghost'} onClick={isEditing ? handleSave : () => setIsEditing(true)}>
-                        {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                        {isEditing ? 'Save' : 'Edit'}
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                    <Label>Dietary Restrictions</Label>
-                    <div className="space-y-2">
-                        {dietaryOptions.map(option => (
-                            <div key={option.value} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={option.value}
-                                    checked={localDietary.includes(option.value)}
-                                    onCheckedChange={(checked) => {
-                                        const newDietary = checked
-                                            ? [...localDietary, option.value]
-                                            : localDietary.filter(item => item !== option.value);
-                                        setLocalDietary(newDietary);
-                                    }}
-                                    disabled={!isEditing}
-                                />
-                                <label htmlFor={option.value} className="text-sm font-medium leading-none">
-                                    {option.label}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="cooking-frequency">Cooking Frequency</Label>
-                    <Select value={localFrequency} onValueChange={(value) => setLocalFrequency(value as CookingFrequency)} disabled={!isEditing}>
-                        <SelectTrigger id="cooking-frequency"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            {cookingFrequencyOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                 <div className="grid gap-2">
-                    <Label>Shopping Locations</Label>
-                    <div className="space-y-2">
-                       {shoppingLocationOptions.map(option => (
-                            <div key={option.value} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={option.value}
-                                    checked={localShopping.includes(option.value)}
-                                    onCheckedChange={(checked) => {
-                                        const newShopping = checked
-                                            ? [...localShopping, option.value]
-                                            : localShopping.filter(item => item !== option.value);
-                                        setLocalShopping(newShopping);
-                                    }}
-                                    disabled={!isEditing}
-                                />
-                                <label htmlFor={option.value} className="text-sm font-medium leading-none">
-                                    {option.label}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                 <div className="grid gap-2">
-                    <Label htmlFor="notes">Other Notes/Preferences</Label>
-                    <Textarea 
-                        id="notes" 
-                        placeholder="e.g. family loves spicy food, busy on weekends..."
-                        value={localNotes}
-                        onChange={(e) => setLocalNotes(e.target.value)}
-                        disabled={!isEditing}
-                    />
-                </div>
-            </CardContent>
-        </Card>
-    );
-}
-
-const GoalSection = () => {
-    const { user } = useAuth();
-    const { settings, setPrimaryGoal } = useUserSettingsStore();
-    const { toast } = useToast();
-    
-    const [isEditing, setIsEditing] = useState(false);
-    const [localGoal, setLocalGoal] = useState<UserGoal>(settings.primaryGoal || 'save_money');
-    
-     useEffect(() => {
-        setLocalGoal(settings.primaryGoal || 'save_money');
-    }, [settings]);
-    
-    const handleSave = async () => {
-        if (!user) return;
-        setPrimaryGoal(localGoal);
-        await saveUserSettings(user.uid, { ...settings, primaryGoal: localGoal });
-        toast({ title: 'Goal Updated!', description: 'Your main goal has been saved.' });
-        setIsEditing(false);
-    };
-    
-    return (
-         <Card>
-            <CardHeader>
-                <div className="flex justify-between items-center">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                        <Target className="text-primary" /> Your Goal
-                    </CardTitle>
-                     <Button size="sm" variant={isEditing ? 'default' : 'ghost'} onClick={isEditing ? handleSave : () => setIsEditing(true)}>
-                        {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                        {isEditing ? 'Save' : 'Edit'}
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                 <div className="grid gap-2">
-                    <Label htmlFor="primary-goal">What would you like to achieve?</Label>
-                    <Select value={localGoal} onValueChange={(value) => setLocalGoal(value as UserGoal)} disabled={!isEditing}>
-                        <SelectTrigger id="primary-goal"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            {goalOptions.map(option => (
-                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </CardContent>
-        </Card>
-    )
 }
 
 export default function ProfilePage() {
@@ -391,9 +87,24 @@ export default function ProfilePage() {
                 </CardHeader>
             </Card>
 
-            <HouseholdInfoSection />
-            <FoodAndLifestyleSection />
-            <GoalSection />
+             <Card 
+                className="cursor-pointer hover:bg-secondary/50 transition-colors"
+                onClick={() => router.push('/user-preference')}
+            >
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <PencilRuler className="w-5 h-5 text-primary" />
+                            <CardTitle className="text-lg">User Preferences</CardTitle>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <CardDescription>
+                        Update your household, lifestyle, and food waste goals to get better recommendations.
+                    </CardDescription>
+                </CardHeader>
+            </Card>
+
 
             {/* Main Settings */}
             <Card>
