@@ -50,13 +50,6 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
             <CardContent className="p-4 pt-0 flex-1 flex flex-col justify-between">
                 <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">{solution.description}</p>
-                    <div className="space-y-1">
-                        <div className="flex justify-between items-center text-xs text-muted-foreground">
-                            <span>Success Rate</span>
-                            <span>{Math.round(solution.successRate * 100)}%</span>
-                        </div>
-                        <Progress value={solution.successRate * 100} className="h-2" />
-                    </div>
                 </div>
                  <Button 
                     size="sm" 
