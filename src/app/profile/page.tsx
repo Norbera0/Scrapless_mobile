@@ -24,6 +24,7 @@ import { useRecipeStore } from '@/stores/recipe-store';
 import { useShoppingListStore } from '@/stores/shopping-list-store';
 import { useChatStore } from '@/stores/chat-store';
 import { useWasteInsightStore } from '@/stores/waste-insight-store';
+import { usePantryLogStore } from '@/stores/pantry-store';
 
 const getInitials = (name?: string | null) => {
     if (!name) return '?';
@@ -44,16 +45,28 @@ export default function ProfilePage() {
     const handleLogout = async () => {
         setIsLoggingOut(true);
         try {
-            // Clear all persisted local storage data from Zustand stores
+            // 1. Reset the in-memory state of all stores
+            useCoachStore.getState().setAnalysis(null);
+            useCoachStore.getState().setSolutions(null);
+            useRecipeStore.getState().clearRecipes();
+            useShoppingListStore.getState().setGeneratedList(null);
+            useChatStore.getState().clearMessages();
+            useWasteInsightStore.getState().setInsight(null);
+            usePantryLogStore.getState().reset(); // Resets pantry log draft
+
+            // 2. Clear persisted storage as a failsafe
             useCoachStore.persist.clearStorage();
             useRecipeStore.persist.clearStorage();
             useShoppingListStore.persist.clearStorage();
             useChatStore.persist.clearStorage();
             useWasteInsightStore.persist.clearStorage();
             
-            // Clean up all Firestore listeners
+            // 3. Clean up all Firestore listeners
             cleanupListeners();
+            
+            // 4. Sign out from Firebase
             await signOut(auth);
+
             toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
             router.push('/login');
         } catch (error) {

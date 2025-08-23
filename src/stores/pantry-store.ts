@@ -158,9 +158,5 @@ export const usePantryLogStore = create<PantryLogState>()((set, get) => ({
     return { deductedItems, missingItems };
   },
   setPantryInitialized: (initialized) => set({ pantryInitialized: initialized }),
-  reset: () => set({ 
-    photoDataUri: null,
-    textInput: '',
-    items: [],
-  }),
+  reset: () => set(initialState),
 }));
