@@ -47,19 +47,19 @@ const HouseholdInfoSection = () => {
     const { toast } = useToast();
 
     const [isEditing, setIsEditing] = useState(false);
-    const [savingsGoal, setSavingsGoal] = useState(settings.savingsGoal || 5000);
+    const [localSavingsGoal, setLocalSavingsGoal] = useState(settings.savingsGoal || 5000);
     const [householdSize, setHouseholdSizeState] = useState<HouseholdSize>(settings.householdSize || '2');
 
     useEffect(() => {
-        setSavingsGoal(settings.savingsGoal || 5000);
+        setLocalSavingsGoal(settings.savingsGoal || 5000);
         setHouseholdSizeState(settings.householdSize || '2');
     }, [settings]);
 
     const handleSave = async () => {
         if (!user) return;
-        setSavingsGoal(savingsGoal);
+        setSavingsGoal(localSavingsGoal);
         setHouseholdSize(householdSize);
-        await saveUserSettings(user.uid, { ...settings, savingsGoal, householdSize });
+        await saveUserSettings(user.uid, { ...settings, savingsGoal: localSavingsGoal, householdSize });
         toast({ title: 'Household Info Updated!', description: `Your settings have been saved.` });
         setIsEditing(false);
     };
@@ -106,8 +106,8 @@ const HouseholdInfoSection = () => {
                         <Input
                             id="savings-goal"
                             type="number"
-                            value={savingsGoal}
-                            onChange={(e) => setSavingsGoal(Number(e.target.value))}
+                            value={localSavingsGoal}
+                            onChange={(e) => setLocalSavingsGoal(Number(e.target.value))}
                             className="font-semibold"
                             disabled={!isEditing}
                         />
