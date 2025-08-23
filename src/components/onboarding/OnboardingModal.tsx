@@ -29,7 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import type { HouseholdSize, MonthlyBudget, DietaryRestriction, CookingFrequency, ShoppingLocation, UserGoal } from '@/types';
 import { cn } from '@/lib/utils';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, CookingPot, Package, Banknote, Landmark } from 'lucide-react';
 import { Input } from '../ui/input';
 
 interface OnboardingModalProps {
@@ -80,6 +80,7 @@ const goalOptions: { value: UserGoal; label: string }[] = [
 export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
   const { settings, setSettings } = useUserSettingsStore();
   const [isSaving, setIsSaving] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
@@ -97,19 +98,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const [notes, setNotes] = useState('');
   const [savingsGoal, setSavingsGoal] = useState(settings.savingsGoal || 5000);
 
-  const totalSteps = 7;
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-    setCurrentStep(api.selectedScrollSnap());
-    api.on("select", () => {
-      setCurrentStep(api.selectedScrollSnap());
-    });
-  }, [api]);
-
-  const handleSave = async () => {
+  const handleSaveAndFinish = async () => {
     if (!user) return;
     setIsSaving(true);
     try {
@@ -130,12 +119,23 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
       await saveUserSettings(user.uid, newSettings);
       toast({ title: "Preferences Saved!", description: "Your experience is now personalized." });
       onClose();
+      router.push('/log-waste?method=camera'); // Redirect after saving
     } catch (error) {
       toast({ variant: 'destructive', title: "Save Failed", description: "Could not save your preferences." });
     } finally {
       setIsSaving(false);
     }
   };
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+    setCurrentStep(api.selectedScrollSnap());
+    api.on("select", () => {
+      setCurrentStep(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   const handleDietaryChange = (checked: boolean, value: DietaryRestriction) => {
     if (value === 'none') {
@@ -236,8 +236,27 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     },
     { title: "Other Notes", content: 
         <Textarea placeholder="e.g. Kids are picky eaters, I prefer quick meals..." value={notes} onChange={e => setNotes(e.target.value)} rows={5} />
-    }
+    },
+    {
+      title: "Confirmation",
+      content: (
+          <div className="flex flex-col items-center text-center space-y-4 p-6">
+            <h2 className="text-2xl font-bold">You’re all set!</h2>
+            <p className="text-gray-600">
+                We’ve saved your preferences. Here’s how to get started:
+            </p>
+            <div className="grid gap-3 text-left w-full max-w-sm">
+                <div className="flex items-center gap-3">🥘 <b>Log your food waste</b> — snap a photo or use voice</div>
+                <div className="flex items-center gap-3">📦 <b>Add food items to your pantry</b> — keep track & get recipes</div>
+                <div className="flex items-center gap-3">💰 <b>See how much you’ve saved</b> — money + CO₂ reduced</div>
+                <div className="flex items-center gap-3">🏦 <b>Grow your savings with BPI</b> — less waste, more savings</div>
+            </div>
+          </div>
+      ),
+    },
   ];
+  
+  const totalSteps = steps.length;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -256,7 +275,9 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
                 <CarouselContent className="-ml-4 h-full">
                     {steps.map((step, index) => (
                         <CarouselItem key={index} className="pl-4 flex flex-col">
-                            <Label className="font-semibold text-base mb-4">{step.title}</Label>
+                           {step.title !== 'Confirmation' && (
+                                <Label className="font-semibold text-base mb-4">{step.title}</Label>
+                            )}
                             <div className="flex-1 overflow-y-auto pr-2">
                                 {step.content}
                             </div>
@@ -278,9 +299,9 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
                         Back
                     </Button>
                     {currentStep === totalSteps - 1 ? (
-                         <Button onClick={handleSave} disabled={isSaving}>
+                         <Button onClick={handleSaveAndFinish} disabled={isSaving}>
                             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Finish
+                            Start Logging →
                         </Button>
                     ) : (
                         <Button onClick={() => api?.scrollNext()}>
