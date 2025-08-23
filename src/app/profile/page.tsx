@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles, Shield } from 'lucide-react';
+import { LogOut, ChevronRight, Palette, Bookmark, Edit, Save, PiggyBank, Sparkles, Shield, Users } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { cleanupListeners, saveUserSettings } from '@/lib/data';
@@ -21,6 +21,8 @@ import Link from 'next/link';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ProfilePolicyDialog } from '@/components/auth/ProfilePolicyDialog';
 import { privacyPolicy, termsAndConditions } from '@/lib/legal';
+import type { HouseholdSize } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const getInitials = (name?: string | null) => {
@@ -32,56 +34,84 @@ const getInitials = (name?: string | null) => {
     return name.charAt(0).toUpperCase();
 }
 
-const SavingsGoalSection = () => {
+const householdSizeOptions: { value: HouseholdSize, label: string }[] = [
+    { value: '1', label: 'Just me (1)' },
+    { value: '2', label: '2 people' },
+    { value: '3-4', label: '3-4 people' },
+    { value: '5+', label: '5+ people' }
+];
+
+const HouseholdInfoSection = () => {
     const { user } = useAuth();
-    const { settings, setSavingsGoal } = useUserSettingsStore();
-    const [isEditing, setIsEditing] = useState(false);
-    const [goal, setGoal] = useState(settings.savingsGoal || 5000);
+    const { settings, setSavingsGoal, setHouseholdSize } = useUserSettingsStore();
     const { toast } = useToast();
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [savingsGoal, setSavingsGoal] = useState(settings.savingsGoal || 5000);
+    const [householdSize, setHouseholdSizeState] = useState<HouseholdSize>(settings.householdSize || '2');
+
     useEffect(() => {
-        setGoal(settings.savingsGoal || 5000);
-    }, [settings.savingsGoal]);
+        setSavingsGoal(settings.savingsGoal || 5000);
+        setHouseholdSizeState(settings.householdSize || '2');
+    }, [settings]);
 
     const handleSave = async () => {
         if (!user) return;
-        setSavingsGoal(goal);
-        await saveUserSettings(user.uid, { ...settings, savingsGoal: goal });
-        toast({ title: 'Savings goal updated!', description: `Your new monthly goal is ₱${goal.toLocaleString()}.` });
+        setSavingsGoal(savingsGoal);
+        setHouseholdSize(householdSize);
+        await saveUserSettings(user.uid, { ...settings, savingsGoal, householdSize });
+        toast({ title: 'Household Info Updated!', description: `Your settings have been saved.` });
         setIsEditing(false);
     };
 
     return (
-         <Card>
+        <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                    <PiggyBank className="text-primary" />
-                    Monthly Savings Goal
-                </CardTitle>
+                <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Users className="text-primary" />
+                        Household Information
+                    </CardTitle>
+                    <Button size="sm" variant={isEditing ? 'default' : 'ghost'} onClick={isEditing ? handleSave : () => setIsEditing(true)}>
+                        {isEditing ? <Save className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
+                        {isEditing ? 'Save' : 'Edit'}
+                    </Button>
+                </div>
                 <CardDescription className="text-sm">
-                    Set a target for your virtual savings each month.
+                    Manage your household size and monthly savings goal.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <div className="flex items-center gap-2">
-                    <Label htmlFor="savings-goal" className="whitespace-nowrap">₱</Label>
-                    <Input
-                        id="savings-goal"
-                        type="number"
-                        value={goal}
-                        onChange={(e) => setGoal(Number(e.target.value))}
-                        className="text-base font-semibold"
+                <div className="grid gap-2">
+                    <Label htmlFor="household-size">How many people live in your household?</Label>
+                    <Select
+                        value={householdSize}
+                        onValueChange={(value) => setHouseholdSizeState(value as HouseholdSize)}
                         disabled={!isEditing}
-                    />
-                    {isEditing ? (
-                         <Button size="sm" onClick={handleSave}>
-                            <Save className="w-4 h-4" />
-                        </Button>
-                    ) : (
-                         <Button size="sm" variant="ghost" onClick={() => setIsEditing(true)}>
-                            <Edit className="w-4 h-4" />
-                        </Button>
-                    )}
+                    >
+                        <SelectTrigger id="household-size">
+                            <SelectValue placeholder="Select size..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {householdSizeOptions.map(option => (
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="savings-goal">Monthly Savings Goal</Label>
+                    <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">₱</span>
+                        <Input
+                            id="savings-goal"
+                            type="number"
+                            value={savingsGoal}
+                            onChange={(e) => setSavingsGoal(Number(e.target.value))}
+                            className="font-semibold"
+                            disabled={!isEditing}
+                        />
+                    </div>
                 </div>
             </CardContent>
         </Card>
@@ -167,7 +197,7 @@ export default function ProfilePage() {
                 </Card>
             </div>
 
-            <SavingsGoalSection />
+            <HouseholdInfoSection />
 
             {/* Main Settings */}
             <Card>

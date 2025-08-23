@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UserSettings } from '@/types';
+import type { UserSettings, HouseholdSize } from '@/types';
 
 interface UserSettingsState {
   settings: UserSettings;
@@ -7,17 +7,22 @@ interface UserSettingsState {
   setSettings: (settings: UserSettings) => void;
   setSettingsInitialized: (initialized: boolean) => void;
   setSavingsGoal: (goal: number) => void;
+  setHouseholdSize: (size: HouseholdSize) => void;
 }
 
 export const useUserSettingsStore = create<UserSettingsState>()((set) => ({
   settings: {
     language: 'en',
     savingsGoal: 5000, // Default goal
+    householdSize: '2', // Default household size
   },
   settingsInitialized: false,
   setSettings: (settings) => set({ settings }),
   setSettingsInitialized: (initialized) => set({ settingsInitialized: initialized }),
   setSavingsGoal: (goal) => set(state => ({
     settings: { ...state.settings, savingsGoal: goal }
+  })),
+  setHouseholdSize: (size) => set(state => ({
+    settings: { ...state.settings, householdSize: size }
   })),
 }));

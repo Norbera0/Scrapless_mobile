@@ -72,17 +72,18 @@ export const initializeUserCache = (userId: string) => {
     const settingsDoc = doc(db, `users/${userId}/settings`, 'app');
     const settingsUnsub = onSnapshot(settingsDoc, (doc) => {
         const settings = doc.data() as UserSettings;
-        // Ensure a default savings goal if not present
-        if (!settings?.savingsGoal) {
-            useUserSettingsStore.getState().setSettings({ ...settings, savingsGoal: 5000 });
-        } else {
-            useUserSettingsStore.getState().setSettings(settings);
-        }
+        const defaults = {
+            savingsGoal: 5000,
+            householdSize: '2' as const
+        };
+        // Ensure default values if fields are missing
+        const finalSettings = { ...defaults, ...settings };
+        useUserSettingsStore.getState().setSettings(finalSettings);
         useUserSettingsStore.getState().setSettingsInitialized(true);
     }, (error) => {
         console.error("Error with settings listener:", error);
         // Set default settings on error
-        useUserSettingsStore.getState().setSettings({ savingsGoal: 5000, language: 'en' });
+        useUserSettingsStore.getState().setSettings({ savingsGoal: 5000, language: 'en', householdSize: '2' });
         useUserSettingsStore.getState().setSettingsInitialized(true);
     });
     listenerManager.userSettings.push(settingsUnsub);
@@ -393,14 +394,16 @@ export const getUserSettings = async (userId: string): Promise<UserSettings> => 
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
         const settings = docSnap.data() as UserSettings;
-        // Ensure savingsGoal has a default value
-        if (settings.savingsGoal === undefined) {
-            settings.savingsGoal = 5000;
-        }
-        return settings;
+        const defaults = {
+            savingsGoal: 5000,
+            householdSize: '2' as const
+        };
+        // Ensure default values if fields are missing
+        const finalSettings = { ...defaults, ...settings };
+        return finalSettings;
     }
     // Return default settings if document doesn't exist
-    return { language: 'en', savingsGoal: 5000 };
+    return { language: 'en', savingsGoal: 5000, householdSize: '2' };
 };
 
 
