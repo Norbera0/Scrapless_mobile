@@ -73,7 +73,8 @@ const goalOptions: { value: UserGoal; label: string }[] = [
     { value: 'save_money', label: 'Save money on groceries' },
     { value: 'reduce_waste', label: 'Reduce food waste by half' },
     { value: 'meal_planning', label: 'Learn better meal planning' },
-    { value: 'stop_spoiling', label: 'Stop throwing away spoiled food' }
+    { value: 'stop_spoiling', label: 'Stop throwing away spoiled food' },
+    { value: 'other', label: 'Other' },
 ];
 
 export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
@@ -92,9 +93,11 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   const [frequency, setFrequency] = useState<CookingFrequency>('daily');
   const [shopping, setShopping] = useState<ShoppingLocation[]>(['supermarket']);
   const [goal, setGoal] = useState<UserGoal>('save_money');
+  const [otherGoalText, setOtherGoalText] = useState('');
   const [notes, setNotes] = useState('');
+  const [savingsGoal, setSavingsGoal] = useState(settings.savingsGoal || 5000);
 
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   useEffect(() => {
     if (!api) {
@@ -119,7 +122,9 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
         cookingFrequency: frequency,
         shoppingLocations: shopping,
         primaryGoal: goal,
+        otherGoal: otherGoalText,
         notes,
+        savingsGoal,
       };
       setSettings(newSettings);
       await saveUserSettings(user.uid, newSettings);
@@ -144,6 +149,7 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
   };
 
   const isAllergiesChecked = dietary.includes('allergies');
+  const isOtherGoalChecked = goal === 'other';
 
   const steps = [
     { title: "Household Size", content: 
@@ -158,25 +164,27 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
     },
     { title: "Dietary Needs", content:
       <div className="space-y-3">
-        {dietaryOptions.map(o => (
-            <div key={o.value} className="flex items-center space-x-2">
-                <Checkbox 
-                    id={o.value} 
-                    checked={dietary.includes(o.value)} 
-                    onCheckedChange={(c) => handleDietaryChange(!!c, o.value)} 
-                />
-                <Label htmlFor={o.value}>{o.label}</Label>
+        {dietaryOptions.map(option => (
+            <div key={option.value}>
+                <div className="flex items-center space-x-2">
+                    <Checkbox 
+                        id={option.value} 
+                        checked={dietary.includes(option.value)} 
+                        onCheckedChange={(c) => handleDietaryChange(!!c, option.value)} 
+                    />
+                    <Label htmlFor={option.value}>{option.label}</Label>
+                </div>
+                 {option.value === 'allergies' && isAllergiesChecked && (
+                    <div className="pl-6 pt-2">
+                        <Input 
+                            placeholder="Please specify allergies..."
+                            value={foodAllergiesText}
+                            onChange={(e) => setFoodAllergiesText(e.target.value)}
+                        />
+                    </div>
+                )}
             </div>
         ))}
-        {isAllergiesChecked && (
-            <div className="pl-6 pt-2">
-                <Input 
-                    placeholder="Please specify allergies..."
-                    value={foodAllergiesText}
-                    onChange={(e) => setFoodAllergiesText(e.target.value)}
-                />
-            </div>
-        )}
       </div>
     },
     { title: "Cooking & Shopping", content:
@@ -196,9 +204,35 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
       </div>
     },
     { title: "Primary Goal", content: 
-      <RadioGroup value={goal} onValueChange={setGoal} className="gap-3">
-        {goalOptions.map(o => <div key={o.value} className="flex items-center space-x-2"><RadioGroupItem value={o.value} id={o.value}/><Label htmlFor={o.value}>{o.label}</Label></div>)}
-      </RadioGroup> 
+      <div className="space-y-3">
+          <RadioGroup value={goal} onValueChange={(value) => setGoal(value as UserGoal)} className="gap-3">
+            {goalOptions.map(o => <div key={o.value} className="flex items-center space-x-2"><RadioGroupItem value={o.value} id={o.value}/><Label htmlFor={o.value}>{o.label}</Label></div>)}
+          </RadioGroup>
+          {isOtherGoalChecked && (
+             <div className="pl-6 pt-2">
+                <Input 
+                    placeholder="What's your main goal?"
+                    value={otherGoalText}
+                    onChange={(e) => setOtherGoalText(e.target.value)}
+                />
+            </div>
+          )}
+      </div>
+    },
+    { title: "Monthly Savings Goal", content: 
+        <div className="grid gap-2">
+            <p className="text-sm text-muted-foreground">How much would you like to save each month by reducing waste?</p>
+            <div className="flex items-center gap-2">
+                <span className="text-muted-foreground font-semibold text-lg">₱</span>
+                <Input
+                    type="number"
+                    value={savingsGoal}
+                    onChange={(e) => setSavingsGoal(Number(e.target.value))}
+                    className="text-lg font-bold h-12"
+                    placeholder="5,000"
+                />
+            </div>
+        </div>
     },
     { title: "Other Notes", content: 
         <Textarea placeholder="e.g. Kids are picky eaters, I prefer quick meals..." value={notes} onChange={e => setNotes(e.target.value)} rows={5} />
@@ -207,10 +241,9 @@ export function OnboardingModal({ isOpen, onClose }: OnboardingModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-        if (!open) {
-            return;
+        if (!open && !isSaving) { // only allow close if not saving
+            onClose();
         }
-        onClose();
     }}>
       <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col p-0" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader className="p-6 pb-2">

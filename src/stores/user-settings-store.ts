@@ -14,6 +14,7 @@ interface UserSettingsState {
   setCookingFrequency: (frequency: CookingFrequency) => void;
   setShoppingLocations: (locations: ShoppingLocation[]) => void;
   setPrimaryGoal: (goal: UserGoal) => void;
+  setOtherGoal: (goalText: string) => void;
   setNotes: (notes: string) => void;
 }
 
@@ -27,6 +28,7 @@ const defaultSettings: UserSettings = {
   cookingFrequency: 'daily',
   shoppingLocations: ['supermarket'],
   primaryGoal: 'save_money',
+  otherGoal: '',
   notes: '',
 };
 
@@ -58,6 +60,9 @@ export const useUserSettingsStore = create<UserSettingsState>()((set) => ({
   })),
   setPrimaryGoal: (goal) => set(state => ({
     settings: { ...state.settings, primaryGoal: goal }
+  })),
+  setOtherGoal: (goalText) => set(state => ({
+    settings: { ...state.settings, otherGoal: goalText }
   })),
   setNotes: (notes) => set(state => ({
     settings: { ...state.settings, notes: notes }

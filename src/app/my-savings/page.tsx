@@ -179,7 +179,7 @@ export default function MySavingsPage() {
                         <>
                             <div className="flex justify-between items-center text-sm text-muted-foreground mb-1">
                                 <span className="font-medium text-primary">₱{currentGoalProgress.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
-                                <span>₱{goalAmount.toLocaleString()}</span>
+                                <span>₱{settings.savingsGoal.toLocaleString()}</span>
                             </div>
                             <Progress value={goalProgressPercent} />
                             <p className="text-xs text-muted-foreground text-right mt-1">{goalProgressPercent.toFixed(0)}% to your goal</p>
