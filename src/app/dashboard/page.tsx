@@ -105,18 +105,20 @@ function DashboardContent() {
   const [greeting, setGreeting] = useState("Good morning");
   const [isAddMethodOpen, setIsAddMethodOpen] = useState(false);
   const [isLogWasteMethodOpen, setIsLogWasteMethodOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true); // TEMPORARY: Set to true for debugging
 
   const { total, available } = useSavingsSummary(savingsEvents);
   const transferred = total - available;
 
   useEffect(() => {
+    /* TEMPORARY: Commented out to force onboarding for debugging
     const shouldShow = searchParams.get('onboarding') === 'true';
     if (shouldShow) {
       setShowOnboarding(true);
       // Clean up URL
       router.replace('/dashboard', { scroll: false });
     }
+    */
   }, [searchParams, router]);
 
   useEffect(() => {
