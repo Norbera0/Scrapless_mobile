@@ -1,3 +1,4 @@
+
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -40,7 +41,7 @@ const generateFoodImageFlow = ai.defineFlow(
   async ({ recipeName }) => {
     // 1. Generate the image using the AI model
     const { media } = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-preview-image-generation',
+      model: 'googleai/imagen-3.0-generate-001',
       prompt: `A delicious-looking photo of ${recipeName}, professionally shot for a cookbook, vibrant and appetizing.`,
       config: { responseModalities: ['TEXT', 'IMAGE'] },
     });
