@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { useSavingsStore } from '@/stores/savings-store';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote, Target, TrendingUp, Check, Globe, Settings, History, ChevronRight, Info, Edit, Save } from 'lucide-react';
+import { Loader2, PiggyBank, Sparkles, CheckCircle, ArrowRight, Banknote, Target, TrendingUp, Check, Globe, Settings, History, ChevronRight, Info, Edit, Save, Lightbulb, CookingPot } from 'lucide-react';
 import type { SavingsEvent } from '@/types';
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -240,16 +240,45 @@ export default function MySavingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">Impact Summary</CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-base">How Virtual Savings Work</CardTitle>
+                    <CardDescription>Your savings are calculated based on your positive actions.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
-                        <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-lg">✅</div>
-                        <p className="font-medium">{analytics.totalWasteValue.toFixed(1)}kg food waste prevented</p>
+                <CardContent className="space-y-4 text-sm">
+                     <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 pt-1">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">Avoiding Expiry</p>
+                          <p className="text-muted-foreground">You earn a portion of an item's value when you use it close to its expiration date, preventing waste.</p>
+                        </div>
                      </div>
-                     <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-lg">
-                        <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-lg">🌍</div>
-                        <p className="font-medium">{analytics.totalWasteCO2e.toFixed(1)}kg CO₂ saved</p>
+                     <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 pt-1">
+                           <CookingPot className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">Cooking Recipes</p>
+                          <p className="text-muted-foreground">You save the difference between cooking a suggested recipe and the cost of an average alternative meal.</p>
+                        </div>
+                     </div>
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 pt-1">
+                           <Lightbulb className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">Following Coach Insights</p>
+                          <p className="text-muted-foreground">You earn a bonus for committing to actionable solutions from your AI Kitchen Coach.</p>
+                        </div>
+                     </div>
+                     <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 pt-1">
+                            <TrendingUp className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                            <p className="font-semibold">Weekly Bonuses</p>
+                            <p className="text-muted-foreground">Earn extra savings by having a lower total waste value this week compared to last week.</p>
+                        </div>
                      </div>
                 </CardContent>
             </Card>
