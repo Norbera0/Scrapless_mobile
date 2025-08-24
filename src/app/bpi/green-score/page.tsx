@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { Gauge } from '@/components/ui/gauge';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
+import { Label } from '@/components/ui/label';
 
 const scoreTiers = {
     legend: { min: 850, label: 'Eco-Legend', color: 'text-green-500' },
