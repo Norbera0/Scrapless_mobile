@@ -1,11 +1,10 @@
-
 'use client';
 
 import Image from 'next/image';
 import { type Recipe } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot, Utensils, Bot } from 'lucide-react';
+import { Clock, ChefHat, Bookmark, ImageOff, Users, Leaf, Zap, Globe, Heart, CookingPot, Utensils, Bot, CalendarPlus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardFooter, CardHeader } from '../ui/card';
 import { cn } from '@/lib/utils';
@@ -19,9 +18,10 @@ interface RecipeCardProps {
   recipe: Recipe;
   isSaved: boolean;
   onToggleSave: (recipe: Recipe) => void;
+  onAddToPlan: (recipe: Recipe) => void;
 }
 
-export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
+export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: RecipeCardProps) {
     const { toast } = useToast();
     const { user } = useAuth();
     const deductRecipeIngredients = usePantryLogStore((state) => state.deductRecipeIngredients);
@@ -32,13 +32,10 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
         e.stopPropagation();
         if (!user) return;
 
-        // 1. Optimistically update the UI by deducting ingredients from the pantry store
         const { deductedItems, missingItems } = deductRecipeIngredients(recipe.ingredients);
 
-        // 2. Trigger the backend calculation for savings
         calculateAndSaveRecipeSavings(user, recipe).catch(err => {
             console.error("Failed to save recipe savings event:", err);
-            // Here you might want to add logic to revert the optimistic update if the backend fails
         });
         
         let description = `You've earned savings for cooking "${recipe.name}".`;
@@ -54,7 +51,6 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
             description,
         });
 
-        // 3. Remove the recipe from the suggestion list
         setRecipes(currentRecipes.filter(r => r.id !== recipe.id));
     };
 
@@ -99,14 +95,14 @@ export function RecipeCard({ recipe, isSaved, onToggleSave }: RecipeCardProps) {
                     </div>
                 </CardContent>
                 <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2">
+                    <Button size="sm" variant="secondary" className="h-auto px-3 py-1 text-xs flex-1" onClick={() => onAddToPlan(recipe)}>
+                        <CalendarPlus className="mr-2 h-4 w-4" /> Add to Plan
+                    </Button>
                     <DialogTrigger asChild>
                          <Button size="sm" className="h-auto px-3 py-1 text-xs flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
                             View Recipe
                         </Button>
                     </DialogTrigger>
-                    <Button size="sm" variant="secondary" className="h-auto px-3 py-1 text-xs flex-1" onClick={handleMarkAsCooked}>
-                        Cooked
-                    </Button>
                 </CardFooter>
             </Card>
 

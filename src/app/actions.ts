@@ -1,9 +1,8 @@
-
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { saveInsight } from '@/lib/data';
-import type { Insight, User } from '@/types';
+import { saveInsight, scheduleRecipe as scheduleRecipeInData } from '@/lib/data';
+import type { Insight, User, Recipe } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
 import { analyzeWastePatterns as analyzeWastePatternsFlow, type AnalyzeWastePatternsInput, type AnalyzeWastePatternsOutput } from '@/ai/flows/analyze-waste-patterns';
@@ -75,5 +74,14 @@ export async function fetchItemInsights(input: GetItemInsightsInput): Promise<Ge
     } catch (error) {
         console.error("Error getting item insights in server action:", error);
         throw new Error("Failed to get item insights.");
+    }
+}
+
+export async function scheduleRecipe(userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> {
+    try {
+        await scheduleRecipeInData(userId, recipe, scheduledDate, mealType);
+    } catch (error) {
+        console.error("Error scheduling recipe in server action:", error);
+        throw new Error("Failed to schedule recipe.");
     }
 }

@@ -1,5 +1,3 @@
-
-
 'use client';
 import { db } from './firebase';
 import type { WasteLog, PantryItem, Recipe, User, SavingsEvent, GreenPointsEvent, UserSettings } from '@/types';
@@ -396,6 +394,16 @@ export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string
 export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
+
+export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']) => {
+    const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
+    // Use set with merge to ensure we don't overwrite other recipe data
+    await setDoc(recipeRef, {
+        isScheduled: true,
+        scheduledDate,
+        mealType,
+    }, { merge: true });
+};
 
 // --- User Settings Functions ---
 export const getUserSettings = async (userId: string): Promise<UserSettings> => {
