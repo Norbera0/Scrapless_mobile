@@ -62,7 +62,7 @@ export default function BpiPage() {
                     <div>
                         <CardTitle className="flex items-center gap-2">
                              <ShieldCheck className="w-5 h-5 text-primary" />
-                            Green Score
+                            Sustainability Score
                         </CardTitle>
                         <CardDescription>Check your sustainability score for potential eco-friendly financial products.</CardDescription>
                     </div>
@@ -82,7 +82,7 @@ export default function BpiPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground">
-                        Your responsible consumption, tracked through Scrapless, can now contribute to a better financial future. By using our app, you're not just saving money on groceries—you're building a "Green Score" that demonstrates your commitment to sustainability, potentially unlocking future eco-friendly financial products from BPI.
+                        Your responsible consumption, tracked through Scrapless, can now contribute to a better financial future. By using our app, you're not just saving money on groceries—you're building a "Sustainability Score" that demonstrates your commitment to sustainability, potentially unlocking future eco-friendly financial products from BPI.
                     </p>
                 </CardContent>
             </Card>

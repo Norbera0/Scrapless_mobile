@@ -72,7 +72,7 @@ export default function BpiTransferPage() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Suggest transfer to BPI</CardTitle>
+                <CardTitle>Suggest a Transfer</CardTitle>
                 <CardDescription>Move your eco-savings to your BPI account.</CardDescription>
             </CardHeader>
             <CardContent>

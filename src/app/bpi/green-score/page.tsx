@@ -53,7 +53,7 @@ const BadgeDisplay = ({ badge }: { badge: string }) => {
     );
 };
 
-export default function GreenScorePage() {
+export default function SustainabilityScorePage() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const { score, breakdown, badges, calculateScore } = useGreenScoreStore();
     const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +85,7 @@ export default function GreenScorePage() {
             <div className="space-y-1">
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
                     <ShieldCheck className="w-8 h-8 text-primary" />
-                    Green Score
+                    Sustainability Score
                 </h1>
                 <p className="text-muted-foreground text-sm">
                     Your sustainability score, powered by your daily habits.
@@ -95,7 +95,7 @@ export default function GreenScorePage() {
             <Card className="text-center">
                 <CardHeader>
                     <CardTitle className={`text-2xl font-bold ${tier.color}`}>{tier.label}</CardTitle>
-                    <CardDescription>Your current Green Score reflects your positive environmental and financial habits.</CardDescription>
+                    <CardDescription>Your current Sustainability Score reflects your positive environmental and financial habits.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center">
                     <Gauge value={score} max={1000} size={200} strokeWidth={20} />
