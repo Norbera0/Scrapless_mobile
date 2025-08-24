@@ -256,11 +256,11 @@ function DashboardContent() {
                     <CardTitle className="text-lg font-bold tracking-tight sm:text-xl">{user?.name}'s Impact</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 grid grid-cols-2 gap-6 text-center">
-                    <div>
+                    <div className="cursor-pointer" onClick={() => router.push('/my-savings')}>
                         <p className="text-xs text-green-200 mb-1">Total Virtual Savings</p>
                         <div className="flex items-center justify-center gap-2">
                             <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
-                            <Info className="w-4 h-4 text-green-200 cursor-pointer" onClick={() => router.push('/my-savings')}/>
+                            <Info className="w-4 h-4 text-green-200"/>
                         </div>
                     </div>
                     <div>
