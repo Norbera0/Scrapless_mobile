@@ -246,7 +246,7 @@ export default function CookAndShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6 pb-24">
       <div className="space-y-1">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
           <ChefHat className="w-8 h-8 text-primary" />
