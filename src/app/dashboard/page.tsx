@@ -247,7 +247,7 @@ function DashboardContent() {
       <div className="relative min-h-full">
          <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('/dashboard/total_impact_bg.jpg')" }}></div>
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
-        <div className="relative p-5 space-y-6">
+        <div className="relative p-5 space-y-6 pb-24">
 
             <Card className="shadow-lg text-white relative overflow-hidden rounded-2xl">
               <Image src="/dashboard/user_impact_final.jpg" layout="fill" objectFit="cover" alt="Dashboard hero image" className="z-0" data-ai-hint="impact savings" />
