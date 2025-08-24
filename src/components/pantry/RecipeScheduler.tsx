@@ -47,6 +47,7 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     setIsSaving(true);
     try {
         const scheduledDateISO = selectedDate.toISOString();
+        console.log('[RecipeScheduler] Saving...', { recipeId: recipe.id, scheduledDate: scheduledDateISO, mealType });
         
         // Optimistically update the UI in Zustand
         updateRecipe(recipe.id, {
@@ -64,6 +65,7 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
         });
         onClose();
     } catch (error) {
+        console.error('[RecipeScheduler] Scheduling failed:', error);
         // Revert optimistic update on failure
         updateRecipe(recipe.id, {
             isScheduled: recipe.isScheduled,
@@ -106,8 +108,8 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
                  <ToggleGroup 
                     type="single" 
                     value={mealType}
-                    onValueChange={(value: Recipe['mealType']) => {
-                        if (value) setMealType(value);
+                    onValueChange={(value) => {
+                        if (value) setMealType(value as Recipe['mealType']);
                     }}
                     className="grid grid-cols-2 sm:grid-cols-4 gap-2"
                 >

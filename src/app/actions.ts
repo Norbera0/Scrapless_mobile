@@ -1,7 +1,7 @@
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { saveInsight, scheduleRecipe as scheduleRecipeInData } from '@/lib/data';
+import { saveRecipe as saveRecipeData, scheduleRecipe as scheduleRecipeInData } from '@/lib/data';
 import type { Insight, User, Recipe } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
@@ -79,6 +79,7 @@ export async function fetchItemInsights(input: GetItemInsightsInput): Promise<Ge
 
 export async function scheduleRecipe(userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> {
     try {
+        console.log('[Server Action] scheduleRecipe called with:', { userId, recipeId: recipe.id, scheduledDate, mealType });
         await scheduleRecipeInData(userId, recipe, scheduledDate, mealType);
     } catch (error) {
         console.error("Error scheduling recipe in server action:", error);

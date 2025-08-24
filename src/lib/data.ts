@@ -396,9 +396,24 @@ export const unsaveRecipe = async (userId: string, recipeId: string) => {
 }
 
 export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']) => {
-    const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
-    // Use set with merge to ensure we don't overwrite other recipe data
-    await setDoc(recipeRef, {
+    const savedRecipeCollection = collection(db, `users/${userId}/savedRecipes`);
+    // Find if the recipe is already saved
+    const recipeQuery = query(savedRecipeCollection, where('id', '==', recipe.id));
+    const querySnapshot = await getDocs(recipeQuery);
+
+    let docRef;
+    if (querySnapshot.empty) {
+        // If not saved, create a new document with the recipe id
+        docRef = doc(savedRecipeCollection, recipe.id);
+    } else {
+        // If already saved, use its reference
+        docRef = querySnapshot.docs[0].ref;
+    }
+
+    console.log('[scheduleRecipe] Saving to Firestore:', { isScheduled: true, scheduledDate, mealType });
+
+    await setDoc(docRef, {
+        ...recipe, // Save the full recipe data
         isScheduled: true,
         scheduledDate,
         mealType,
