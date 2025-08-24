@@ -42,7 +42,8 @@ import {
   Camera,
   Mic,
   Type,
-  CookingPot
+  CookingPot,
+  ChevronRight
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatPeso, estimateRiceKgFromPesos, estimateWaterSavedLitersFromSavings } from '@/lib/utils';
@@ -260,7 +261,7 @@ function DashboardContent() {
                         <p className="text-xs text-green-200 mb-1">Total Virtual Savings</p>
                         <div className="flex items-center justify-center gap-2">
                             <p className="text-2xl sm:text-3xl font-bold">{formatPeso(analytics.totalVirtualSavings)}</p>
-                            <Info className="w-4 h-4 text-green-200"/>
+                            <ChevronRight className="w-5 h-5 text-green-200"/>
                         </div>
                     </div>
                     <div>
