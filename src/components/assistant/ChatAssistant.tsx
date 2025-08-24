@@ -206,7 +206,7 @@ export function ChatAssistant() {
                 <Card className="max-w-md">
                     <CardContent className="p-3 text-sm flex items-center">
                         <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                        <span>Thinking...</span>
+                        <span>Typing...</span>
                     </CardContent>
                 </Card>
             </div>
