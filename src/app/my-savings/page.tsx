@@ -246,20 +246,11 @@ export default function MySavingsPage() {
                 <CardContent className="space-y-4 text-sm">
                      <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 pt-1">
-                          <CheckCircle className="w-5 h-5 text-green-600" />
+                            <TrendingUp className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                          <p className="font-semibold">Avoiding Expiry</p>
-                          <p className="text-muted-foreground">You earn a portion of an item's value when you use it close to its expiration date, preventing waste.</p>
-                        </div>
-                     </div>
-                     <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 pt-1">
-                           <CookingPot className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">Cooking Recipes</p>
-                          <p className="text-muted-foreground">You save the difference between cooking a suggested recipe and the cost of an average alternative meal.</p>
+                            <p className="font-semibold">Weekly Bonuses</p>
+                            <p className="text-muted-foreground">Earn extra savings by having a lower total waste value this week compared to last week.</p>
                         </div>
                      </div>
                       <div className="flex items-start gap-3">
@@ -273,11 +264,20 @@ export default function MySavingsPage() {
                      </div>
                      <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 pt-1">
-                            <TrendingUp className="w-5 h-5 text-green-600" />
+                          <CheckCircle className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                            <p className="font-semibold">Weekly Bonuses</p>
-                            <p className="text-muted-foreground">Earn extra savings by having a lower total waste value this week compared to last week.</p>
+                          <p className="font-semibold">Avoiding Expiry</p>
+                          <p className="text-muted-foreground">You earn a portion of an item's value when you use it close to its expiration date. The calculation is based on the item's cost and its probability of being wasted.</p>
+                        </div>
+                     </div>
+                     <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 pt-1">
+                           <CookingPot className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">Cooking Recipes</p>
+                          <p className="text-muted-foreground">You save the difference between cooking a suggested recipe and the cost of an average alternative meal.</p>
                         </div>
                      </div>
                 </CardContent>
