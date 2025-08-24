@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -13,6 +14,7 @@ import { calculateAndSaveRecipeSavings } from '@/lib/savings';
 import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useRecipeStore } from '@/stores/recipe-store';
+import { unsaveRecipe as unsaveRecipeFromDB } from '@/lib/data';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -38,6 +40,11 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
             console.error("Failed to save recipe savings event:", err);
         });
         
+        // Remove the recipe from the database as well
+        unsaveRecipeFromDB(user.uid, recipe.id).catch(err => {
+             console.error("Failed to unsave cooked recipe from DB:", err);
+        });
+
         let description = `You've earned savings for cooking "${recipe.name}".`;
         if (deductedItems.length > 0) {
             description += ` Your pantry has been updated.`
