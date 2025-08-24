@@ -90,7 +90,7 @@ export default function MySavingsPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+        <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen pb-24">
              <div className="flex items-center justify-between">
                 <div className="space-y-1">
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 Virtual Savings</h1>
