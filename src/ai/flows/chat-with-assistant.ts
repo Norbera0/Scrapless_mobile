@@ -115,6 +115,7 @@ const chatWithAssistantFlow = ai.defineFlow(
     name: 'chatWithAssistantFlow',
     inputSchema: ChatWithAssistantInputSchema,
     outputSchema: ChatWithAssistantOutputSchema,
+    model: 'googleai/gemini-2.5-flash',
   },
   async (input) => {
     let userQuery = input.query;
