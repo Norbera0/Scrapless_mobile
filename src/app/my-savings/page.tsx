@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { BpiTransferForm } from '@/app/bpi/transfer/page';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { saveUserSettings } from '@/lib/data';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function MySavingsPage() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -208,29 +209,31 @@ export default function MySavingsPage() {
                     <CardDescription>See how your smart habits are adding up.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ScrollArea className="h-48">
-                        <div className="space-y-3 pr-4">
-                            {savingsEvents.map(event => (
-                                <div key={event.id} className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <p className="font-medium text-sm">{event.description}</p>
-                                        <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMM d, h:mm a')}</p>
-                                    </div>
-                                     <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <p className="font-semibold text-green-600 text-sm whitespace-nowrap cursor-help flex items-center gap-1">
-                                                    + ₱{event.amount.toFixed(2)} <Info className="w-3 h-3 text-muted-foreground" />
+                    <ScrollArea className="h-48 pr-4">
+                        {savingsEvents.length > 0 ? (
+                             <Accordion type="single" collapsible className="w-full">
+                                {savingsEvents.map(event => (
+                                    <AccordionItem value={event.id} key={event.id}>
+                                        <AccordionTrigger className="text-sm">
+                                            <div className="flex items-center justify-between w-full">
+                                                <div className="flex-1 text-left">
+                                                    <p className="font-medium">{event.description}</p>
+                                                    <p className="text-xs text-muted-foreground">{format(parseISO(event.date), 'MMM d, h:mm a')}</p>
+                                                </div>
+                                                <p className="font-semibold text-green-600 text-sm whitespace-nowrap pl-4">
+                                                    + ₱{event.amount.toFixed(2)}
                                                 </p>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p className="text-xs max-w-xs">{event.calculationMethod}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </div>
-                            ))}
-                        </div>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent className="text-xs text-muted-foreground bg-secondary/50 p-3 rounded-md">
+                                            <p><span className="font-semibold text-foreground">How it's calculated:</span> {event.calculationMethod}</p>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
+                        ) : (
+                             <p className="text-center text-muted-foreground py-10">No savings events yet. Use items from your pantry to start saving!</p>
+                        )}
                     </ScrollArea>
                 </CardContent>
             </Card>
