@@ -371,13 +371,9 @@ export default function CookAndShopPage() {
         <Card className="bg-gradient-to-br from-primary to-green-700 text-primary-foreground">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base"><Zap /> One-Tap Restock</CardTitle>
-                <CardDescription className="text-green-200">Automatically purchase your list via our partners.</CardDescription>
+                <CardDescription className="text-green-200">Automatically purchase your list and pay with your BPI account.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <Button className="w-full bg-white text-primary hover:bg-white/90">
-                    <Image src="/grabmart-logo.png" alt="GrabMart" width={20} height={20} className="mr-2" />
-                     Auto-Buy with GrabMart
-                 </Button>
                  <div className="flex items-center justify-between text-sm text-green-100">
                     <Label htmlFor="auto-buy-toggle" className="font-semibold">Enable Auto-Buy</Label>
                     <Switch 
@@ -389,7 +385,7 @@ export default function CookAndShopPage() {
                  </div>
                  {isAutoBuyEnabled && (
                     <p className="text-xs text-center text-green-200 bg-black/20 p-2 rounded-md">
-                        Next delivery: Saturday, ~₱{generatedList.totalEstimatedCost.toFixed(2)} total, paid via BPI.
+                        Next delivery: Saturday, ~₱{generatedList.totalEstimatedCost.toFixed(2)} total, Paid via VYBE (BPI e-wallet).
                     </p>
                  )}
             </CardContent>
