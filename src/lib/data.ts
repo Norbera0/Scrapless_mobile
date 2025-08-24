@@ -389,7 +389,7 @@ export const getSavedRecipes = async (userId: string): Promise<Recipe[]> => {
 
 export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string> => {
     const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
-    await setDoc(recipeRef, recipe);
+    await setDoc(recipeRef, recipe, { merge: true });
     return recipe.id;
 }
 

@@ -108,6 +108,10 @@ export interface Recipe {
   photoDataUri?: string;
   tags?: string[];
   benefit: string;
+  // New Meal Planning Fields
+  isScheduled?: boolean;
+  scheduledDate?: string; // ISO String
+  mealType?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack';
 }
 
 // Item-specific AI Insights
@@ -157,6 +161,7 @@ export interface SavingsEvent {
     relatedWasteLogId?: string;
     relatedSolutionId?: string;
     relatedSolutionTitle?: string;
+    relatedRecipeId?: string;
     calculationMethod: string;
     transferredToBank: boolean;
     transferDate?: string; // ISO string

@@ -1,4 +1,5 @@
 
+
 'use server';
 
 /**
@@ -64,11 +65,14 @@ const suggestRecipesFlow = ai.defineFlow(
       return { recipes: [] };
     }
 
-    // Ensure all recipes have a unique ID and clear any potentially old photo data
+    // Ensure all recipes have a unique ID and clear any potentially old data
     const recipesWithIds = output.recipes.map(recipe => ({
         ...recipe,
         id: recipe.id || crypto.randomUUID(),
         photoDataUri: undefined, // Explicitly clear old data
+        isScheduled: false,
+        scheduledDate: undefined,
+        mealType: undefined,
     }));
 
     // 2. Generate an image for each recipe in parallel
