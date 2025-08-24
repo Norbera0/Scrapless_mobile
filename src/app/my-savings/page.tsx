@@ -92,7 +92,7 @@ export default function MySavingsPage() {
         <div className="flex flex-col gap-6 p-4 md:p-6 bg-gray-50 min-h-screen">
              <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 My Waste-Free Wins</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">💰 Virtual Savings</h1>
                     <p className="text-muted-foreground text-sm">
                         The value you've rescued from being wasted.
                     </p>
@@ -107,7 +107,7 @@ export default function MySavingsPage() {
                             <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-xs">
                               <PiggyBank className="w-4 h-4" />
                             </div>
-                            Waste-Free Wins Jar
+                            Virtual Savings Jar
                         </div>
                         <TooltipProvider>
                             <Tooltip>
@@ -202,7 +202,7 @@ export default function MySavingsPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center gap-2 text-base">
-                            <History /> Wins History
+                            <History /> Savings History
                         </span>
                     </CardTitle>
                     <CardDescription>See how your smart habits are adding up.</CardDescription>
