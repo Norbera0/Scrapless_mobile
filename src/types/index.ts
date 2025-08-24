@@ -156,6 +156,7 @@ export interface SavingsEvent {
     relatedPantryItemId?: string;
     relatedWasteLogId?: string;
     relatedSolutionId?: string;
+    relatedSolutionTitle?: string;
     calculationMethod: string;
     transferredToBank: boolean;
     transferDate?: string; // ISO string

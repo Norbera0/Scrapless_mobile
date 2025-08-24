@@ -9,6 +9,7 @@ import { usePantryLogStore } from '@/stores/pantry-store';
 import { FOOD_DATA_MAP } from './food-data';
 import { parse } from 'path';
 import { GREEN_POINTS_CONFIG } from './points-config';
+import type { GetCoachSolutionsOutput, KitchenCoachOutput } from '@/ai/schemas';
 
 const RECIPE_ALTERNATIVE_COST = 150; // ₱150
 const RECIPE_SAVINGS_CAP = 100; // ₱100
@@ -154,6 +155,53 @@ export const calculateAndSaveRecipeSavings = async (user: User, recipe: Recipe) 
         console.log(`Saved ₱${finalSavings} for following the recipe: ${recipe.name}.`);
     } catch (error) {
         console.error('Failed to save recipe following event:', error);
+    }
+};
+
+
+/**
+ * Mechanism 3: Acting on a Solution from Kitchen Coach
+ * Awards virtual savings and green points when a user commits to a solution.
+ */
+export const saveSolutionImplementation = async (user: User, solution: GetCoachSolutionsOutput['solutions'][0], insightType: KitchenCoachOutput['insightType']) => {
+    const { estimatedSavings, title: solutionTitle } = solution;
+
+    if (!user || estimatedSavings <= 0) {
+        return;
+    }
+
+    // 1. Award Green Points for acting on the insight
+    const pointsConfig = GREEN_POINTS_CONFIG.acted_on_insight;
+    const pointsEvent: Omit<GreenPointsEvent, 'id'> = {
+        userId: user.uid,
+        date: new Date().toISOString(),
+        type: 'acted_on_insight',
+        points: pointsConfig.points,
+        description: pointsConfig.defaultDescription(solutionTitle),
+        relatedInsightId: insightType,
+    };
+    saveGreenPointsEvent(user.uid, pointsEvent).catch(console.error);
+
+    // 2. Create and save the financial savings event
+    const finalSavings = roundToTwoDecimals(estimatedSavings);
+    const savingsEvent: Omit<SavingsEvent, 'id'> = {
+        userId: user.uid,
+        date: new Date().toISOString(),
+        type: 'solution_implemented',
+        amount: finalSavings,
+        description: `Virtual savings for trying the solution: "${solutionTitle}".`,
+        relatedSolutionId: insightType,
+        relatedSolutionTitle: solutionTitle,
+        calculationMethod: 'AI-estimated savings from implementing a suggested solution.',
+        transferredToBank: false,
+    };
+
+    try {
+        await saveSavingsEvent(user.uid, savingsEvent);
+        console.log(`Saved ₱${finalSavings} for implementing solution: "${solutionTitle}".`);
+    } catch (error) {
+        console.error(`Failed to save solution implementation event for "${solutionTitle}":`, error);
+        throw error; // Re-throw so the UI can handle the error state
     }
 };
 

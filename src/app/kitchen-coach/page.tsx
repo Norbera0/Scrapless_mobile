@@ -23,6 +23,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { saveSolutionImplementation } from '@/lib/savings';
+import type { SavingsEvent } from '@/types';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -53,7 +55,7 @@ function SolutionCard({ solution, onSelect, isSelected, isUpdating }: { solution
                  <Button 
                     size="sm" 
                     onClick={onSelect} 
-                    disabled={isUpdating}
+                    disabled={isUpdating || isSelected}
                     className="mt-4 bg-primary hover:bg-primary/90 w-full"
                  >
                     {isUpdating ? 
@@ -105,6 +107,14 @@ export default function KitchenCoachPage() {
         }
         return () => clearInterval(intervalId);
     }, [isGenerating, isFetchingSolutions]);
+
+    useEffect(() => {
+        // Load selected solutions from savings events on component mount
+        const implementedSolutionTitles = savingsEvents
+            .filter(e => e.type === 'solution_implemented' && e.relatedSolutionTitle)
+            .map(e => e.relatedSolutionTitle!);
+        setSelectedSolutions(new Set(implementedSolutionTitles));
+    }, [savingsEvents]);
     
     const handleAskCoach = async () => {
         setIsGenerating(true);
@@ -148,7 +158,7 @@ export default function KitchenCoachPage() {
                     analysis: analysisResult,
                     userContext: {
                         userStage: 'regular_user',
-                        previouslyAttemptedSolutions: [],
+                        previouslyAttemptedSolutions: Array.from(selectedSolutions),
                     }
                 };
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
@@ -169,17 +179,31 @@ export default function KitchenCoachPage() {
         }
     };
     
-    const handleSelectSolution = (solutionTitle: string) => {
-        setSelectedSolutions(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(solutionTitle)) {
-                newSet.delete(solutionTitle);
-            } else {
-                newSet.add(solutionTitle);
-            }
-            return newSet;
-        });
-        toast({ title: 'Great!', description: "We'll track your progress on this solution." });
+    const handleSelectSolution = async (solution: Solutions['solutions'][0]) => {
+        if (!user || !analysis) return;
+
+        // Optimistically update UI
+        setSelectedSolutions(prev => new Set(prev).add(solution.title));
+
+        try {
+            await saveSolutionImplementation(user, solution, analysis.insightType);
+            toast({
+                title: 'Great!',
+                description: `You've earned ₱${solution.estimatedSavings} in virtual savings and some Green Points!`
+            });
+        } catch(error) {
+            // Revert optimistic update on failure
+            setSelectedSolutions(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(solution.title);
+                return newSet;
+            });
+             toast({
+                variant: 'destructive',
+                title: 'Action Failed',
+                description: 'Could not save your commitment. Please try again.'
+            });
+        }
     };
 
     if (!analytics && !isGenerating) {
@@ -323,7 +347,7 @@ export default function KitchenCoachPage() {
                                             <div className="h-full">
                                                 <SolutionCard 
                                                     solution={solution} 
-                                                    onSelect={() => handleSelectSolution(solution.title)} 
+                                                    onSelect={() => handleSelectSolution(solution)} 
                                                     isSelected={selectedSolutions.has(solution.title)}
                                                     isUpdating={isGenerating}
                                                 />
@@ -363,7 +387,10 @@ export default function KitchenCoachPage() {
                     onClose={() => setShowWizard(false)}
                     analysis={analysis}
                     solutions={solutions}
-                    onSelectSolution={handleSelectSolution}
+                    onSelectSolution={(title) => {
+                        const solution = solutions.solutions.find(s => s.title === title);
+                        if (solution) handleSelectSolution(solution);
+                    }}
                     selectedSolutions={selectedSolutions}
                     isUpdatingSolution={isGenerating}
                     isBpiLinked={false}

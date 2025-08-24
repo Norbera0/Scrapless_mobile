@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PiggyBank, Sparkles, ShieldCheck } from 'lucide-react';
+import { ChevronRight, PiggyBank, Sparkles, ShieldCheck, Landmark } from 'lucide-react';
 import Image from 'next/image';
 
 export default function BpiPage() {
@@ -15,7 +15,7 @@ export default function BpiPage() {
             <div className="flex items-center gap-3">
                 <Image src="/bpi-logo-2.png" alt="BPI Logo" width={40} height={40} />
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">BPI Integration</h1>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">BPI Partnership</h1>
                     <p className="text-muted-foreground text-sm">
                         Connect your Scrapless savings with your BPI account.
                     </p>
@@ -68,6 +68,23 @@ export default function BpiPage() {
                     </div>
                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </CardHeader>
+            </Card>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                        <Landmark className="text-primary" />
+                        About BPI Partnership
+                    </CardTitle>
+                    <CardDescription>
+                        Scrapless is proud to partner with BPI, a leader in sustainable finance, to connect your eco-friendly habits with tangible financial rewards.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                        Your responsible consumption, tracked through Scrapless, can now contribute to a better financial future. By using our app, you're not just saving money on groceries—you're building a "Green Score" that demonstrates your commitment to sustainability, potentially unlocking future eco-friendly financial products from BPI.
+                    </p>
+                </CardContent>
             </Card>
         </div>
     );
