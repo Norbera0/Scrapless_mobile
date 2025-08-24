@@ -94,6 +94,9 @@ export default function CookAndShopPage() {
   const { generatedList, setGeneratedList, toggleItemChecked } = useShoppingListStore();
   const { savingsEvents } = useSavingsStore();
 
+  // New state for tabs
+  const [activeTab, setActiveTab] = useState('recipes');
+
   // Recipe State
   const { recipes, setRecipes, clearRecipes } = useRecipeStore();
   const [savedRecipeIds, setSavedRecipeIds] = useState<Set<string>>(new Set());
@@ -270,126 +273,153 @@ export default function CookAndShopPage() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2"><ChefHat /> Recipe Suggestions</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => fetchRecipes(true)} disabled={isLoadingRecipes}>
-              {isLoadingRecipes ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            </Button>
-          </div>
-          <CardDescription className="flex items-center gap-2 text-amber-600"><AlertTriangle className="w-4 h-4" /> Using items expiring soon</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoadingRecipes ? (
-            <div className="text-center p-8"><Loader2 className="w-8 h-8 animate-spin mx-auto" /></div>
-          ) : recipes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recipes.map(recipe => (
-                <RecipeCard key={recipe.id} recipe={recipe} isSaved={savedRecipeIds.has(recipe.id)} onToggleSave={handleToggleSave} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">No recipes could be generated with your current pantry.</div>
+      <div className="flex bg-gray-200/70 p-1 rounded-xl">
+        <button
+          onClick={() => setActiveTab('recipes')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-0',
+            activeTab === 'recipes'
+              ? 'bg-white text-gray-800 shadow-md font-semibold'
+              : 'bg-transparent text-gray-500'
           )}
-        </CardContent>
-      </Card>
-
-      <div className="flex items-center gap-4 text-muted-foreground">
-        <Separator className="flex-1" />
-        <span className="font-semibold">OR</span>
-        <Separator className="flex-1" />
+        >
+          <ChefHat className="w-4 h-4" />
+          Recipes
+        </button>
+        <button
+          onClick={() => setActiveTab('shopping')}
+          className={cn(
+            'flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-0',
+            activeTab === 'shopping'
+              ? 'bg-white text-gray-800 shadow-md font-semibold'
+              : 'bg-transparent text-gray-500'
+          )}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Shopping List
+        </button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2"><ShoppingCart /> Smart Shopping List</CardTitle>
-            {generatedList && (
-                <Button variant="ghost" size="sm"><Share2 className="w-4 h-4 mr-2" /> Export List</Button>
-            )}
-          </div>
-           <CardDescription className="flex items-center gap-2"><Info className="w-4 h-4" /> Based on your pantry & waste patterns</CardDescription>
-        </CardHeader>
-        <CardContent>
-            {!generatedList ? (
-                 <Button className="w-full" onClick={handleGenerateList} disabled={isLoadingShoppingList}>
-                    {isLoadingShoppingList ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    Generate Smart Shopping List
-                </Button>
+      {activeTab === 'recipes' && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2"><ChefHat /> Recipe Suggestions</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => fetchRecipes(true)} disabled={isLoadingRecipes}>
+                {isLoadingRecipes ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              </Button>
+            </div>
+            <CardDescription className="flex items-center gap-2 text-amber-600"><AlertTriangle className="w-4 h-4" /> Using items expiring soon</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingRecipes ? (
+              <div className="text-center p-8"><Loader2 className="w-8 h-8 animate-spin mx-auto" /></div>
+            ) : recipes.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recipes.map(recipe => (
+                  <RecipeCard key={recipe.id} recipe={recipe} isSaved={savedRecipeIds.has(recipe.id)} onToggleSave={handleToggleSave} />
+                ))}
+              </div>
             ) : (
-                <div className="space-y-4">
-                    <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                        <Bot className="w-3 h-3 mr-1" />
-                        AI-Generated List
-                    </Badge>
-                    {generatedList.items.map(item => (
-                        <div key={item.id} className={cn("flex flex-col gap-2 p-3 rounded-lg transition-colors", item.isChecked && "bg-green-50/50")}>
-                            <div className="flex items-start gap-3">
-                                <Checkbox 
-                                    id={`item-${item.id}`}
-                                    checked={item.isChecked}
-                                    onCheckedChange={() => toggleItemChecked(item.id)}
-                                    className="mt-1 h-5 w-5"
-                                />
-                                <Label htmlFor={`item-${item.id}`} className="flex-1 grid gap-1 cursor-pointer">
-                                    <p className={cn("font-semibold leading-tight", item.isChecked && "line-through text-muted-foreground")}>{item.name} <span className="text-muted-foreground font-normal">({item.quantity})</span></p>
-                                    <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                                        {getCategoryIcon(item.category)}
-                                        {item.reasoning}
-                                    </p>
-                                </Label>
-                                <div className="text-right">
-                                    <p className={cn("font-semibold", item.isChecked && "line-through text-muted-foreground")}>₱{item.estimatedCost.toFixed(2)}</p>
-                                    <p className="text-xs capitalize text-muted-foreground">{item.priority}</p>
-                                </div>
-                            </div>
-                            {item.deal && <DealCard deal={item.deal} />}
-                        </div>
-                    ))}
-                    <Button variant="outline" className="w-full border-dashed"><Plus className="w-4 h-4 mr-2" /> Add Custom Item</Button>
-                </div>
+              <div className="text-center py-8 text-muted-foreground">No recipes could be generated with your current pantry.</div>
             )}
-        </CardContent>
-        {generatedList && (
-            <CardFooter className="flex-col items-stretch gap-4 pt-4 border-t">
-                 <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" onClick={() => handleGenerateList()} disabled={isLoadingShoppingList}>
-                        {isLoadingShoppingList ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Regenerate
-                    </Button>
-                    <Button variant="destructive" onClick={() => setGeneratedList(null)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Clear List
-                    </Button>
-                </div>
-            </CardFooter>
-        )}
-      </Card>
-      
-      {generatedList && (
-        <Card className="bg-gradient-to-br from-primary to-green-700 text-primary-foreground">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Zap /> One-Tap Restock</CardTitle>
-                <CardDescription className="text-green-200">Automatically purchase your list and pay with your BPI account.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="flex items-center justify-between text-sm text-green-100">
-                    <Label htmlFor="auto-buy-toggle" className="font-semibold">Enable Auto-Buy</Label>
-                    <Switch 
-                        id="auto-buy-toggle" 
-                        checked={isAutoBuyEnabled}
-                        onCheckedChange={setIsAutoBuyEnabled}
-                        className="data-[state=checked]:bg-green-400"
-                    />
-                 </div>
-                 {isAutoBuyEnabled && (
-                    <p className="text-xs text-center text-green-200 bg-black/20 p-2 rounded-md">
-                        Next delivery: Saturday, ~₱{generatedList.totalEstimatedCost.toFixed(2)} total, Paid via VYBE (BPI e-wallet).
-                    </p>
-                 )}
-            </CardContent>
+          </CardContent>
         </Card>
+      )}
+      
+      {activeTab === 'shopping' && (
+        <>
+            <Card>
+                <CardHeader>
+                <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center gap-2"><ShoppingCart /> Smart Shopping List</CardTitle>
+                    {generatedList && (
+                        <Button variant="ghost" size="sm"><Share2 className="w-4 h-4 mr-2" /> Export List</Button>
+                    )}
+                </div>
+                <CardDescription className="flex items-center gap-2"><Info className="w-4 h-4" /> Based on your pantry & waste patterns</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {!generatedList ? (
+                        <Button className="w-full" onClick={handleGenerateList} disabled={isLoadingShoppingList}>
+                            {isLoadingShoppingList ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            Generate Smart Shopping List
+                        </Button>
+                    ) : (
+                        <div className="space-y-4">
+                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                <Bot className="w-3 h-3 mr-1" />
+                                AI-Generated List
+                            </Badge>
+                            {generatedList.items.map(item => (
+                                <div key={item.id} className={cn("flex flex-col gap-2 p-3 rounded-lg transition-colors", item.isChecked && "bg-green-50/50")}>
+                                    <div className="flex items-start gap-3">
+                                        <Checkbox 
+                                            id={`item-${item.id}`}
+                                            checked={item.isChecked}
+                                            onCheckedChange={() => toggleItemChecked(item.id)}
+                                            className="mt-1 h-5 w-5"
+                                        />
+                                        <Label htmlFor={`item-${item.id}`} className="flex-1 grid gap-1 cursor-pointer">
+                                            <p className={cn("font-semibold leading-tight", item.isChecked && "line-through text-muted-foreground")}>{item.name} <span className="text-muted-foreground font-normal">({item.quantity})</span></p>
+                                            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                                {getCategoryIcon(item.category)}
+                                                {item.reasoning}
+                                            </p>
+                                        </Label>
+                                        <div className="text-right">
+                                            <p className={cn("font-semibold", item.isChecked && "line-through text-muted-foreground")}>₱{item.estimatedCost.toFixed(2)}</p>
+                                            <p className="text-xs capitalize text-muted-foreground">{item.priority}</p>
+                                        </div>
+                                    </div>
+                                    {item.deal && <DealCard deal={item.deal} />}
+                                </div>
+                            ))}
+                            <Button variant="outline" className="w-full border-dashed"><Plus className="w-4 h-4 mr-2" /> Add Custom Item</Button>
+                        </div>
+                    )}
+                </CardContent>
+                {generatedList && (
+                    <CardFooter className="flex-col items-stretch gap-4 pt-4 border-t">
+                        <div className="grid grid-cols-2 gap-4">
+                            <Button variant="outline" onClick={() => handleGenerateList()} disabled={isLoadingShoppingList}>
+                                {isLoadingShoppingList ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                                Regenerate
+                            </Button>
+                            <Button variant="destructive" onClick={() => setGeneratedList(null)}>
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Clear List
+                            </Button>
+                        </div>
+                    </CardFooter>
+                )}
+            </Card>
+
+            {generatedList && (
+                <Card className="bg-gradient-to-br from-primary to-green-700 text-primary-foreground">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base"><Zap /> One-Tap Restock</CardTitle>
+                        <CardDescription className="text-green-200">Automatically purchase your list and pay with your BPI account.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between text-sm text-green-100">
+                            <Label htmlFor="auto-buy-toggle" className="font-semibold">Enable Auto-Buy</Label>
+                            <Switch 
+                                id="auto-buy-toggle" 
+                                checked={isAutoBuyEnabled}
+                                onCheckedChange={setIsAutoBuyEnabled}
+                                className="data-[state=checked]:bg-green-400"
+                            />
+                        </div>
+                        {isAutoBuyEnabled && (
+                            <p className="text-xs text-center text-green-200 bg-black/20 p-2 rounded-md">
+                                Next delivery: Saturday, ~₱{generatedList.totalEstimatedCost.toFixed(2)} total, Paid via VYBE (BPI e-wallet).
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
+        </>
       )}
 
     </div>
