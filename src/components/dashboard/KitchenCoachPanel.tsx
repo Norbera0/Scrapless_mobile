@@ -81,13 +81,6 @@ export function KitchenCoachPanel() {
         }
     };
     
-    useEffect(() => {
-        // Automatically generate a tip on first load if none exists or if it's stale
-        if (!lastTip && !isGenerating && analytics) {
-            handleGenerateTip();
-        }
-    }, [analytics, lastTip, isGenerating]);
-
     const canRefresh = (() => {
         if (!lastGenerated) return true;
         const oneHourAgo = new Date(new Date().getTime() - 60 * 60 * 1000);
@@ -155,7 +148,16 @@ export function KitchenCoachPanel() {
                     <div className="text-center text-muted-foreground py-6">
                         <Lightbulb className="w-10 h-10 mx-auto mb-3" />
                         <p className="font-semibold">No tips available right now</p>
-                        <p className="text-sm">Try adding items to your pantry or logging waste.</p>
+                        <p className="text-sm">Click 'Refresh Tip' to get your first insight.</p>
+                         <Button 
+                            variant="outline"
+                            className="mt-4"
+                            onClick={handleGenerateTip}
+                            disabled={isGenerating}
+                        >
+                            {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                            Refresh Tip
+                        </Button>
                     </div>
                 )}
             </CardContent>
