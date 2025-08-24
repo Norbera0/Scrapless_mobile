@@ -11,15 +11,11 @@ import {
     Bookmark,
     PackagePlus,
     PiggyBank,
-    Landmark,
     User,
     Bot,
-    Gift,
-    Sparkles,
     ChefHat,
     BarChart2,
-    PencilRuler,
-    ShieldCheck
+    PencilRuler
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -76,12 +72,6 @@ export function SidebarNav({ user }: { user: UserType }) {
     { href: '/kitchen-coach', label: 'Kitchen Coach', icon: Bot },
   ];
   
-  const bpiMenuItems = [
-    { href: '/my-savings', label: 'Virtual Savings', icon: PiggyBank },
-    { href: '/rewards', label: 'Green Points', icon: Gift },
-    { href: '/bpi/green-score', label: 'Green Score', icon: ShieldCheck },
-  ];
-
   const getInitials = (name?: string | null) => {
     if (!name) return '?';
     const names = name.split(' ');
@@ -133,31 +123,6 @@ export function SidebarNav({ user }: { user: UserType }) {
               </SidebarMenuItem>
             );
           })}
-          <SidebarSeparator />
-           <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => {}}
-                  isSubmenu
-                  className="w-full justify-start text-base h-12"
-                  tooltip={"BPI Partnership"}
-                >
-                  <Landmark className="h-5 w-5" />
-                  <span>BPI Partnership</span>
-                </SidebarMenuButton>
-                 <SidebarMenuSub>
-                    {bpiMenuItems.map((item) => (
-                        <SidebarMenuSubItem key={item.href}>
-                            <SidebarMenuSubButton 
-                                onClick={() => handleNavigation(item.href)}
-                                isActive={isActive(item.href)}
-                            >
-                                <item.icon className="h-4 w-4" />
-                                <span>{item.label}</span>
-                            </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                    ))}
-                 </SidebarMenuSub>
-           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-2">
