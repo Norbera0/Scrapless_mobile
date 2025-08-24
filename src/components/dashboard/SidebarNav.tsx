@@ -36,6 +36,7 @@ import {
   useSidebar,
   SidebarMenuSub,
   SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import type { User as UserType } from '@/types';
 import { signOut } from 'firebase/auth';
