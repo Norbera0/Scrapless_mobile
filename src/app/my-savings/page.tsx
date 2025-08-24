@@ -209,7 +209,7 @@ export default function MySavingsPage() {
                     <CardDescription>See how your smart habits are adding up.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ScrollArea className="h-48 pr-4">
+                    <ScrollArea className="h-96 pr-4">
                         {savingsEvents.length > 0 ? (
                              <Accordion type="single" collapsible className="w-full">
                                 {savingsEvents.map(event => (
