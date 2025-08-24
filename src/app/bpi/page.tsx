@@ -4,7 +4,7 @@
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PiggyBank, Sparkles } from 'lucide-react';
+import { ChevronRight, PiggyBank, Sparkles, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 
 export default function BpiPage() {
@@ -49,6 +49,22 @@ export default function BpiPage() {
                             Green Points & Rewards
                         </CardTitle>
                         <CardDescription>Convert your Green Points to BPI Rewards via VYBE.</CardDescription>
+                    </div>
+                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </CardHeader>
+            </Card>
+
+             <Card 
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => router.push('/bpi/green-score')}
+            >
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle className="flex items-center gap-2">
+                             <ShieldCheck className="w-5 h-5 text-primary" />
+                            Green Score
+                        </CardTitle>
+                        <CardDescription>Check your sustainability score for potential eco-friendly financial products.</CardDescription>
                     </div>
                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </CardHeader>
