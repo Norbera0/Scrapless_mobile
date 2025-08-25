@@ -87,11 +87,10 @@ export default function AddToPantryPage() {
 
   // Camera Permission Effect
   useEffect(() => {
-    if (selectedMethod !== 'camera' || photoPreview) return;
-
     let stream: MediaStream | null = null;
-    
+
     const getCameraPermission = async () => {
+      if (selectedMethod !== 'camera' || photoPreview) return;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         if (videoRef.current) {
@@ -106,13 +105,17 @@ export default function AddToPantryPage() {
     getCameraPermission();
 
     return () => {
-        // Stop all tracks of the stream
-        if (videoRef.current && videoRef.current.srcObject) {
-            const currentStream = videoRef.current.srcObject as MediaStream;
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-    }
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (videoRef.current && videoRef.current.srcObject) {
+          const currentStream = videoRef.current.srcObject as MediaStream;
+          currentStream.getTracks().forEach(track => track.stop());
+          videoRef.current.srcObject = null;
+      }
+    };
   }, [selectedMethod, photoPreview, facingMode]);
+
 
    useEffect(() => {
      if (selectedMethod !== 'voice') return;

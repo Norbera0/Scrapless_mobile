@@ -61,11 +61,10 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   // Camera Permission Effect
   useEffect(() => {
-    if (method !== 'camera' || photoPreview) return;
-    
     let stream: MediaStream | null = null;
     
     const getCameraPermission = async () => {
+      if (method !== 'camera' || photoPreview) return;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         if (videoRef.current) {
@@ -86,11 +85,15 @@ export function WasteLogger({ method }: WasteLoggerProps) {
     getCameraPermission();
     
     return () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-            const currentStream = videoRef.current.srcObject as MediaStream;
-            currentStream.getTracks().forEach(track => track.stop());
-        }
-    }
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (videoRef.current && videoRef.current.srcObject) {
+        const currentStream = videoRef.current.srcObject as MediaStream;
+        currentStream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+      }
+    };
   }, [method, toast, facingMode, photoPreview]);
   
   // Audio Permission Check Effect
@@ -474,3 +477,5 @@ export function WasteLogger({ method }: WasteLoggerProps) {
 
   return null;
 }
+
+    
