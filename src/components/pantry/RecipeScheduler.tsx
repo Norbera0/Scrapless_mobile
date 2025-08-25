@@ -18,7 +18,7 @@ import { useRecipeStore } from '@/stores/recipe-store';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { scheduleRecipe } from '@/lib/data'; // Corrected import path
+import { scheduleRecipe } from '@/lib/data';
 
 interface RecipeSchedulerProps {
   isOpen: boolean;
@@ -49,15 +49,15 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     try {
         const scheduledDateISO = selectedDate.toISOString();
         
-        // Optimistically update the UI in Zustand
+        // Asynchronously update the backend. This is the crucial part.
+        await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
+
+        // Update the UI in Zustand now that the backend is confirmed.
         updateRecipe(recipe.id, {
             isScheduled: true,
             scheduledDate: scheduledDateISO,
             mealType: mealType,
         });
-
-        // Asynchronously update the backend
-        await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
         
         toast({
             title: 'Meal Scheduled!',
@@ -66,12 +66,6 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
         onClose();
     } catch (error) {
         console.error('[RecipeScheduler] Scheduling failed:', error);
-        // Revert optimistic update on failure
-        updateRecipe(recipe.id, {
-            isScheduled: recipe.isScheduled,
-            scheduledDate: recipe.scheduledDate,
-            mealType: recipe.mealType,
-        });
         toast({
             variant: 'destructive',
             title: 'Scheduling Failed',

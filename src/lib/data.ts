@@ -402,7 +402,7 @@ export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDa
         throw new Error("Invalid arguments for scheduling recipe.");
     }
     
-    // First, ensure the recipe is saved (without the large photo data).
+    // First, ensure the base recipe is saved (without the large photo data).
     await saveRecipe(userId, recipe);
 
     // Then, update it with schedule information.
