@@ -30,6 +30,7 @@ import { FOOD_DATA_MAP } from './food-data';
 import { GREEN_POINTS_CONFIG } from './points-config';
 import { differenceInDays, parseISO, startOfToday } from 'date-fns';
 import { useUserSettingsStore } from '@/stores/user-settings-store';
+import { useRecipeStore } from '@/stores/recipe-store';
 
 // --- Listener Management ---
 const listenerManager: { [key: string]: Unsubscribe[] } = {
@@ -79,6 +80,8 @@ export const initializeUserCache = (userId: string) => {
     useSavingsStore.getState().setSavingsInitialized(true); // Should be true, as it's just a local cache for now.
     useGreenPointsStore.getState().setPointsInitialized(false);
     useUserSettingsStore.getState().setSettingsInitialized(false);
+    useRecipeStore.getState().setPlannedRecipes([]);
+
 
     // Listener for User Settings
     const settingsDoc = doc(db, `users/${userId}/settings`, 'app');
@@ -152,6 +155,16 @@ export const initializeUserCache = (userId: string) => {
         useGreenPointsStore.getState().setPointsInitialized(true);
     });
     listenerManager.greenPointsEvents.push(greenPointsUnsub);
+    
+    // Listener for Scheduled Recipes (part of savedRecipes collection)
+    const scheduledRecipesQuery = query(collection(db, `users/${userId}/savedRecipes`), where('isScheduled', '==', true));
+    const scheduledRecipesUnsub = onSnapshot(scheduledRecipesQuery, (snapshot) => {
+        const plannedRecipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Recipe));
+        useRecipeStore.getState().setPlannedRecipes(plannedRecipes);
+    }, (error) => {
+        console.error("Error with scheduledRecipes listener:", error);
+    });
+    listenerManager.savedRecipes.push(scheduledRecipesUnsub);
 };
 
 
@@ -397,21 +410,24 @@ export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
 
-export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> => {
-    if (!userId || !recipe || !recipe.id) {
+export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<Recipe> => {
+    if (!userId || !recipe) {
         throw new Error("Invalid arguments for scheduling recipe.");
     }
-    
-    // First, ensure the base recipe is saved (without the large photo data).
-    await saveRecipe(userId, recipe);
 
-    // Then, update it with schedule information.
-    const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
-    await setDoc(recipeRef, {
+    const { photoDataUri, ...baseRecipe } = recipe;
+
+    const plannedRecipe: Recipe = {
+        ...baseRecipe,
+        id: `${baseRecipe.id}-${new Date(scheduledDate).getTime()}`, // Create a unique ID for the planned instance
         isScheduled: true,
         scheduledDate,
         mealType,
-    }, { merge: true });
+    };
+    
+    const recipeRef = doc(db, `users/${userId}/savedRecipes`, plannedRecipe.id);
+    await setDoc(recipeRef, plannedRecipe);
+    return plannedRecipe;
 };
 
 // --- User Settings Functions ---

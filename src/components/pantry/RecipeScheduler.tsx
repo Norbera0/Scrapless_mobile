@@ -29,7 +29,7 @@ interface RecipeSchedulerProps {
 export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { updateRecipe } = useRecipeStore();
+  const { addPlannedRecipe, updateRecipe } = useRecipeStore();
   
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [mealType, setMealType] = useState<Recipe['mealType']>('Dinner');
@@ -49,15 +49,14 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     try {
         const scheduledDateISO = selectedDate.toISOString();
         
-        // Asynchronously update the backend. This is the crucial part.
-        await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
+        // Asynchronously save the duplicated, planned recipe to the backend.
+        const newPlannedRecipe = await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
 
         // Update the UI in Zustand now that the backend is confirmed.
-        updateRecipe(recipe.id, {
-            isScheduled: true,
-            scheduledDate: scheduledDateISO,
-            mealType: mealType,
-        });
+        addPlannedRecipe(newPlannedRecipe);
+
+        // Mark the original suggested recipe so the UI can reflect it's been planned
+        updateRecipe(recipe.id, { isScheduled: true });
         
         toast({
             title: 'Meal Scheduled!',

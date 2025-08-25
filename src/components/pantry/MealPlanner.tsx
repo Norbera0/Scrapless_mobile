@@ -166,15 +166,11 @@ const MonthlyView = ({ scheduledRecipes, onDateSelect }: { scheduledRecipes: Rec
 };
 
 export function MealPlanner() {
-    const { recipes } = useRecipeStore();
+    const { plannedRecipes } = useRecipeStore();
     const [view, setView] = useState<'daily' | 'monthly'>('daily');
     const [selectedDate, setSelectedDate] = useState<Date>(startOfToday());
 
-    const scheduledRecipes = useMemo(() => {
-        return recipes.filter(r => r.isScheduled);
-    }, [recipes]);
-    
-    if (scheduledRecipes.length === 0) {
+    if (plannedRecipes.length === 0) {
         return (
             <Card className="text-center">
                 <CardHeader>
@@ -206,9 +202,9 @@ export function MealPlanner() {
             </CardHeader>
             <CardContent>
                 {view === 'daily' ? (
-                     <DailyView scheduledRecipes={scheduledRecipes} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+                     <DailyView scheduledRecipes={plannedRecipes} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
                 ) : (
-                    <MonthlyView scheduledRecipes={scheduledRecipes} onDateSelect={handleDateSelectFromMonth} />
+                    <MonthlyView scheduledRecipes={plannedRecipes} onDateSelect={handleDateSelectFromMonth} />
                 )}
             </CardContent>
         </Card>
