@@ -5,19 +5,20 @@ import { useMemo } from 'react';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
 import { useSavingsStore } from '@/stores/savings-store';
-import { differenceInDays, startOfToday, parseISO, startOfMonth, isAfter, subMonths } from 'date-fns';
+import { useRecipeStore } from '@/stores/recipe-store';
+import { differenceInDays, startOfToday, parseISO, startOfMonth, isAfter, subMonths, isToday } from 'date-fns';
 import type { Notification } from '@/types';
 
 export function useNotifications() {
     const { liveItems, pantryInitialized } = usePantryLogStore();
     const { logs, logsInitialized } = useWasteLogStore();
     const { savingsEvents, savingsInitialized } = useSavingsStore();
+    const { plannedRecipes } = useRecipeStore();
 
     const notifications = useMemo(() => {
         const generated: Notification[] = [];
         const today = startOfToday();
         const startOfThisMonth = startOfMonth(today);
-        const startOfLastMonth = subMonths(startOfThisMonth, 1);
 
         if (pantryInitialized) {
             // Critical: Expiring Today/Tomorrow
@@ -56,7 +57,7 @@ export function useNotifications() {
             }
         }
         
-        if (savingsInitialized && logsInitialized) {
+        if (savingsInitialized) {
             const thisMonthSavings = savingsEvents
                 .filter(e => isAfter(parseISO(e.date), startOfThisMonth))
                 .reduce((sum, e) => sum + e.amount, 0);
@@ -73,10 +74,25 @@ export function useNotifications() {
             }
         }
 
+        if (plannedRecipes.length > 0) {
+            const todaysMeals = plannedRecipes.filter(r => r.scheduledDate && isToday(parseISO(r.scheduledDate)));
+            if (todaysMeals.length > 0) {
+                const mealNames = todaysMeals.map(m => m.name).join(', ');
+                generated.push({
+                    id: `meal-plan-today-${today.toISOString().slice(0, 10)}`,
+                    category: 'important',
+                    title: 'On the menu for today!',
+                    message: `Reminder to cook: ${mealNames}.`,
+                    date: new Date().toISOString(),
+                    isRead: false,
+                });
+            }
+        }
+
 
         return generated.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    }, [liveItems, pantryInitialized, logs, logsInitialized, savingsEvents, savingsInitialized]);
+    }, [liveItems, pantryInitialized, logs, logsInitialized, savingsEvents, savingsInitialized, plannedRecipes]);
 
     const totalNew = notifications.filter(n => !n.isRead).length;
 
