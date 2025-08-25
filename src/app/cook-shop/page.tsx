@@ -329,7 +329,7 @@ export default function CookAndShopPage() {
                   >
                     <CarouselContent>
                       {recipes.map(recipe => (
-                        <CarouselItem key={recipe.id} className="pl-4 basis-4/5 sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={recipe.id} className="pl-4 basis-3/5 sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
                           <div className="h-full">
                             <RecipeCard recipe={recipe} isSaved={savedRecipeIds.has(recipe.id)} onToggleSave={handleToggleSave} onAddToPlan={() => setRecipeToSchedule(recipe)} />
                           </div>
