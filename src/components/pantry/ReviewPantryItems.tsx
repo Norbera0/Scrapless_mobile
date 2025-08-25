@@ -117,11 +117,26 @@ const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: P
                                 className="h-11"
                             />
                         </div>
-                      <DatePicker
-                          date={calculatedExpiryDate}
-                          onDateChange={onDateChange}
-                          className="h-11"
-                      />
+                        <div className="grid gap-1.5">
+                            <Label htmlFor={`expiration-date-${item.id}`}>Expiration Date</Label>
+                             <DatePicker
+                                date={calculatedExpiryDate}
+                                onDateChange={onDateChange}
+                                className="h-11"
+                                id={`expiration-date-${item.id}`}
+                            />
+                        </div>
+                        <div className="grid gap-1.5 sm:col-span-2">
+                            <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
+                            <Input
+                                id={`price-${item.id}`}
+                                type="number"
+                                value={item.estimatedCost ?? ''}
+                                onChange={(e) => handleItemChange(index, 'estimatedCost', e.target.valueAsNumber || undefined)}
+                                placeholder="e.g. 150.00"
+                                className="h-11 bg-background"
+                            />
+                        </div>
                   </div>
               </div>
               <Button variant="ghost" size="icon" className="shrink-0" onClick={() => handleRemoveItem(index)}>
@@ -179,17 +194,6 @@ const ItemCard = ({ item, index, handleItemChange, handleRemoveItem }: { item: P
                                 />
                             </div>
                         )}
-                        <div className="grid gap-1.5">
-                            <Label htmlFor={`price-${item.id}`}>Estimated Cost (PHP):</Label>
-                            <Input
-                                id={`price-${item.id}`}
-                                type="number"
-                                value={item.estimatedCost ?? ''}
-                                onChange={(e) => handleItemChange(index, 'estimatedCost', e.target.valueAsNumber || undefined)}
-                                placeholder="e.g. 150.00"
-                                className="h-11 bg-background"
-                            />
-                        </div>
                     </div>
                 </div>
             </CollapsibleContent>

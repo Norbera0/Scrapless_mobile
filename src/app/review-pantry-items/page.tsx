@@ -1,5 +1,7 @@
 
 import { ReviewPantryItems } from '@/components/pantry/ReviewPantryItems';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Bot } from 'lucide-react';
 
 export default function ReviewPantryItemsPage() {
   return (
@@ -10,6 +12,13 @@ export default function ReviewPantryItemsPage() {
           Adjust the items detected by the AI before adding them to your pantry.
         </p>
       </div>
+      <Alert>
+        <Bot className="h-4 w-4" />
+        <AlertTitle>AI-Powered Detection</AlertTitle>
+        <AlertDescription>
+          Our AI does its best, but it can sometimes make mistakes. Please double-check the item names, quantities, and especially the estimated costs to ensure everything is accurate.
+        </AlertDescription>
+      </Alert>
       <ReviewPantryItems />
     </div>
   );
