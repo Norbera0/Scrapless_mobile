@@ -322,9 +322,9 @@ graph TD
     User --> UC4
     User --> UC5
 
-    UC4 ..> UC1 : <<includes>>
-    UC4 ..> UC5 : <<includes>>
-    UC3 ..> UC4 : <<extends>>
+    UC4 ..> UC1 : "<<includes>>"
+    UC4 ..> UC5 : "<<includes>>"
+    UC3 ..> UC4 : "<<extends>>"
 
 ```
 
