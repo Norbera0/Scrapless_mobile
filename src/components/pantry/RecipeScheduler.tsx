@@ -48,7 +48,6 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     setIsSaving(true);
     try {
         const scheduledDateISO = selectedDate.toISOString();
-        console.log('[RecipeScheduler] Calling server action with:', { recipeId: recipe.id, scheduledDate: scheduledDateISO, mealType });
         
         // Optimistically update the UI in Zustand
         updateRecipe(recipe.id, {

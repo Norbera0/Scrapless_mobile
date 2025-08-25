@@ -81,32 +81,31 @@ export async function fetchItemInsights(input: GetItemInsightsInput): Promise<Ge
 }
 
 export async function scheduleRecipe(userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> {
+    if (!userId || !recipe || !recipe.id) {
+        throw new Error("Invalid arguments for scheduling recipe.");
+    }
+    
     try {
-      console.log('[Server Action] scheduleRecipe called with:', { userId, recipeId: recipe.id, scheduledDate, mealType });
+      console.log('[Server Action] scheduleRecipe received:', { userId, recipeId: recipe.id, scheduledDate, mealType });
       
-      const savedRecipeCollection = collection(db, `users/${userId}/savedRecipes`);
-      const recipeQuery = query(savedRecipeCollection, where('id', '==', recipe.id));
-      const querySnapshot = await getDocs(recipeQuery);
-  
-      let docRef;
-      if (querySnapshot.empty) {
-          docRef = doc(savedRecipeCollection, recipe.id);
-      } else {
-          docRef = querySnapshot.docs[0].ref;
-      }
+      const savedRecipesCollection = collection(db, `users/${userId}/savedRecipes`);
+      const recipeDocRef = doc(savedRecipesCollection, recipe.id);
   
       // Create a new object without the photoDataUri to avoid saving large base64 strings
       const { photoDataUri, ...recipeToSave } = recipe;
   
-      await setDoc(docRef, {
+      await setDoc(recipeDocRef, {
           ...recipeToSave,
           isScheduled: true,
           scheduledDate,
           mealType,
       }, { merge: true });
   
+      console.log(`[Server Action] Successfully scheduled recipe ${recipe.id} for user ${userId}`);
+  
     } catch (error) {
-      console.error("Error scheduling recipe in server action:", error);
-      throw new Error("Failed to schedule recipe.");
+      console.error("[Server Action] Error in scheduleRecipe:", error);
+      // Re-throw a more generic error to the client
+      throw new Error("Failed to schedule the recipe on the server.");
     }
 }
