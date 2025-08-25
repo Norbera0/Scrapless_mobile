@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight, User } from 'lucide-react';
+import { Lightbulb, Sparkles, Landmark, TrendingUp, Info, BarChart, Leaf, Recycle, Globe, ArrowRight, User, Bot } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,6 +13,7 @@ import { estimateRiceKgFromPesos } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 type Fact = {
   icon: React.ElementType;
@@ -134,13 +135,30 @@ export function FunFactPanel({ wasteLogs, savingsEvents }: FunFactPanelProps) {
 
   const currentFact = facts[currentFactIndex];
   const Icon = categoryIcons[currentFact.category as keyof typeof categoryIcons] || Lightbulb;
+  const isPersonalized = currentFact.category === 'Personalized' || currentFact.category === 'Achievement';
 
   return (
      <Card className="shadow-sm">
         <CardHeader>
-             <CardTitle className="flex items-center gap-2 text-base">
-                <Icon className="w-5 h-5" />
-                Did You Know?
+             <CardTitle className="flex items-center justify-between text-base">
+                <span className="flex items-center gap-2">
+                    <Icon className="w-5 h-5" />
+                    Did You Know?
+                </span>
+                {isPersonalized && (
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span className="flex items-center gap-1.5 text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded-full">
+                                    <Bot className="w-3.5 h-3.5" /> For You
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="max-w-xs text-center">This insight is personalized for you based on your recent activity.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
             </CardTitle>
         </CardHeader>
         <CardContent>

@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { saveSolutionImplementation } from '@/lib/savings';
 import type { SavingsEvent } from '@/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type Solutions = GetCoachSolutionsOutput;
 
@@ -271,10 +272,19 @@ export default function KitchenCoachPage() {
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
                                     <Brain className="text-primary" /> The Analysis
                                 </h2>
-                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                                    <Bot className="w-3 h-3 mr-1" />
-                                    AI-Generated
-                                </Badge>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                                <Bot className="w-3 h-3 mr-1" />
+                                                AI-Generated
+                                            </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
                             <Card>
                                 <CardContent className="space-y-4 pt-6">
@@ -327,10 +337,19 @@ export default function KitchenCoachPage() {
                                 <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
                                     <Lightbulb className="text-primary" /> Actionable Solutions
                                 </h2>
-                                <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                                    <Bot className="w-3 h-3 mr-1" />
-                                    AI-Generated
-                                </Badge>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                                <Bot className="w-3 h-3 mr-1" />
+                                                AI-Generated
+                                            </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
                             <Carousel
                                 opts={{

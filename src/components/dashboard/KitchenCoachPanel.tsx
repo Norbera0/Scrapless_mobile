@@ -20,6 +20,7 @@ import { useUserSettingsStore } from '@/stores/user-settings-store';
 import { formatDistanceToNow, isBefore, parseISO } from 'date-fns';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Badge } from '../ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export function KitchenCoachPanel() {
     const router = useRouter();
@@ -116,10 +117,19 @@ export function KitchenCoachPanel() {
                 ) : lastTip ? (
                     <div className="space-y-4">
                         <div className="space-y-2">
-                             <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                                <Bot className="w-3 h-3 mr-1" />
-                                AI-Generated Tip
-                            </Badge>
+                            <TooltipProvider>
+                               <Tooltip>
+                                   <TooltipTrigger asChild>
+                                        <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                           <Bot className="w-3 h-3 mr-1" />
+                                           AI-Generated Tip
+                                       </Badge>
+                                   </TooltipTrigger>
+                                   <TooltipContent>
+                                       <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                   </TooltipContent>
+                               </Tooltip>
+                           </TooltipProvider>
                             <div className="bg-secondary/50 rounded-xl p-4 border">
                                 <p className="text-muted-foreground text-sm font-medium">{lastTip.title}</p>
                             </div>
