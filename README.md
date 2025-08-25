@@ -8,21 +8,23 @@ The application goes beyond simple tracking. It provides powerful analytics to v
 
 ## 2. Target Audience
 
-*   **Environmentally Conscious Individuals:** People who are actively looking for ways to live more sustainably and reduce their carbon footprint.
-*   **Budget-Conscious Households:** Families and individuals who want to save money by reducing food spoilage and optimizing their grocery shopping.
-*   **Busy Professionals and Parents:** Individuals who need help with meal planning and efficient grocery shopping to manage their busy schedules.
-*   **Tech-Savvy Millennials and Gen Z:** Users who are comfortable with mobile apps and are interested in using technology to improve their daily lives.
+Our target users can be defined by their primary motivation and their stage in the journey toward financial and sustainable mastery. The app, particularly the AI Kitchen Coach, is designed to guide them from "new user" to "advanced user."
+
+*   **The Financially-Minded Saver:** This user's primary goal is to cut costs and save money. They see food waste as a direct financial loss. They are motivated by seeing their Virtual Savings grow and successfully transferring that money to their bank account.
+*   **The Eco-Conscious Optimizer:** This user is driven by a desire to live more sustainably. While they care about the environment, they understand that reducing waste also has a significant financial benefit. They are motivated by reducing their carbon footprint and improving their Sustainability Score.
+*   **The Busy Household Manager:** This user, often a parent or a working professional, values time and convenience. They are looking for a system to simplify meal planning and grocery shopping. They are motivated by features that reduce mental load, like the AI-powered shopping list and recipe suggestions, which in turn save them money and reduce waste.
 
 ## 3. User Problems & Solutions
 
-| User Problem | Solution |
+Our users face common but often invisible financial drains in their kitchen. Scrapless provides tangible, AI-powered solutions to each problem.
+
+| User's Financial Pain Point | The Scrapless Solution & Financial Outcome |
 | :--- | :--- |
-| "I often forget what food I have at home, leading to buying duplicates and wasting food that expires." | **Smart Pantry Management:** Users can easily log items via text, voice, or photo. The app tracks expiry dates and provides a clear overview of all inventory. |
-| "I don't know how to use up ingredients before they go bad." | **AI-Powered Recipe Suggestions:** The app suggests recipes based on the items available in the user's pantry, prioritizing ingredients that are about to expire. |
-| "I feel guilty about the amount of food I throw away, but I don't know how to improve." | **Waste Logging & Analytics:** Users can log food waste to understand their habits. The app provides detailed analytics and insights into waste patterns, helping users identify areas for improvement. |
-| "Meal planning is time-consuming and I often run out of ideas." | **Automated Meal Planner & Shopping Hub:** The app can automatically generate a weekly meal plan and a corresponding shopping list, saving users time and effort. |
-| "I want to save money, but it's hard to see the financial impact of my food waste." | **Savings Tracker & Fintech Integration:** Scrapless quantifies the monetary value of saved food. Through a partnership with BPI, users can transfer these virtual savings into a real bank account. |
-| "Living sustainably feels like a chore and it's hard to stay motivated." | **Gamification and Rewards:** The app incorporates a "Green Points" system, rewarding users for positive actions like logging pantry items and reducing waste. |
+| **"My grocery bill is high, but I still end up throwing food away. I feel like I'm losing money twice."** | **Financial Waste Audits:** Log what you waste to see exactly how much money is leaving your wallet. The app's analytics provide a clear "profit and loss" statement for your kitchen, with AI insights to plug the financial leaks. |
+| **"I buy ingredients for a recipe but don't know how to use the leftovers. It's a sunk cost."** | **Ingredient ROI Maximizer:** The AI suggests recipes based on what's *already in your pantry*, turning sunk costs into delicious meals. This directly converts at-risk items into Virtual Savings, maximizing the return on your grocery investment. |
+| **"I want to save money, but I can't see the direct impact of my efforts. It's hard to stay motivated."** | **Tangible, Real-Time Savings:** The Virtual Savings system makes your financial wins visible and instant. When you save an item from being wasted, you see its full monetary value added to your balance, which you can then transfer to your BPI account. |
+| **"I feel like I'm stuck in a rut of wasting the same things, but I don't know how to change my habits."** | **Personalized Financial Coaching:** The AI Kitchen Coach acts as your personal financial advisor for food. It analyzes your unique spending and waste patterns to provide tailored, actionable solutions with clear, estimated savings, guiding you from simple habits to advanced optimization strategies. |
+| **"Meal planning and creating a shopping list takes too much time and effort. I often give up and just buy what looks good."** | **Automated Financial Planning:** The AI-generated meal plans and smart shopping lists act as your automated financial plan for groceries. By building a list based on what you already own and what you need, it prevents impulse buys and duplicate purchases, directly cutting your grocery bill. |
 
 ## 4. Key Features
 
