@@ -396,31 +396,6 @@ export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
 
-export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']) => {
-    const savedRecipeCollection = collection(db, `users/${userId}/savedRecipes`);
-    const recipeQuery = query(savedRecipeCollection, where('id', '==', recipe.id));
-    const querySnapshot = await getDocs(recipeQuery);
-
-    let docRef;
-    if (querySnapshot.empty) {
-        docRef = doc(savedRecipeCollection, recipe.id);
-    } else {
-        docRef = querySnapshot.docs[0].ref;
-    }
-
-    console.log('[scheduleRecipe] Saving to Firestore:', { isScheduled: true, scheduledDate, mealType });
-
-    // Create a new object without the photoDataUri to avoid saving large base64 strings
-    const { photoDataUri, ...recipeToSave } = recipe;
-
-    await setDoc(docRef, {
-        ...recipeToSave,
-        isScheduled: true,
-        scheduledDate,
-        mealType,
-    }, { merge: true });
-};
-
 // --- User Settings Functions ---
 export const getUserSettings = async (userId: string): Promise<UserSettings> => {
     const docRef = doc(db, `users/${userId}/settings`, 'app');

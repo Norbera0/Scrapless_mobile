@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -47,7 +48,7 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     setIsSaving(true);
     try {
         const scheduledDateISO = selectedDate.toISOString();
-        console.log('[RecipeScheduler] Saving...', { recipeId: recipe.id, scheduledDate: scheduledDateISO, mealType });
+        console.log('[RecipeScheduler] Calling server action with:', { recipeId: recipe.id, scheduledDate: scheduledDateISO, mealType });
         
         // Optimistically update the UI in Zustand
         updateRecipe(recipe.id, {
@@ -56,7 +57,7 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
             mealType: mealType,
         });
 
-        // Asynchronously update the backend
+        // Asynchronously update the backend via server action
         await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
         
         toast({

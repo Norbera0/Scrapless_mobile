@@ -1,7 +1,10 @@
+
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { saveRecipe as saveRecipeData, scheduleRecipe as scheduleRecipeInData } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { saveRecipe as saveRecipeData } from '@/lib/data';
 import type { Insight, User, Recipe } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
@@ -79,10 +82,31 @@ export async function fetchItemInsights(input: GetItemInsightsInput): Promise<Ge
 
 export async function scheduleRecipe(userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> {
     try {
-        console.log('[Server Action] scheduleRecipe called with:', { userId, recipeId: recipe.id, scheduledDate, mealType });
-        await scheduleRecipeInData(userId, recipe, scheduledDate, mealType);
+      console.log('[Server Action] scheduleRecipe called with:', { userId, recipeId: recipe.id, scheduledDate, mealType });
+      
+      const savedRecipeCollection = collection(db, `users/${userId}/savedRecipes`);
+      const recipeQuery = query(savedRecipeCollection, where('id', '==', recipe.id));
+      const querySnapshot = await getDocs(recipeQuery);
+  
+      let docRef;
+      if (querySnapshot.empty) {
+          docRef = doc(savedRecipeCollection, recipe.id);
+      } else {
+          docRef = querySnapshot.docs[0].ref;
+      }
+  
+      // Create a new object without the photoDataUri to avoid saving large base64 strings
+      const { photoDataUri, ...recipeToSave } = recipe;
+  
+      await setDoc(docRef, {
+          ...recipeToSave,
+          isScheduled: true,
+          scheduledDate,
+          mealType,
+      }, { merge: true });
+  
     } catch (error) {
-        console.error("Error scheduling recipe in server action:", error);
-        throw new Error("Failed to schedule recipe.");
+      console.error("Error scheduling recipe in server action:", error);
+      throw new Error("Failed to schedule recipe.");
     }
 }
