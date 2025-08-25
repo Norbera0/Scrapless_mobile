@@ -48,7 +48,6 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { MealPlanner } from '@/components/pantry/MealPlanner';
 import { RecipeScheduler } from '@/components/pantry/RecipeScheduler';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['items'][0]['deal']> }) => {
     
@@ -320,23 +319,13 @@ export default function CookAndShopPage() {
                 {isLoadingRecipes ? (
                   <div className="text-center p-8"><Loader2 className="w-8 h-8 animate-spin mx-auto" /></div>
                 ) : recipes.length > 0 ? (
-                  <Carousel
-                    opts={{
-                      align: "start",
-                      loop: false,
-                    }}
-                    className="w-full -ml-4"
-                  >
-                    <CarouselContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {recipes.map(recipe => (
-                        <CarouselItem key={recipe.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3">
-                          <div className="h-full">
+                          <div key={recipe.id} className="h-full">
                             <RecipeCard recipe={recipe} isSaved={savedRecipeIds.has(recipe.id)} onToggleSave={handleToggleSave} onAddToPlan={() => setRecipeToSchedule(recipe)} />
                           </div>
-                        </CarouselItem>
                       ))}
-                    </CarouselContent>
-                  </Carousel>
+                  </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">No recipes could be generated with your current pantry.</div>
                 )}
