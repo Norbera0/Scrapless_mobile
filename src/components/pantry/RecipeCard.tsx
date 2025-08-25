@@ -131,9 +131,15 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                         </Badge>
                     </div>
                     <DialogTitle className="text-left">{recipe.name}</DialogTitle>
-                    <DialogDescription className="text-left">
-                        {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
-                    </DialogDescription>
+                    <div className="text-left">
+                        <DialogDescription>
+                            {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
+                        </DialogDescription>
+                         <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700 mt-2">
+                            <Bot className="w-3 h-3 mr-1" />
+                            AI-Generated Recipe
+                        </Badge>
+                    </div>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <div>
