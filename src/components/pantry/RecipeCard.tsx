@@ -63,7 +63,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
 
     return (
         <Dialog>
-            <Card className="w-full min-w-0 overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors">
+            <Card className="overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors w-full min-w-0">
                 <CardHeader className="p-0 relative flex-shrink-0">
                     <DialogTrigger asChild>
                         <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
@@ -75,7 +75,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
-                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20 whitespace-nowrap">
+                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
                                 <Bot className="h-3 w-3 mr-1.5" />
                                 AI-Generated
                             </Badge>
@@ -89,24 +89,25 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                             </Badge>
                         ))}
                     </div>
-                     <Button size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm" onClick={() => onToggleSave(recipe)}>
+                     <Button size="icon" className="absolute top-2 right-2 h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm flex-shrink-0" onClick={() => onToggleSave(recipe)}>
                         <Heart className={cn("h-4 w-4 text-white transition-colors", isSaved && "fill-red-500 text-red-500")} />
                      </Button>
                 </CardHeader>
                 <CardContent className="p-3 flex-1 min-h-0">
-                    <h3 className="font-bold text-sm leading-tight md:text-base line-clamp-2">{recipe.name}</h3>
+                    <h3 className="font-bold text-sm leading-tight md:text-base line-clamp-2 mb-1">{recipe.name}</h3>
                      <p className="text-xs font-semibold text-green-600 mt-1 line-clamp-2">{recipe.benefit}</p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
-                        <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
-                        <div className="flex items-center gap-1"><ChefHat className="h-3 w-3" /> {recipe.difficulty}</div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2 flex-wrap">
+                        <div className="flex items-center gap-1 whitespace-nowrap"><Clock className="h-3 w-3 flex-shrink-0" /> {recipe.cookingTime}</div>
+                        <div className="flex items-center gap-1 whitespace-nowrap"><ChefHat className="h-3 w-3 flex-shrink-0" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
                 <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2 flex-shrink-0">
-                    <Button size="sm" variant="secondary" className="h-auto px-2 py-1.5 text-xs flex-1 min-w-0" onClick={() => onAddToPlan(recipe)}>
-                        <CalendarPlus className="mr-2 h-4 w-4 flex-shrink-0" /> <span className="truncate">Add to Plan</span>
+                    <Button size="sm" variant="secondary" className="h-auto px-2 py-1 text-xs flex-1 min-w-0" onClick={() => onAddToPlan(recipe)}>
+                        <CalendarPlus className="mr-1 h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">Add to Plan</span>
                     </Button>
                     <DialogTrigger asChild>
-                         <Button size="sm" className="h-auto px-2 py-1.5 text-xs flex-1 min-w-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                         <Button size="sm" className="h-auto px-2 py-1 text-xs flex-1 min-w-0 bg-primary text-primary-foreground hover:bg-primary/90">
                             <span className="truncate">View Recipe</span>
                         </Button>
                     </DialogTrigger>
@@ -114,7 +115,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
             </Card>
 
             {/* Modal Content */}
-            <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogContent className="max-h-[80vh] overflow-y-auto max-w-2xl">
                 <DialogHeader>
                     <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
                         {recipe.photoDataUri ? (
@@ -129,8 +130,8 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                             AI-Generated Image
                         </Badge>
                     </div>
-                    <DialogTitle>{recipe.name}</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-left">{recipe.name}</DialogTitle>
+                    <DialogDescription className="text-left">
                         {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
                     </DialogDescription>
                 </DialogHeader>
@@ -139,7 +140,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                         <h3 className="font-semibold text-lg mb-2">Ingredients</h3>
                         <ul className="list-disc list-inside space-y-1">
                             {recipe.ingredients.map((ing, i) => (
-                                <li key={i} className={cn(ing.status === 'Need' && 'text-muted-foreground')}>
+                                <li key={i} className={cn("break-words", ing.status === 'Need' && 'text-muted-foreground')}>
                                     {ing.quantity} {ing.unit} {ing.name}
                                     {ing.status === 'Need' && <Badge variant="outline" className="ml-2">Need</Badge>}
                                 </li>
@@ -150,7 +151,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                         <h3 className="font-semibold text-lg mb-2">Instructions</h3>
                         <ol className="list-decimal list-inside space-y-2">
                         {recipe.instructions.map((step, i) => (
-                            <li key={i}>{step}</li>
+                            <li key={i} className="break-words">{step}</li>
                         ))}
                         </ol>
                     </div>
