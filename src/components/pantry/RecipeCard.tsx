@@ -65,7 +65,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
         <Dialog>
             <Card className="overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors">
                 <CardHeader className="p-0 relative">
-                    {/* <DialogTrigger asChild>
+                    <DialogTrigger asChild>
                         <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
                             {recipe.photoDataUri ? (
                                 <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -80,7 +80,7 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                                 AI-Generated
                             </Badge>
                         </div>
-                    </DialogTrigger> */}
+                    </DialogTrigger>
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1">
                         {recipe.tags?.map(tag => (
                             <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg text-xs">
