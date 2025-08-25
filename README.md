@@ -1,4 +1,4 @@
-# Scrapless: Product Requirements Document (PRD)
+# Scrapeless: Product Requirements Document (PRD)
 
 ## 1. Overview
 
@@ -12,7 +12,7 @@ Our target users can be defined by their primary motivation and their stage in t
 
 *   **The Financially-Minded Saver:** This user's primary goal is to cut costs and save money. They see food waste as a direct financial loss. They are motivated by seeing their Virtual Savings grow and successfully transferring that money to their bank account.
 *   **The Eco-Conscious Optimizer:** This user is driven by a desire to live more sustainably. While they care about the environment, they understand that reducing waste also has a significant financial benefit. They are motivated by reducing their carbon footprint and improving their Sustainability Score.
-*   **The Busy Household Manager:** This user, often a parent or a working professional, values time and convenience. They are looking for a system to simplify meal planning and grocery shopping. They are motivated by features that reduce mental load, like the AI-powered shopping list and recipe suggestions, which in turn save them money and reduce waste.
+*   **The Busy Household Manager:** This user, often a parent or a working professional, values time and convenience. They are a parent or a working professional, values time and convenience. They are looking for a system to simplify meal planning and grocery shopping. They are motivated by features that reduce mental load, like the AI-powered shopping list and recipe suggestions, which in turn save them money and reduce waste.
 
 ## 3. User Problems & Solutions
 
@@ -235,20 +235,181 @@ Scrapless aims to evolve from a kitchen management tool into a comprehensive pla
 *   **Hardware & IoT Integration:**
     *   **Smart Appliance Sync:** Seamlessly integrating with smart refrigerators and ovens to automate inventory management and cooking processes.
 
-## 9. BPI Integration
+## 9. System Architecture
+
+Scrapless is built on a modern, serverless architecture that separates the user interface from the backend logic and AI processing. This design ensures that the app is scalable, secure, and can be developed efficiently.
+
+```mermaid
+graph TD
+    A[User] -->|Interacts with| B(Frontend);
+    B -->|Fetches Data & Triggers AI| C(Backend);
+    C -->|Reads/Writes Data| D(Firestore Database);
+    C -->|Executes Logic| E(Cloud Functions);
+    C -->|Orchestrates AI Flows| F(AI Layer - Genkit);
+
+    subgraph "Client-Side"
+        B["Frontend (Next.js on Vercel)"];
+    end
+
+    subgraph "Server-Side (Firebase)"
+        C["Backend Logic"];
+        D["Firestore Database"];
+        E["Cloud Functions"];
+        F["AI Layer (Genkit)"];
+    end
+
+```
+
+### 9.1. Frontend (Client-Side)
+The user interface is a **Next.js** application written in **TypeScript**. It is responsible for everything the user sees and interacts with.
+*   **UI Components:** Built with **Tailwind CSS** and **shadcn/ui** for a clean and responsive design.
+*   **State Management:** **Zustand** is used to manage the app's state, such as the list of pantry items or the current user's savings. This makes the UI fast and reactive.
+*   **Communication:** The frontend communicates with the backend through a data layer defined in `src/lib/data.ts`. This layer makes calls to Firestore to get data and triggers the AI flows when needed.
+
+### 9.2. Backend (Server-Side on Firebase)
+The backend is powered entirely by **Google Firebase**, which provides a scalable, serverless platform.
+*   **Data Storage:** All user data (pantry items, waste logs, etc.) is stored in **Firestore**, a flexible NoSQL database.
+*   **Business Logic:** **Firebase Cloud Functions** are used for tasks that need to be done on the server, like calculating the "waste difference" for virtual savings or performing complex data aggregations for the analytics page.
+*   **Authentication:** **Firebase Authentication** handles all user sign-ups and logins securely.
+
+### 9.3. AI Layer (Genkit)
+The intelligence of Scrapless is managed by **Genkit**, an open-source AI framework. It acts as an orchestration layer that connects the user's data to the powerful language models that provide insights.
+*   **AI Flows:** Each major AI feature, like the Kitchen Coach advice or the shopping list generation, is defined as a "flow" in the `src/ai/flows` directory.
+*   **Data Processing:** A flow takes in user data (e.g., pantry items, waste logs, user settings), formats it into a detailed prompt, sends it to the language model, and then structures the model's response into a predictable format using **Zod schemas**. This ensures the app receives reliable, well-structured data every time.
+
+#### Example AI Flow: Kitchen Coach Analysis
+This diagram shows how data moves through the system when a user requests advice from the Kitchen Coach.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant GenkitFlow as "AI Flow (Genkit)"
+    participant LLM as "Language Model"
+
+    User->>Frontend: Clicks "Get New Advice"
+    Frontend->>Backend: Triggers getCoachAdvice() function
+    Backend->>GenkitFlow: Invokes "get-kitchen-coach-advice" flow with user data (pantry, waste, settings)
+    GenkitFlow->>LLM: Sends formatted prompt with raw data and summary metrics
+    LLM-->>GenkitFlow: Returns unstructured text analysis
+    GenkitFlow->>GenkitFlow: Parses and validates the text into a structured JSON object (using Zod)
+    GenkitFlow-->>Backend: Returns structured analysis
+    Backend-->>Frontend: Returns analysis to the UI
+    Frontend-->>User: Displays the personalized advice story
+```
+
+## 10. Process Flow & Use-Case Diagrams
+
+These diagrams illustrate how users interact with the Scrapless system and how data flows through its core processes.
+
+### 10.1. Use-Case Diagram
+This diagram shows the main actions a user can perform within the Scrapless application.
+
+```mermaid
+graph TD
+    subgraph Scrapless System
+        UC1((Manage Pantry))
+        UC2((Log Food Waste))
+        UC3((Analyze Performance))
+        UC4((Get AI-Powered Guidance))
+        UC5((Manage Savings & Rewards))
+    end
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+
+    UC4 ..> UC1 : <<includes>>
+    UC4 ..> UC5 : <<includes>>
+    UC3 ..> UC4 : <<extends>>
+
+```
+
+| Use-Case | Description |
+| :--- | :--- |
+| **Manage Pantry** | The user adds, edits, and removes items from their digital pantry. They can view the status of all items, including those that are expiring soon. |
+| **Log Food Waste** | When food is thrown away, the user logs the item, the reason, and its estimated value. This is the primary input for the financial waste audit. |
+| **Analyze Performance** | The user reviews their historical data on the Analytics page, viewing trends in their waste, savings, and overall Sustainability Score. |
+| **Get AI-Powered Guidance** | The user interacts with the AI Kitchen Coach to get a deep analysis of their habits and receive personalized solutions. This also includes generating AI-powered recipes and shopping lists. |
+| **Manage Savings & Rewards** | The user views their accumulated Virtual Savings and can transfer them to a linked BPI account. They can also convert their Green Points into BPI rewards. |
+
+
+### 10.2. Core Process Flow: The "Data-to-Savings" Loop
+This diagram shows the main process loop within Scrapless. It illustrates how user actions create data, which is then analyzed by the AI to provide insights that lead to actions, resulting in tangible savings.
+
+```mermaid
+graph TD
+    A[User logs pantry & waste data] --> B{Data is Stored in Firestore};
+    B --> C(AI Kitchen Coach analyzes patterns);
+    C --> D{Generates personalized insights & solutions};
+    D --> E[User receives advice via the app];
+    E --> F{User implements a solution};
+    F --> G[Virtual Savings are generated];
+    G --> H(User's Sustainability Score improves);
+    H --> I{User transfers savings to BPI};
+    I --> A;
+```
+This loop represents the core value of Scrapless: turning everyday kitchen activities into a continuous cycle of learning, improvement, and financial reward.
+
+## 11. BPI Integration
 
 Scrapless partners with BPI to connect your eco-friendly habits with tangible financial rewards.
 
 *   **Transfer Savings:** Users can transfer their accumulated virtual savings to a BPI #MySaveUp account, turning their good habits into real money.
-*   **Sustainability Score:** Your in-app activity contributes to a Sustainability Score, which serves as a testament to your responsible consumption habits. A higher score can potentially unlock future eco-friendly financial products and benefits from BPI.
+*   **Sustainability Score:** Your in-app activity contributes to a Sustainability Score, which serves as a testament to your responsible consumption habits. A higher score can a testament to your responsible consumption habits. A higher score can a testament to your responsible consumption habits. A higher score can potentially unlock future eco-friendly financial products and benefits from BPI.
 *   **Exclusive Deals:** The AI-powered shopping list highlights special deals and offers from BPI and its partners (e.g., Vybe), providing additional savings opportunities on grocery purchases.
 *   **Green Points Conversion:** Users can convert the Green Points earned in the app into BPI rewards points, further integrating their sustainable actions with financial perks.
 
-## 10. Technical Stack
+## 12. Technical Stack
 
-*   **Frontend:** Next.js, React, TypeScript
-*   **Styling:** Tailwind CSS, shadcn/ui
-*   **State Management:** Zustand
-*   **Backend:** Firebase (Firestore, Authentication, Functions)
-*   **AI:** Genkit
-*   **Deployment:** Vercel, Firebase Hosting
+The technology stack for Scrapless was chosen to facilitate rapid development, ensure scalability, and leverage modern AI and cloud capabilities.
+
+*   **Frontend (Next.js with TypeScript):** Next.js provides a powerful React framework that enables a fast, server-rendered user experience. TypeScript ensures type safety and code quality, which is crucial for a data-intensive application.
+*   **Styling (Tailwind CSS & shadcn/ui):** Tailwind CSS allows for rapid, utility-first styling, enabling the creation of a custom design system. `shadcn/ui` provides a set of beautifully designed and accessible components that are built on top of Tailwind, accelerating UI development.
+*   **State Management (Zustand):** Zustand is a small, fast, and scalable state-management solution. Its simplicity and minimal boilerplate make it ideal for managing the client-side state of the application without unnecessary complexity.
+*   **Backend (Firebase):** The Firebase suite provides a robust and scalable serverless backend:
+    *   **Firestore:** A NoSQL, cloud-native database for storing all user data, including pantry items, waste logs, and savings events.
+    *   **Firebase Authentication:** Handles secure user sign-up and login, supporting various authentication methods.
+    *   **Cloud Functions:** Used for server-side logic, such as complex calculations for the Sustainability Score or handling BPI integration webhooks.
+*   **AI (Genkit):** The core of our intelligent features is powered by Genkit, an open-source framework from Google that helps orchestrate and manage our AI flows. It allows us to reliably chain prompts, process data, and generate the complex analyses and solutions provided by the Kitchen Coach.
+*   **Deployment (Vercel & Firebase Hosting):** The Next.js frontend is deployed on Vercel for optimal performance and seamless integration with the framework. Backend services, including Cloud Functions and Firestore, are hosted on Firebase.
+
+## 13. Implementation
+
+Building Scrapless followed a structured, component-based approach, starting from the foundational design and data layers and moving up to the complex AI and UI features.
+
+1.  **Foundation & Design System:**
+    *   The project was initialized as a Next.js application with TypeScript.
+    *   Tailwind CSS was integrated for utility-first styling. The core design system, including the color palette (`--primary`, `--destructive`, etc.) and typography, was defined in `src/app/globals.css`.
+    *   `shadcn/ui` was used to provide a base library of accessible and reusable components (Buttons, Cards, etc.), which were then customized to match the Scrapless brand.
+
+2.  **Core Data & State Management:**
+    *   All primary data structures (`PantryItem`, `WasteLog`, `SavingsEvent`, `GreenPointsEvent`, etc.) were defined in `src/types/index.ts`.
+    *   Firestore database rules were established to ensure data security and integrity.
+    *   Client-side state management was implemented using Zustand. Separate stores were created for each major data domain (e.g., `pantry-store.ts`, `waste-log-store.ts`, `green-points-store.ts`) to keep the state logic modular and maintainable.
+
+3.  **Component & Page Development:**
+    *   With the design system and state management in place, individual UI components were built for each feature (e.g., `PantryItemCard`, `WasteBreakdownCard`).
+    *   These components were then assembled into the main pages of the application (Dashboard, Pantry, Analytics, etc.), connecting them to the Zustand stores to display and interact with live data.
+
+4.  **Backend Logic & Firebase Functions:**
+    *   Data persistence logic was created in `src/lib/data.ts` to handle all Firestore queries (CRUD operations).
+    *   Firebase Cloud Functions were developed to handle more complex backend tasks, such as calculating the periodic "waste difference" for the Virtual Savings system or processing user data for the Kitchen Coach.
+
+5.  **AI Integration with Genkit:**
+    *   The AI flows were defined in the `src/ai/flows` directory. Each flow (e.g., `get-coach-advice.ts`, `generate-shopping-list.ts`) was constructed using Genkit, which orchestrates the calls to the underlying language models.
+    *   Zod schemas were created in `src/ai/schemas.ts` to define the expected input and output structures for each AI flow, ensuring type-safe and predictable interactions between the frontend and the AI backend.
+
+6.  **BPI Integration & Finalization:**
+    *   The final step involved connecting to the (mock) BPI APIs to handle the transfer of Virtual Savings and the conversion of Green Points.
+    *   The application was then deployed, with the frontend hosted on Vercel and the backend services running on Firebase.
+    
+## 14. Development Environment
+
+The development of Scrapless utilized a hybrid approach, leveraging both a powerful web-based IDE and a specialized local IDE to maximize efficiency and collaboration.
+
+*   **Firebase Studio:** This web-based IDE was used for its seamless integration with the project's backend. It provided a convenient way to manage Firestore data, monitor Cloud Functions, and handle deployments directly within a browser-based environment.
+*   **Cursor:** The majority of the application's code was written in Cursor, an AI-first local IDE. Its advanced AI capabilities facilitated a "vibe-coding" workflow, enabling rapid prototyping, AI-assisted pair programming, and efficient code generation, which significantly accelerated the development process.
