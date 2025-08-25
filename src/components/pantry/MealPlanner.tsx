@@ -120,7 +120,7 @@ const DailyView = ({ scheduledRecipes, selectedDate, setSelectedDate }: { schedu
                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(subDays(selectedDate, 1))}>
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <h3 className="font-semibold text-lg">{format(selectedDate, 'MMMM d, yyyy')}</h3>
+                <h3 className="font-semibold text-lg">{selectedDate instanceof Date && !isNaN(selectedDate.getTime()) ? format(selectedDate, 'MMMM d, yyyy') : ''}</h3>
                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSelectedDate(addDays(selectedDate, 1))}>
                     <ChevronRight className="h-4 w-4" />
                 </Button>
