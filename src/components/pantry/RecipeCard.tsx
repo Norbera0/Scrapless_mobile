@@ -63,8 +63,8 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
 
     return (
         <Dialog>
-            <Card className="overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors">
-                <CardHeader className="p-0 relative">
+            <Card className="w-full min-w-0 overflow-hidden h-full flex flex-col group border-green-500/20 hover:border-green-500/50 transition-colors">
+                <CardHeader className="p-0 relative flex-shrink-0">
                     <DialogTrigger asChild>
                         <div className="aspect-video w-full relative overflow-hidden cursor-pointer" data-ai-hint="recipe food">
                             {recipe.photoDataUri ? (
@@ -75,15 +75,15 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
-                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20 whitespace-nowrap">
                                 <Bot className="h-3 w-3 mr-1.5" />
                                 AI-Generated
                             </Badge>
                         </div>
                     </DialogTrigger>
-                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                    <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-5rem)]">
                         {recipe.tags?.map(tag => (
-                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg text-xs">
+                            <Badge key={tag} variant={tag === 'Urgent' ? 'destructive' : 'secondary'} className="shadow-lg text-xs whitespace-nowrap">
                                 {tag === 'Urgent' ? <Zap className="h-3 w-3 mr-1" /> : <Leaf className="h-3 w-3 mr-1" />}
                                 {tag}
                             </Badge>
@@ -93,21 +93,21 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                         <Heart className={cn("h-4 w-4 text-white transition-colors", isSaved && "fill-red-500 text-red-500")} />
                      </Button>
                 </CardHeader>
-                <CardContent className="p-3 flex-1">
-                    <h3 className="font-bold text-sm leading-tight md:text-base">{recipe.name}</h3>
-                     <p className="text-xs font-semibold text-green-600 mt-1">{recipe.benefit}</p>
+                <CardContent className="p-3 flex-1 min-h-0">
+                    <h3 className="font-bold text-sm leading-tight md:text-base line-clamp-2">{recipe.name}</h3>
+                     <p className="text-xs font-semibold text-green-600 mt-1 line-clamp-2">{recipe.benefit}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-2">
                         <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {recipe.cookingTime}</div>
                         <div className="flex items-center gap-1"><ChefHat className="h-3 w-3" /> {recipe.difficulty}</div>
                     </div>
                 </CardContent>
-                <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2">
-                    <Button size="sm" variant="secondary" className="h-auto px-3 py-1 text-xs flex-1" onClick={() => onAddToPlan(recipe)}>
-                        <CalendarPlus className="mr-2 h-4 w-4" /> Add to Plan
+                <CardFooter className="p-2 bg-secondary/30 flex justify-between items-center gap-2 flex-shrink-0">
+                    <Button size="sm" variant="secondary" className="h-auto px-2 py-1.5 text-xs flex-1 min-w-0" onClick={() => onAddToPlan(recipe)}>
+                        <CalendarPlus className="mr-2 h-4 w-4 flex-shrink-0" /> <span className="truncate">Add to Plan</span>
                     </Button>
                     <DialogTrigger asChild>
-                         <Button size="sm" className="h-auto px-3 py-1 text-xs flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
-                            View Recipe
+                         <Button size="sm" className="h-auto px-2 py-1.5 text-xs flex-1 min-w-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                            <span className="truncate">View Recipe</span>
                         </Button>
                     </DialogTrigger>
                 </CardFooter>
