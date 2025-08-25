@@ -4,15 +4,20 @@
 import { useMemo } from 'react';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useWasteLogStore } from '@/stores/waste-log-store';
-import { differenceInDays, startOfToday, parseISO } from 'date-fns';
+import { useSavingsStore } from '@/stores/savings-store';
+import { differenceInDays, startOfToday, parseISO, startOfMonth, isAfter, subMonths } from 'date-fns';
 import type { Notification } from '@/types';
 
 export function useNotifications() {
     const { liveItems, pantryInitialized } = usePantryLogStore();
+    const { logs, logsInitialized } = useWasteLogStore();
+    const { savingsEvents, savingsInitialized } = useSavingsStore();
 
     const notifications = useMemo(() => {
         const generated: Notification[] = [];
         const today = startOfToday();
+        const startOfThisMonth = startOfMonth(today);
+        const startOfLastMonth = subMonths(startOfThisMonth, 1);
 
         if (pantryInitialized) {
             // Critical: Expiring Today/Tomorrow
@@ -25,7 +30,7 @@ export function useNotifications() {
                 const itemNames = expiringSoon.map(i => i.name).slice(0, 2).join(', ');
                 const additionalItems = expiringSoon.length > 2 ? ` and ${expiringSoon.length - 2} more` : '';
                 generated.push({
-                    id: `expiring-soon-${today.toISOString()}`,
+                    id: `expiring-soon-${today.toISOString().slice(0, 10)}`,
                     category: 'critical',
                     title: `${expiringSoon.length} item(s) expire soon`,
                     message: `${itemNames}${additionalItems} need to be used!`,
@@ -41,7 +46,7 @@ export function useNotifications() {
             });
             if (expiringThisWeek.length > 0) {
                  generated.push({
-                    id: `expiring-week-${today.toISOString()}`,
+                    id: `expiring-week-${today.toISOString().slice(0, 10)}`,
                     category: 'important',
                     title: `Plan ahead for ${expiringThisWeek.length} items`,
                     message: `You have items expiring in the next 7 days. Plan your meals to avoid waste.`,
@@ -51,19 +56,27 @@ export function useNotifications() {
             }
         }
         
-        // Dummy success notification for demo
-        generated.push({
-            id: 'success-dummy-1',
-            category: 'success',
-            title: 'Great job!',
-            message: 'You saved ₱150 this month by reducing waste.',
-            date: new Date().toISOString(),
-            isRead: false
-        })
+        if (savingsInitialized && logsInitialized) {
+            const thisMonthSavings = savingsEvents
+                .filter(e => isAfter(parseISO(e.date), startOfThisMonth))
+                .reduce((sum, e) => sum + e.amount, 0);
+
+            if (thisMonthSavings > 50) {
+                 generated.push({
+                    id: `monthly-savings-${startOfThisMonth.toISOString()}`,
+                    category: 'success',
+                    title: 'Great job this month!',
+                    message: `You've saved ₱${thisMonthSavings.toFixed(0)} so far by reducing waste.`,
+                    date: new Date().toISOString(),
+                    isRead: false
+                });
+            }
+        }
+
 
         return generated.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    }, [liveItems, pantryInitialized]);
+    }, [liveItems, pantryInitialized, logs, logsInitialized, savingsEvents, savingsInitialized]);
 
     const totalNew = notifications.filter(n => !n.isRead).length;
 
