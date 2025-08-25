@@ -81,9 +81,11 @@ export default function KitchenCoachPage() {
         solutions, 
         isGenerating,
         lastGenerated,
+        hasUnseenAnalysis,
         setAnalysis, 
         setSolutions, 
-        setIsGenerating 
+        setIsGenerating,
+        markAnalysisAsSeen,
     } = useCoachStore();
     
     const [isFetchingSolutions, setIsFetchingSolutions] = useState(false);
@@ -117,6 +119,14 @@ export default function KitchenCoachPage() {
         setSelectedSolutions(new Set(implementedSolutionTitles));
     }, [savingsEvents]);
     
+    useEffect(() => {
+        // Automatically show wizard if there's a new, unseen analysis
+        if (hasUnseenAnalysis && analysis && solutions && !isGenerating) {
+            setShowWizard(true);
+        }
+    }, [hasUnseenAnalysis, analysis, solutions, isGenerating]);
+
+
     const handleAskCoach = async () => {
         setIsGenerating(true);
         setAnalysis(null);
@@ -165,7 +175,6 @@ export default function KitchenCoachPage() {
                 const solutionsResult = await fetchCoachSolutions(solutionsInput);
                 setSolutions(solutionsResult);
                 setIsFetchingSolutions(false);
-                setShowWizard(true); // Only show wizard for new advice
             }
 
         } catch (error) {
@@ -206,6 +215,11 @@ export default function KitchenCoachPage() {
             });
         }
     };
+    
+    const handleWizardClose = () => {
+        setShowWizard(false);
+        markAnalysisAsSeen();
+    }
 
     if (!analytics && !isGenerating) {
         return (
@@ -403,7 +417,7 @@ export default function KitchenCoachPage() {
             {analysis && solutions && showWizard && (
                  <KitchenCoachWizard 
                     isOpen={showWizard}
-                    onClose={() => setShowWizard(false)}
+                    onClose={handleWizardClose}
                     analysis={analysis}
                     solutions={solutions}
                     onSelectSolution={(title) => {

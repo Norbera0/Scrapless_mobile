@@ -2,103 +2,251 @@
 
 ## 1. Overview
 
-*   **Product Name:** Scrapless
-*   **Mission:** To empower Filipino households to significantly reduce food waste, save money, and lessen their environmental impact through intelligent, data-driven tools.
-*   **Vision:** To close the loop from consumption to waste, creating a smart, sustainable lifestyle platform that makes eco-conscious living effortless and financially rewarding.
-*   **Problem Statement:** In the Philippines, a significant portion of household income is spent on food, yet a substantial amount ends up as waste due to spoilage, over-purchasing, and poor inventory management. This results in direct financial loss for families and contributes to environmental degradation.
-*   **Solution:** Scrapless is a mobile-first web application that provides users with AI-powered tools to track their pantry, log waste, gain insights into their consumption habits, and receive actionable recommendations to prevent waste before it happens.
+Scrapless is an AI-powered financial management platform designed to tackle one of the most significant hidden costs in every household: food waste. It reframes kitchen management as a financial activity, empowering users to see, understand, and reduce the money they lose to spoilage and inefficient consumption. By meticulously tracking the monetary value of every food item—from purchase to consumption or disposal—Scrapless provides a clear, real-time view of your "food finances."
+
+The application goes beyond simple tracking. It provides powerful analytics to visualize the financial impact of waste and leverages AI to offer actionable solutions, from intelligent recipe suggestions to optimized shopping lists. Most importantly, Scrapless makes saving money a rewarding experience. The platform's core "Virtual Savings" system quantifies the money saved through positive actions, turning waste reduction into a tangible financial gain that users can transfer to their actual bank accounts through our BPI integration. Scrapless is not just about saving the planet; it's about saving your wallet.
 
 ## 2. Target Audience
 
-*   **Primary:** Budget-conscious household managers in urban and suburban areas of the Philippines (e.g., parents, young professionals, heads of household) who are responsible for grocery shopping and meal preparation. They are digitally savvy and looking for practical ways to manage their expenses.
-*   **Secondary:** Environmentally-conscious millennials and Gen Z individuals who are motivated by sustainability and want to take concrete steps to reduce their carbon footprint.
+*   **Environmentally Conscious Individuals:** People who are actively looking for ways to live more sustainably and reduce their carbon footprint.
+*   **Budget-Conscious Households:** Families and individuals who want to save money by reducing food spoilage and optimizing their grocery shopping.
+*   **Busy Professionals and Parents:** Individuals who need help with meal planning and efficient grocery shopping to manage their busy schedules.
+*   **Tech-Savvy Millennials and Gen Z:** Users who are comfortable with mobile apps and are interested in using technology to improve their daily lives.
 
-## 3. Core Features & Functionality
+## 3. User Problems & Solutions
 
-| Feature ID | Feature Name          | Description                                                                                                                                                                                                  | User Goal / Value                                                                                                        |
-| :--------- | :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
-| **F-01**   | **Smart Pantry**      | A digital inventory of the user's food items. Users can add items via camera (receipt/item scan), voice, or text. The system auto-suggests expiration dates and categorizes items.                              | "I want to know what I have at a glance so I don't buy duplicates or forget about items."                                |
-| **F-02**   | **Intelligent Waste Log** | Users can quickly log discarded food using their camera, voice, or text. The AI identifies items and estimates their financial and environmental (CO₂e) impact. Users must specify a reason for the waste. | "I need a fast way to track what I throw away, so I can see where my money is going."                                    |
-| **F-03**   | **AI Insights Engine**    | (Formerly Kitchen Coach) Proactively analyzes user data (pantry, waste, savings) to deliver personalized, narrative-driven insights about their core waste habits (e.g., "The Weekend Impulse Buyer").         | "I want to understand the *why* behind my waste, not just the *what*."                                                   |
-| **F-04**   | **Actionable Solutions**  | For each insight, the AI provides a set of tailored, actionable solutions with varying difficulty levels and estimated impact, encouraging users to commit to a plan.                                         | "Tell me exactly what I can do to fix my bad habits."                                                                    |
-| **F-05**   | **Cook & Shop Hub**       | Provides recipe suggestions based on pantry items nearing expiration. Generates a smart shopping list based on pantry depletion, consumption history, and waste patterns to prevent over-buying.             | "Help me use what I have and buy only what I need."                                                                      |
-| **F-06**   | **Impact Dashboard (Analytics)**  | Visualizes key metrics: waste trends over time (vs. savings), waste breakdown by food category, and top reasons for waste.                                                                         | "Show me my progress and where my biggest problem areas are."                                                            |
-| **F-07**   | **Virtual Savings & Rewards** | Users earn "virtual savings" for positive actions (e.g., using an item before expiry). These savings can be tracked and (in the future) transferred. Users also earn "Green Points" for gamification. | "I want to see the tangible financial benefit of my efforts and be rewarded for good habits."                            |
+| User Problem | Solution |
+| :--- | :--- |
+| "I often forget what food I have at home, leading to buying duplicates and wasting food that expires." | **Smart Pantry Management:** Users can easily log items via text, voice, or photo. The app tracks expiry dates and provides a clear overview of all inventory. |
+| "I don't know how to use up ingredients before they go bad." | **AI-Powered Recipe Suggestions:** The app suggests recipes based on the items available in the user's pantry, prioritizing ingredients that are about to expire. |
+| "I feel guilty about the amount of food I throw away, but I don't know how to improve." | **Waste Logging & Analytics:** Users can log food waste to understand their habits. The app provides detailed analytics and insights into waste patterns, helping users identify areas for improvement. |
+| "Meal planning is time-consuming and I often run out of ideas." | **Automated Meal Planner & Shopping Hub:** The app can automatically generate a weekly meal plan and a corresponding shopping list, saving users time and effort. |
+| "I want to save money, but it's hard to see the financial impact of my food waste." | **Savings Tracker & Fintech Integration:** Scrapless quantifies the monetary value of saved food. Through a partnership with BPI, users can transfer these virtual savings into a real bank account. |
+| "Living sustainably feels like a chore and it's hard to stay motivated." | **Gamification and Rewards:** The app incorporates a "Green Points" system, rewarding users for positive actions like logging pantry items and reducing waste. |
 
-## 4. User Flow
+## 4. Key Features
 
-### 4.1. Onboarding & First-Time Use
+### 4.1. Dashboard
 
-1.  **Sign Up:** User creates an account with Name, Email, and Password.
-2.  **Welcome:** Brief introduction to the app's mission.
-3.  **Action:** User is prompted to add their first items to the **Smart Pantry** (`F-01`).
-4.  **Feedback:** The dashboard provides an initial state, encouraging the user to log waste to unlock insights.
+The Dashboard is the user's central hub, providing an at-a-glance view of their impact, quick access to core features, and actionable insights.
 
-### 4.2. Core Loop: The "Track-Understand-Act" Cycle
+*   **User Impact Card:** A prominent card at the top displaying key metrics:
+    *   **Total Virtual Savings:** The monetary value of food saved.
+    *   **Carbon Footprint:** The estimated CO2 equivalent (in kg) of the user's food waste.
+    *   **Savings Goal:** A progress bar tracking virtual savings transferred to a linked bank account against a user-defined goal.
+*   **Quick Actions:** Buttons for the most common tasks:
+    *   **Add to Pantry:** A multi-modal input (Camera, Voice, Text) for logging new items.
+    *   **Log Food Waste:** A multi-modal input (Camera, Voice, Text) for tracking discarded items.
+*   **Waste Breakdown Card:** A visual breakdown of food waste, helping users understand their habits.
+*   **Kitchen Coach Panel:** Provides direct access to the AI Kitchen Coach for immediate advice and tips.
+*   **Fun Facts Panel:** Shows engaging fun facts and actionable tips based on the user's data to encourage sustainable habits.
+*   **Cook & Shop Hub:** A navigation panel that directs users to a dedicated section for recipe generation and smart shopping list creation.
+*   **Notifications:** Alerts users about items that are expiring soon.
 
-  <!-- Placeholder for a flowchart diagram -->
+### 4.2. My Pantry Page
 
-1.  **Track (Input):**
-    *   User adds new groceries to the **Pantry** (`F-01`).
-    *   When food is discarded, user opens the **Waste Log** (`F-02`) and logs the items.
-2.  **Understand (Analysis):**
-    *   User visits the **Analytics** page (`F-06`) to see their weekly trends and waste breakdown.
-    *   User receives a notification or visits the **AI Insights** page (`F-03`) to see a new analysis of their habits.
-3.  **Act (Output):**
-    *   Based on pantry items, user browses the **Cook & Shop Hub** (`F-05`) for recipes.
-    *   Based on AI insights, user commits to an **Actionable Solution** (`F-04`).
-    *   User generates a **Smart Shopping List** (`F-05`) before going to the store.
-4.  **Reward:**
-    *   User's **Virtual Savings** (`F-07`) increase as they act on recommendations.
-    *   The cycle repeats, with new data feeding smarter insights.
+A comprehensive inventory management system that also provides a historical view of food waste.
 
-## 5. Page Content & Structure
+*   **Tabbed Interface:** Easily switch between two views:
+    *   **My Pantry:** A real-time inventory of all food items.
+    *   **Waste Bin:** A historical log of all discarded items.
+*   **Pantry View:**
+    *   **Search and Filter:** Quickly find items by name or filter by status (e.g., "Expiring Soon", "Fresh").
+    *   **Item Cards:** Each item is displayed with its name, quantity, and a visual indicator for its freshness status.
+    *   **Multi-Modal Add:** Add new items via camera, voice, or text.
+    *   **Item Details & Editing:** Click on an item to view, edit, or delete it.
+*   **Waste Bin View:**
+    *   **Recent Waste History:** A chronological log of all wasted food items.
+    *   **Date-Based Filtering:** A calendar interface to view waste logs for specific days.
+    *   **Categorized by Time:** Waste entries are grouped by time of day (Morning, Afternoon, Evening).
+    *   **Detailed Waste Cards:** Each card shows the item name, time of disposal, reason for waste, monetary value, and carbon footprint.
 
-*   **/dashboard (Home):**
-    *   **Content:** At-a-glance summary of key stats (Pantry health, weekly waste vs. savings), quick action buttons ("Add to Pantry", "Log Waste"), and the main AI Insight card. Serves as the user's mission control.
-*   **/pantry (My Pantry):**
-    *   **Content:** A card-based view of all "live" items, searchable and filterable. Displays item name, quantity, and freshness status. Each card is clickable for details. Includes a "Waste Bin" tab to view recent waste history.
-*   **/add-to-pantry:**
-    *   **Content:** A multi-modal input screen (Camera, Voice, Text) for adding new grocery items.
-*   **/analytics (Analytics):**
-    *   **Content:** In-depth charts and visualizations. Includes a trend line of waste vs. savings, a breakdown of waste by food category, and a chart showing the top reasons for waste.
-*   **/log-waste:**
-    *   **Content:** A multi-modal input screen for logging waste. The primary entry point for waste data.
-*   **/ai-insights (AI Insights):**
-    *   **Content:** The main page for the AI analysis. Presents the latest insight "story" and a list of actionable solutions the user can adopt.
-*   **/cook-shop (Cook & Shop):**
-    *   **Content:** Two main sections: AI-suggested recipes based on expiring pantry items, and the smart shopping list generator and viewer.
-*   **/my-savings:**
-    *   **Content:** A financial-focused dashboard showing total virtual savings, the amount available to "transfer," and a history of all savings events.
-*   **/rewards:**
-    *   **Content:** A dashboard for "Green Points," showing total points earned and a history of point-generating activities. Includes mock integration for converting points.
-*   **/profile:**
-    *   **Content:** User account details, settings (e.g., savings goals), and links to saved items/recipes.
+### 4.3. Analytics Page
 
-## 6. Key Metrics & Success Criteria
+A dedicated section for visualizing data and understanding long-term trends in food consumption and waste.
 
-### 6.1. North Star Metric
+*   **Net Savings/Loss:** A prominent display showing the net financial result of savings versus waste over a selected period.
+*   **Waste & Savings Trends:** An interactive area chart that visualizes:
+    *   The monetary value of food waste over time.
+    *   The monetary value of savings from sustainable actions.
+    *   The carbon footprint of waste.
+    *   Users can filter the data by timeframe (7, 15, or 30 days) and view it as daily or aggregate data.
+*   **Waste Reason Analysis:** A stacked bar chart that breaks down the primary reasons for food waste (e.g., "Spoiled", "Expired") and the food categories associated with each reason.
+*   **Pantry Health Score:** A gamified score that provides an at-a-glance understanding of the user's pantry management effectiveness.
+*   **Trends & KPIs:** Key Performance Indicators that provide a quick summary of important metrics like waste reduction and savings.
+*   **Navigation to Kitchen Coach:** A call-to-action that encourages users to get deeper, AI-powered insights.
 
-*   **Weekly Waste Reduction (%):** The average week-over-week percentage decrease in the monetary value of food waste per active user. This directly measures our core mission.
+### 4.4. Cook & Shop Page
 
-### 6.2. Key Performance Indicators (KPIs)
+An integrated hub for meal planning and smart grocery shopping, designed to help users utilize their existing pantry items and shop more efficiently.
 
-*   **User Engagement & Retention:**
-    *   DAU/MAU Ratio
-    *   Waste Log Frequency (Avg. logs per user per week)
-    *   Pantry Interaction Rate (% of users who add to pantry weekly)
-*   **Feature Adoption:**
-    *   % of users who generate a smart shopping list.
-    *   % of users who commit to an AI-suggested solution.
-    *   % of users who cook a suggested recipe.
-*   **Impact Metrics:**
-    *   Total monetary value of waste logged (and hopefully, reduced over time).
-    *   Total virtual savings generated per user.
-    *   Total CO₂e emissions tracked as avoided.
+*   **Tabbed Interface:** Switch between "Recipes" and "Shopping List".
+*   **Recipe Suggestions:**
+    *   **AI-Powered Generation:** The app automatically suggests recipes based on the items in the user's pantry, with a focus on using ingredients that are expiring soon.
+    *   **Recipe Cards:** Each recipe is displayed with a photo, title, and key information. Users can save recipes for later or add them to a meal plan.
+    *   **Meal Planner:** A dedicated component to schedule meals for the upcoming week.
+*   **Smart Shopping List:**
+    *   **AI-Generated List:** Creates a personalized shopping list based on the user's pantry inventory and historical waste patterns.
+    *   **Detailed Item Info:** Each suggested item includes the quantity, estimated cost, priority, and the reasoning behind the suggestion.
+    *   **Interactive Checklist:** Users can check off items as they shop.
+    *   **One-Tap Restock:** (Future Scope) A feature to automatically purchase the shopping list through integrated partners.
 
-## 7. Future Vision & Potential Extensions
+### 4.5. Kitchen Coach Page
 
-*   **Grocery Integration:** Full API integration with partners like GrabMart for seamless "Smart Auto-Buy" execution.
-*   **Fintech Integration:** Real integration with BPI APIs to allow users to transfer virtual savings to a real #MySaveUp account.
-*   **Community Features:** Social challenges, leaderboards for waste reduction, and sharing of user-created recipes or waste-prevention tips.
-*   **Advanced AI:** Predictive analysis to forecast a user's "at-risk" items for the upcoming week.
+A personalized AI-powered coach that analyzes the user's data to provide deep insights and actionable solutions for reducing food waste.
+
+*   **On-Demand Analysis:** Users can request a new analysis at any time. The coach processes historical and real-time data on pantry, waste, and savings to generate insights.
+*   **The Analysis:** A detailed breakdown of the user's habits, presented in an easy-to-understand narrative format:
+    *   **What's Happening:** A summary of the user's current situation.
+    *   **The Root Cause:** The underlying reasons for the observed patterns.
+    *   **Financial Impact:** The monetary cost of the identified issues.
+    *   **Prediction:** A forecast of what will happen if the behavior continues.
+*   **Actionable Solutions:**
+    *   **Carousel of Solutions:** A horizontally scrollable list of personalized, AI-generated solutions.
+    *   **Solution Cards:** Each card presents a specific action the user can take, including the estimated financial savings.
+    *   **One-Click Implementation:** Users can commit to trying a solution with a single click, which also logs a savings event in the app.
+*   **Quick Wins & Encouragement:** Provides immediate, easy-to-implement tips and motivational messages to keep the user engaged.
+*   **Interactive Wizard:** For new analyses, a wizard guides the user through the findings and helps them select their first solution to implement.
+
+## 5. Core Systems & Concepts
+
+### 5.1. AI Chatbot (Scrapless Assistant)
+
+A conversational AI assistant integrated throughout the app to provide on-demand help and guidance.
+
+*   **Personality:** Friendly, encouraging, and uses a natural mix of English and Taglish to be approachable.
+*   **Capabilities:**
+    *   **Recipe Suggestions:** Offers recipe ideas based on ingredients the user has on hand.
+    *   **Expiry Management:** Provides tips on how to store food properly and use items before they expire.
+    *   **Waste Pattern Analysis:** Explains the user's waste habits in simple terms.
+    *   **Shopping Advice:** Gives suggestions for smarter grocery shopping to prevent future waste.
+    *   **Impact Explanations:** Clarifies the environmental and financial impact of the user's actions.
+
+### 5.2. Virtual Savings
+
+Virtual Savings is a core system that translates a user's positive, waste-reducing actions into a tangible monetary value (in PHP). It serves as the primary motivational tool to make the financial benefits of sustainable living visible and rewarding.
+
+*   **How Savings are Generated:** Users accumulate virtual savings by performing specific, high-impact actions that directly prevent food and money from going to waste. The system is designed to be credible and directly linked to user behavior.
+    *   **Implementing AI Coach Solutions:** When the Kitchen Coach identifies a recurring, costly waste pattern (e.g., "regularly throwing away spoiled vegetables"), it proposes a targeted solution with a **realistic, pre-calculated savings value** (e.g., ₱150). When the user commits to this solution, this amount is instantly credited to their Virtual Savings. This represents a significant, one-time reward for addressing a core behavioral issue.
+    *   **Utilizing At-Risk Pantry Items:** When a user marks a pantry item as "Used" instead of letting it expire and be logged as "Wasted," the app credits the item's **full estimated monetary value** to Virtual Savings. This provides a direct, granular reward for mindful consumption and good inventory management.
+    *   **Cooking with AI-Suggested Recipes:** When the user follows an AI-generated recipe designed specifically to use up ingredients that are close to expiring, the **combined value of those saved ingredients** is added to their Virtual Savings upon completion. This incentivizes proactive meal planning and the use of the app's intelligent features.
+    *   **Waste Reduction Performance:** The system periodically compares a user's waste in the current period to the previous one. If there is a significant reduction, a portion of that **"waste difference"** is awarded as a virtual saving, directly rewarding the user for their improved performance and positive behavioral change.
+
+*   **Purpose and Impact:**
+    *   **Makes Savings Tangible:** It transforms the abstract concept of "money saved from not wasting" into a concrete, visible number that grows with positive actions, providing powerful motivation.
+    *   **Direct Financial Feedback:** The system creates a direct feedback loop, showing users the immediate financial upside of their sustainable choices.
+    *   **The Bridge to Real-World Value:** Virtual Savings is not just an in-app score. The accumulated balance is the centerpiece of the BPI integration, allowing users to **transfer their virtual earnings to a real BPI bank account**, effectively turning their sustainable habits into real money.
+
+### 5.3. Green Points System
+
+A gamification layer designed to reward user engagement and positive actions within the app.
+
+*   **Earning Points:** Users earn Green Points for activities like:
+    *   Logging new items in their pantry.
+    *   Consistently tracking their food waste.
+    *   Completing waste-free day streaks.
+    *   Trying new recipes or implementing coach solutions.
+*   **Purpose:** To create a fun and rewarding user experience, encouraging consistent engagement and the formation of long-term sustainable habits.
+
+### 5.4. Green Score (Sustainability Score)
+
+A comprehensive score that provides a holistic measure of a user's sustainability performance, acting as a "credit score" for their food habits.
+
+*   **Score Components:** The score is calculated based on three key pillars:
+    *   **Behavioral:** Measures how efficiently you use food. Higher points for using items vs. wasting them.
+    *   **Financial:** Reflects your ability to generate savings relative to your waste.
+    *   **Engagement:** Rewards consistency, like regular logging and maintaining waste-free streaks.
+
+## 6. User Flow
+
+The typical user journey is designed to guide individuals from initial awareness to becoming financially savvy, waste-conscious power users.
+
+1.  **Onboarding & First Data Input:**
+    *   The user signs up using a simple authentication method (e.g., Google, Email).
+    *   A brief, engaging onboarding flow introduces the core concepts: "Your kitchen is a financial asset," "Turn saved food into real money," and "Track your progress with a Green Score."
+    *   The user is immediately prompted to log their first pantry items, experiencing the ease of the multi-modal (camera, voice, text) input system.
+
+2.  **Habit Formation & Initial Insights:**
+    *   The user begins the core loop of logging groceries after shopping and logging any food waste as it occurs.
+    *   The Dashboard comes to life, showing their initial waste breakdown, carbon footprint, and the first Green Points earned for engagement.
+    *   They receive their first expiry date notifications, creating an initial sense of urgency and awareness.
+
+3.  **Discovering AI-Powered Tools:**
+    *   Prompted by an expiring item, the user explores the **Cook & Shop** page.
+    *   They use the AI Recipe Generator, successfully cook a meal, and mark the ingredients as "Used." This triggers their first **Virtual Savings** event, demonstrating the app's core value proposition.
+    *   They generate their first **Smart Shopping List**, which intelligently suggests items based on their current inventory and past waste patterns. They notice exclusive BPI/Vybe deals on certain items, highlighting potential bonus savings.
+
+4.  **Deepening Understanding with the Kitchen Coach:**
+    *   After several weeks of consistent data logging, the user is notified that the **Kitchen Coach** has enough data to provide a deep analysis.
+    *   The user requests an analysis and receives a personalized story identifying their primary waste pattern (e.g., "Weekend Over-shopping").
+    *   The Coach presents a set of simple, actionable solutions tailored to their "regular_user" status. The user selects a solution like "Plan 2 Meals Before Shopping," which immediately rewards them with a significant Virtual Savings boost.
+
+5.  **Closing the Financial Loop:**
+    *   The user's Virtual Savings balance has now grown to a meaningful amount.
+    *   They navigate to the **BPI Integration** section and link their BPI #MySaveUp account.
+    *   They perform their first transfer, moving money from their Virtual Savings to their real bank account, completing the "waste-to-wealth" journey.
+    *   They also explore converting their accumulated Green Points into BPI Rewards.
+
+6.  **Achieving Mastery:**
+    *   The user now operates in a seamless cycle of logging, analyzing, and acting. The app is an integral part of their financial and kitchen routine.
+    *   They regularly consult the Kitchen Coach, now receiving "Level Up" challenges as an "advanced_user."
+    *   Their **Sustainability Score** is high, and they are motivated to maintain it, knowing it reflects their responsible financial and environmental habits and may unlock future benefits.
+
+## 7. Key Metrics & Success Criteria
+
+The success of Scrapless will be measured by its ability to drive user engagement, create tangible financial impact, and successfully integrate with our partners.
+
+### 7.1. User Engagement & Retention
+*   **DAU/MAU Ratio:** A measure of the "stickiness" of the app. *Success: > 20%*
+*   **D7 Retention:** Percentage of users who return 7 days after their first session. *Success: > 30%*
+*   **Core Action Rate:** Percentage of MAU who log at least one pantry item and one waste item per week. *Success: > 50%*
+*   **Power User Rate:** Percentage of MAU who use the Kitchen Coach or generate a shopping list. *Success: > 25%*
+
+### 7.2. Financial & Waste Reduction Impact
+*   **Average Weekly Waste Reduction:** The average percentage decrease in the monetary value of a user's logged waste after their first 30 days. *Success: > 15%*
+*   **Average Net Savings Ratio:** The average user's ratio of `Virtual Savings / Monetary Value of Waste`. *Success: > 1.0*
+*   **Sustainability Score Growth:** The average increase in a user's Sustainability Score over their first 60 days. *Success: > 100 points*
+
+### 7.3. BPI Integration Success
+*   **BPI Account Linkage Rate:** Percentage of eligible users who successfully link their BPI account. *Success: > 20%*
+*   **Virtual Savings Transfer Rate:** Percentage of linked users who transfer savings at least once per quarter. *Success: > 40%*
+*   **Average Transfer Amount:** The average monetary value of each transfer. *Success: > ₱500*
+
+## 8. Future Vision & Potential Extensions
+
+Scrapless aims to evolve from a kitchen management tool into a comprehensive platform for sustainable personal finance.
+
+*   **Enhanced AI & Personalization:**
+    *   **Predictive Shopping:** AI that automatically forecasts when users will run out of staple items and adds them to a shopping list.
+    *   **Automated Pantry Logging:** Utilizing camera vision to automatically detect and log items from a grocery receipt or as they are placed in the refrigerator.
+    *   **Dietary & Health Integration:** Suggesting recipes and meal plans based not just on inventory, but also on the user's personal dietary goals (calories, macros, allergies).
+
+*   **Deeper Financial Integration:**
+    *   **Eco-Friendly Financial Products:** Partnering with BPI to offer preferential rates on loans or exclusive investment opportunities for users with high Sustainability Scores.
+    *   **Grocery Budgeting Tools:** Integrating pantry spending into a broader household budgeting feature within the app.
+
+*   **Community & Social Features:**
+    *   **Recipe Sharing Hub:** A community platform for users to share their own waste-reducing recipes and kitchen hacks.
+    *   **Community Challenges:** "Zero-Waste Week" competitions with leaderboards and BPI-sponsored rewards.
+    *   **Local Food Sharing:** A feature to safely share or trade surplus food items with neighbors to prevent waste at a community level.
+
+*   **Hardware & IoT Integration:**
+    *   **Smart Appliance Sync:** Seamlessly integrating with smart refrigerators and ovens to automate inventory management and cooking processes.
+
+## 9. BPI Integration
+
+Scrapless partners with BPI to connect your eco-friendly habits with tangible financial rewards.
+
+*   **Transfer Savings:** Users can transfer their accumulated virtual savings to a BPI #MySaveUp account, turning their good habits into real money.
+*   **Sustainability Score:** Your in-app activity contributes to a Sustainability Score, which serves as a testament to your responsible consumption habits. A higher score can potentially unlock future eco-friendly financial products and benefits from BPI.
+*   **Exclusive Deals:** The AI-powered shopping list highlights special deals and offers from BPI and its partners (e.g., Vybe), providing additional savings opportunities on grocery purchases.
+*   **Green Points Conversion:** Users can convert the Green Points earned in the app into BPI rewards points, further integrating their sustainable actions with financial perks.
+
+## 10. Technical Stack
+
+*   **Frontend:** Next.js, React, TypeScript
+*   **Styling:** Tailwind CSS, shadcn/ui
+*   **State Management:** Zustand
+*   **Backend:** Firebase (Firestore, Authentication, Functions)
+*   **AI:** Genkit
+*   **Deployment:** Vercel, Firebase Hosting
