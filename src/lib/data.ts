@@ -419,7 +419,7 @@ export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDa
 
     const plannedRecipe: Recipe = {
         ...baseRecipe,
-        id: `${baseRecipe.id}-${new Date(scheduledDate).getTime()}`, // Create a unique ID for the planned instance
+        id: crypto.randomUUID(), // Ensure a truly unique ID for the planned instance
         isScheduled: true,
         scheduledDate,
         mealType,

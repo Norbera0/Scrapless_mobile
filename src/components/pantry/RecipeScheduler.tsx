@@ -29,7 +29,6 @@ interface RecipeSchedulerProps {
 export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { addPlannedRecipe, updateRecipe } = useRecipeStore();
   
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [mealType, setMealType] = useState<Recipe['mealType']>('Dinner');
@@ -49,14 +48,9 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
     try {
         const scheduledDateISO = selectedDate.toISOString();
         
-        // Asynchronously save the duplicated, planned recipe to the backend.
-        const newPlannedRecipe = await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
-
-        // Update the UI in Zustand now that the backend is confirmed.
-        addPlannedRecipe(newPlannedRecipe);
-
-        // Mark the original suggested recipe so the UI can reflect it's been planned
-        updateRecipe(recipe.id, { isScheduled: true });
+        // This now handles creating a unique copy and saving it to the backend.
+        // The Firestore listener will automatically update the UI.
+        await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
         
         toast({
             title: 'Meal Scheduled!',
