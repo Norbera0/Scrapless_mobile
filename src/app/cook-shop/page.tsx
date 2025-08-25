@@ -48,6 +48,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { MealPlanner } from '@/components/pantry/MealPlanner';
 import { RecipeScheduler } from '@/components/pantry/RecipeScheduler';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const DealCard = ({ deal }: { deal: NonNullable<GenerateShoppingListOutput['items'][0]['deal']> }) => {
     
@@ -356,10 +357,19 @@ export default function CookAndShopPage() {
                           </Button>
                       ) : (
                           <div className="space-y-4">
-                              <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
-                                  <Bot className="w-3 h-3 mr-1" />
-                                  AI-Generated List
-                              </Badge>
+                              <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700">
+                                            <Bot className="w-3 h-3 mr-1" />
+                                            AI-Generated List
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               {generatedList.items.map(item => (
                                   <div key={item.id} className={cn("flex flex-col gap-2 p-3 rounded-lg transition-colors", item.isChecked && "bg-green-50/50")}>
                                       <div className="flex items-start gap-3">

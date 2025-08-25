@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { usePantryLogStore } from '@/stores/pantry-store';
 import { useRecipeStore } from '@/stores/recipe-store';
 import { unsaveRecipe as unsaveRecipeFromDB } from '@/lib/data';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -75,10 +76,19 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                                 </div>
                             )}
                             <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors"></div>
-                             <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
-                                <Bot className="h-3 w-3 mr-1.5" />
-                                AI-Generated
-                            </Badge>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                                            <Bot className="h-3 w-3 mr-1.5" />
+                                            AI-Generated Image
+                                        </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
                     </DialogTrigger>
                     <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[calc(100%-5rem)]">
@@ -125,20 +135,38 @@ export function RecipeCard({ recipe, isSaved, onToggleSave, onAddToPlan }: Recip
                                 <Utensils className="w-20 h-20 text-primary/40" />
                             </div>
                         )}
-                         <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
-                            <Bot className="h-3 w-3 mr-1.5" />
-                            AI-Generated Image
-                        </Badge>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                     <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                                        <Bot className="h-3 w-3 mr-1.5" />
+                                        AI-Generated Image
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                     <DialogTitle className="text-left">{recipe.name}</DialogTitle>
                     <div className="text-left">
                         <DialogDescription>
                             {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
                         </DialogDescription>
-                         <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700 mt-2">
-                            <Bot className="w-3 h-3 mr-1" />
-                            AI-Generated Recipe
-                        </Badge>
+                         <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge variant="outline" className="border-purple-300 bg-purple-50 text-purple-700 mt-2">
+                                        <Bot className="w-3 h-3 mr-1" />
+                                        AI-Generated Recipe
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p className="max-w-xs text-center">AI-generated to provide helpful suggestions. Please use your best judgment, as inaccuracies may occasionally occur.</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
