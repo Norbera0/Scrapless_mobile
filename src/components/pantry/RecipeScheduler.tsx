@@ -18,7 +18,7 @@ import { useRecipeStore } from '@/stores/recipe-store';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
-import { scheduleRecipe } from '@/app/actions';
+import { scheduleRecipe } from '@/lib/data'; // Corrected import path
 
 interface RecipeSchedulerProps {
   isOpen: boolean;
@@ -56,7 +56,7 @@ export function RecipeScheduler({ isOpen, onClose, recipe }: RecipeSchedulerProp
             mealType: mealType,
         });
 
-        // Asynchronously update the backend via server action
+        // Asynchronously update the backend
         await scheduleRecipe(user.uid, recipe, scheduledDateISO, mealType);
         
         toast({

@@ -2,9 +2,7 @@
 'use server';
 
 import { suggestRecipes, type SuggestRecipesInput, type SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { db } from '@/lib/firebase';
-import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import { saveRecipe as saveRecipeData } from '@/lib/data';
+import { adminDb as db } from '@/lib/firebase-admin';
 import type { Insight, User, Recipe } from '@/types';
 import { getKitchenCoachAdvice, type KitchenCoachInput, type KitchenCoachOutput } from '@/ai/flows/get-kitchen-coach-advice';
 import { getCoachSolutions, type GetCoachSolutionsInput, type GetCoachSolutionsOutput } from '@/ai/flows/get-coach-solutions';
@@ -28,8 +26,6 @@ export async function getRecipeSuggestions(input: SuggestRecipesInput): Promise<
         return result;
     } catch (error) {
         console.error("Error getting recipe recommendation in server action:", error);
-        // In a real app, you might want more sophisticated error handling here.
-        // For now, we'll re-throw to let the client-side catch it.
         throw new Error("Failed to generate recipe recommendations.");
     }
 }
@@ -77,35 +73,5 @@ export async function fetchItemInsights(input: GetItemInsightsInput): Promise<Ge
     } catch (error) {
         console.error("Error getting item insights in server action:", error);
         throw new Error("Failed to get item insights.");
-    }
-}
-
-export async function scheduleRecipe(userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> {
-    if (!userId || !recipe || !recipe.id) {
-        throw new Error("Invalid arguments for scheduling recipe.");
-    }
-    
-    try {
-      console.log('[Server Action] scheduleRecipe received:', { userId, recipeId: recipe.id, scheduledDate, mealType });
-      
-      const savedRecipesCollection = collection(db, `users/${userId}/savedRecipes`);
-      const recipeDocRef = doc(savedRecipesCollection, recipe.id);
-  
-      // Create a new object without the photoDataUri to avoid saving large base64 strings
-      const { photoDataUri, ...recipeToSave } = recipe;
-  
-      await setDoc(recipeDocRef, {
-          ...recipeToSave,
-          isScheduled: true,
-          scheduledDate,
-          mealType,
-      }, { merge: true });
-  
-      console.log(`[Server Action] Successfully scheduled recipe ${recipe.id} for user ${userId}`);
-  
-    } catch (error) {
-      console.error("[Server Action] Error in scheduleRecipe:", error);
-      // Re-throw a more generic error to the client
-      throw new Error("Failed to schedule the recipe on the server.");
     }
 }

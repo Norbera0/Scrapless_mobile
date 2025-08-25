@@ -387,14 +387,32 @@ export const getSavedRecipes = async (userId: string): Promise<Recipe[]> => {
 }
 
 export const saveRecipe = async (userId: string, recipe: Recipe): Promise<string> => {
+    const { photoDataUri, ...recipeToSave } = recipe;
     const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
-    await setDoc(recipeRef, recipe, { merge: true });
+    await setDoc(recipeRef, recipeToSave, { merge: true });
     return recipe.id;
 }
 
 export const unsaveRecipe = async (userId: string, recipeId: string) => {
     await deleteDoc(doc(db, `users/${userId}/savedRecipes`, recipeId));
 }
+
+export const scheduleRecipe = async (userId: string, recipe: Recipe, scheduledDate: string, mealType: Recipe['mealType']): Promise<void> => {
+    if (!userId || !recipe || !recipe.id) {
+        throw new Error("Invalid arguments for scheduling recipe.");
+    }
+    
+    // First, ensure the recipe is saved (without the large photo data).
+    await saveRecipe(userId, recipe);
+
+    // Then, update it with schedule information.
+    const recipeRef = doc(db, `users/${userId}/savedRecipes`, recipe.id);
+    await setDoc(recipeRef, {
+        isScheduled: true,
+        scheduledDate,
+        mealType,
+    }, { merge: true });
+};
 
 // --- User Settings Functions ---
 export const getUserSettings = async (userId: string): Promise<UserSettings> => {
