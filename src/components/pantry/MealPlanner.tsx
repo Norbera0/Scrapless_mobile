@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -6,14 +7,15 @@ import { Button } from '../ui/button';
 import { Calendar } from '../ui/calendar';
 import { useRecipeStore } from '@/stores/recipe-store';
 import { format, isSameDay, startOfToday, addDays, subDays } from 'date-fns';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CookingPot, Utensils, Bot, Clock, ChefHat } from 'lucide-react';
 import type { Recipe } from '@/types';
 import Image from 'next/image';
 import { Badge } from '../ui/badge';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 
-const mealOrder: Recipe['mealType'][] = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+const mealOrder: (Recipe['mealType'])[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 const MealTypeBadge = ({ mealType }: { mealType: Recipe['mealType'] }) => {
     const config = {
@@ -30,6 +32,82 @@ const MealTypeBadge = ({ mealType }: { mealType: Recipe['mealType'] }) => {
         </Badge>
     );
 };
+
+const PlannedRecipeCard = ({ recipe }: { recipe: Recipe }) => (
+    <Dialog>
+        <DialogTrigger asChild>
+            <motion.div
+                layout
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="w-full"
+            >
+                <Card className="cursor-pointer hover:bg-secondary/50 transition-colors">
+                    <CardContent className="p-3 flex items-center gap-3">
+                        <div className="w-16 h-16 relative rounded-md overflow-hidden flex-shrink-0 bg-secondary">
+                            {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} layout="fill" objectFit="cover" />}
+                        </div>
+                        <div className="flex-1">
+                            <MealTypeBadge mealType={recipe.mealType} />
+                            <p className="font-semibold leading-tight mt-1">{recipe.name}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </DialogTrigger>
+        <DialogContent className="max-h-[80vh] overflow-y-auto max-w-2xl">
+            <DialogHeader>
+                <div className="aspect-video w-full relative rounded-md overflow-hidden mb-4" data-ai-hint="recipe food">
+                    {recipe.photoDataUri ? (
+                        <Image src={recipe.photoDataUri} alt={`A generated image of ${recipe.name}`} fill className="object-cover" />
+                    ) : (
+                         <div className="w-full h-full bg-secondary/70 flex items-center justify-center">
+                            <Utensils className="w-20 h-20 text-primary/40" />
+                        </div>
+                    )}
+                     <Badge variant="secondary" className="absolute bottom-2 left-2 text-xs bg-black/50 text-white border-white/20">
+                        <Bot className="h-3 w-3 mr-1.5" />
+                        AI-Generated Image
+                    </Badge>
+                </div>
+                <DialogTitle className="text-left">{recipe.name}</DialogTitle>
+                <DialogDescription className="text-left">
+                    {recipe.cuisine} • {recipe.difficulty} • {recipe.cookingTime} • {recipe.servings} Servings
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div>
+                    <h3 className="font-semibold text-lg mb-2">Ingredients</h3>
+                    <ul className="list-disc list-inside space-y-1">
+                        {recipe.ingredients.map((ing, i) => (
+                            <li key={i} className={cn("break-words", ing.status === 'Need' && 'text-muted-foreground')}>
+                                {ing.quantity} {ing.unit} {ing.name}
+                                {ing.status === 'Need' && <Badge variant="outline" className="ml-2">Need</Badge>}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div>
+                    <h3 className="font-semibold text-lg mb-2">Instructions</h3>
+                    <ol className="list-decimal list-inside space-y-2">
+                    {recipe.instructions.map((step, i) => (
+                        <li key={i} className="break-words">{step}</li>
+                    ))}
+                    </ol>
+                </div>
+            </div>
+            <DialogFooter>
+                <Button className="w-full" disabled>
+                    <CookingPot className="mr-2 h-4 w-4" />
+                    Mark as Cooked (from recipe card)
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+);
+
 
 const DailyView = ({ scheduledRecipes, selectedDate, setSelectedDate }: { scheduledRecipes: Recipe[], selectedDate: Date, setSelectedDate: (d:Date) => void }) => {
     const mealsForDay = scheduledRecipes
@@ -53,25 +131,7 @@ const DailyView = ({ scheduledRecipes, selectedDate, setSelectedDate }: { schedu
                 <div className="space-y-3">
                     <AnimatePresence>
                         {mealsForDay.map(recipe => (
-                            <motion.div 
-                                key={recipe.id}
-                                layout
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                            >
-                                <Card>
-                                    <CardContent className="p-3 flex items-center gap-3">
-                                        <div className="w-16 h-16 relative rounded-md overflow-hidden flex-shrink-0">
-                                            {recipe.photoDataUri && <Image src={recipe.photoDataUri} alt={recipe.name} layout="fill" objectFit="cover" />}
-                                        </div>
-                                        <div className="flex-1">
-                                            <MealTypeBadge mealType={recipe.mealType} />
-                                            <p className="font-semibold leading-tight mt-1">{recipe.name}</p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
+                           <PlannedRecipeCard key={recipe.id} recipe={recipe} />
                         ))}
                     </AnimatePresence>
                 </div>
