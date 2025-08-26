@@ -4,7 +4,7 @@ An intelligent food waste reduction platform that helps users track their pantry
 
 ## 🔗 Live Application
 
-**Access the app**: [[https://scrapless-app.web.app](https://scrapless-app.web.app)](https://studio--scrapless-bzy61.us-central1.hosted.app/)
+**Access the app**: https://studio--scrapless-bzy61.us-central1.hosted.app/ 
 
 > 📱 **Best Experience**: For optimal functionality, please access this application on your mobile phone. The app is designed as a mobile-first experience and works best on smartphones for features like camera scanning, voice input, and on-the-go pantry management.
 
